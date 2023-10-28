@@ -1,0 +1,54 @@
+iel der App:
+Die "League Matchup App" ist eine Desktop-Anwendung, die es Spielern des Spiels "League of Legends" ermöglicht, Informationen zu bestimmten Matchups zwischen Champions zu sammeln, zu speichern und zu teilen. Die App soll den Spielern helfen, bessere Entscheidungen im Spiel zu treffen, indem sie auf umfassende Matchup-Daten zugreifen können.
+
+Benutzergruppen:
+
+Spieler von "League of Legends"
+Trainer oder Coaches für "League of Legends"-Teams
+Interessierte Community-Mitglieder
+Hauptfunktionen:
+
+Matchup-Eingabe: Benutzer können Informationen zu einem bestimmten Matchup zwischen zwei Champions eingeben. Dies umfasst die Auswahl der beiden Champions, die Rolle des Benutzers im Spiel und das Eingeben von Notizen und Bewertungen.
+
+Matchup-Ansicht: Benutzer können eine Übersicht aller gespeicherten Matchups anzeigen und nach bestimmten Matchups suchen. Sie können auch detaillierte Informationen zu einem ausgewählten Matchup anzeigen, einschließlich Notizen und Bewertungen.
+
+Community-Beitrag: Benutzer können ihre Matchup-Informationen und -Erfahrungen der Community zur Verfügung stellen. Andere Benutzer können diese Informationen anzeigen und bewerten.
+
+Benutzerprofil: Jeder Benutzer hat ein persönliches Profil, in dem seine gespeicherten Matchups, Notizen und Bewertungen angezeigt werden. Benutzer können auch Matchup-Informationen anderer Benutzer kopieren und in ihr eigenes Profil aufnehmen.
+
+Suche und Filter: Die App bietet Such- und Filteroptionen, um nach bestimmten Champions, Rollen oder Matchup-Typen zu suchen.
+
+Datenbankanforderungen:
+
+Eine Datenbank zum Speichern von Benutzerkonten, Matchup-Daten, Notizen und Bewertungen.
+Sicherheitsmaßnahmen zur Speicherung von Benutzerdaten und zum Schutz vor unautorisiertem Zugriff.
+Sicherheitsanforderungen:
+
+Authentifizierung und Autorisierung der Benutzer.
+Verschlüsselung von Benutzerdaten und Passwörtern.
+Schutz vor SQL-Injektion und anderen Sicherheitsrisiken.
+Plattformanforderungen:
+
+Die App soll auf Desktop-Computern unter Windows, macOS und Linux lauffähig sein.
+Sie sollte eine moderne und benutzerfreundliche Benutzeroberfläche bieten.
+Entwicklungstechnologien:
+
+Backend-Entwicklung: Python mit einem Framework wie Django oder Flask.
+Frontend-Entwicklung: Eine JavaScript-Bibliothek oder ein Framework wie React oder Vue.js.
+Datenbank: Eine geeignete relationale oder NoSQL-Datenbank.
+Cloud-Hosting für die Bereitstellung der App.
+Testanforderungen:
+
+Die App muss umfassend getestet werden, um sicherzustellen, dass alle Funktionen ordnungsgemäß funktionieren.
+Dies umfasst Unit-Tests, Integrationstests, Leistungstests und Benutzertests.
+Zeitrahmen:
+
+Eine grobe Schätzung des Zeitrahmens für die Entwicklung der App.
+Budget:
+
+Eine Budgetschätzung für die Entwicklung und Bereitstellung der App.
+Zusätzliche Überlegungen:
+
+Die App sollte benutzerfreundlich und leicht verständlich sein.
+Ein Mechanismus zur Sammlung von Benutzerfeedback und -bewertungen sollte vorhanden sein, um zukünftige Updates zu informieren.
+Diese Anforderungsanalyse dient als Ausgangspunkt für die Entwicklung Ihrer "League Matchup App". Sie können sie weiter verfeinern und spezifizieren, während Sie Ihre Entwicklungsarbeit fortsetzen.
