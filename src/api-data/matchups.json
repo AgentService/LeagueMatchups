@@ -1,0 +1,47 @@
+[
+  {
+    "id": "Aatrox-Akali",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": "",
+    "mindset": ""
+  },
+  {
+    "id": "Aatrox-Ahri",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": "",
+    "mindset": ""
+  },
+  {
+    "id": "Ahri-Akali",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": "",
+    "mindset": ""
+  }
+]

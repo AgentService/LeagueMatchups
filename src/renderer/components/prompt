@@ -1,0 +1,1 @@
+Edit the file so that the champion info (class="selected-champion") bulletpoints like attack, .. defense...  are already shown even before the champ is selected. So that the containers not move suddendly. Then when you select a champion the ui should be updated with the specific champion infos.

@@ -1,15 +1,18 @@
 {
-  "name": "electron-forge-vite-vue-template",
-  "productName": "electron-forge-vite-vue-template",
+  "name": "matchups",
+  "productName": "LeagueMatchups",
   "version": "1.0.0",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
+  "type": "commonjs",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "server": "node server.js",
+    "build": "babel src --out-dir dist"
   },
   "keywords": [],
   "author": {
@@ -30,7 +33,13 @@
     "vite": "^4.3.5"
   },
   "dependencies": {
+    "@fightmegg/riot-api": "^0.0.17",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
     "electron-squirrel-startup": "^1.0.0",
-    "vue": "^3.2.47"
+    "express": "^4.18.2",
+    "kayn": "^0.10.2",
+    "vue": "^3.2.47",
+    "vuex": "^4.0.2"
   }
 }

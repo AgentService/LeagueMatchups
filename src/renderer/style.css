@@ -32,12 +32,11 @@ a:hover {
   color: #535bf2;
 }
 
-body {
+html, body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 h1 {
@@ -69,10 +68,12 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* existing styles */
+margin: 0 auto;
+text-align: center;
+/* new styles */
+height: 100vh;  /* 100% of the viewport height */
+overflow-y: hidden;  /* Hide vertical overflow */
 }
 
 @media (prefers-color-scheme: light) {
@@ -86,4 +87,74 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.search-container {
+  position: relative;
+  width: 100%; /* Set this to the width you desire */
+}
+
+.search-input {
+  box-sizing: border-box; /* This ensures padding is included in the width */
+  width: 100%; /* Full width */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.search-wrap {
+  position: relative; /* New: Establishes a positioning context for suggestions-popup */
+}
+
+.search-input {
+  padding: 10px;
+  font-size: 16px;
+}
+
+.suggestions-popup {
+  background-color: #222; /* Subtle background color for suggestions */
+  border-radius: 5px; /* Gentle curves */
+  position: absolute; /* Floating suggestions */
+  width: 100%; /* Extend suggestions to full width */
+  max-height: 22px; /* Limit height to maintain a tidy appearance */
+  overflow-y: auto; /* Enable scrolling if needed */
+  z-index: 1; /* Ensure suggestions are above other elements */
+}
+
+.suggestions-popup div {
+  padding: 10px;
+  cursor: pointer; /* Provide a pointer cursor for interaction */
+  transition: background-color 0.2s ease; /* Smooth background color change on hover */
+
+  /* Customize fonts, colors, and additional styles as needed for the suggestions */
+}
+
+.suggestions-popup div:hover {
+  background-color: #333; /* Highlight on hover */
+}
+
+
+.selected-champion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  background-color: #333; /* Mystical background color */
+  border-radius: 10px; /* Continuing the magical curves */
+  padding: 20px;
+  color: white; /* Text color for readability */
+  transition: width 0.3s ease; /* Smooth width change for layout transition */
+}
+
+.selected-champion h2 {
+  font-size: 24px; /* Heading font size */
+  margin-bottom: 10px; /* Add space below the heading */
+}
+
+.selected-champion img {
+  max-width: 100%; /* Ensure champion image fits within the container */
+  border-radius: 5px; /* Soft curves for the image */
+}
+
+.selected-champion p {
+  margin-top: 10px; /* Create spacing between paragraphs */
 }
