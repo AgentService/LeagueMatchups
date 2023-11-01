@@ -1,23 +1,37 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
 
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Blue colors */
+  --blue-1: #CDFAFA;
+  --blue-2: #0AC8B9;
+  --blue-3: #0397AB;
+  --blue-4: #005A82;
+  --blue-5: rgb(10, 50, 60);
+  --blue-6: #091428;
+  --blue-7: #0A1428;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Gold colors */
+  --gold-1: #F0E6D2;
+  --gold-2: #C8AA6E;
+  --gold-3: #C8AA6E;
+  --gold-4: #C89B3C;
+  --gold-5: #785A28;
+  --gold-6: #463714;
+  --gold-7: #32281E;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+  /* Grey colors */
+  --grey-1: #A09B8C;
+  --grey-1-5: #5B5A56;
+  --grey-2: #3C3C41;
+  --grey-3: #1E2328;
+  --grey-cool: #1E282D;
+  --hextech-black: #010A13;
 }
+
+.selector-for-some-widget {
+  box-sizing: content-box;
+}
+
 
 html {
   box-sizing: border-box;
@@ -47,6 +61,7 @@ a:hover {
 html, body {
   margin: 0;
   padding: 0;
+  background-color: rgb(10, 50, 60, 0.7);;
 }
 
 h1 {
@@ -74,7 +89,7 @@ button:focus-visible {
 }
 
 .card {
-  padding: 2em;
+  
 }
 
 #app {
@@ -89,7 +104,7 @@ text-align: center;
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: #442727;
   }
   a:hover {
     color: #747bff;

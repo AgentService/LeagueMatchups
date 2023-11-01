@@ -1,13 +1,24 @@
 <template>
-  <nav class="navbar">
-    <ul class="navbar-list">
-      <li class="navbar-item">DAARPTANIES</li>
-      <li class="navbar-item">NOW</li>
-      <li class="navbar-item">LEDAUBE</li>
-      <!-- The magical paths (texts) continue here -->
-    </ul>
-  </nav>
+  <b-navbar type="dark" variant="dark" class="bg-gray-800">
+    <b-container fluid>
+      <b-navbar-brand href="#">
+        <img src="../../../public/img/champions/Aatrox.png" alt="Your Logo" height="30" class="d-inline-block align-top" />
+      </b-navbar-brand>
+
+      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+
+      <b-collapse id="nav-collapse" is-nav>
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item href="#">Dashboard</b-nav-item>
+          <b-nav-item href="#">Matchups</b-nav-item>
+          <b-nav-item href="#">Settings</b-nav-item>
+          <!-- Add more navigation items here -->
+        </b-navbar-nav>
+      </b-collapse>
+    </b-container>
+  </b-navbar>
 </template>
+
 
 <style scoped>
 .navbar {

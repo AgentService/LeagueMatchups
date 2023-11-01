@@ -1,23 +1,27 @@
 <template>
   
-<div class="champion-card">
-  <div class="champion-selector">  
-    <div class="search-popover-container">
-        <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Filter by champion..." class="search-input" />
-        <div v-if="isDropdownOpen" class="champion-popover">
-          <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option" @click="selectChampion(champion)">
-            <img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
-            <span>{{ champion.name }}</span>
+  <div class="champion-card d-flex align-items-center justify-content-center w-100 h-100" :style="backgroundStyle2">
+
+    <div class="champion-selector w-100">  
+      <div class="search-popover-container position-relative">
+          <div v-if="isDropdownOpen" class="champion-popover position-absolute">
+            <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Search..." class="form-control" />
+
+            <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option d-flex align-items-center p-2" @click="selectChampion(champion)">
+              <img :src="getChampionImageSource('small', champion.id)" class="img-fluid me-2" alt="Champion Image" />
+              <span>{{ champion.name }}</span>
+            </div>
           </div>
         </div>
+        <div class="champion-display">
+
+        <img class="champion-image" 
+             :src="selectedChampion ? getChampionImageSource('small', selectedChampion.id) : '/img/champions/placeholder.png'" 
+             @click="isDropdownOpen = true" />
       </div>
-    <div class="champion-display">
-      <img class="champion-image" :src="selectedChampion ? getChampionImageSource('loading', selectedChampion.id) : '/img/champions/placeholder.png'" alt="Champion Image"/>
     </div>
   </div>
-</div>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -106,36 +110,44 @@ export default {
       const store = useStore();
       return store.state.matchups; // Access matchups from the Vuex state
     },
+    backgroundStyle() {
+      return this.selectedChampion ? 
+        {
+          backgroundImage: `url(${this.getChampionImageSource('splash', this.selectedChampion.id)})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Adding a semi-transparent black background
+          backgroundBlendMode: 'multiply', // Blending the background image with the background color
+        } : {};
+    },
   },
 };
 </script>
 
 <style scoped>
 .champion-image {
-  width: 100%; /* take up 100% of the container's width */
-  height: 100%; /* take up 100% of the container's height */
-  object-fit: cover; /* cover the container while maintaining aspect ratio */
-  border-radius: 4px;
-  border: 1px solid #2d3748;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
+  border: 2px solid #2d3748;
+  transition: border 0.3s ease;
 }
+
+
 .champion-card {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%; /* or any specific value */
-  width: 100%; /* or any specific value */
+  justify-content:center;
+
 }
-.champion-selector {
-  position: relative;
-   display: flex;
-  flex-direction: column; /* Align children in a column direction */
-  align-items: center; /* Center children horizontally */
+.champion-display {
+  display:flex;
 }
 
-.champion-display {
-  position: relative;
-  text-align: center;
-}
 
 .search-input {
   position: relative;
@@ -144,8 +156,9 @@ export default {
   border-radius: 4px;
 }
 .search-popover-container {
-  display: flex;
-  top:50;
+  left:0;
+  max-height: 0px;
+  position: absolute;
   width: 100%; /* Take the full width of the parent */
   z-index: 1; /* Ensure it appears above other elements if there's overlap */
 }
@@ -153,14 +166,15 @@ export default {
 
 .champion-popover {
   width: 100%; /* Make the popover take up the full width of the parent */
-  top: 40px; /* Position the popover 20px below the input */
+  top: 130px; /* Position the popover 20px below the input */
   position: absolute;
+  color: white;
   border-bottom: 1px solid #2d3748;
   transition: width 0.3s ease; /* Adding a transition for smooth expansion */
   background-color: #1a202c;
   border: 1px solid #2d3748;
-  max-height: 200px;
-  overflow-y: auto; /* Ensuring the popover is scrollable if content overflows */
+  max-height: 300px;
+  overflow-x: hidden; /* Ensuring the popover is scrollable if content overflows */
 }
 
 
