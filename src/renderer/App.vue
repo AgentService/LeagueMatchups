@@ -1,26 +1,37 @@
 <template>
-  <div class="app-container">
-    <header class="app-header">
-      <Navbar />
-    </header>
-    <main class="app-main">
-      <section class="champion-selectors">
-        <ChampionSearch :instanceId="1" @championSelected="setChampionA"/>
-        <ChampionSearch :instanceId="2" @championSelected="setChampionB"/>
-        <ChampionMatchup :currentMatchup="currentMatchup" />
-      </section>
-      <section>
-        <MatchupNotes />
-      </section>
-    </main>
-    <footer class="app-footer">
-      <p>© 2022 League of Legends Learning App</p>
-    </footer>
+  <div :style="gridStyle" class="h-auto grid grid-rows-2 grid-cols-12 gap-4 p-4">
+    <!-- First Row -->
+    <div class="col-span-3 bg-gray-700 flex items-stretch overflow-auto">
+      <MatchupNotes />
+    </div>
+    <!-- This column will be twice as wide as the others -->
+    <div class="col-span-6 bg-gray-700 flex items-stretch overflow-auto">
+      <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+      <ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+    </div>
+    <div class="col-span-3 bg-gray-700 flex items-stretch overflow-auto">
+      <MatchupNotes />
+    </div>
+    
+    <!-- Second Row -->
+    <div class="col-span-3 bg-gray-700 flex items-stretch overflow-auto">
+      <MatchupNotes />
+    </div>
+    <div class="col-span-6 bg-gray-700 flex items-stretch overflow-auto">
+      <ChampionMatchup />
+    </div>
+    <div class="col-span-3 bg-gray-700 flex items-stretch overflow-auto">
+      <MatchupNotes />
+    </div>
   </div>
 </template>
 
 
+
 <script setup>
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
+
+   
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import ChampionSearch from './components/matchup/ChampionSearch.vue';
@@ -29,13 +40,43 @@ import MatchupNotes from './components/matchup/MatchupNotes.vue';
 
 import Navbar from './components/Navbar.vue';
 
+import { computed } from 'vue'
+
+// Define your computed property using the Composition API
+const gridStyle = computed(() => ({
+  display: 'grid', // Ensures the grid display is set
+  gap: '1rem', // Replace this with your preferred gap size
+  width: '100%', // Full width
+  height: '100vh', // Full viewport height
+  padding: '1rem', // Replace with your preferred padding
+  boxSizing: 'border-box', // Include padding in the width and height calculations
+}))
+
+const user = {
+  name: 'Tom Cook',
+  email: 'tom@example.com',
+  imageUrl:
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+}
+const navigation = [
+  { name: 'Dashboard', href: '#', current: true },
+  { name: 'Team', href: '#', current: false },
+  { name: 'Projects', href: '#', current: false },
+  { name: 'Calendar', href: '#', current: false },
+  { name: 'Reports', href: '#', current: false },
+]
+const userNavigation = [
+  { name: 'Your Profile', href: '#' },
+  { name: 'Settings', href: '#' },
+  { name: 'Sign out', href: '#' },
+]
 const store = useStore();
 const championA = ref(null);
 const championB = ref(null);
-
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+console.log('baseUrl:', baseUrl);
 
 let bothSelected = false;
-const uniqueMatchups = new Set();
 
 const handleMatchup = () => {
   console.log("handleMatchup called");
@@ -51,21 +92,13 @@ const handleMatchup = () => {
         console.error('You cannot select the same champion twice!');
         return;
       }
-
       const matchupKey = `${champAName}-${champBName}`;
 
-      if (!uniqueMatchups.has(matchupKey)) {
-        uniqueMatchups.add(matchupKey);
-        const matchup = {
-          id: matchupKey, // using matchupKey as a unique id
-          champions: [championA.value, championB.value] // retaining champions data
-        };
-        store.dispatch('createMatchup', matchup);
-        store.dispatch('fetchSelectedMatchup', matchup.id);
-        console.log(`Matchup created or updated successfully with champions: ${champAName}, ${champBName}`);
-      } else {
-        console.log(`Matchup between ${champAName} and ${champBName} already exists.`);
-      }
+      const matchup = {
+        id: matchupKey, // using matchupKey as a unique id
+        champions: [championA.value, championB.value] // retaining champions data
+      };
+      store.dispatch('handleMatchupCreation', matchup);
     }
   } else {
     bothSelected = false;
@@ -96,6 +129,19 @@ watch([championA, championB], (newValues, oldValues) => {
 
 
 <style scoped>
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+/* Apply specific styles to sections as needed */
+.section-container {
+  background-color: #ccc; /* Example background color */
+  padding: 16px; /* Example padding */
+  overflow: auto; /* Enable scrolling if needed */
+  /* Add any other necessary styling here */
+}
 :root {
   --primary-color: #1a202c;
   --secondary-color: #2d3748;
@@ -108,55 +154,4 @@ watch([championA, championB], (newValues, oldValues) => {
   --transition-duration: 0.3s;
 }
 
-.app-container {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  width: 100%;
-  box-sizing: border-box;
-  height: 100%;  /* 100% of the viewport height */
-  overflow: hidden;  /* Hide overflow content */
-  padding: 1rem;
-  background-color: var(--primary-color);
-  color: var(--text-color);
-  font-family: var(--font-family);
-}
-
-.app-header, .app-footer {
-  text-align: center;
-  background-color: rgb(45, 141, 148);
-}
-
-.app-main {
-  display: grid;
-  grid-gap: 2rem;
-  flex: 1;  /* If parent is a flex container */
-  width: 100%;
-  overflow: auto;
-}
-
-.champion-selectors {
-  display: flex;
-  justify-content: space-between; /* or space-evenly, depending on what you like */
-  overflow: hidden;
-  background-color: var(--secondary-color);
-  padding: 5rem;
-
-}
-
-
-
-button, input {
-  transition: background-color var(--transition-duration) ease;
-}
-
-button:hover, input:hover {
-  background-color: var(--accent-color);
-}
-
-.your-champion {
-  background-color: var(--your-champion-color);
-}
-.opponent-champion {
-  background-color: var(--opponent-champion-color);
-}
 </style>

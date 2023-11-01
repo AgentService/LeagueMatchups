@@ -29,11 +29,16 @@
     "@electron-forge/plugin-vite": "^6.1.1",
     "@electron-forge/publisher-github": "^6.1.1",
     "@vitejs/plugin-vue": "^4.2.1",
+    "autoprefixer": "^10.4.16",
     "electron": "^24.8.8",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
     "vite": "^4.3.5"
   },
   "dependencies": {
     "@fightmegg/riot-api": "^0.0.17",
+    "@headlessui/vue": "^1.7.16",
+    "@vue-hero-icons/outline": "^1.7.2",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "electron-squirrel-startup": "^1.0.0",

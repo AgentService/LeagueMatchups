@@ -2,8 +2,10 @@ import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import fs from 'fs';
+import { main as downloadChampionImages } from './download.mjs';
 
-const RIOT_API_KEY = 'RGAPI-5dbc1ff0-d029-4dfe-b23c-16d34e8cf00b';  // Replace with your key
+
+const RIOT_API_KEY = 'RGAPI-44c9ff52-c3a6-485d-97b8-a0ef6735fe3d';  // Replace with your key
 
 import { Kayn, REGIONS } from 'kayn';
 const kayn = Kayn(RIOT_API_KEY)();
@@ -17,7 +19,10 @@ kayn.Summoner.by.name('hide on bush')
 const app = express();
 const PORT = 3001;  // Choose an appropriate port
 app.use(cors(), express.json());
-
+app.get('/download-champion-images', (req, res) => {
+  downloadChampionImages();
+  res.send('Downloading champion images.');
+});
 
 // Function to write champions to a local JSON file
 function writeChampions(champions) {
@@ -56,7 +61,6 @@ function readMatchups() {
   
   // Function to write matchups to JSON file
   function writeMatchups(matchups) {
-    console.log("Matchups endpoint " + JSON.stringify(matchups));
     const data = JSON.stringify(matchups, null, 2);
     fs.writeFileSync('./api-data/matchups.json', data);
   }
@@ -68,16 +72,20 @@ function readMatchups() {
 
   app.get('/api/matchups/:id', (req, res) => {
     const matchups = readMatchups();
-    console.log(matchup.id)
     
+    // Corrected the logging statements
+    console.log("matchups", matchups); 
+
     const matchup = matchups.find(m => m.id === req.params.id);
+    
+    // Corrected the logging statements
+    console.log("matchup", matchup); 
 
     if (matchup) {
       res.json(matchup);
     } else {
-      res.status(404).json({ error: 'Matchup not found' });
+      res.json({ message: 'Matchup not found' });
     }
-    res.json(matchups);
   });
   
   app.post('/api/matchups', (req, res) => {
@@ -116,5 +124,7 @@ function readMatchups() {
 app.listen(PORT, () => {
   console.log(`Server started on http://localhost:${PORT}`);
 });
+
+
 
 // Path: src/store/index.js

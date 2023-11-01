@@ -1,5 +1,19 @@
 [
   {
+    "id": "Ahri-Akali",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
     "id": "Aatrox-Akali",
     "champions": [
       {
@@ -11,8 +25,7 @@
         "name": "Akali"
       }
     ],
-    "notes": "",
-    "mindset": ""
+    "notes": ""
   },
   {
     "id": "Aatrox-Ahri",
@@ -26,22 +39,48 @@
         "name": "Ahri"
       }
     ],
-    "notes": "",
-    "mindset": ""
+    "notes": ""
   },
   {
-    "id": "Ahri-Akali",
+    "id": "Amumu-Akali",
     "champions": [
       {
-        "id": "Ahri",
-        "name": "Ahri"
+        "id": "Amumu",
+        "name": "Amumu"
       },
       {
         "id": "Akali",
         "name": "Akali"
       }
     ],
-    "notes": "",
-    "mindset": ""
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Akali",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Briar-Akali",
+    "champions": [
+      {
+        "id": "Briar",
+        "name": "Briar"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
   }
 ]

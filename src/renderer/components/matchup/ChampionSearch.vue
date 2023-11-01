@@ -1,23 +1,21 @@
-// champion search component
 <template>
-  <div class="champion-selector">    
-     <div class="champion-display">
-      <div class="search-popover-container">
-    <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Filter by champion..." class="search-input" />
-    <div v-if="isDropdownOpen" class="champion-popover">
-      <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option" @click="selectChampion(champion)">
-        <img :src="getChampionImageSource(champion.id)" alt="Champion Image" />
-        <span>{{ champion.name }}</span>
+  
+<div class="champion-card">
+  <div class="champion-selector">  
+    <div class="search-popover-container">
+        <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Filter by champion..." class="search-input" />
+        <div v-if="isDropdownOpen" class="champion-popover">
+          <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option" @click="selectChampion(champion)">
+            <img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
+            <span>{{ champion.name }}</span>
+          </div>
+        </div>
       </div>
+    <div class="champion-display">
+      <img class="champion-image" :src="selectedChampion ? getChampionImageSource('loading', selectedChampion.id) : '/img/champions/placeholder.png'" alt="Champion Image"/>
     </div>
   </div>
-      <img :src="selectedChampion ? getChampionImageSource(selectedChampion.id) : '/img/champions/placeholder.png'" alt="Champion Image" />
-    </div>
-
-    
-    <div class="selected-champion">
-  </div>
-  </div>
+</div>
 </template>
 
 
@@ -47,7 +45,6 @@ export default {
   mounted() {
     
     const store = useStore();
-    store.dispatch('fetchMatchups'); // Fetch matchups when the component mounts
     axios.get('http://localhost:3001/api/champions')
     .then(response => {
       // Convert object to array
@@ -84,9 +81,19 @@ export default {
       this.closeDropdown();
 
     },
-    getChampionImageSource(championId) {
-      return `/img/champions/${championId}.png`;
-    },
+    getChampionImageSource(type, championId) {
+    switch (type) {
+      case 'small':
+        return `/img/champions/${championId}.png`;
+      case 'loading':
+        return `/img/champion_loading/${championId}.png`;
+      case 'splash':
+        return `/img/champion_splash/${championId}.png`;
+      default:
+        // Handle the case where the type does not match 'small' or 'loading'
+        return ''; // or some default path
+    }
+  },
     toggleDropdown() {
       this.isDropdownOpen = !this.isDropdownOpen; // The toggle spell that opens or closes the dropdown
     },
@@ -104,37 +111,58 @@ export default {
 </script>
 
 <style scoped>
-.search-popover-container {
-  position: absolute; /* Positioning the container */
-  top: 0; /* Aligning it at the top */
-  left: 0; /* Aligning it to the left */
-}
-.search-input {
-  width: 200px; /* Expanding the search field when focused */
-  border-bottom: 1px solid #2d3748;
-  transition: width 0.3s ease; /* Adding a transition for smooth expansion */
-  flex-direction: column;
-  background-color: #1a202c;
+.champion-image {
+  width: 100%; /* take up 100% of the container's width */
+  height: 100%; /* take up 100% of the container's height */
+  object-fit: cover; /* cover the container while maintaining aspect ratio */
+  border-radius: 4px;
   border: 1px solid #2d3748;
 }
+.champion-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* or any specific value */
+  width: 100%; /* or any specific value */
+}
+.champion-selector {
+  position: relative;
+   display: flex;
+  flex-direction: column; /* Align children in a column direction */
+  align-items: center; /* Center children horizontally */
+}
+
+.champion-display {
+  position: relative;
+  text-align: center;
+}
+
+.search-input {
+  position: relative;
+  width: 100%;
+  border: none;
+  border-radius: 4px;
+}
+.search-popover-container {
+  display: flex;
+  top:50;
+  width: 100%; /* Take the full width of the parent */
+  z-index: 1; /* Ensure it appears above other elements if there's overlap */
+}
+
 
 .champion-popover {
-  width: 200px; /* Expanding the search field when focused */
+  width: 100%; /* Make the popover take up the full width of the parent */
+  top: 40px; /* Position the popover 20px below the input */
+  position: absolute;
   border-bottom: 1px solid #2d3748;
   transition: width 0.3s ease; /* Adding a transition for smooth expansion */
-  flex-direction: column;
   background-color: #1a202c;
   border: 1px solid #2d3748;
   max-height: 200px;
   overflow-y: auto; /* Ensuring the popover is scrollable if content overflows */
 }
-.champion-display {
-  display: flex;
-  position: relative; /* Establishing a positioning context for the child elements */
 
-  flex-direction: column;
-  align-items: center;
-}
 
 .champion-option {
   display: flex;
@@ -148,15 +176,7 @@ export default {
   height: auto;
   margin-right: 0.5rem;
 }
-.champion-selector {
 
-  width: 45%;
-}
 
-.selected-champion {
-  flex: 1; /* Make it take up all available space */
-  display: flex;
-  /* ... */
-}
 
 </style>

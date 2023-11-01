@@ -13,6 +13,7 @@
 .navbar {
   background-color: #04121f;
   padding: 1rem;
+  height:5rem;
 }
 
 .navbar-list {

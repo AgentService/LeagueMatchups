@@ -1,9 +1,9 @@
 <template>
   <div>
     <div>
-    <h2>Matchups</h2>
+      <button @click="executeMainFunction">Download Champion Images</button>
+
     <button @click="deleteMatchups">Delete Matchups</button>
-  
     <ul>
       <li v-for="(matchup, index) in matchups" :key="index">
         <template v-if="matchup.champions && matchup.champions.length >= 2">
@@ -16,6 +16,7 @@
     </ul>
   </div>
   <div>
+    <MatchupNotes></MatchupNotes>
   </div>
 </div>
 </template>
@@ -25,6 +26,8 @@ import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import { mapActions } from 'vuex';
 import axios from 'axios';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
+import { main } from "../../../download.mjs";
 
 export default {
   setup() {
@@ -39,9 +42,19 @@ export default {
   },
   
   methods: {
+    async executeMainFunction() {
+      debugger
+      try {
+        await main();
+        alert("Images downloaded successfully!");
+      } catch (error) {
+        alert("An error occurred while downloading images.");
+        console.error(error);
+      }
+    },
     async deleteMatchups() {
       try {
-        await axios.delete('http://localhost:3001/api/matchups/delete');
+        await axios.delete(`${baseUrl}/api/matchups/delete`);
         // Optionally, you can also clear the client-side state here if needed
         this.$store.commit('CLEAR_MATCHUPS'); // Assuming you have a mutation to clear matchups
       } catch (error) {
@@ -55,11 +68,6 @@ export default {
   
   mounted() {
     const store = useStore();
-    store.dispatch('fetchMatchups'); // Fetching matchups when the component is mounted
-  },
-  created() {
-    this.$store.dispatch('fetchChampions');
-
   },
   computed: {
   champions() {

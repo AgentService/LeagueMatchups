@@ -1,6 +1,7 @@
 // store/index.js
 import { createStore } from 'vuex';
 import axios from 'axios';
+const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export const store = createStore({
 
@@ -8,30 +9,23 @@ export const store = createStore({
     championA: null,
     championB: null,
     matchups: [],
-    selectedChampions: [], // Initialize it as an empty array or with default values
+    currentMatchup: null // Holds the currently selected matchup
   },
   getters: {
     getChampionA: state => state.championA,
     getChampionB: state => state.championB,
-    currentMatchup: (state) => {
-      return state.matchups.find((matchup) => {
-        return (
-          matchup.champions.includes(state.championA) &&
-          matchup.champions.includes(state.championB)
-        );
-      });
-    },
-    // ...other getters
+    getCurrentMatchup: (state) => {
+      console.log("getCurrentMatchupGETTER: ", state.currentMatchup);
+      return state.currentMatchup;
+    },    // ...other getters
   },
   mutations: {
+    CLEAR_MATCHUPS(state) {
+      state.matchups = [];
+    },
     SET_CURRENT_MATCHUP(state, matchup) {
+      console.log("SET_CURRENT_MATCHUP: ", matchup);
       state.currentMatchup = matchup;
-    },
-    SET_SELECTED_CHAMPIONS(state, payload) {
-      state.selectedChampions = payload;
-    },
-    SET_MATCHUPS(state, matchups) {
-      state.matchups = matchups;
     },
     ADD_OR_UPDATE_MATCHUP(state, oMatchup) {
       const index = state.matchups.findIndex((m) => m.id === oMatchup.id);
@@ -42,14 +36,6 @@ export const store = createStore({
         state.matchups.push(oMatchup);
       }
     },
-    CLEAR_MATCHUPS(state) {
-      state.matchups = [];
-    },
-    SET_CHAMPIONS(state, { championA, championB }) {
-      state.championA = championA;
-      state.championB = championB;
-    },
-
     UPDATE_NOTES(state, payload) {
       // Find the matchup with the given id
       const matchup = state.matchups.find(m => m.id === payload.matchupId);
@@ -63,62 +49,50 @@ export const store = createStore({
       actions: {
         async fetchSelectedMatchup({ commit }, matchupId) {
           try {
-            const response = await axios.get(`/api/matchups/${matchupId}`);
+            const response = await axios.get(`${baseUrl}/api/matchups/${matchupId}`);
             commit('SET_CURRENT_MATCHUP', response.data);
           } catch (error) {
             console.error('Error fetching the matchup:', error);
           }
         },
-        fetchChampions({ commit }) {
-          axios.get('/api/champions')
-            .then(response => {
-              commit('SET_CHAMPIONS', response.data);
-            })
-            .catch(error => {
-              console.error('An error occurred while fetching champions:', error);
-            });
-        },
         async fetchMatchups({ commit }) {
           try {
-            const response = await axios.get('http://localhost:3001/api/matchups');
+            const response = await axios.get(`${baseUrl}/api/matchups`);
             commit('SET_MATCHUPS', response.data);
           } catch (error) {
             console.error('An error occurred while fetching the matchups:', error);
           }
         },
-        setChampions({ commit }, payload) {
-          console.log("Action payload: ", payload);
-
-          commit('SET_CHAMPIONS', payload);
-        },
-        clearMatchups({ commit }) {
-          commit('CLEAR_MATCHUPS');
-        },
-        async createMatchup({ commit, state, dispatch  }, { champions: [championA, championB] }) {
+        async handleMatchupCreation({ commit }, { id, champions: [championA, championB] }) {
           try {
-            const existingMatchup = state.matchups.find((matchup) =>
-                matchup.id === `${championA.id}-${championB.id}` || matchup.id === `${championB.id}-${championA.id}`
-            );    
-        
-            if (!existingMatchup) {
-              const matchupData = {
-                id: `${championA.id}-${championB.id}`,
+            const matchupFound = await axios.get(`${baseUrl}/api/matchups/${id}`);
+            
+            let matchupData;
+            if (matchupFound.data.message === 'Matchup not found') {
+              matchupData = {
+                id: id,
                 champions: [{ id: championA.id, name: championA.name }, { id: championB.id, name: championB.name }],
-                notes: '',
-                mindset: ''
+                notes: ''
               };
-        
-              const response = await axios.post('http://localhost:3001/api/matchups', matchupData);
-              commit('ADD_OR_UPDATE_MATCHUP', response.data);
-            } 
+              await axios.post(`${baseUrl}/api/matchups/`, matchupData);
+              commit('ADD_OR_UPDATE_MATCHUP', matchupData);
+            } else {
+              console.log('Matchup already exists');
+              matchupData = matchupFound.data;
+            }
+            
+            // Committing SET_CURRENT_MATCHUP once after the conditions
+            commit('SET_CURRENT_MATCHUP', matchupData);
+            return matchupData;
+            
           } catch (error) {
-            console.error('Error creating the matchup:', error);
+            console.error('Error handling the matchup creation:', error);
           }
         },
+        
         // custom data
         saveNotes({ commit }, payload) {
-          console.log("Payload: ", payload.matchupId, payload.notes);
-          axios.patch(`/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes })
+          axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes })
                .then(response => {
                  commit('UPDATE_NOTES', payload);
                });
