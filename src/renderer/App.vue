@@ -14,30 +14,57 @@
     <!-- Adjust the height to take up the remaining space after Navbar -->
     <!-- First Row -->
     <div class="row h-50">
-      <div class="col-md-4 d-flex align-items-center justify-content-center">
+      <div class="col-md-3 col-span-4 d-flex align-items-center justify-content-center">
+                <LearningObjectives></LearningObjectives>
+
       </div>
 
-      <div class="col-md-4 d-flex align-items-center justify-content-center front">
+      <div class="col-md-6 col-span-8 d-flex align-items-center justify-content-center front">
         <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
         <ChampionSearch :instanceId="2" @championSelected="setChampionB" />
       </div>
 
-      <div class="col-md-4 d-flex align-items-center justify-content-center">
+      <div class="col-md-3 col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives></LearningObjectives>
+
       </div>
     </div>
 
     <!-- Second Row -->
-    <div class="row h-50">
-      <div class="col-md-4 d-flex align-items-center justify-content-center">
-        
+    <div class="row h-25">
+      <div class="col-md-3 col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives></LearningObjectives>
+
       </div>
 
-      <div class="col-md-4 d-flex align-items-center justify-content-center">
+      <div class="col-md-6  col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives></LearningObjectives>
+
+      </div>
+
+      <div class="col-md-3 col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives></LearningObjectives>
+
+      </div>
+    </div>
+     <!-- Second Row -->
+     <div class="row h-25">
+      <div class="col-md-4 col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives></LearningObjectives>
+      </div>
+
+      <div class="col-md-4  col-span-2 d-flex align-items-center justify-content-center">
+        <LearningObjectives>
+
+          <MatchupNotes></MatchupNotes>
+
+        </LearningObjectives>
+
+      </div>
+
+      <div class="col-md-4 col-span-2 d-flex align-items-center justify-content-center">
         <MatchupNotes></MatchupNotes>
 
-      </div>
-
-      <div class="col-md-4 d-flex align-items-center justify-content-center">
       </div>
     </div>
   </div>
@@ -46,14 +73,13 @@
 
 
 <script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
-
-   
+ 
 import { ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import ChampionSearch from './components/matchup/ChampionSearch.vue';
 import ChampionMatchup from './components/matchup/ChampionMatchup.vue';
 import MatchupNotes from './components/matchup/MatchupNotes.vue';
+import LearningObjectives from './components/matchup/LearningObjectives.vue';
 
 import Navbar from './components/Navbar.vue';
 
@@ -195,12 +221,23 @@ watch([championA, championB], (newValues, oldValues) => {
 .gradient-overlay {
   position: absolute;
   top: 0;
-  left: 0;
+  left: -10px;
   width: 100%;
   height: 100%;
   background: linear-gradient(to right, rgba(255,255,255,0), rgba(0,0,0,1), rgba(255,255,255,0));
   z-index: -1; /* Place it above the images but below other content */
 }
+
+.gradient-overlay2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #010c2200;
+  z-index: -1; /* Place it above the images but below other content */
+}
+
 
 .left {
   left: 0;
@@ -213,7 +250,6 @@ watch([championA, championB], (newValues, oldValues) => {
 /*  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%); /* Only display the right half of the image */
 }
 .app-container {
-  
   height: calc(100vh - 32px); /* Subtracting the navbar height */
 }
 html {

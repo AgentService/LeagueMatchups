@@ -1,11 +1,19 @@
 // matchup/MatchupNotes.vue
 <template>
-
-    <div class="notes-section h-50 card p-3 mb-3 form-floating">
+    <div class="custom-container ">
+      <div class="placeholder" style="background-color: #005b8281; height: 100%; width: 100%">
+        <div class="card" style="width: 100%; height: 100%;">
+          <div class="card-body">
+            <h5 class="card-title">Custom  Notes</h5>
+            <div class="notes-section ">
       <textarea v-model="notes" id="floatingTextarea" placeholder="Notes" class="form-control" rows="2" style="resize: none;"></textarea>
-      <label for="floatingTextarea">Notes</label>
-</div>
-
+    </div>
+      </div>
+    </div>
+  </div>
+   
+    </div>
+     
 </template>
   <script>
   import { computed } from 'vue';
@@ -53,10 +61,9 @@
 
 
 .notes-section {
-  width: 50%;
-  background: linear-gradient(to bottom, #0AC8B9, #005A82);
   padding: 2rem;
-
+  height: 100%;
+  width: 100%; 
 }
 
 .notes-section textarea {
@@ -69,4 +76,6 @@
   margin: 0 auto; /* Center the textarea */
 }
 </style>
+
+
   

@@ -782,5 +782,117 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Anivia-Aphelios",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Aphelios",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Aphelios",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Brand",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Azir",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": "ijnijnmijnmijmioj"
+  },
+  {
+    "id": "Amumu-Aatrox",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Bard",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Galio",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Galio",
+        "name": "Galio"
+      }
+    ],
+    "notes": ""
   }
 ]

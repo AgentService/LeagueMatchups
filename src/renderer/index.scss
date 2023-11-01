@@ -32,6 +32,27 @@
   box-sizing: content-box;
 }
 
+.row {
+  --bs-gutter-x: 0;
+}
+.custom-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  color: var(--gold-1);
+  /*background: #005b8281;*/
+}
+
+.card {
+  background-color: #005b8213;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  height: 100%;
+  width: 100%;
+  color: var(--gold-1);
+}
+ 
 
 html {
   box-sizing: border-box;
@@ -86,10 +107,6 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-.card {
-  
 }
 
 #app {
