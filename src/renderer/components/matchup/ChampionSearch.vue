@@ -1,5 +1,6 @@
 <template>
-  
+    <div class="note-card card text-light">
+
   <div class="champion-card d-flex align-items-center justify-content-center w-100 h-100" :style="backgroundStyle2">
 
     <div class="champion-selector w-100">  
@@ -21,6 +22,7 @@
       </div>
     </div>
   </div>
+    </div>
 </template>
 
 <script>
@@ -126,6 +128,16 @@ export default {
 </script>
 
 <style scoped>
+.note-card {
+  /*background-color: rgba(0, 0, 0, 0.7); /* Adjust the alpha for transparency */
+  padding: 1rem;
+  color: #fff;
+  height: 100%;
+  font-family: 'Your Font', sans-serif; /* Replace 'Your Font' with your actual font */
+}
+
+/*  background: linear-gradient(to left, #FF4C5A, #0D2029, #00FDFF); /* Your gradient here */
+
 .champion-image {
   width: 100px;
   height: 100px;
@@ -139,12 +151,14 @@ export default {
 
 
 .champion-card {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content:center;
 
 }
 .champion-display {
+  height: 100%;
   display:flex;
 }
 

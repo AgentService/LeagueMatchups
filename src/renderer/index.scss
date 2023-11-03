@@ -26,15 +26,39 @@
   --grey-3: #1E2328;
   --grey-cool: #1E282D;
   --hextech-black: #010A13;
-}
 
+  --grey-4: #0D2029;
+
+  --background-1-gradient: linear-gradient(135deg, #000406, #000507);
+  --red-laser-gradient: linear-gradient(135deg, #FF4C5A, #FF5D6B);
+  --blue-laser-gradient: linear-gradient(135deg, #00FDFF, #10FEFF);
+  --border-grey-gradient: linear-gradient(to top, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
+  --border-grey-gradient-horizontal: linear-gradient(to left, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
+
+  --border-red-blue-gradient: linear-gradient(to left, #FF4C5A, #0D2029, #00FDFF); /* Your gradient here */
+
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Full height */
+
+}
 .selector-for-some-widget {
   box-sizing: content-box;
 }
 
-.row {
-  --bs-gutter-x: 0;
+
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
+  overflow: hidden; /* Hide overflow */
+
 }
+
 .custom-container {
   display: flex;
   width: 100%;
@@ -44,21 +68,57 @@
 }
 
 .card {
-  background-color: #005b8213;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+  /*background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+  background-color: transparent;
+  padding: 2rem;
+  color: #fff;
+  border-radius: 0px;
+  font-family: 'Arial', sans-serif;
   height: 100%;
   width: 100%;
-  color: var(--gold-1);
+  color: white;
 }
  
-
-html {
-  box-sizing: border-box;
+/* Text area styles */
+.textarea {
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+  color: #E6E6E6; /* Light grey text for contrast */
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem;
+  line-height: 1.5;
+  resize: vertical;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
-*, *::before, *::after {
-  box-sizing: inherit;
+
+.textarea:focus {
+  outline: none;
+  border-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2); /* More opaque on focus */
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); /* Glow effect */
+}
+
+.textarea::placeholder {
+  color: #A9A9A9; /* Placeholder text color */
+  font-style: italic;
+}
+
+.textarea:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* More visible on hover */
+}
+
+/* Button styles */
+.btn {
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  transition: color 0.3s ease;
+}
+
+.btn:hover,
+.btn:focus {
+  color: #28a745; /* Change color on hover/focus */
 }
 
 a {
@@ -79,49 +139,17 @@ a:hover {
   color: #535bf2;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background-color: rgb(10, 50, 60, 0.7);;
-}
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
 
-#app {
-/* existing styles */
-margin: 0 auto;
-text-align: center;
-/* new styles */
-  margin: 0 auto; /* centers the container */
-  overflow: hidden; /* adds scrollbar if content overflows */
-}
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #442727;
   }
   a:hover {
     color: #747bff;

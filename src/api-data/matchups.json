@@ -11,7 +11,7 @@
         "name": "Akali"
       }
     ],
-    "notes": "Nice \n\n\n\n\nBig\n\n\n\nNotes\n\n\n\nSection"
+    "notes": "Start Dorans and 3 Stack\n- \n-"
   },
   {
     "id": "Aatrox-Akali",
@@ -697,7 +697,7 @@
         "name": "Blitzcrank"
       }
     ],
-    "notes": ""
+    "notes": "wtf"
   },
   {
     "id": "Brand-Aatrox",
@@ -891,6 +891,174 @@
       {
         "id": "Galio",
         "name": "Galio"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Cassiopeia",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Cassiopeia",
+        "name": "Cassiopeia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Ashe",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Braum",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Braum",
+        "name": "Braum"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Caitlyn",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Caitlyn",
+        "name": "Caitlyn"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Amumu",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Brand",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Brand",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Ashe",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Ahri",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Aphelios",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bel'Veth-Akali",
+    "champions": [
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": "Farm"
+  },
+  {
+    "id": "Amumu-Dr. Mundo",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "DrMundo",
+        "name": "Dr. Mundo"
       }
     ],
     "notes": ""

@@ -1,81 +1,112 @@
-// matchup/MatchupNotes.vue
+Waiit this is to complicated, lets ceck if there is another issue.
+
 <template>
-    <div class="custom-container ">
-      <div class="placeholder" style="background-color: #005b8281; height: 100%; width: 100%">
-        <div class="card" style="width: 100%; height: 100%;">
-          <div class="card-body">
-            <h5 class="card-title">Custom  Notes</h5>
-            <div class="notes-section ">
-      <textarea v-model="notes" id="floatingTextarea" placeholder="Notes" class="form-control" rows="2" style="resize: none;"></textarea>
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Matchup Notes</h5>
+      <transition name="fade">
+        <i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
+      </transition>
     </div>
-      </div>
+    <div class="card-body">
+      <textarea v-model="notes" placeholder="Type your notes here..." class="note-textarea " rows="4"></textarea>
     </div>
   </div>
-   
-    </div>
-     
 </template>
-  <script>
-  import { computed } from 'vue';
-  import { useStore } from 'vuex';
 
-  export default {
-    setup() {
-      const store = useStore();
-      const currentMatchup = computed(() => store.getters.getCurrentMatchup);
-      return {
-        currentMatchup,
-      };
-    },
-    data() {
-      return {
-        notes: '',
-        timeout: null,
-      };
-    },
-    watch: {
-    notes(newNotes) {
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-            console.log("Saving notes:", newNotes);
-        this.$store.dispatch('saveNotes', { matchupId: this.currentMatchup.id, notes: newNotes });
-        }, 1000);
-    },
-    currentMatchup(newMatchup, oldMatchup) {
-        console.log("currentMatchup changed:", newMatchup, oldMatchup);
+<script>
+import { computed, ref, watch } from 'vue';
+import { useStore } from 'vuex';
 
-    if (newMatchup !== oldMatchup) {
-      this.notes = newMatchup.notes;
-    }}
-    },
-    mounted() {
-    if (this.currentMatchup) {
-      this.notes = this.currentMatchup.notes;
+export default {
+  setup() {
+    const store = useStore();
+    const currentMatchup = computed(() => store.getters.getCurrentMatchup);
+    const autoSaved = ref(false);
+    const notes = ref(currentMatchup.value ? currentMatchup.value.notes : '');
+    const timeout = ref(null);
+
+    function saveNotes(newNotes) {
+      console.log("autoSaved:", autoSaved.value);
+
+      console.log("Saving notes:", newNotes);
+      store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
+      autoSaved.value = true;
+      console.log("autoSaved:", autoSaved.value);
+
+      setTimeout(() => autoSaved.value = false, 3000);
     }
-    },
-  }
-  </script>
 
-<style  scoped>
+    watch(notes, (newNotes) => {
+      clearTimeout(timeout.value);
+      timeout.value = setTimeout(() => {
+        saveNotes(newNotes);
+      }, 1000);
+    });
 
+    watch(currentMatchup, (newMatchup, oldMatchup) => {
+      if (newMatchup !== oldMatchup) {
+        notes.value = newMatchup.notes;
+      }
+    });
 
-
-.notes-section {
-  padding: 2rem;
-  height: 100%;
-  width: 100%; 
+    return {
+      notes,
+      autoSaved,
+      saveNotes,
+    };
+  },
 }
+</script>
 
-.notes-section textarea {
+<style scoped>
+
+
+.note-textarea {
+  border-radius: 10px;
+  resize:none;
   height: 100%;
   width: 100%;
-  color:  var(--blue-1);
-  border-radius:5px;
-  background: linear-gradient(to bottom, #091428, #0A1428);
+  border-color: var(--grey-4);
+  border-width: 0px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  background:var(--background-1-gradient);
+  color: var(--gold-2);
+  font-family: 'Arial', sans-serif;
+  line-height: 1.5;
+  padding: 0.5rem;
 
-  margin: 0 auto; /* Center the textarea */
+}
+.note-textarea:focus {
+  outline: none;
+  border-color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 1); /* Slightly more opaque on focus */
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); /* Adding a glow effect */
+}
+.note-textarea::placeholder {
+  color: #A9A9A9; /* Lighter than the text color for subtlety */
+  font-style: italic;
+}
+.note-textarea {
+  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+.note-textarea:hover {
+  background-color: rgba(255, 255, 255, 1); /* Slightly more visible on hover */
+}
+.card-header {
+  padding: 0.75rem 1.25rem;
+}
+
+/* Transition styles for fade effect */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-to, .fade-leave-from {
+  opacity: 1;
 }
 </style>
-
-
-  
