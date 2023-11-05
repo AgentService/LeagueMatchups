@@ -67,10 +67,10 @@ export default {
       categories: ['In-Game', 'Out-of-Game'],
       newLO: { name: '', weeks: 1, progress: 0, category: 'In-Game' },
       learningObjectives: [
-        { name: 'Focus on first 10 min', progress: 10, started: true, category: 'In-Game', endDate: this.addWeeksToDate(new Date(), 4) },
-        { name: 'Lasthitting', progress: 55, started: true, category: 'In-Game', endDate: this.addWeeksToDate(new Date(), 4) },
+        { name: 'Focus on first 10 min', startDate: new Date(), progress: 10, started: true, category: 'In-Game', endDate: this.addWeeksToDate(new Date(), 4) },
+        { name: 'Lasthitting', startDate: new Date(), progress: 55, started: true, category: 'In-Game', endDate: this.addWeeksToDate(new Date(), 4) },
 
-        { name: 'Teamfights', completed: true, progress: 100, started: true, category: 'Out-of-Game', endDate: this.addWeeksToDate(new Date(), 6) },
+        { name: 'Teamfights', startDate: new Date(), completed: true, progress: 100, started: true, category: 'Out-of-Game', endDate: this.addWeeksToDate(new Date(), 6) },
 
         // ... other placeholder LOs ...   
       ]

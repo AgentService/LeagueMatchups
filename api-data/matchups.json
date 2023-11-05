@@ -1,0 +1,1080 @@
+[
+  {
+    "id": "Ahri-Akali",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": "Start Dorans and 3 Stack\n- \n-"
+  },
+  {
+    "id": "Aatrox-Akali",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Ahri",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Akali",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Akali",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Briar-Akali",
+    "champions": [
+      {
+        "id": "Briar",
+        "name": "Briar"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Akali",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Akali",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Corki",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Corki",
+        "name": "Corki"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Cho'Gath-Corki",
+    "champions": [
+      {
+        "id": "Chogath",
+        "name": "Cho'Gath"
+      },
+      {
+        "id": "Corki",
+        "name": "Corki"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Draven-Corki",
+    "champions": [
+      {
+        "id": "Draven",
+        "name": "Draven"
+      },
+      {
+        "id": "Corki",
+        "name": "Corki"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Ekko",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Ekko",
+        "name": "Ekko"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aphelios-Ahri",
+    "champions": [
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Caitlyn-Ahri",
+    "champions": [
+      {
+        "id": "Caitlyn",
+        "name": "Caitlyn"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Azir-Akali",
+    "champions": [
+      {
+        "id": "Azir",
+        "name": "Azir"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Ahri",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Ahri",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Akali",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Azir",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Akali",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aphelios-Akali",
+    "champions": [
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Annie-Akali",
+    "champions": [
+      {
+        "id": "Annie",
+        "name": "Annie"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bard-Akali",
+    "champions": [
+      {
+        "id": "Bard",
+        "name": "Bard"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Aatrox",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Bard",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Aatrox",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": "X"
+  },
+  {
+    "id": "Ahri-Azir",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Alistar",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Annie",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Annie",
+        "name": "Annie"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Diana",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Diana",
+        "name": "Diana"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Azir",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Garen",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Garen",
+        "name": "Garen"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Heimerdinger",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Heimerdinger",
+        "name": "Heimerdinger"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Evelynn",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Evelynn",
+        "name": "Evelynn"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Akshan",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Akshan",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Akshan",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Braum-Akali",
+    "champions": [
+      {
+        "id": "Braum",
+        "name": "Braum"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Diana-Akali",
+    "champions": [
+      {
+        "id": "Diana",
+        "name": "Diana"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Akali",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Bard",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Bel'Veth",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Bard",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Azir",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Cho'Gath-Akali",
+    "champions": [
+      {
+        "id": "Chogath",
+        "name": "Cho'Gath"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Cho'Gath-Darius",
+    "champions": [
+      {
+        "id": "Chogath",
+        "name": "Cho'Gath"
+      },
+      {
+        "id": "Darius",
+        "name": "Darius"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aphelios-Azir",
+    "champions": [
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Alistar",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Bel'Veth",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Blitzcrank",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      }
+    ],
+    "notes": "wtf"
+  },
+  {
+    "id": "Brand-Aatrox",
+    "champions": [
+      {
+        "id": "Brand",
+        "name": "Brand"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Briar-Aatrox",
+    "champions": [
+      {
+        "id": "Briar",
+        "name": "Briar"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bel'Veth-Aatrox",
+    "champions": [
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Draven-Aatrox",
+    "champions": [
+      {
+        "id": "Draven",
+        "name": "Draven"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ekko-Aatrox",
+    "champions": [
+      {
+        "id": "Ekko",
+        "name": "Ekko"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Diana-Aatrox",
+    "champions": [
+      {
+        "id": "Diana",
+        "name": "Diana"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Aphelios",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Aphelios",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Aphelios",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Brand",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ashe-Azir",
+    "champions": [
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": "ijnijnmijnmijmioj"
+  },
+  {
+    "id": "Amumu-Aatrox",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Bard",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Galio",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Galio",
+        "name": "Galio"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Cassiopeia",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Cassiopeia",
+        "name": "Cassiopeia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Ashe",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Braum",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Braum",
+        "name": "Braum"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Anivia-Caitlyn",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Caitlyn",
+        "name": "Caitlyn"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Amumu",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Brand",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Brand",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Brand",
+        "name": "Brand"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Ashe",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Ahri",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Alistar-Aphelios",
+    "champions": [
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      },
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bel'Veth-Akali",
+    "champions": [
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": "Farm"
+  },
+  {
+    "id": "Amumu-Dr. Mundo",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "DrMundo",
+        "name": "Dr. Mundo"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Draven-Akali",
+    "champions": [
+      {
+        "id": "Draven",
+        "name": "Draven"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  }
+]

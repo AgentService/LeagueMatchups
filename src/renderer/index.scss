@@ -34,8 +34,9 @@
   --blue-laser-gradient: linear-gradient(135deg, #00FDFF, #10FEFF);
   --border-grey-gradient: linear-gradient(to top, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
   --border-grey-gradient-horizontal: linear-gradient(to left, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
+  --border-laser-gradient-horizontal: linear-gradient(to left, #000406 , #FF4C5A , #00FDFF, #000406); /* Your gradient here */
 
-  --border-red-blue-gradient: linear-gradient(to left, #FF4C5A, #0D2029, #00FDFF); /* Your gradient here */
+  --border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF); /* Your gradient here */
 
 }
 html,
