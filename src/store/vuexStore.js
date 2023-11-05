@@ -1,8 +1,8 @@
 // store/index.js
 import { createStore } from 'vuex';
 import { summoner } from './modules/summoner.js';
-import { retrieveFromSessionStorage } from './storage.mjs'; // import the function
-import { champions } from './modules/champions';
+import { retrieveFromSessionStorage, saveToLocalStorage, loadFromLocalStorage } from './storage.mjs'; // import the function
+import { champions } from './modules/champions.js';
 
 import axios from 'axios';
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
@@ -27,6 +27,9 @@ export const store = createStore({
     },    // ...other getters
   },
   mutations: {
+    SET_MATCHUPS_DATA(state, matchups) {
+      state.matchups = matchups;
+    },
     CLEAR_MATCHUPS(state) {
       state.matchups = [];
     },
@@ -71,37 +74,55 @@ export const store = createStore({
       }
     },
     async fetchMatchups({ commit }) {
-      try {
-        const response = await axios.get(`${baseUrl}/api/matchups`);
-        commit('SET_MATCHUPS', response.data);
-      } catch (error) {
-        console.error('An error occurred while fetching the matchups:', error);
+      let matchupsData = loadFromLocalStorage('matchupsData');
+
+      if (!matchupsData) {
+        try {
+          const response = await axios.get('/api/matchups');
+          matchupsData = response.data;
+          saveToLocalStorage('matchupsData', matchupsData);
+          commit('SET_MATCHUPS_DATA', matchupsData);
+        } catch (error) {
+          console.error('Error fetching matchups data:', error);
+        }
+      } else {
+        commit('SET_MATCHUPS_DATA', matchupsData);
       }
     },
     async handleMatchupCreation({ commit }, { id, champions: [championA, championB] }) {
-      try {
-        const matchupFound = await axios.get(`${baseUrl}/api/matchups/${id}`);
+      // Check if the matchup is already in local storage
+      let matchups = loadFromLocalStorage('matchupsData') || {};
 
-        let matchupData;
-        if (matchupFound.data.message === 'Matchup not found') {
-          matchupData = {
-            id: id,
-            champions: [{ id: championA.id, name: championA.name }, { id: championB.id, name: championB.name }],
-            notes: ''
-          };
-          await axios.post(`${baseUrl}/api/matchups/`, matchupData);
-          commit('ADD_OR_UPDATE_MATCHUP', matchupData);
-        } else {
-          matchupData = matchupFound.data;
+      if (!matchups[id]) {
+        // Matchup not found in local storage, check the server
+        try {
+          const response = await axios.get(`${baseUrl}/api/matchups/${id}`);
+          if (response.data.message === 'Matchup not found') {
+            // Create new matchup if it doesn't exist on the server
+            const newMatchupData = {
+              id: id,
+              champions: [{ id: championA.id, name: championA.name }, { id: championB.id, name: championB.name }],
+              notes: ''
+            };
+            await axios.post(`${baseUrl}/api/matchups`, newMatchupData);
+            matchups[id] = newMatchupData; // Add new matchup to local object
+          } else {
+            matchups[id] = response.data; // Use existing matchup from server
+          }
+        } catch (error) {
+          console.error('Error fetching or creating matchup data:', error);
+          // Handle error appropriately
         }
-
-        // Committing SET_CURRENT_MATCHUP once after the conditions
-        commit('SET_CURRENT_MATCHUP', matchupData);
-        return matchupData;
-
-      } catch (error) {
-        console.error('Error handling the matchup creation:', error);
       }
+
+      // At this point, matchups[id] is either loaded from local storage, fetched from the server, or created new
+      saveToLocalStorage('matchupsData', matchups); // Save updated matchups object to local storage
+      commit('SET_CURRENT_MATCHUP', matchups[id]); // Commit to Vuex state
+
+      // If you need to update the list of matchups in the state as well
+      commit('ADD_OR_UPDATE_MATCHUP', matchups[id]);
+
+      return matchups[id]; // Return the matchup data
     },
 
     // custom data
@@ -122,8 +143,8 @@ export const store = createStore({
       return state.summonerData || retrieveFromSessionStorage('summonerData');
       // const summonerData = this.$store.dispatch('getSummonerData');
 
-    },   
+    },
   },
-  }
+}
 
 );

@@ -27,7 +27,7 @@ import { useStore } from 'vuex';
 import { mapActions } from 'vuex';
 import axios from 'axios';
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
-import { main } from "../../../download.mjs";
+// import { main } from "../../../download.mjs";
 
 export default {
   setup() {
@@ -42,16 +42,15 @@ export default {
   },
   
   methods: {
-    async executeMainFunction() {
-      debugger
-      try {
-        await main();
-        alert("Images downloaded successfully!");
-      } catch (error) {
-        alert("An error occurred while downloading images.");
-        console.error(error);
-      }
-    },
+    // async executeMainFunction() {
+    //   try {
+    //     await main();
+    //     alert("Images downloaded successfully!");
+    //   } catch (error) {
+    //     alert("An error occurred while downloading images.");
+    //     console.error(error);
+    //   }
+    // },
     async deleteMatchups() {
       try {
         await axios.delete(`${baseUrl}/api/matchups/delete`);

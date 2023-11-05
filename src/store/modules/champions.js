@@ -12,7 +12,7 @@ export const champions = {
     state: () => ({
         championList: null, // This will store the list of all champions
         championDetails: null, // This will store the detailed info for each champion
-        data: loadFromLocalStorage('championData') || null, // Initialize state with data from local storage
+        data: loadFromLocalStorage('championListData') || null, // Initialize state with data from local storage
     }),
     mutations: {
         SET_CHAMPION_LIST_DATA(state, listData) {

@@ -1076,5 +1076,19 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Blitzcrank-Alistar",
+    "champions": [
+      {
+        "id": "Blitzcrank",
+        "name": "Blitzcrank"
+      },
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      }
+    ],
+    "notes": ""
   }
 ]

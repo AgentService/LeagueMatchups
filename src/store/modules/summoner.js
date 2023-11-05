@@ -1,5 +1,5 @@
 // store/modules/summoner.js
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 // If summoner.js is at src/store/modules/summoner.js and storage.js is at src/store/storage.js
 import { saveToSessionStorage, retrieveFromSessionStorage } from '../storage.mjs';
 
@@ -11,6 +11,7 @@ export const summoner = {
     mutations: {
         setSummonerData(state, data) {
             state.summonerData = data;
+            console.log('Updated summoner data in Vuex:', state.summonerData);
             // Save to session storage whenever the summoner data is updated
             saveToSessionStorage('summonerData', data);
         },
@@ -18,9 +19,8 @@ export const summoner = {
     actions: {
         async fetchSummonerData({ commit }, summonerName) {
             try {
-                console.log('Current summoner data before fetch:', state.summonerData);
-
-                const response = await fetch(`${API_BASE_URL}/summoner/${summonerName}`);
+                const region = 'euw1'; // TODO: Get this from the user
+                const response = await fetch(`${baseUrl}/summoner/${region}/${summonerName}`);
                 const data = await response.json();
                 console.log('Fetched summoner data:', data);
 

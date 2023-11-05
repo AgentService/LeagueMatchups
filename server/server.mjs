@@ -23,10 +23,12 @@ const app = express();
 const PORT = 3001;  // Choose an appropriate port
 
 app.use(cors(), express.json());
+
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.path}`);
   next();
 });
+
 app.get('/api/champions', serveChampionData);
 
 app.get('/download-champion-images', (req, res) => {
@@ -49,6 +51,7 @@ app.get('/summoner/:region/:name', async (req, res) => {
     });
   }
 });
+
 // Function to write champions to a local JSON file
 function writeChampions(champions) {
   const data = JSON.stringify(champions, null, 2);
@@ -67,10 +70,6 @@ app.get('/api/update-champions', (req, res) => {
     });
 });
 
-
-// Endpoint to get champions from the local JSON file
-
-// Matchups endpoint
 
 // Function to read matchups from JSON file
 function readMatchups() {
@@ -91,15 +90,10 @@ function readMatchups() {
 
   app.get('/api/matchups/:id', (req, res) => {
     const matchups = readMatchups();
-    
     // Corrected the logging statements
     console.log("matchups", matchups); 
-
     const matchup = matchups.find(m => m.id === req.params.id);
-    
     // Corrected the logging statements
-    console.log("matchup", matchup); 
-
     if (matchup) {
       res.json(matchup);
     } else {

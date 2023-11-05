@@ -1,5 +1,5 @@
 <template>
-  <button @click="fetchAndSaveSummonerData">Get Summoner Data</button>
+  <button @click="handleButtonClick()">Get Summoner Data</button>
   <div v-if="summonerData">
     {{ summonerData }}
   </div></template>
@@ -10,35 +10,29 @@ import { useStore } from 'vuex';
 import { retrieveFromSessionStorage } from '../../store/storage.mjs';
 
 const store = useStore();
+const summonerData = computed(() => store.state.summoner.summonerData);
 
-const RIOT_API_KEY = import.meta.env.VITE_RIOT_API_KEY;
-const summonerName = ref(''); // Assuming you have a way to set this
+function handleButtonClick() {
+  // When the button is clicked, call the function with the value of the computed property
+  fetchAndSaveSummonerData(summonerData.value.name);
+}
 
-const summonerData = computed(() => {
-  // Here is where you put your console.log for the computed property.
-  const data = store.state.summoner.summonerData;
-  console.log('Summoner data in component:', data);
-  return data;
-});
-
-const fetchAndSaveSummonerData = async () => {
+// Make sure to pass only the value, not the entire ref
+const fetchAndSaveSummonerData = async (summonerNameValue) => {
   try {
-    // Assuming the summonerName is retrieved and stored in a ref named 'summonerName'
-    if (summonerName.value) {
-      await store.dispatch('summoner/fetchSummonerData', summonerName.value);
+    // Now summonerNameValue should be a string, not a ComputedRefImpl object
+    if (summonerNameValue) {
+      await store.dispatch('summoner/fetchSummonerData', summonerNameValue);
     }
   } catch (error) {
     console.error('Error fetching and saving summoner data:', error);
   }
 };
 
-
-// Register the receive listener when the component is mounted
 onMounted(() => {
   window.api.receive('summoner-name-response', (newSummonerName) => {
     const currentSummonerData = retrieveFromSessionStorage('summonerData');
-
-    if (!currentSummonerData || currentSummonerData.summonerName !== newSummonerName) {
+    if (!currentSummonerData || currentSummonerData.name !== newSummonerName) {
       // New summoner name detected or not found in sessionStorage, fetch new data
       fetchAndSaveSummonerData(newSummonerName);
     } else {

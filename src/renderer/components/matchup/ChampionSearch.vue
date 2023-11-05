@@ -30,9 +30,7 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { useStore } from 'vuex';
-import { ref } from 'vue';
 export default {
   props: {
     instanceId: {
@@ -53,29 +51,22 @@ export default {
     };
   },
   mounted() {
-
     const store = useStore();
-    axios.get('http://localhost:3001/api/champions')
-      .then(response => {
-        // Convert object to array
-        console.log('response.data:', response.data);
-        this.listChampionsData = response.data.list;
-        this.detailedChampionsData = response.data.details;
-        const championsArray = Object.values(this.listChampionsData).map(champ => champ);
 
-        const filteredChampions = [...championsArray];
-        console.log('filteredChampions:', filteredChampions);
+    // Dispatch the action to fetch champion data
+    store.dispatch('champions/fetchChampionData').then(() => {
+      const listChampionsData = store.state.champions.championList;
+      const detailedChampionsData = store.state.champions.championDetails;
+      // Process the data as needed for this component
+      const championsArray = Object.values(listChampionsData).map(champ => champ);
+      this.filteredChampions = [...championsArray];
 
-        const preselectedChampion = this.instanceId === 1 ? championsArray[1] : championsArray[2];
-        console.log(this.listChampionsData[1]);
-        console.log('preselectedChampion:', preselectedChampion);
-        this.selectChampion(preselectedChampion);
-
-        this.filteredChampions = [...filteredChampions]; // Initially, all champions are displayed
-      })
-      .catch(error => {
-        console.error('Error fetching champions:', error);
-      });
+      // Determine and select a preselected champion based on instanceId
+      const preselectedChampion = this.instanceId === 1 ? championsArray[1] : championsArray[2];
+      this.selectChampion(preselectedChampion);
+    }).catch(error => {
+      console.error('Error fetching champions:', error);
+    });
   },
 
 
@@ -88,7 +79,6 @@ export default {
     selectChampion(champion) {
 
       this.selectedChampion = champion;
-      console.log("this.selectedChampion:", this.selectedChampion);
 
       this.searchTerm = ''; // Clears the search field, bestowing it with a fresh start
       this.$emit('championSelected', this.selectedChampion);

@@ -1,8 +1,7 @@
 <template>
 
   <div class="app-wrapper">
-    <LeagueListener />
-
+    <ChampionDataTest /> 
     <LearningObjectives></LearningObjectives>
     <div class="app-container">
       <div class="background-container gradient-top-border ">
@@ -76,7 +75,7 @@
           </div>
 
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
-            <Template></Template>
+            <LeagueListener />
 
           </div>
         </div>
@@ -123,8 +122,6 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL;
 let bothSelected = false;
 
 onMounted(async () => {
-  // Dispatch the action to fetch champion data when the component is mounted
-  await store.dispatch('champions/fetchChampionData');
 });
 const handleMatchup = () => {
 
