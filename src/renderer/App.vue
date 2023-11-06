@@ -1,9 +1,11 @@
 <template>
+
   <Navbar></Navbar>
 
   <div class="app-wrapper">
-    <LearningObjectives></LearningObjectives>
     <div class="app-container">
+      <LearningObjectives></LearningObjectives>
+
       <div class="background-container gradient-top-border ">
         <!--
   <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
@@ -74,7 +76,6 @@
           </div>
 
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
-            <LeagueListener />
 
           </div>
         </div>
@@ -89,14 +90,13 @@
 
 import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import ChampionSearch from './components/matchup/ChampionSearch.vue';
-import summonerWidget from './components/summoner/SummonerInfo.vue';
-import MatchupNotes from './components/matchup/MatchupNotes.vue';
-import LearningObjectives from './components/learningObjectives/LearningObjectives.vue';
-import Template from './components/matchup/Template.vue';
-import LeagueListener from './components/LeagueListener.vue';
+import ChampionSearch from './components/ChampionSelection.vue';
+import summonerWidget from './components/SummonerInfo.vue';
+import MatchupNotes from './components/MatchupNotes.vue';
+import LearningObjectives from './components/LearningObjectives.vue';
+import Template from './components/Template.vue';
 
-import Navbar from './components/Navbar.vue';
+import Navbar from './components/TopNavbar.vue';
 
 import { computed } from 'vue'
 import ChampionDataTest from './components/test/ChampionDataTest.vue';
@@ -262,7 +262,7 @@ watch([championA, championB], (newValues, oldValues) => {
   /* Flip the image horizontally */
 }
 
-/* Background */
+/* Background 
 .background-container {
   position: absolute;
   top: 0;
@@ -272,6 +272,19 @@ watch([championA, championB], (newValues, oldValues) => {
   z-index: -3;
   background: var(--background-1-gradient);
 
+}*/
+.background-container {
+  position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 999;
+    background: linear-gradient( to right, hsla(var(--primary-hsl-hover) / 0.75), hsla(var(--primary-hsl) / 1) );
+    opacity: 0;
+    animation: none;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .row.front {
@@ -390,4 +403,5 @@ watch([championA, championB], (newValues, oldValues) => {
   /* Set to 0 or any specific value you need */
   margin: auto;
   /* Auto margins on left and right to center the block */
-}</style>
+}
+</style>

@@ -1090,5 +1090,61 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Ahri-Aurelion Sol",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Darius",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Darius",
+        "name": "Darius"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Fiora",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Fiora",
+        "name": "Fiora"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Ashe",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
   }
 ]

@@ -39,7 +39,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
-import ProgressBar from '../utility/ProgressBar.vue';
+import ProgressBar from './utility/ProgressBar.vue';
 
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 

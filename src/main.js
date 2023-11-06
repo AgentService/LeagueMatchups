@@ -9,6 +9,7 @@ let mainWindow; // Store a reference to the main window
 
 const LEAGUE_CLIENT_PATH = 'C:/Riot Games/League of Legends/lockfile'; // Adjust if necessary
 
+
 ipcMain.on('get-summoner-name', async (event) => {
   console.log('IPC message received: get-summoner-name');
   const summonerName = await getSummonerName(); // This function retrieves the summoner name
@@ -73,6 +74,9 @@ async function getSummonerName() {
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
+
+
+
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

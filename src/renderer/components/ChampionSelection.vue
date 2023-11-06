@@ -9,9 +9,10 @@
             <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Search..."
               class="form-control" />
 
-            <div v-for="champion in filteredChampions" :key="champion.id"
-              class="champion-option d-flex align-items-center p-2" @click="selectChampion(champion)">
-              <img :src="getChampionImageSource('small', champion.id)" class="img-fluid me-2" alt="Champion Image" />
+            <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option d-flex align-items-center
+              p-2" @click="selectChampion(champion)">
+              <!-- Use v-lazy instead of :src for lazy loading -->
+              <img v-lazy="getChampionImageSource('small', champion.id)" class="img-fluid me-2" alt="Champion Image" />
               <span>{{ champion.name }}</span>
             </div>
           </div>

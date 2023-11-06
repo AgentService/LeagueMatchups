@@ -1,7 +1,7 @@
 // store/index.js
 import { createStore } from 'vuex';
 import { summoner } from './modules/summoner.js';
-import { retrieveFromSessionStorage, saveToLocalStorage, loadFromLocalStorage } from './storage.mjs'; // import the function
+import { retrieveFromSessionStorage, saveToLocalStorage, loadFromLocalStorage } from './plugins/storage.mjs'; // import the function
 import { champions } from './modules/champions.js';
 
 import axios from 'axios';
@@ -17,7 +17,6 @@ export const store = createStore({
     championB: null,
     matchups: [],
     currentMatchup: null, // Holds the currently selected matchup
-    playerDetails: retrieveFromSessionStorage('playerDetails') || null,
   },
   getters: {
     getChampionA: state => state.championA,
@@ -53,16 +52,7 @@ export const store = createStore({
         // Update the notes of the found matchup
         matchup.notes = payload.notes;
       }
-    },
-    setSummonerData(state, data) {
-      state.summonerData = data;
-      console.log('Updated summoner data in Vuex:', state.summonerData);
-
-      // Save to sessionStorage whenever the summoner data is updated
-      saveToSessionStorage('summonerData', data);
-      console.log('Summoner data saved to sessionStorage:', retrieveFromSessionStorage('summonerData'));
-
-    },
+    }
   },
   actions: {
     async fetchSelectedMatchup({ commit }, matchupId) {
@@ -132,19 +122,8 @@ export const store = createStore({
           commit('UPDATE_NOTES', payload);
         });
     },
-    updateSummonerData({ commit }, summonerData) {
-      commit('setSummonerData', summonerData);
-      // Usage in a Vue component
-      // To save data
-      // this.$store.dispatch('updateSummonerData', yourSummonerData);
-    },
-    getSummonerData({ state }) {
-      // This will trigger a re-fetch from sessionStorage if needed
-      return state.summonerData || retrieveFromSessionStorage('summonerData');
-      // const summonerData = this.$store.dispatch('getSummonerData');
-
-    },
   },
 }
 
 );
+export default store; // Make sure this line is present

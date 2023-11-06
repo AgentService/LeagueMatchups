@@ -22,18 +22,17 @@
   
   <style scoped>
 .progress-bar-container {
-  background-color: #0e1726; /* New background color */
-  border: 1px solid #1f2a3f; /* Border color */
-  border-radius: 10px; /* More pronounced border-radius for rounded edges */
-  height: 10px; /* Thinner height for the progress bar container */
-  overflow: hidden; /* Ensures the inner bar stays within the border-radius */
+  width: 100%; /* Full width of the parent element */
+  background-color: #0e0e10; /* Dark background for the container */
+  border-radius: 1rem; /* Rounded corners for the container */
+  height: 1.5rem; /* Height of the container */
+  overflow: hidden; /* Ensures the inner bar doesn't overflow */
 }
 
 .progress-bar {
-  height: 100%; /* Make the inner bar fill the container height */
-  background-color: var(--blue-laser-1); /* Preserving the original bar color */
-  /* Maintain the border-radius for the inner bar, if it's filled */
-  border-radius: 8px 0 0 8px; /* Rounded on the left side only; adjust as needed */
+  background-color: #4e0ecc; /* Color for the progress bar fill */
+  height: 100%; /* Full height of the container */
+  width: 0; /* Initial width, will be set by Vue binding */
 }
   </style>
   
