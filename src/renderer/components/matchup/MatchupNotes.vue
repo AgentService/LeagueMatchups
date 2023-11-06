@@ -27,14 +27,9 @@ export default {
     const timeout = ref(null);
 
     function saveNotes(newNotes) {
-      console.log("autoSaved:", autoSaved.value);
-
-      console.log("Saving notes:", newNotes);
-      store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
-      autoSaved.value = true;
-      console.log("autoSaved:", autoSaved.value);
-
-      setTimeout(() => autoSaved.value = false, 3000);
+      //store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
+      autoSaved.value = false;
+     // setTimeout(() => autoSaved.value = false, 3000);
     }
 
     watch(notes, (newNotes) => {
@@ -60,7 +55,7 @@ export default {
 </script>
 
 <style scoped>
-
+   
 
 .note-textarea {
   border-radius: 10px;

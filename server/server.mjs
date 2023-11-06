@@ -51,6 +51,33 @@ app.get('/summoner/:region/:name', async (req, res) => {
     });
   }
 });
+app.get('/summoner/:region/by-riot-id', async (req, res) => {
+  const { region } = req.params;
+  const { gameName, tagLine } = req.query; // Expecting 'gameName' and 'tagLine' as query parameters
+
+  try {
+    // Use the '/riot/account/v1/accounts/by-riot-id/' endpoint to obtain the PUUID
+    const accountResponse = await axios.get(`https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`, {
+      headers: {
+        "X-Riot-Token": RIOT_API_KEY
+      }
+    });
+    const puuid = accountResponse.data.puuid;
+
+    // Now you can use the PUUID to get the summoner's data
+    const summonerResponse = await axios.get(`https://${region}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`, {
+      headers: {
+        "X-Riot-Token": RIOT_API_KEY
+      }
+    });
+
+    res.json(summonerResponse.data);
+  } catch (error) {
+    res.status(error.response?.status || 500).json({
+      message: error.response?.data?.status?.message || error.message
+    });
+  }
+});
 
 // Function to write champions to a local JSON file
 function writeChampions(champions) {

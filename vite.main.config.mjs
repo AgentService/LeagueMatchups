@@ -9,6 +9,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: ['node-fetch']
-    }
-  }
+    },
+  
+  },
+  resolve: {
+    alias: {
+      // other aliases
+    },
+  },
 });

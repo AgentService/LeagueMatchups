@@ -1,7 +1,7 @@
 <template>
+  <Navbar></Navbar>
 
   <div class="app-wrapper">
-    <ChampionDataTest /> 
     <LearningObjectives></LearningObjectives>
     <div class="app-container">
       <div class="background-container gradient-top-border ">
@@ -17,10 +17,9 @@
         <!-- Adjust the height to take up the remaining space after Navbar -->
         <!-- First Row -->
         <div class="row">
-          <div class="col-md-3 d-flex align-items-stretch gradient-border ">
-            <MatchupNotes></MatchupNotes>
+          <div class="col-md-3 d-flex container-md gradient-border">
           </div>
-          <div class="col-md-6 d-flex align-items-stretch flex-column  justify-content-between">
+          <div class="col-md-6 d-flex align-items-stretch flex-column justify-content-between">
             <div class="row">
               <div class="d-flex justify-content-end w-50">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
@@ -39,7 +38,7 @@
             </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch gradient-border  ">
-            <Template></Template>
+            <MatchupNotes></MatchupNotes>
           </div>
         </div>
 
@@ -71,7 +70,7 @@
           </div>
 
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
-            <Template></Template>
+            <ChampionDataTest />
           </div>
 
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
@@ -91,7 +90,7 @@
 import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import ChampionSearch from './components/matchup/ChampionSearch.vue';
-import ChampionMatchup from './components/matchup/ChampionMatchup.vue';
+import summonerWidget from './components/summoner/SummonerInfo.vue';
 import MatchupNotes from './components/matchup/MatchupNotes.vue';
 import LearningObjectives from './components/learningObjectives/LearningObjectives.vue';
 import Template from './components/matchup/Template.vue';
@@ -184,14 +183,7 @@ watch([championA, championB], (newValues, oldValues) => {
 
 
 
-/* #app is the root Vue element and should fill the entire height of the viewport */
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  /* Full viewport height */
 
-}
 
 /* .app-wrapper is the main wrapper that contains all content including the navbar and banner */
 .app-wrapper {
@@ -199,7 +191,10 @@ watch([championA, championB], (newValues, oldValues) => {
   /* Flex grow to fill available space */
   display: flex;
   flex-direction: column;
-
+  margin: 0 auto;
+  /* Auto margins on left and right to center the block */
+  width: 100%;
+  max-width: 1280px;
 }
 
 /* .app-container is a flex container for the main content area below the navbar and banner */
@@ -207,7 +202,12 @@ watch([championA, championB], (newValues, oldValues) => {
   flex: 1;
   /* Flex grow to take up all available space */
   position: relative;
-  display: flex;
+  justify-content: center;
+  /* Centers children horizontally */
+  align-items: center;
+  /* Centers children vertically */
+  flex-grow: 1;
+  /* Fill the available space */
   /* Establishes a flex context for children */
   flex-direction: column;
   /* Stacks children vertically */
@@ -229,6 +229,7 @@ watch([championA, championB], (newValues, oldValues) => {
 
 /* .grid-container holds the main grid and should fill the available space in .app-container */
 .grid-container {
+
   flex-grow: 1;
   /* Takes up all available space within .app-container */
   display: flex;
@@ -240,6 +241,9 @@ watch([championA, championB], (newValues, oldValues) => {
 
 /* Each .row should take up an equal amount of space within .grid-container */
 .row {
+  justify-content: center;
+  /* Center columns horizontally */
+  height: 350px;
   flex-grow: 1;
   /* Flex grow to fill the container */
   min-height: 0;
@@ -277,7 +281,18 @@ watch([championA, championB], (newValues, oldValues) => {
 @media (max-height: 780px) {
   .row {
     min-height: 0;
+  }
 
+  .app-wrapper {
+    width: 100%;
+    /* Full width on smaller screens */
+    margin: 10px 0;
+    /* Adjusted margin for smaller screens */
+  }
+
+  /* Adjust the app-container padding for smaller screens if needed */
+  .app-wrapper {
+    padding: 0 10px;
   }
 }
 
@@ -369,5 +384,10 @@ watch([championA, championB], (newValues, oldValues) => {
 .col-md-4,
 .col-md-6 {
   position: relative;
-}
-</style>
+  height: 100%;
+  /* Full height of the row */
+  padding: 0;
+  /* Set to 0 or any specific value you need */
+  margin: auto;
+  /* Auto margins on left and right to center the block */
+}</style>

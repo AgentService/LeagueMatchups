@@ -29,6 +29,8 @@
 
   --grey-4: #0D2029;
 
+  --blue-laser-1:  #00FDFF;
+  --blue-laser-2: #10FEFF;
   --background-1-gradient: linear-gradient(135deg, #000406, #000507);
   --red-laser-gradient: linear-gradient(135deg, #FF4C5A, #FF5D6B);
   --blue-laser-gradient: linear-gradient(135deg, #00FDFF, #10FEFF);
@@ -44,6 +46,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%; /* Full height */
+  background-color: #000406;
 
 }
 .selector-for-some-widget {
@@ -52,11 +55,13 @@ body {
 
 
 
+/* #app is the root Vue element and should fill the entire height of the viewport */
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; 
-  overflow: hidden; /* Hide overflow */
+  min-height: 100vh;
+  background-color: #000406;
+  /* Full viewport height */
 
 }
 
