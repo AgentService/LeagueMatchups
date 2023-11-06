@@ -58,10 +58,11 @@ import ProgressBar from './utility/ProgressBar.vue';
 const store = useStore();
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
-const summonerName = computed(() => store.state.summonerData.name);
-const profileIconId = computed(() => store.state.summonerData.profileIconId);
+const summonerName = computed(() => store.state.playerDetails.accountData.gameName + '#' + store.state.playerDetails.accountData.tagLine);
+console.log(store.state);
+const profileIconId = computed(() => store.state.playerDetails.summonerData.profileIconId);
 const summonerIcon = computed(() => `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${profileIconId.value}.png`);
-const level = computed(() => store.state.summonerData.summonerLevel);
+const level = computed(() => store.state.playerDetails.summonerData.summonerLevel);
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 </script>
 

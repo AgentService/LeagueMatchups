@@ -17,7 +17,7 @@ export const store = createStore({
     championB: null,
     matchups: [],
     currentMatchup: null, // Holds the currently selected matchup
-    summonerData: retrieveFromSessionStorage('summonerData') || null,
+    playerDetails: retrieveFromSessionStorage('playerDetails') || null,
   },
   getters: {
     getChampionA: state => state.championA,

@@ -1,7 +1,7 @@
 <template>
     <div>
       <button @click="fetchAndDisplayChampionData">Load Champion Data</button>
-      <p v-if="championData">Champion Data: {{ championData }}</p>
+      <p v-if="championData">Champion Data: {{ championData.name }}</p>
     </div>
   </template>
   
