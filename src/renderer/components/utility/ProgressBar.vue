@@ -24,8 +24,8 @@
 .progress-bar-container {
   width: 100%; /* Full width of the parent element */
   background-color: #0e0e10; /* Dark background for the container */
-  border-radius: 1rem; /* Rounded corners for the container */
-  height: 1.5rem; /* Height of the container */
+  border-radius: .5rem; /* Rounded corners for the container */
+  height: .6rem; /* Height of the container */
   overflow: hidden; /* Ensures the inner bar doesn't overflow */
 }
 

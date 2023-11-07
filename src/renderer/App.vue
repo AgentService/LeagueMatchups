@@ -1,5 +1,4 @@
 <template>
-
   <Navbar></Navbar>
 
   <div class="app-wrapper">
@@ -21,23 +20,16 @@
         <div class="row">
           <div class="col-md-3 d-flex container-md gradient-border">
           </div>
-          <div class="col-md-6 d-flex align-items-stretch flex-column justify-content-between">
-            <div class="row">
-              <div class="d-flex justify-content-end w-50">
+          <div class="col-md-6 d-flex  ">
+            <div class="row ">
+              <div class="d-flex  w-50">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="d-flex justify-content-end w-50">
+              <div class="d-flex  w-50">
                 <ChampionSearch class="gradient-border-laser" :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
-            <div class="row">
-              <div class="d-flex justify-content-end w-50">
-                <Template></Template>
-              </div>
-              <div class="d-flex justify-content-end w-50">
-                <Template></Template>
-              </div>
-            </div>
+
           </div>
           <div class="col-md-3 d-flex align-items-stretch gradient-border  ">
             <MatchupNotes></MatchupNotes>
@@ -253,38 +245,18 @@ watch([championA, championB], (newValues, oldValues) => {
 }
 
 
-.custom-component {
-  height: 100%;
-}
-
-.mirrored-image {
-  transform: scaleX(-1);
-  /* Flip the image horizontally */
-}
-
-/* Background 
-.background-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -3;
-  background: var(--background-1-gradient);
-
-}*/
 .background-container {
   position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    z-index: 999;
-    background: linear-gradient( to right, hsla(var(--primary-hsl-hover) / 0.75), hsla(var(--primary-hsl) / 1) );
-    opacity: 0;
-    animation: none;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 999;
+  background: linear-gradient(to right, hsla(var(--primary-hsl-hover) / 0.75), hsla(var(--primary-hsl) / 1));
+  opacity: 0;
+  animation: none;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .row.front {
@@ -309,57 +281,7 @@ watch([championA, championB], (newValues, oldValues) => {
   }
 }
 
-.front {
-  z-index: 0;
-}
 
-
-.background-image {
-  position: absolute;
-  bottom: 25%;
-  /* Center the image vertically */
-  left: 50%;
-  /* Center the image horizontally */
-  max-width: 100%;
-  /* Increase the width to have a "zoomed out" effect */
-  max-height: 100%;
-  /* Increase the height to have a "zoomed out" effect */
-  z-index: -2;
-  background-size: contain;
-  background-position: center;
-}
-
-.gradient-overlay {
-  position: absolute;
-  top: 0;
-  left: -10px;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  /* Place it above the images but below other content */
-}
-
-.gradient-overlay2x {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #010c2260;
-  z-index: -2;
-  /* Place it above the images but below other content */
-}
-
-
-.left {
-  left: 0;
-  /* clip-path: polygon(0% 0%, 50% 0%, 50% 100%, 0% 100%); /* Display the left half */
-}
-
-.right {
-  right: 0;
-  /*  clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%); /* Only display the right half of the image */
-}
 
 /* Gradient Border Class */
 .gradient-border::before {

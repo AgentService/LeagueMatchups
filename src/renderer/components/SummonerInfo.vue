@@ -94,7 +94,7 @@ const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 .rank-title,
 .lp-title,
 .winrate-title {
-  font-size: 1rem;
+  font-size: var(--bs-font-size-base);
   color: #bbb;
   font-weight: bold;
 
@@ -103,6 +103,6 @@ const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 .rank-value,
 .lp-value,
 .winrate-value {
-  font-size: 0.8rem;
+  font-size: var(--bs-font-size-base);
 }
 </style>
