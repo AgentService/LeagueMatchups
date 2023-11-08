@@ -31,13 +31,13 @@ import matchupsRouter from './api/matchups.mjs';
 const app = express();
 const PORT = 3001;
 
-const debugApi = Debug('api');
+const debugApi = Debug(process.env.VITE_DEBUG);
 
 
 app.use(cors());
 app.use(express.json());
 
-debugApi(`DEBUG is set to ${process.env.DEBUG}`);
+console.log('111:', process.env);
 
 // Centralized error handling
 app.use((error, req, res, next) => {

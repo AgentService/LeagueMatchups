@@ -89,6 +89,7 @@ const summonerIcon = computed(() => {
   border-radius: 0.5rem;
   /* Consistent rounded corners */
   padding: 1rem;
+  max-height: 120px;
   /* Space inside the container */
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
   /* Subtle shadow for depth */
@@ -179,11 +180,9 @@ const summonerIcon = computed(() => {
 
 /* Adjust as needed */
 .icon-image {
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
 }
-
-
 
 .lp-text {
   position: relative;
@@ -201,7 +200,7 @@ const summonerIcon = computed(() => {
   /* Adjust this value so the pill appears just below the image */
   left: 50%;
   transform: translateX(-50%);
-  font-size: 12px;
+  font-size: 10px;
   color: #fff;
   padding: 0.25em 0.5em;
   /* Add padding around the text */

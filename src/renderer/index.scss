@@ -1,5 +1,3 @@
-
-
 :root {
   /* Blue colors */
   --blue-1: #CDFAFA;
@@ -10,6 +8,14 @@
   --blue-6: #091428;
   --blue-7: #0A1428;
 
+  --red-1: #FACDCD;
+  --red-2: #B90A0A;
+  --red-3: #AB0303;
+  --red-4: #820000;
+  --red-5: rgb(60, 10, 10);
+  --red-6: #280909;
+  --red-7: #140A0A;
+  
   /* Gold colors */
   --gold-1: #F0E6D2;
   --gold-2: #C8AA6E;
@@ -29,9 +35,9 @@
 
   --grey-4: #0D2029;
 
-  --blue-laser-1:  #00FDFF;
+  --blue-laser-1: #00FDFF;
   --blue-laser-2: #10FEFF;
-  --red-laser-1:  #FF5D6B;
+  --red-laser-1: #FF5D6B;
   --red-laser-2: #FF4C5A;
 
   --navbar-background-elements: #13151b;
@@ -39,20 +45,27 @@
   --background-1-gradient: linear-gradient(135deg, #000406, #000507);
   --red-laser-gradient: linear-gradient(135deg, #FF4C5A, #FF5D6B);
   --blue-laser-gradient: linear-gradient(135deg, #00FDFF, #10FEFF);
-  --border-grey-gradient: linear-gradient(to top, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
-  --border-grey-gradient-horizontal: linear-gradient(to left, #000406, #0D2029, #000406); /* Gradient from black to base color and back to black */
-  --border-laser-gradient-horizontal: linear-gradient(to left, #000406 , #FF4C5A , #00FDFF, #000406); /* Your gradient here */
+  --border-grey-gradient: linear-gradient(to top, #000406, #0D2029, #000406);
+  /* Gradient from black to base color and back to black */
+  --border-grey-gradient-horizontal: linear-gradient(to left, #000406, #0D2029, #000406);
+  /* Gradient from black to base color and back to black */
+  --border-laser-gradient-horizontal: linear-gradient(to left, #000406, #FF4C5A, #00FDFF, #000406);
+  /* Your gradient here */
 
-  --border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF); /* Your gradient here */
+  --border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF);
+  /* Your gradient here */
 
 }
+
 html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Full height */
+  height: 100%;
+  /* Full height */
 
 }
+
 .selector-for-some-widget {
   box-sizing: content-box;
 }
@@ -88,11 +101,13 @@ body {
   width: 100%;
   color: white;
 }
- 
+
 /* Text area styles */
 .textarea {
-  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
-  color: #E6E6E6; /* Light grey text for contrast */
+  background-color: rgba(255, 255, 255, 0.1);
+  /* Semi-transparent white background */
+  color: #E6E6E6;
+  /* Light grey text for contrast */
   border: none;
   border-radius: 5px;
   padding: 0.5rem;
@@ -105,17 +120,21 @@ body {
 .textarea:focus {
   outline: none;
   border-color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 0.2); /* More opaque on focus */
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); /* Glow effect */
+  background-color: rgba(255, 255, 255, 0.2);
+  /* More opaque on focus */
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+  /* Glow effect */
 }
 
 .textarea::placeholder {
-  color: #A9A9A9; /* Placeholder text color */
+  color: #A9A9A9;
+  /* Placeholder text color */
   font-style: italic;
 }
 
 .textarea:hover {
-  background-color: rgba(255, 255, 255, 0.15); /* More visible on hover */
+  background-color: rgba(255, 255, 255, 0.15);
+  /* More visible on hover */
 }
 
 /* Button styles */
@@ -128,7 +147,8 @@ body {
 
 .btn:hover,
 .btn:focus {
-  color: #28a745; /* Change color on hover/focus */
+  color: #28a745;
+  /* Change color on hover/focus */
 }
 
 a {
@@ -136,6 +156,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -145,6 +166,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -161,9 +183,11 @@ h1 {
   :root {
     color: #213547;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
@@ -171,8 +195,10 @@ h1 {
 
 
 .search-input {
-  box-sizing: border-box; /* This ensures padding is included in the width */
-  width: 100%; /* Full width */
+  box-sizing: border-box;
+  /* This ensures padding is included in the width */
+  width: 100%;
+  /* Full width */
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -182,5 +208,3 @@ h1 {
   padding: 10px;
   font-size: 16px;
 }
-
-

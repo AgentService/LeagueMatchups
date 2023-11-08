@@ -2,9 +2,10 @@
 import express from 'express';
 import { RiotAPI, DDragon } from '@fightmegg/riot-api';
 import Debug from 'debug';
-const debugApi = Debug('api');
 
+const debugApi = Debug('api');
 const router = express.Router();
+
 const rAPI = new RiotAPI(process.env.VITE_RIOT_API_KEY);
 const ddragon = new DDragon();
 const cacheDuration = 24 * 60 * 60; // 1 day in seconds

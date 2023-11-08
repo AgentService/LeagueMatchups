@@ -1,42 +1,44 @@
 <template>
-  <div :class="[themeClass, 'note-card', 'gradient-border', 'card', 'text-light']">
+	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light']">
+		<div class="note-card">
 
-    <div class="champion-card d-flex align-items-center justify-content-center">
+			<!-- Search Bar - Toggles the grid when clicked -->
+			<div class="search-bar">
+				<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
+					class="form-control" />
+			</div>
 
-      <div class="champion-selector w-100">
-        <div class="search-popover-container position-relative">
-          <div v-if="isDropdownOpen" class="champion-popover position-absolute">
-            <input v-model="searchTerm" @input="filterChampions" @focus="isDropdownOpen = true" placeholder="Search..."
-              class="form-control" />
+			<!-- Champion Grid - Visible when isGridVisible is true -->
+			<div class="champion-grid" v-show="isGridVisible">
 
-            <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option d-flex align-items-center
-                                        p-2" @click="selectChampion(champion)">
-              <!-- Use v-lazy instead of :src for lazy loading -->
-              <img v-lazy="getChampionImageSource('small', champion.id)" class="img-fluid me-2" alt="Champion Image" />
-              <span>{{ champion.name }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="champion-display d-flex align-items-center flex-column  justify-content-between">
-          <div class="lo-title align-items-center">
-            <!-- <h3>{{ selectedChampion.id }}</h3> -->
-          </div>
-          <div class="champion-display">
-            <div :class="[themeClass, 'champion-image-container']">
-              <img ref="elementToAnimate" class="champion-image "
-                :src="selectedChampion ? getChampionImageSource('tiles', selectedChampion.id) : '/img/champions/placeholder.png'"
-                @click="isDropdownOpen = true" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+				<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
+					@click="selectChampion(champion)">
+					<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
+					<span>{{ champion.name }}</span>
+				</div>
+			</div>
+
+			<!-- Detail View - Shown when a champion is selected -->
+			<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
+				<div :class="[themeClass, 'champion-image-container']">
+					<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
+						alt="Champion Image" />
+					<!-- Insert more details here as needed -->
+					<h3>{{ selectedChampion.name }}</h3>
+					<!-- For example, add lore, abilities, stats etc. -->
+					<p>{{ selectedChampion.lore }}</p>
+					<!-- ... -->
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
-
+  
+  
+  
 <script>
 import { useStore } from "vuex";
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import gsap from "gsap";
 import Debug from "debug";
 const debug = Debug("app:component:ChampionSelection");
@@ -50,7 +52,6 @@ export default {
 	},
 	setup() {
 		const elementToAnimate = ref(null);
-
 		onMounted(() => {
 			debug("Mounted");
 			// Define the animation for the blue theme
@@ -96,12 +97,13 @@ export default {
 			searchTerm: "",
 			champions: [],
 			filteredChampions: [],
-			selectedChampion: "",
+			selectedChampion: null,
 			selectedChampions: [], // Initialize empty array
-			isDropdownOpen: false // A mystical gatekeeper that controls the visibility of the dropdown
-
+			isGridVisible: false,
+			championSelectedFromClient: null, // This will hold the auto-selected champion
 		};
 	},
+
 	mounted() {
 		const store = useStore();
 
@@ -110,46 +112,90 @@ export default {
 		store.dispatch("champions/fetchChampionData").then(() => {
 			const listChampionsData = store.state.champions.championList;
 			// const detailedChampionsData = store.state.champions.championDetails;
-			// Process the data as needed for this component
-			const championsArray = Object.values(listChampionsData).map(champ => champ);
-			this.filteredChampions = [...championsArray];
+			// Store the full list of champions for filtering
+			this.champions = Object.values(listChampionsData);
+
+			// Optionally, initialize filteredChampions with the full list if you want
+			// all champions to be displayed before any search is performed.
+			this.filteredChampions = [...this.champions];
 
 			// Determine and select a preselected champion based on instanceId
-			const preselectedChampion = this.instanceId === 1 ? championsArray[1] : championsArray[2];
-			this.selectChampion(preselectedChampion);
+			// Ensure there is a valid champion at the index before selecting
+			const preselectedChampionIndex = this.instanceId === 1 ? 0 : 1;
+			if (this.champions.length > preselectedChampionIndex) {
+				const preselectedChampion = this.champions[preselectedChampionIndex];
+				//this.selectChampion(preselectedChampion);
+			}
 		}).catch(error => {
 			console.error("Error fetching champions:", error);
 		});
 	},
-
-
-	methods: {
-		filterChampions() {
-			this.filteredChampions = this.champions.filter(champion =>
-				champion.toLowerCase().startsWith(this.searchTerm.toLowerCase())
+	computed: {
+		filteredChampions() {
+			if (!this.searchTerm) return this.champions;
+			return this.champions.filter(champion =>
+				champion.name.toLowerCase().includes(this.searchTerm.toLowerCase())
 			);
+		},
+		themeClass() {
+			return this.instanceId === 1 ? "blue-theme" : "red-theme";
+		},
+	},
+	methods: {
+		checkScrollable() {
+			const gridContainer = this.$refs.gridContainer; // You'll need to add a ref="gridContainer" to the element
+			if (gridContainer.scrollHeight > gridContainer.clientHeight) {
+				gridContainer.classList.add('is-scrollable');
+			} else {
+				gridContainer.classList.remove('is-scrollable');
+			}
+		},
+		syncWithClient() {
+			// Logic to sync with the League client and fetch the selected champion
+			// For example, this could be set based on a response from an API call:
+			// this.championSelectedFromClient = responseFromClient;
+			this.isGridVisible = true; // Show the grid after syncing
+		},
+		showGrid() {
+			this.isGridVisible = true;
+		},
+
+		// Method to hide the grid if you need it
+		hideGrid() {
+			this.isGridVisible = false;
+		},
+		filterChampions() {
+			if (!this.searchTerm) return this.champions;
+			this.filteredChampions = this.champions.filter(champion => {
+				return champion.name.toLowerCase().includes(this.searchTerm.toLowerCase());
+			});
 		},
 		selectChampion(champion) {
 			this.selectedChampion = champion;
+			this.hideGrid();
 			debug("Selected champion:", this.selectedChampion);
-			this.searchTerm = ""; // Clears the search field, bestowing it with a fresh start
+			// Trigger the GSAP animation for the selected champion
+			this.animateChampion();
+			// Emit an event if you need to notify the parent component
 			this.$emit("championSelected", this.selectedChampion);
-			this.closeDropdown();
-
+		},
+		animateChampion() {
+			// Define your GSAP animations here
+			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
 		},
 		getChampionImageSource(type, championId) {
 			switch (type) {
-			case "small":
-				return `/img/champions/${championId}.png`;
-			case "loading":
-				return `/img/champion_loading/${championId}.png`;
-			case "splash":
-				return `/img/champion_splash/${championId}.png`;
-			case "tiles":
-				return `/img/tiles/${championId}_0.jpg`;
-			default:
-				// Handle the case where the type does not match 'small' or 'loading'
-				return ""; // or some default path
+				case "small":
+					return `/img/champions/${championId}.png`;
+				case "loading":
+					return `/img/champion_loading/${championId}.png`;
+				case "splash":
+					return `/img/champion_splash/${championId}.png`;
+				case "tiles":
+					return `/img/tiles/${championId}_0.jpg`;
+				default:
+					// Handle the case where the type does not match 'small' or 'loading'
+					return ""; // or some default path
 			}
 		},
 		toggleDropdown() {
@@ -160,17 +206,6 @@ export default {
 		},
 	},
 	computed: {
-		backgroundStyle() {
-			return this.selectedChampion ?
-				{
-					backgroundImage: `url(${this.getChampionImageSource("splash", this.selectedChampion.id)})`,
-					backgroundSize: "cover",
-					backgroundPosition: "center",
-					backgroundRepeat: "no-repeat",
-					backgroundColor: "rgba(0, 0, 0, 0.7)", // Adding a semi-transparent black background
-					backgroundBlendMode: "multiply", // Blending the background image with the background color
-				} : {};
-		},
 		themeClass() {
 			return this.instanceId === 1 ? "blue-theme" : "red-theme";
 		},
@@ -180,137 +215,235 @@ export default {
 
 <style scoped>
 .note-card {
-  /*background-color: rgba(0, 0, 0, 0.7); /* Adjust the alpha for transparency */
-  padding: 1rem;
-  color: #fff;
-  height: 100%;
-  font-family: 'Your Font', sans-serif;
-  /* Replace 'Your Font' with your actual font */
+	width: 100%;
+	/* Full width of the card */
+	height: 100%;
+	/* Full height of the card */
+	display: flex;
+	/* Use flexbox to manage the layout */
+	flex-direction: column;
+	/* Stack children vertically */
 }
 
-.champion-image-container {}
+.champion-grid-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: auto;
 
+	/* Ensure the padding does not increase the total width of the element */
+	/* Other styles... */
+	/* Ensure the container fills the parent height */
+}
 
-.champion-display {
-  height: 100%;
-  display: flex;
+/* Style for the champion grid container */
+.champion-grid {
+	flex-grow: 1;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+	gap: 0.6rem;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 1rem;
+	box-sizing: border-box;
+	margin-right: 20px;
+}
+
+.champion-grid.is-scrollable {
+	padding-right: 10px;
+	/* Add some padding to the right to make room for the scrollbar */
+}
+
+.slim-row {
+	top: 0;
+	z-index: 100;
+	position: fixed;
+	justify-content: center;
+	height: auto;
+	/* Let the content define the height */
+	flex-grow: 0;
+	/* Do not allow the row to grow */
+	padding: 0 2rem;
+}
+
+.search-bar {
+	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	padding-bottom: 0rem;
+}
+
+.search-bar input.form-control {
+	background: var(--grey-cool);
+	width: 40%;
+	/* Set the width of the input to 50% of its parent */
+	border-bottom: 2px solid var(--gold-4);
+	color: var(--gold-3);
+}
+
+/* Change the placeholder color */
+.search-bar input.form-control::placeholder {
+	color: var(--gold-3);
+	/* Set the placeholder text color to gold */
+}
+
+/* For the placeholder image */
+.champion-placeholder-image {
+	/* Your styles for the placeholder image */
+	color: var(--gold-3);
+	/* If the image is an icon font, set the color to gold */
 }
 
 
-.search-input {
-  position: relative;
-  width: 100%;
-  border: none;
-  border-radius: 4px;
+.champion-tile {
+	background: var(--hextech-black);
+	border: 1px solid var(--blue-7);
+	/* Add more styles for padding, margins, etc. as needed */
 }
 
-.search-popover-container {
-  left: 0;
-  max-height: 0px;
-  position: absolute;
-  width: 100%;
-  /* Take the full width of the parent */
-  z-index: 1;
-  /* Ensure it appears above other elements if there's overlap */
+/* Champion tile image */
+.champion-tile img {
+	max-width: 100%;
+	/* Ensure the image does not exceed its container */
+	display: block;
+	/* Images are inline by default; change this to block to allow for margin */
+	margin-bottom: 0.5rem;
+	/* Space between the image and the name */
 }
 
-
-.champion-popover {
-  width: 100%;
-  /* Make the popover take up the full width of the parent */
-  top: 130px;
-  /* Position the popover 20px below the input */
-  position: absolute;
-  color: white;
-  border-bottom: 1px solid #2d3748;
-  transition: width 0.3s ease;
-  /* Adding a transition for smooth expansion */
-  background-color: #1a202c;
-  border: 1px solid #2d3748;
-  max-height: 300px;
-  overflow-x: hidden;
-  /* Ensuring the popover is scrollable if content overflows */
+/* Champion tile name */
+.champion-tile span {
+	display: block;
+	text-shadow: 1px 1px 2px var(--blue-6);
+	/* Make the span a block element to allow for text alignment */
+	text-align: center;
+	/* Center the text */
+	color: var(--gold-2);
+	display: block;
+	font-size: 1rem;
+	margin-top: 0.25rem;
 }
 
-
-.champion-option {
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  cursor: pointer;
+.champion-detail {
+	display: flex;
+	/* Establishes a flex container */
+	justify-content: center;
+	/* Centers children along the main axis (horizontal) */
+	align-items: center;
+	/* Centers children along the cross axis (vertical) */
+	height: 100%;
+	/* Ensures the container takes full height of its parent */
+	text-align: center;
+	/* Centers the text within the container */
 }
 
-.champion-option img {
-  width: 30px;
-  height: auto;
-  margin-right: 0.5rem;
+.champion-image-container {
+	display: flex;
+	flex-direction: column;
+	/* Aligns children (image and text) in a vertical stack */
+}
+
+.champion-image {
+	max-width: 150px;
+	/* Ensures the image is not larger than its container */
+	max-height: 150px;
+	/* Ensures the image does not exceed the container height */
+	object-fit: contain;
+	/* Ensures the image maintains aspect ratio without being cropped */
 }
 
 
 .blue-theme .champion-image {
-  display: block;
-  border-radius: 50%;
-  width: 150px;
-  height: 150px;
-  overflow: hidden;
-  /* To clip the pseudo-element within the circular shape */
-  /* border: 2px solid var(--blue-laser-1); */
-  position: relative;
+	border-radius: 50%;
+	width: 150px;
+	overflow: hidden;
+	border: 2px solid var(--blue-laser-1);
 }
 
+/* .blue-theme .note-card {
+	color: var(--blue-laser-1);
+}
+
+.red-theme .note-card {
+	color: var(--red-laser-1);
+} */
+
+
 .red-theme .champion-image {
-  display: block;
-  border-radius: 50%;
-  width: 150px;
-  height: 150px;
-  overflow: hidden;
-  /* To clip the pseudo-element within the circular shape */
-  /* border: 2px solid var(--blue-laser-1); */
-  position: relative;
+	display: block;
+	border-radius: 50%;
+	width: 150px;
+	height: 150px;
+	overflow: hidden;
+	border: 3px solid var(--red-laser-1);
+	position: relative;
 }
 
 .blue-theme .champion-image {
-  border: 3px solid var(--blue-laser-2);
-  animation: blue-glow 2s infinite alternate;
+	border: 3px solid var(--blue-laser-2);
+	animation: blue-glow 2s infinite alternate;
 }
 
 .red-theme .champion-image {
-  border: 3px solid var(--red-laser-1);
-  animation: red-glow 2s infinite alternate;
+	border: 3px solid var(--red-laser-1);
+	animation: red-glow 2s infinite alternate;
 }
 
 @keyframes red-glow {
 
-  0%,
-  100% {
-    border-color: var(--red-laser-2);
-    /* Red */
-    box-shadow: 0 0 14px 4px var(--red-laser-1);
-    /* Red glow */
-  }
+	0%,
+	100% {
+		border-color: var(--red-laser-2);
+		/* Red */
+		box-shadow: 0 0 14px 4px var(--red-laser-1);
+		/* Red glow */
+	}
 
-  50% {
-    border-color: var(--red-laser-1);
-    box-shadow: 0 0 14px 4px var(--red-laser-2);
-    /* Constant Red glow */
-  }
+	50% {
+		border-color: var(--red-laser-1);
+		box-shadow: 0 0 14px 4px var(--red-laser-2);
+		/* Constant Red glow */
+	}
 }
 
 @keyframes blue-glow {
 
-  0%,
-  100% {
-    border-color: var(--blue-laser-2);
-    /* Blue */
-    box-shadow: 0 0 14px 4px var(--blue-laser-1);
-    /* Blue glow */
-  }
+	0%,
+	100% {
+		border-color: var(--blue-laser-2);
+		/* Blue */
+		box-shadow: 0 0 14px 4px var(--blue-laser-1);
+		/* Blue glow */
+	}
 
-  50% {
-    border-color: var(--blue-laser-1);
-    box-shadow: 0 0 14px 4px var(--blue-laser-2);
-    /* Constant Blue glow */
-    /* Red glow */
-  }
+	50% {
+		border-color: var(--blue-laser-1);
+		box-shadow: 0 0 14px 4px var(--blue-laser-2);
+		/* Constant Blue glow */
+		/* Red glow */
+	}
 }
-</style>
+
+/* Scrollbar styles for the search bar or its container */
+.champion-grid::-webkit-scrollbar {
+	padding-right: 10px;
+	width: .75rem;
+	/* Width of the scrollbar */
+}
+
+.blue-theme .champion-grid::-webkit-scrollbar-thumb {
+	background-color: var(--blue-laser-1);
+	border-radius: 6px;
+	height: 2rem;
+}
+
+.champion-grid::-webkit-scrollbar-track {
+	background-color: var(--navbar-background-elements);
+	/* Black color for the track */
+}
+
+.red-theme .champion-grid::-webkit-scrollbar-thumb {
+	background-color: var(--red-laser-1);
+	border-radius: 6px;
+	height: 2rem;
+}</style>

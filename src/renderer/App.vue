@@ -1,43 +1,50 @@
 <template>
-  <Navbar></Navbar>
+  <Navbar>
+
+  </Navbar>
   <div class="app-wrapper">
     <div class="app-container">
-      <LearningObjectives></LearningObjectives>
-
       <div class="background-container gradient-top-border ">
         <!--
         <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
         <img v-if="championB" :src="`/img/champion_splash/${championB.id}.png`" class="background-image right" alt="Champion B" />
         -->
       </div>
-
       <div class="grid-container">
-
         <!-- Adjust the height to take up the remaining space after Navbar -->
         <!-- First Row -->
         <div class="row">
           <div class="col-md-3 d-flex container-md gradient-border">
+            <LearningObjectives></LearningObjectives>
+
           </div>
-          <div class="col-md-6 d-flex  ">
-            <div class="row ">
-              <div class="d-flex  w-50">
+          <div class="col-md-6">
+            <!-- New slim full-width row above ChampionSearch components -->
+            <div class="row slim-row ">
+              <div class="col-12">
+                <div class="title-bar">
+                  <h4>Select your Matchup</h4>
+                </div>
+              </div>
+            </div>
+            <!-- Existing rows for ChampionSearch components -->
+            <div class="row">
+              <div class="col-md-6 d-flex">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="d-flex  w-50">
+              <div class="col-md-6 d-flex">
                 <ChampionSearch class="gradient-border-laser" :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
-          <div class="col-md-3 d-flex align-items-stretch gradient-border  ">
-            <MatchupNotes></MatchupNotes>
+          <div class="col-md-3 d-flex align-items-stretch gradient-border">
           </div>
         </div>
         <!-- Second Row -->
         <div class="row">
           <div class="col-md-3 d-flex align-items-stretch gradient-top-border">
-            <Template></Template>
           </div>
-          <div class="col-md-6 d-flex flex-column align-items-stretch gradient-top-border">
+          <div class="col-md-6 d-flex flex-column align-items-stretch ">
             <div class="row">
               <div class="col-md-6 gradient-border">
               </div>
@@ -46,15 +53,14 @@
             </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch gradient-border gradient-top-border">
-            <Template></Template>
           </div>
         </div>
         <div class="row ">
           <div class="col-md-4 d-flex align-items-stretch gradient-top-border">
-            <Template></Template>
           </div>
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
-            <ChampionDataTest />
+            <MatchupNotes></MatchupNotes>
+
           </div>
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
           </div>
@@ -104,42 +110,42 @@ onMounted(async () => {
 });
 const handleMatchup = () => {
 
-	if (championA.value && championB.value) {
-		if (!bothSelected) {
-			bothSelected = true;
+  if (championA.value && championB.value) {
+    if (!bothSelected) {
+      bothSelected = true;
 
-			const champAName = championA.value.name;
-			const champBName = championB.value.name;
+      const champAName = championA.value.name;
+      const champBName = championB.value.name;
 
-			if (champAName === champBName) {
-				return;
-			}
-			const matchupKey = `${champAName}-${champBName}`;
+      if (champAName === champBName) {
+        return;
+      }
+      const matchupKey = `${champAName}-${champBName}`;
 
-			const matchup = {
-				id: matchupKey, // using matchupKey as a unique id
-				champions: [championA.value, championB.value] // retaining champions data
-			};
-			debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
-			store.dispatch("matchups/handleMatchupCreation", matchup);
-		}
-	} else {
-		bothSelected = false;
-	}
+      const matchup = {
+        id: matchupKey, // using matchupKey as a unique id
+        champions: [championA.value, championB.value] // retaining champions data
+      };
+      debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
+      store.dispatch("matchups/handleMatchupCreation", matchup);
+    }
+  } else {
+    bothSelected = false;
+  }
 };
 
 
 const setChampionA = (champion) => {
-	championA.value = champion;
+  championA.value = champion;
 };
 
 const setChampionB = (champion) => {
-	championB.value = champion;
+  championB.value = champion;
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {
-	bothSelected = false;
-	handleMatchup();
+  bothSelected = false;
+  handleMatchup();
 });
 
 
@@ -162,6 +168,14 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 
+.title-bar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--gold-3);
+	border-bottom: 1px solid var(--gold-4);
+	margin-bottom: 1rem;
+}
 
 
 
@@ -175,7 +189,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   margin: 0 auto;
   /* Auto margins on left and right to center the block */
   width: 100%;
-  max-width: 1280px;
+  max-width: 1600px;
 }
 
 /* .app-container is a flex container for the main content area below the navbar and banner */
@@ -225,12 +239,22 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   justify-content: center;
   /* Center columns horizontally */
   height: 350px;
-  flex-grow: 1;
+  /* flex-grow: 1; */
   /* Flex grow to fill the container */
   min-height: 0;
   /* Override the default min-height to ensure flex-grow works */
   --bs-gutter-x: 0;
 
+}
+
+/* For slim rows */
+.slim-row {
+  justify-content: center;
+  height: auto;
+  /* Let the content define the height */
+  flex-grow: 0;
+  /* Do not allow the row to grow */
+  padding: 0 2rem;
 }
 
 
@@ -241,7 +265,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   right: 0;
   height: 3px;
   z-index: 999;
-  background: linear-gradient(to right, hsla(var(--primary-hsl-hover) / 0.75), hsla(var(--primary-hsl) / 1));
+  background: var(--navbar-background-gradient);
   opacity: 0;
   animation: none;
   transition: opacity 0.3s ease;
