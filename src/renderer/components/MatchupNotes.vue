@@ -17,6 +17,8 @@ Waiit this is to complicated, lets ceck if there is another issue.
 <script>
 import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
+import Debug from 'debug';
+const debug = Debug('app:component:MatchupNotes');
 
 export default {
   setup() {
@@ -41,7 +43,8 @@ export default {
 
     watch(currentMatchup, (newMatchup, oldMatchup) => {
       if (newMatchup !== oldMatchup) {
-        notes.value = newMatchup.notes;
+        debug('Matchup changed, updating notes...');
+        notes.value = newMatchup?.notes;
       }
     });
 

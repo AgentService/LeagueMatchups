@@ -55,18 +55,13 @@
   </div>
 </template>
 
-
-
-
 <script setup>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import ProgressBar from './utility/ProgressBar.vue';
 
-
 const store = useStore();
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
-
 
 const accountData = computed(() => store.getters['summoner/accountData']);
 const summonerData = computed(() => store.getters['summoner/summonerData']);
@@ -83,11 +78,7 @@ const summonerIcon = computed(() => {
   }
   return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
 });
-
-
-
 </script>
-
 
 <style scoped>
 /* Main container style */

@@ -1,15 +1,16 @@
 // summonerDataService.js
 import store from '../store/index'; // Import the store directly
-
+import Debug from 'debug';
+const debug = Debug('app:services:summoner-data');
 // Function that invokes the fetching of summoner data
 export async function fetchAndSaveSummonerData(summonerNameValue) {
   try {
     if (summonerNameValue) {
-      console.log('Fetching summoner data for:', summonerNameValue);
+      debug('Fetching summoner data for:', summonerNameValue);
       await store.dispatch('summoner/fetchSummonerData', {
         region: "europe",
         gameName: summonerNameValue,
-        tagLine: 'EUW1',
+        tagLine: 'euw1',
       });
     }
   } catch (error) {
@@ -24,7 +25,7 @@ export function initializeSummonerDataFetching() {
     if (!currentSummonerData || currentSummonerData.name !== newSummonerName) {
       await fetchAndSaveSummonerData(newSummonerName);
     } else {
-      console.log('Summoner data is up to date.');
+      debug('Summoner data already up to date');
     }
   });
 

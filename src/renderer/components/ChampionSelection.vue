@@ -10,7 +10,7 @@
               class="form-control" />
 
             <div v-for="champion in filteredChampions" :key="champion.id" class="champion-option d-flex align-items-center
-                                p-2" @click="selectChampion(champion)">
+                                        p-2" @click="selectChampion(champion)">
               <!-- Use v-lazy instead of :src for lazy loading -->
               <img v-lazy="getChampionImageSource('small', champion.id)" class="img-fluid me-2" alt="Champion Image" />
               <span>{{ champion.name }}</span>
@@ -23,11 +23,9 @@
           </div>
           <div class="champion-display">
             <div :class="[themeClass, 'champion-image-container']">
-              <img class="champion-image laser-glow"
+              <img ref="elementToAnimate" class="champion-image "
                 :src="selectedChampion ? getChampionImageSource('tiles', selectedChampion.id) : '/img/champions/placeholder.png'"
                 @click="isDropdownOpen = true" />
-              <div ref="elementToAnimate">Move me</div>
-
             </div>
           </div>
         </div>
@@ -40,6 +38,8 @@
 import { useStore } from 'vuex';
 import { ref, onMounted } from 'vue';
 import gsap from 'gsap';
+import Debug from 'debug';
+const debug = Debug('app:component:ChampionSelection');
 
 export default {
   props: {
@@ -52,41 +52,40 @@ export default {
     const elementToAnimate = ref(null);
 
     onMounted(() => {
-      // gsap.to('.champion-image', {
-      //   duration: 1,
-      //   boxShadow: '0 0 20px rgba(255, 255, 255, 0.75)',
-      //   repeat: -1, // repeat indefinitely
-      //   yoyo: true, // go back and forth
-      //   ease: 'power1.inOut'
-      // });
-      // gsap.fromTo('.champion-image',
-      //   { boxShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000, 0 0 40px #ff0077, 0 0 70px #ff0077, 0 0 80px #ff0077, 0 0 100px #ff0077' },
-      //   {
-      //     boxShadow: '0 0 5px #0000ff, 0 0 15px #0000ff, 0 0 20px #0000ff, 0 0 25px #7700ff, 0 0 35px #7700ff, 0 0 40px #7700ff, 0 0 50px #7700ff',
-      //     repeat: -1,
-      //     yoyo: true,
-      //     ease: 'linear',
-      //     duration: 2
-      //   }
-      // );
-
-      // Select the element with the 'laser-glow' class
-      const laserGlowElement = document.querySelector('.laser-glow');
-
-      // GSAP timeline for the "rotating" glow effect
-      const tl = gsap.timeline({ repeat: -1, yoyo: true });
-
-      // Animate the border color and shadow glow
-      tl.to(laserGlowElement, {
-        boxShadow: "0 0 12px 2px #00FDFF", // Blue glow
-        borderColor: "#10FEFF",
-        duration: 2,
-      })
-        .to(laserGlowElement, {
-          boxShadow: "0 0 12px 2px #10FEFF", // Blue glow
-          borderColor: "#00FDFF",
-          duration: 2,
+      debug('Mounted');
+      // Define the animation for the blue theme
+      const blueAnimation = () => {
+        gsap.to(elementToAnimate.value, {
+          boxShadow: "0 0 20px rgba(0, 253, 255, 0.75)", // Blue glow
+          borderColor: "#10FEFF", // Light blue
+          repeat: -1, // repeat indefinitely
+          yoyo: true, // go back and forth
+          ease: "power1.inOut",
+          duration: 1
         });
+      };
+
+      // Define the animation for the red theme
+      const redAnimation = () => {
+        gsap.to(elementToAnimate.value, {
+          boxShadow: "0 0 28px rgba(255, 0, 0, 0.75)", // Red glow
+          borderColor: "#FE1010", // Light red
+          repeat: -1, // repeat indefinitely
+          yoyo: true, // go back and forth
+          ease: "power1.inOut",
+          duration: 1
+        });
+      };
+
+      // Check the instanceId and apply the corresponding animation
+      if (this?.instanceId) {
+        debug('instanceId:', this.instanceId);
+        if (this.instanceId === 1) {
+          blueAnimation();
+        } else if (this.instanceId === 2) {
+          redAnimation();
+        }
+      }
     });
 
     return { elementToAnimate };
@@ -107,6 +106,7 @@ export default {
     const store = useStore();
 
     // Dispatch the action to fetch champion data
+    debug('Fetching champion data...');
     store.dispatch('champions/fetchChampionData').then(() => {
       const listChampionsData = store.state.champions.championList;
       const detailedChampionsData = store.state.champions.championDetails;
@@ -130,12 +130,10 @@ export default {
       );
     },
     selectChampion(champion) {
-
       this.selectedChampion = champion;
-
+      debug('Selected champion:', this.selectedChampion);
       this.searchTerm = ''; // Clears the search field, bestowing it with a fresh start
       this.$emit('championSelected', this.selectedChampion);
-
       this.closeDropdown();
 
     },
@@ -162,10 +160,6 @@ export default {
     },
   },
   computed: {
-    matchups() {
-      const store = useStore();
-      return store.state.matchups; // Access matchups from the Vuex state
-    },
     backgroundStyle() {
       return this.selectedChampion ?
         {
@@ -262,8 +256,6 @@ export default {
   /* To clip the pseudo-element within the circular shape */
   /* border: 2px solid var(--blue-laser-1); */
   position: relative;
-
-
 }
 
 .red-theme .champion-image {
@@ -271,26 +263,43 @@ export default {
   border-radius: 50%;
   width: 150px;
   height: 150px;
-  position: relative;
-  /* border: 2px solid var(--red-laser-1); */
-  /* Important for positioning the pseudo-element */
   overflow: hidden;
+  /* To clip the pseudo-element within the circular shape */
+  /* border: 2px solid var(--blue-laser-1); */
   position: relative;
-  box-shadow: 0 0 2px #E91E63, 0 0 5px #F3216C;
-  /* Initial red glow */
-  animation: red-laser-glow-animation 2s infinite alternate;
 }
 
-.laser-glow {
-  position: relative;
+.blue-theme .champion-image {
   border: 3px solid var(--blue-laser-2);
-  /* Transparent border to set the initial size */
-  box-shadow: 0 0 10px 2px var(--blue-laser-1);
-  /* Blue glow */
+  animation: blue-glow 2s infinite alternate;
 }
 
-@keyframes glow {
-  0%, 100% {
+.red-theme .champion-image {
+  border: 3px solid var(--red-laser-1);
+  animation: red-glow 2s infinite alternate;
+}
+
+@keyframes red-glow {
+
+  0%,
+  100% {
+    border-color: var(--red-laser-2);
+    /* Red */
+    box-shadow: 0 0 14px 4px var(--red-laser-1);
+    /* Red glow */
+  }
+
+  50% {
+    border-color: var(--red-laser-1);
+    box-shadow: 0 0 14px 4px var(--red-laser-2);
+    /* Constant Red glow */
+  }
+}
+
+@keyframes blue-glow {
+
+  0%,
+  100% {
     border-color: var(--blue-laser-2);
     /* Blue */
     box-shadow: 0 0 14px 4px var(--blue-laser-1);
@@ -299,7 +308,9 @@ export default {
 
   50% {
     border-color: var(--blue-laser-1);
-    box-shadow: 0 0 14px 4px var(--blue-laser-2);/* Constant Blue glow */
+    box-shadow: 0 0 14px 4px var(--blue-laser-2);
+    /* Constant Blue glow */
     /* Red glow */
   }
-}</style>
+}
+</style>

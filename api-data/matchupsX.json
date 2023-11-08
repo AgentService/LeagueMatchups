@@ -1146,5 +1146,173 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Aphelios-Aatrox",
+    "champions": [
+      {
+        "id": "Aphelios",
+        "name": "Aphelios"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Lucian-Akali",
+    "champions": [
+      {
+        "id": "Lucian",
+        "name": "Lucian"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Rakan-Akali",
+    "champions": [
+      {
+        "id": "Rakan",
+        "name": "Rakan"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Annie-Aatrox",
+    "champions": [
+      {
+        "id": "Annie",
+        "name": "Annie"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Fizz-Akali",
+    "champions": [
+      {
+        "id": "Fizz",
+        "name": "Fizz"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Kha'Zix-Akali",
+    "champions": [
+      {
+        "id": "Khazix",
+        "name": "Kha'Zix"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "K'Sante-Akali",
+    "champions": [
+      {
+        "id": "KSante",
+        "name": "K'Sante"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Volibear-Akali",
+    "champions": [
+      {
+        "id": "Volibear",
+        "name": "Volibear"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Rammus-Akali",
+    "champions": [
+      {
+        "id": "Rammus",
+        "name": "Rammus"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Kled-Akali",
+    "champions": [
+      {
+        "id": "Kled",
+        "name": "Kled"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Kennen-Akali",
+    "champions": [
+      {
+        "id": "Kennen",
+        "name": "Kennen"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Garen",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Garen",
+        "name": "Garen"
+      }
+    ],
+    "notes": ""
   }
 ]

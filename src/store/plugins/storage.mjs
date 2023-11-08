@@ -1,3 +1,4 @@
+import { createDebugger } from '../../logger.js';
 
 // storage.js
 const cacheDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -12,7 +13,6 @@ export function saveToSessionStorage(key, value) {
   try {
     const stringValue = JSON.stringify(value);
     sessionStorage.setItem(key, stringValue);
-    console.log(`Data saved for key: ${key}`);
   } catch (error) {
     console.error(`Error saving data to sessionStorage for key: ${key}`, error);
   }
@@ -37,14 +37,13 @@ export function saveToLocalStorage(key, value) {
       data: value,
     };
     localStorage.setItem(key, JSON.stringify(dataToStore))
-    console.log(`Data saved for key: ${key}`);
   } catch (error) {
     console.error(`Error saving data to sessionStorage for key: ${key}`, error);
   }
 }
 
 // Utility to retrieve data from sessionStorage
-export function loadFromLocalStorage(key) {
+export function retrieveFromLocalStorage(key) {
   try {
     const cachedDataString = localStorage.getItem(key);
     if (!cachedDataString) return null;

@@ -1,8 +1,11 @@
 // store/index.js
 import { createStore } from 'vuex';
 import { summoner } from './modules/summoner.js';
-import { retrieveFromSessionStorage, saveToLocalStorage, loadFromLocalStorage } from './plugins/storage.mjs'; // import the function
+import { saveToLocalStorage, retrieveFromLocalStorage } from './plugins/storage.mjs'; // import the function
 import { champions } from './modules/champions.js';
+import Debug from 'debug';
+
+const debug = Debug('app:components:matchup');
 
 import axios from 'axios';
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
@@ -56,6 +59,7 @@ export const store = createStore({
   },
   actions: {
     async fetchSelectedMatchup({ commit }, matchupId) {
+      debug('Fetching matchup with id:', matchupId);
       try {
         const response = await axios.get(`${baseUrl}/api/matchups/${matchupId}`);
         commit('SET_CURRENT_MATCHUP', response.data);
@@ -64,10 +68,12 @@ export const store = createStore({
       }
     },
     async fetchMatchups({ commit }) {
-      let matchupsData = loadFromLocalStorage('matchupsData');
+      debug('Fetching matchups');
+      let matchupsData = retrieveFromLocalStorage('matchupsData');
 
       if (!matchupsData) {
         try {
+          debug('Fetching matchups from server');
           const response = await axios.get('/api/matchups');
           matchupsData = response.data;
           saveToLocalStorage('matchupsData', matchupsData);
@@ -76,16 +82,18 @@ export const store = createStore({
           console.error('Error fetching matchups data:', error);
         }
       } else {
+        debug('Matchups loaded from local storage');
         commit('SET_MATCHUPS_DATA', matchupsData);
       }
     },
     async handleMatchupCreation({ commit }, { id, champions: [championA, championB] }) {
       // Check if the matchup is already in local storage
-      let matchups = loadFromLocalStorage('matchupsData') || {};
-
+      let matchups = retrieveFromLocalStorage('matchupsData') || {};
       if (!matchups[id]) {
         // Matchup not found in local storage, check the server
         try {
+          console.log('Fetching matchup from server');
+          debug('Fetching matchup from server');
           const response = await axios.get(`${baseUrl}/api/matchups/${id}`);
           if (response.data.message === 'Matchup not found') {
             // Create new matchup if it doesn't exist on the server

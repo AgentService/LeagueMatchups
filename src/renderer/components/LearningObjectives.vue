@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import Debug from 'debug';
+const debug = Debug('app:component:LearingObjectives');
 export default {
   data() {
     return {
@@ -82,12 +84,14 @@ export default {
       this.showLOs = !this.showLOs;
     },
     startLO(lo) {
+      debug('startLO', lo);
       lo.started = true;
       lo.startDate = new Date(); // Set the start date to now
       lo.endDate = this.addWeeksToDate(lo.startDate, lo.weeks); // Set the endDate
       this.calculateProgress(lo); // Calculate initial progress
     },
     addNewLO() {
+      debug('addNewLO', this.newLO);
       const categoryLOs = this.learningObjectives.filter(lo => lo.category === this.newLO.category);
 
       if (categoryLOs.length >= this.maxLOs) {
@@ -107,7 +111,7 @@ export default {
             endDate: endDate, // Set the endDate property
             category: this.newLO.category,
           };
-
+          debug('addNewLO', newObjective);
           this.learningObjectives.push(newObjective);
           // Sort after adding
           this.sortLOs();
@@ -123,6 +127,7 @@ export default {
       return new Date(date.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
     },
     removeLO(index) {
+      debug('removeLO', index);
       const removedLO = this.learningObjectives.splice(index, 1)[0];
       this.provideFeedback('remove', removedLO);
     },

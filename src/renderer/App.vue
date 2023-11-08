@@ -1,16 +1,14 @@
 <template>
   <Navbar></Navbar>
-
   <div class="app-wrapper">
     <div class="app-container">
       <LearningObjectives></LearningObjectives>
 
       <div class="background-container gradient-top-border ">
         <!--
-  <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
-    <img v-if="championB" :src="`/img/champion_splash/${championB.id}.png`" class="background-image right" alt="Champion B" />
-    -->
-
+        <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
+        <img v-if="championB" :src="`/img/champion_splash/${championB.id}.png`" class="background-image right" alt="Champion B" />
+        -->
       </div>
 
       <div class="grid-container">
@@ -29,19 +27,16 @@
                 <ChampionSearch class="gradient-border-laser" :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
-
           </div>
           <div class="col-md-3 d-flex align-items-stretch gradient-border  ">
             <MatchupNotes></MatchupNotes>
           </div>
         </div>
-
         <!-- Second Row -->
         <div class="row">
           <div class="col-md-3 d-flex align-items-stretch gradient-top-border">
             <Template></Template>
           </div>
-
           <div class="col-md-6 d-flex flex-column align-items-stretch gradient-top-border">
             <div class="row">
               <div class="col-md-6 gradient-border">
@@ -49,26 +44,19 @@
               <div class="col-md-6 gradient-border">
               </div>
             </div>
-
-
           </div>
-
           <div class="col-md-3 d-flex align-items-stretch gradient-border gradient-top-border">
             <Template></Template>
           </div>
         </div>
-
         <div class="row ">
           <div class="col-md-4 d-flex align-items-stretch gradient-top-border">
             <Template></Template>
           </div>
-
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
             <ChampionDataTest />
           </div>
-
           <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
-
           </div>
         </div>
       </div>
@@ -82,16 +70,19 @@
 
 import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { computed } from 'vue'
+
+// Debug
+import Debug from 'debug';
+
 import ChampionSearch from './components/ChampionSelection.vue';
-import summonerWidget from './components/SummonerInfo.vue';
 import MatchupNotes from './components/MatchupNotes.vue';
 import LearningObjectives from './components/LearningObjectives.vue';
 import Template from './components/Template.vue';
-
 import Navbar from './components/TopNavbar.vue';
-
-import { computed } from 'vue'
 import ChampionDataTest from './components/test/ChampionDataTest.vue';
+
+const debug = Debug('app:component:App');
 
 const championA = ref(null);
 const championB = ref(null);
@@ -106,10 +97,7 @@ const backgroundStyle2 = computed(() => {
   };
 });
 
-
 const store = useStore();
-const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
 let bothSelected = false;
 
 onMounted(async () => {
@@ -132,6 +120,7 @@ const handleMatchup = () => {
         id: matchupKey, // using matchupKey as a unique id
         champions: [championA.value, championB.value] // retaining champions data
       };
+      debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
       store.dispatch('handleMatchupCreation', matchup);
     }
   } else {

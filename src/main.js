@@ -1,93 +1,86 @@
 import fs from 'fs';
-import https from 'https';
-import { ipcMain, app, BrowserWindow } from 'electron';
+import { ipcMain, app, BrowserWindow, screen} from 'electron';
 import path from 'path';
 require('dotenv').config();
+
+const Debug = require('debug');
+const debug = Debug('app:main');
 
 // ... other code ...
 let mainWindow; // Store a reference to the main window
 
 const LEAGUE_CLIENT_PATH = 'C:/Riot Games/League of Legends/lockfile'; // Adjust if necessary
 
-
 ipcMain.on('get-summoner-name', async (event) => {
-  console.log('IPC message received: get-summoner-name');
+  debug('IPC message received: get-summoner-name');
   const summonerName = await getSummonerName(); // This function retrieves the summoner name
-  console.log('Summoner Name:', summonerName);
   if (summonerName) {
     console.log('Summoner Name:', summonerName);
-
     // Send the summoner name back to the renderer process
     event.reply('summoner-name-response', summonerName);
   }
 });
 
 ipcMain.handle('get-api-key', async (event) => {
-  console.log('IPC message received: get-api-key', process.env.RIOT_API_KEY);
+  debug('IPC message received: get-api-key');
   return process.env.RIOT_API_KEY; // Send the API key to the renderer process
 });
 
 async function getSummonerName() {
-  console.log('Checking for League client...');
+  debug('Retrieving summoner name');
   if (!fs.existsSync(LEAGUE_CLIENT_PATH)) {
-    console.log('League client lockfile does not exist.');
+    debug('League client not found.');
     return null;
   }
-  console.log('League client found.');
-
+  // Temporarily allow self-signed certificates
   try {
+    debug('Reading lockfile');
     const lockfileContent = fs.readFileSync(LEAGUE_CLIENT_PATH, 'utf8');
     const [, , port, token] = lockfileContent.split(':');
-    console.log('Port:', port);
-    console.log('Token:', token);
-
+    debug('Port:', port);
+    debug('Token:', token);
     // Temporarily allow self-signed certificates
     const previousValue = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
+    debug('Fetching summoner name from League client');
     const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
     const response = await fetch(`https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`, {
       headers: { 'Authorization': 'Basic ' + Buffer.from(`riot:${token}`).toString('base64') },
     });
-
     // Reset the environment variable after the request
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousValue;
 
     if (response.ok) { // response.ok checks for response status 200-299
       const data = await response.json();
-      console.log('Summoner Name:', data.displayName);
+      debug('Summoner Name:', data.displayName);
       return data.displayName;
     } else {
+      console.error(`HTTP error! status: ${response.status}`);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    console.error('Error in getSummonerName:', error);
+    console.error('Error retrieving summoner name:', error);
     // Reset the environment variable if an error occurs
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousValue;
   }
   return null;
 }
 
-
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
+  debug('Electron Squirrel Startup');
   app.quit();
 }
 
-
-
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-const createWindow = () => {
-  console.log('createWindow called, initializing BrowserWindow...');
-
-mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    minWidth: 1280, // set the minimum width
-    minHeight: 800, // set the minimum height
+function createWindow(x = 0, y = 0) {
+  debug('Creating main window');
+  mainWindow = new BrowserWindow({
+    x: x,
+    y: y,
+    minWidth: 1920, // set the minimum width
+    minHeight: 1280, // set the minimum height
     // maxHeight: 800,
     // maxWidth: 1280,
     partition: 'nopersist',
@@ -96,6 +89,11 @@ mainWindow = new BrowserWindow({
     },
   });
 
+  // Open the DevTools automatically if in development environment
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
+  debug('Loading main window');
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -105,15 +103,27 @@ mainWindow = new BrowserWindow({
 
 };
 
+app.on('ready', () => {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const allDisplays = screen.getAllDisplays();
+  const externalDisplay = allDisplays.find((display) => {
+    // The right monitor will have an x value greater than the primary display
+    return display.bounds.x > primaryDisplay.bounds.x;
+  });
 
-
-app.on('ready', createWindow);
+  if (externalDisplay) {
+    createWindow(externalDisplay.bounds.x + 50, externalDisplay.bounds.y + 50); // +50 for a slight offset from the corner
+  } else {
+    createWindow(); // Fallback to the primary display if the right monitor is not found
+  }
+});
 
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  debug('All windows closed');
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -135,6 +145,7 @@ app.on('window-all-closed', () => {
 // }, 5000); // Check every 5 seconds, adjust the interval as needed
 
 app.on('activate', () => {
+  debug('App is activated');
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {

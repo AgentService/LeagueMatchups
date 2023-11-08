@@ -42,13 +42,10 @@ import { useStore } from 'vuex';
 import ProgressBar from './utility/ProgressBar.vue';
 
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
-
 const store = useStore();
-
 const name = computed(() => store.state.summonerData.name);
 const profileIconId = computed(() => store.state.summonerData.profileIconId);
 const level = computed(() => store.state.summonerData.summonerLevel);
-
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 
 
