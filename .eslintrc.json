@@ -1,0 +1,42 @@
+{
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "node": true // Add this line to support Node.js global variables
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:vue/vue3-essential"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "parser": "@typescript-eslint/parser",
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "vue"
+    ],
+    "rules": {
+      "indent": [
+        "error",
+        "tab"
+      ],
+      "linebreak-style": [
+        "error",
+        "windows"
+      ],
+      "quotes": [
+        "error",
+        "double"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "@typescript-eslint/no-var-requires": "off", // Add this line to allow 'require' statements
+      "no-undef": "off" // Optionally turn off the rule for undefined variables if it's too noisy
+    }
+  }
+  

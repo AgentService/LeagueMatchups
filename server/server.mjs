@@ -31,7 +31,7 @@ import matchupsRouter from './api/matchups.mjs';
 const app = express();
 const PORT = 3001;
 
-const debugApi = Debug(process.env.DEBUG);
+const debugApi = Debug('api');
 
 
 app.use(cors());

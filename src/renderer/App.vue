@@ -68,34 +68,34 @@
 
 <script setup>
 
-import { ref, watch, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import { computed } from 'vue'
+import { ref, watch, onMounted } from "vue";
+import { useStore } from "vuex";
 
 // Debug
-import Debug from 'debug';
+import Debug from "debug";
 
-import ChampionSearch from './components/ChampionSelection.vue';
-import MatchupNotes from './components/MatchupNotes.vue';
-import LearningObjectives from './components/LearningObjectives.vue';
-import Template from './components/Template.vue';
-import Navbar from './components/TopNavbar.vue';
-import ChampionDataTest from './components/test/ChampionDataTest.vue';
+import ChampionSearch from "./components/ChampionSelection.vue";
+import MatchupNotes from "./components/MatchupNotes.vue";
+import LearningObjectives from "./components/LearningObjectives.vue";
+import Template from "./components/Template.vue";
+import Navbar from "./components/TopNavbar.vue";
+import ChampionDataTest from "./components/test/ChampionDataTest.vue";
 
-const debug = Debug('app:component:App');
+const debug = Debug("app:component:App");
 
 const championA = ref(null);
 const championB = ref(null);
-const backgroundStyle2 = computed(() => {
-  const champAImage = championA.value ? `/img/champion_loading/${championA.value.id}.png` : '';
-  const champBImage = championB.value ? `/img/champion_loading/${championB.value.id}.png` : '';
 
-  return {
-    backgroundImage: `linear-gradient(to right, url(${champAImage}) left, url(${champBImage}) right)`,
-    backgroundSize: '50% 100%, 50% 100%',
-    backgroundRepeat: 'no-repeat, no-repeat'
-  };
-});
+// const backgroundStyle2 = computed(() => {
+// 	const champAImage = championA.value ? `/img/champion_loading/${championA.value.id}.png` : "";
+// 	const champBImage = championB.value ? `/img/champion_loading/${championB.value.id}.png` : "";
+
+// 	return {
+// 		backgroundImage: `linear-gradient(to right, url(${champAImage}) left, url(${champBImage}) right)`,
+// 		backgroundSize: "50% 100%, 50% 100%",
+// 		backgroundRepeat: "no-repeat, no-repeat"
+// 	};
+// });
 
 const store = useStore();
 let bothSelected = false;
@@ -104,42 +104,42 @@ onMounted(async () => {
 });
 const handleMatchup = () => {
 
-  if (championA.value && championB.value) {
-    if (!bothSelected) {
-      bothSelected = true;
+	if (championA.value && championB.value) {
+		if (!bothSelected) {
+			bothSelected = true;
 
-      const champAName = championA.value.name;
-      const champBName = championB.value.name;
+			const champAName = championA.value.name;
+			const champBName = championB.value.name;
 
-      if (champAName === champBName) {
-        return;
-      }
-      const matchupKey = `${champAName}-${champBName}`;
+			if (champAName === champBName) {
+				return;
+			}
+			const matchupKey = `${champAName}-${champBName}`;
 
-      const matchup = {
-        id: matchupKey, // using matchupKey as a unique id
-        champions: [championA.value, championB.value] // retaining champions data
-      };
-      debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
-      store.dispatch('handleMatchupCreation', matchup);
-    }
-  } else {
-    bothSelected = false;
-  }
+			const matchup = {
+				id: matchupKey, // using matchupKey as a unique id
+				champions: [championA.value, championB.value] // retaining champions data
+			};
+			debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
+			store.dispatch("matchups/handleMatchupCreation", matchup);
+		}
+	} else {
+		bothSelected = false;
+	}
 };
 
 
 const setChampionA = (champion) => {
-  championA.value = champion;
+	championA.value = champion;
 };
 
 const setChampionB = (champion) => {
-  championB.value = champion;
+	championB.value = champion;
 };
 
-watch([championA, championB], (newValues, oldValues) => {
-  bothSelected = false;
-  handleMatchup();
+watch([championA, championB], (/* newValues, oldValues */) => {
+	bothSelected = false;
+	handleMatchup();
 });
 
 

@@ -13,8 +13,9 @@ const rAPI = new RiotAPI(process.env.VITE_RIOT_API_KEY);
 router.get('/by-riot-id', async (req, res) => {
   debugApi('Fetching summoner by Riot ID');
   const { region, gameName, tagLine } = req.query;
-  const URL = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
   try {
+    const URL = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
+
     const accountData = await axios.get(URL, {
       headers: {
         "X-Riot-Token": RIOT_API_KEY

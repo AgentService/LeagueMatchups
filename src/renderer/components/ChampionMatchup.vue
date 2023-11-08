@@ -22,53 +22,49 @@
 </template>
 
 <script>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-import axios from 'axios';
+import { computed } from "vue";
+import { useStore } from "vuex";
+import axios from "axios";
 
-import Debug from 'debug';
-const debug = Debug('app:component:ChampionMatchup');
+import Debug from "debug";
+const debug = Debug("app:component:ChampionMatchup");
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL;
 // import { main } from "../../../download.mjs";
 
 export default {
-  setup() {
-    const store = useStore();
-    const currentMatchup = computed(() => store.getters.currentMatchup);
-    const matchups = computed(() => store.state.matchups);
-    return {
-      matchups,
-      currentMatchup,
-    };
-  },
+	setup() {
+		const store = useStore();
+		const currentMatchup = computed(() => store.getters.currentMatchup);
+		const matchups = computed(() => store.state.matchups);
+		return {
+			matchups,
+			currentMatchup,
+		};
+	},
 
-  methods: {
-    async deleteMatchups() {
-      try {
-        debug('Deleting matchups...');
-        await axios.delete(`${baseUrl}/api/matchups/delete`);
-        // Optionally, you can also clear the client-side state here if needed
-        debug('Matchups deleted successfully.');
-        this.$store.commit('CLEAR_MATCHUPS'); // Assuming you have a mutation to clear matchups
-      } catch (error) {
-        console.error('An error occurred while deleting matchups:', error);
-      }
-    },
-    saveNotes() {
-      debug('Saving notes...');
-      this.$store.dispatch('saveNotes', { matchupId: this.matchupId, notes: this.notes });
-    }
-  },
-
-  mounted() {
-    const store = useStore();
-  },
-  computed: {
-    champions() {
-      return this.$store.state.champions;
-    }
-  }
+	methods: {
+		async deleteMatchups() {
+			try {
+				debug("Deleting matchups...");
+				await axios.delete(`${baseUrl}/api/matchups/delete`);
+				// Optionally, you can also clear the client-side state here if needed
+				debug("Matchups deleted successfully.");
+				this.$store.commit("CLEAR_MATCHUPS"); // Assuming you have a mutation to clear matchups
+			} catch (error) {
+				console.error("An error occurred while deleting matchups:", error);
+			}
+		},
+		saveNotes() {
+			debug("Saving notes...");
+			this.$store.dispatch("saveNotes", { matchupId: this.matchupId, notes: this.notes });
+		}
+	},
+	computed: {
+		champions() {
+			return this.$store.state.champions;
+		}
+	}
 };
 </script>
 

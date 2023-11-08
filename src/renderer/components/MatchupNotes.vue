@@ -15,46 +15,46 @@ Waiit this is to complicated, lets ceck if there is another issue.
 </template>
 
 <script>
-import { computed, ref, watch } from 'vue';
-import { useStore } from 'vuex';
-import Debug from 'debug';
-const debug = Debug('app:component:MatchupNotes');
+import { computed, ref, watch } from "vue";
+import { useStore } from "vuex";
+import Debug from "debug";
+const debug = Debug("app:component:MatchupNotes");
 
 export default {
-  setup() {
-    const store = useStore();
-    const currentMatchup = computed(() => store.getters.getCurrentMatchup);
-    const autoSaved = ref(false);
-    const notes = ref(currentMatchup.value ? currentMatchup.value.notes : '');
-    const timeout = ref(null);
+	setup() {
+		const store = useStore();
+		const currentMatchup = computed(() => store.getters.getCurrentMatchup);
+		const autoSaved = ref(false);
+		const notes = ref(currentMatchup.value ? currentMatchup.value.notes : "");
+		const timeout = ref(null);
 
-    function saveNotes(newNotes) {
-      //store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
-      autoSaved.value = false;
-     // setTimeout(() => autoSaved.value = false, 3000);
-    }
+		function saveNotes(newNotes) {
+			//store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
+			autoSaved.value = false;
+			// setTimeout(() => autoSaved.value = false, 3000);
+		}
 
-    watch(notes, (newNotes) => {
-      clearTimeout(timeout.value);
-      timeout.value = setTimeout(() => {
-        saveNotes(newNotes);
-      }, 1000);
-    });
+		watch(notes, (newNotes) => {
+			clearTimeout(timeout.value);
+			timeout.value = setTimeout(() => {
+				saveNotes(newNotes);
+			}, 1000);
+		});
 
-    watch(currentMatchup, (newMatchup, oldMatchup) => {
-      if (newMatchup !== oldMatchup) {
-        debug('Matchup changed, updating notes...');
-        notes.value = newMatchup?.notes;
-      }
-    });
+		watch(currentMatchup, (newMatchup, oldMatchup) => {
+			if (newMatchup !== oldMatchup) {
+				debug("Matchup changed, updating notes...");
+				notes.value = newMatchup?.notes;
+			}
+		});
 
-    return {
-      notes,
-      autoSaved,
-      saveNotes,
-    };
-  },
-}
+		return {
+			notes,
+			autoSaved,
+			saveNotes,
+		};
+	},
+};
 </script>
 
 <style scoped>

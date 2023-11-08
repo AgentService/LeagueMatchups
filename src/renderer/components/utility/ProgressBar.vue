@@ -4,21 +4,21 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    props: {
-      value: {
-        type: Number,
-        default: 0,
-      },
-    },
-    computed: {
-      progress() {
-        return Math.min(Math.max(this.value, 0), 100);
-      },
-    },
-  };
-  </script>
+<script>
+export default {
+	props: {
+		value: {
+			type: Number,
+			default: 0,
+		},
+	},
+	computed: {
+		progress() {
+			return Math.min(Math.max(this.value, 0), 100);
+		},
+	},
+};
+</script>
   
   <style scoped>
 .progress-bar-container {

@@ -13,8 +13,8 @@
 
 <script>
 export default {
-  name: 'Template'
-}
+	name: "Template"
+};
 </script>
 
 <style scoped>

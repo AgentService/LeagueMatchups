@@ -1314,5 +1314,75 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Ahri-Draven",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Draven",
+        "name": "Draven"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bel'Veth-Draven",
+    "champions": [
+      {
+        "id": "Belveth",
+        "name": "Bel'Veth"
+      },
+      {
+        "id": "Draven",
+        "name": "Draven"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Zac-Akali",
+    "champions": [
+      {
+        "id": "Zac",
+        "name": "Zac"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Zac-Azir",
+    "champions": [
+      {
+        "id": "Zac",
+        "name": "Zac"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Zac-Lissandra",
+    "champions": [
+      {
+        "id": "Zac",
+        "name": "Zac"
+      },
+      {
+        "id": "Lissandra",
+        "name": "Lissandra"
+      }
+    ],
+    "notes": ""
   }
 ]

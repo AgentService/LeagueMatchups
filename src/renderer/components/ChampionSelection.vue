@@ -35,146 +35,146 @@
 </template>
 
 <script>
-import { useStore } from 'vuex';
-import { ref, onMounted } from 'vue';
-import gsap from 'gsap';
-import Debug from 'debug';
-const debug = Debug('app:component:ChampionSelection');
+import { useStore } from "vuex";
+import { ref, onMounted } from "vue";
+import gsap from "gsap";
+import Debug from "debug";
+const debug = Debug("app:component:ChampionSelection");
 
 export default {
-  props: {
-    instanceId: {
-      type: Number,
-      required: true
-    }
-  },
-  setup() {
-    const elementToAnimate = ref(null);
+	props: {
+		instanceId: {
+			type: Number,
+			required: true
+		}
+	},
+	setup() {
+		const elementToAnimate = ref(null);
 
-    onMounted(() => {
-      debug('Mounted');
-      // Define the animation for the blue theme
-      const blueAnimation = () => {
-        gsap.to(elementToAnimate.value, {
-          boxShadow: "0 0 20px rgba(0, 253, 255, 0.75)", // Blue glow
-          borderColor: "#10FEFF", // Light blue
-          repeat: -1, // repeat indefinitely
-          yoyo: true, // go back and forth
-          ease: "power1.inOut",
-          duration: 1
-        });
-      };
+		onMounted(() => {
+			debug("Mounted");
+			// Define the animation for the blue theme
+			const blueAnimation = () => {
+				gsap.to(elementToAnimate.value, {
+					boxShadow: "0 0 20px rgba(0, 253, 255, 0.75)", // Blue glow
+					borderColor: "#10FEFF", // Light blue
+					repeat: -1, // repeat indefinitely
+					yoyo: true, // go back and forth
+					ease: "power1.inOut",
+					duration: 1
+				});
+			};
 
-      // Define the animation for the red theme
-      const redAnimation = () => {
-        gsap.to(elementToAnimate.value, {
-          boxShadow: "0 0 28px rgba(255, 0, 0, 0.75)", // Red glow
-          borderColor: "#FE1010", // Light red
-          repeat: -1, // repeat indefinitely
-          yoyo: true, // go back and forth
-          ease: "power1.inOut",
-          duration: 1
-        });
-      };
+			// Define the animation for the red theme
+			const redAnimation = () => {
+				gsap.to(elementToAnimate.value, {
+					boxShadow: "0 0 28px rgba(255, 0, 0, 0.75)", // Red glow
+					borderColor: "#FE1010", // Light red
+					repeat: -1, // repeat indefinitely
+					yoyo: true, // go back and forth
+					ease: "power1.inOut",
+					duration: 1
+				});
+			};
 
-      // Check the instanceId and apply the corresponding animation
-      if (this?.instanceId) {
-        debug('instanceId:', this.instanceId);
-        if (this.instanceId === 1) {
-          blueAnimation();
-        } else if (this.instanceId === 2) {
-          redAnimation();
-        }
-      }
-    });
+			// Check the instanceId and apply the corresponding animation
+			if (this?.instanceId) {
+				debug("instanceId:", this.instanceId);
+				if (this.instanceId === 1) {
+					blueAnimation();
+				} else if (this.instanceId === 2) {
+					redAnimation();
+				}
+			}
+		});
 
-    return { elementToAnimate };
-  },
-  data() {
+		return { elementToAnimate };
+	},
+	data() {
 
-    return {
-      searchTerm: '',
-      champions: [],
-      filteredChampions: [],
-      selectedChampion: '',
-      selectedChampions: [], // Initialize empty array
-      isDropdownOpen: false // A mystical gatekeeper that controls the visibility of the dropdown
+		return {
+			searchTerm: "",
+			champions: [],
+			filteredChampions: [],
+			selectedChampion: "",
+			selectedChampions: [], // Initialize empty array
+			isDropdownOpen: false // A mystical gatekeeper that controls the visibility of the dropdown
 
-    };
-  },
-  mounted() {
-    const store = useStore();
+		};
+	},
+	mounted() {
+		const store = useStore();
 
-    // Dispatch the action to fetch champion data
-    debug('Fetching champion data...');
-    store.dispatch('champions/fetchChampionData').then(() => {
-      const listChampionsData = store.state.champions.championList;
-      const detailedChampionsData = store.state.champions.championDetails;
-      // Process the data as needed for this component
-      const championsArray = Object.values(listChampionsData).map(champ => champ);
-      this.filteredChampions = [...championsArray];
+		// Dispatch the action to fetch champion data
+		debug("Fetching champion data...");
+		store.dispatch("champions/fetchChampionData").then(() => {
+			const listChampionsData = store.state.champions.championList;
+			// const detailedChampionsData = store.state.champions.championDetails;
+			// Process the data as needed for this component
+			const championsArray = Object.values(listChampionsData).map(champ => champ);
+			this.filteredChampions = [...championsArray];
 
-      // Determine and select a preselected champion based on instanceId
-      const preselectedChampion = this.instanceId === 1 ? championsArray[1] : championsArray[2];
-      this.selectChampion(preselectedChampion);
-    }).catch(error => {
-      console.error('Error fetching champions:', error);
-    });
-  },
+			// Determine and select a preselected champion based on instanceId
+			const preselectedChampion = this.instanceId === 1 ? championsArray[1] : championsArray[2];
+			this.selectChampion(preselectedChampion);
+		}).catch(error => {
+			console.error("Error fetching champions:", error);
+		});
+	},
 
 
-  methods: {
-    filterChampions() {
-      this.filteredChampions = this.champions.filter(champion =>
-        champion.toLowerCase().startsWith(this.searchTerm.toLowerCase())
-      );
-    },
-    selectChampion(champion) {
-      this.selectedChampion = champion;
-      debug('Selected champion:', this.selectedChampion);
-      this.searchTerm = ''; // Clears the search field, bestowing it with a fresh start
-      this.$emit('championSelected', this.selectedChampion);
-      this.closeDropdown();
+	methods: {
+		filterChampions() {
+			this.filteredChampions = this.champions.filter(champion =>
+				champion.toLowerCase().startsWith(this.searchTerm.toLowerCase())
+			);
+		},
+		selectChampion(champion) {
+			this.selectedChampion = champion;
+			debug("Selected champion:", this.selectedChampion);
+			this.searchTerm = ""; // Clears the search field, bestowing it with a fresh start
+			this.$emit("championSelected", this.selectedChampion);
+			this.closeDropdown();
 
-    },
-    getChampionImageSource(type, championId) {
-      switch (type) {
-        case 'small':
-          return `/img/champions/${championId}.png`;
-        case 'loading':
-          return `/img/champion_loading/${championId}.png`;
-        case 'splash':
-          return `/img/champion_splash/${championId}.png`;
-        case 'tiles':
-          return `/img/tiles/${championId}_0.jpg`;
-        default:
-          // Handle the case where the type does not match 'small' or 'loading'
-          return ''; // or some default path
-      }
-    },
-    toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen; // The toggle spell that opens or closes the dropdown
-    },
-    closeDropdown() {
-      this.isDropdownOpen = false;
-    },
-  },
-  computed: {
-    backgroundStyle() {
-      return this.selectedChampion ?
-        {
-          backgroundImage: `url(${this.getChampionImageSource('splash', this.selectedChampion.id)})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)', // Adding a semi-transparent black background
-          backgroundBlendMode: 'multiply', // Blending the background image with the background color
-        } : {};
-    },
-    themeClass() {
-      return this.instanceId === 1 ? 'blue-theme' : 'red-theme';
-    },
-  },
+		},
+		getChampionImageSource(type, championId) {
+			switch (type) {
+			case "small":
+				return `/img/champions/${championId}.png`;
+			case "loading":
+				return `/img/champion_loading/${championId}.png`;
+			case "splash":
+				return `/img/champion_splash/${championId}.png`;
+			case "tiles":
+				return `/img/tiles/${championId}_0.jpg`;
+			default:
+				// Handle the case where the type does not match 'small' or 'loading'
+				return ""; // or some default path
+			}
+		},
+		toggleDropdown() {
+			this.isDropdownOpen = !this.isDropdownOpen; // The toggle spell that opens or closes the dropdown
+		},
+		closeDropdown() {
+			this.isDropdownOpen = false;
+		},
+	},
+	computed: {
+		backgroundStyle() {
+			return this.selectedChampion ?
+				{
+					backgroundImage: `url(${this.getChampionImageSource("splash", this.selectedChampion.id)})`,
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+					backgroundColor: "rgba(0, 0, 0, 0.7)", // Adding a semi-transparent black background
+					backgroundBlendMode: "multiply", // Blending the background image with the background color
+				} : {};
+		},
+		themeClass() {
+			return this.instanceId === 1 ? "blue-theme" : "red-theme";
+		},
+	},
 };
 </script>
 
