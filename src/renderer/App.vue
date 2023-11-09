@@ -47,8 +47,10 @@
           <div class="col-md-6 d-flex flex-column align-items-stretch ">
             <div class="row">
               <div class="col-md-6 gradient-border">
+                <ChampionStats :champion="championA" />
               </div>
               <div class="col-md-6 gradient-border">
+                <ChampionStats :champion="championB" />
               </div>
             </div>
           </div>
@@ -81,6 +83,8 @@ import { useStore } from "vuex";
 import Debug from "debug";
 
 import ChampionSearch from "./components/ChampionSelection.vue";
+import ChampionStats from "./components/ChampionStats.vue";
+
 import MatchupNotes from "./components/MatchupNotes.vue";
 import LearningObjectives from "./components/LearningObjectives.vue";
 import Template from "./components/Template.vue";
@@ -113,7 +117,6 @@ const handleMatchup = () => {
   if (championA.value && championB.value) {
     if (!bothSelected) {
       bothSelected = true;
-
       const champAName = championA.value.name;
       const champBName = championB.value.name;
 
@@ -137,10 +140,12 @@ const handleMatchup = () => {
 
 const setChampionA = (champion) => {
   championA.value = champion;
+  store.dispatch("matchups/setChampionA", champion);
 };
 
 const setChampionB = (champion) => {
   championB.value = champion;
+  store.dispatch("matchups/setChampionB", champion);
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {

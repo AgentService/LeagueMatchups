@@ -1552,5 +1552,75 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Akali-Anivia",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Ahri",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Akshan",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Camille",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Camille",
+        "name": "Camille"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Camille",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "Camille",
+        "name": "Camille"
+      }
+    ],
+    "notes": ""
   }
 ]

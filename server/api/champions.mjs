@@ -24,37 +24,50 @@ async function getLatestVersion() {
 }
 
 async function updateChampionData() {
-    let listChampionsData = {};
-    let detailedChampionsData = {};
+    let championsList = {};
+    let championsDetails = {};
 
     try {
         const version = await getLatestVersion();
         if (!version) {
             throw new Error('Failed to retrieve the latest version.');
         }
-        debugApi(`Updating champion data for version ${version}`)
-        listChampionsData = await ddragon.champion.all(version);
-        // Assuming you still want detailed data per champion:
-        for (const championKey in listChampionsData.data) {
-            const championName = listChampionsData.data[championKey].id; // Use the champion ID as the name
-            detailedChampionsData[championKey] = await ddragon.champion.byName({
-                championName: championName, // Provide the championName parameter as required by the byName method
-                version: version // Pass in the version if needed, otherwise it will fetch the latest
+        debugApi(`Updating champion data for version ${version}`);
+        const listChampionsResponse = await ddragon.champion.all(version);
+
+        // Store the basic data
+        championsList = listChampionsResponse.data;
+
+        // Fetch and store detailed data for each champion
+        for (const championKey in championsList) {
+            const championName = championsList[championKey].id;
+            const detailedDataResponse = await ddragon.champion.byName({
+                championName: championName,
+                version: version
             });
+            // Assuming detailedDataResponse.data contains the details
+            championsDetails[championKey] = detailedDataResponse.data[championName];
         }
 
-        debugApi('Champion data updated successfully.')
-        // Return both sets of data
-        return {
-            list: listChampionsData.data,
-            details: detailedChampionsData
+        debugApi('Champion data updated successfully.');
+        debugApi('Champion data:', championsList['Aatrox'], championsDetails['Aatrox']);
+        // Return the structured data
+        const result = {
+            data: {
+                list: championsList,
+                details: championsDetails
+            },
+            timestamp: Date.now(),
+            version: version
         };
+        return result;
 
     } catch (error) {
-        console.log('Error updating champion data:', error);
+        console.error('Error updating champion data:', error);
         return null;
     }
 }
+
 
 // Initialize the cache on startup
 debugApi('Initializing champion data cache on startup.');

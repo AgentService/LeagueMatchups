@@ -28,7 +28,7 @@ export const summoner = {
 			};
 		},
 		summonerName: (getters) => {
-			return getters.summonerData.name || {};
+			return getters.playerDetails?.summonerData.name || {};
 		},
 		profileIconId: (state) => {
 			return state.playerDetails?.summonerData?.profileIconId || null;

@@ -22,6 +22,12 @@ export const matchups = {
 		},    // ...other getters
 	},
 	mutations: {
+		SET_CHAMPION_A(state, champion) {
+			state.championA = champion;
+		},
+		SET_CHAMPION_B(state, champion) {
+			state.championB = champion;
+		},
 		SET_MATCHUPS_DATA(state, matchups) {
 			state.matchups = matchups;
 		},
@@ -29,6 +35,8 @@ export const matchups = {
 			state.matchups = [];
 		},
 		SET_CURRENT_MATCHUP(state, matchup) {
+			state.championA = matchup.champions[0];
+			state.championB = matchup.champions[1];
 			state.currentMatchup = matchup;
 		},
 		ADD_OR_UPDATE_MATCHUP(state, oMatchup) {
@@ -114,7 +122,12 @@ export const matchups = {
 
 			return matchups[id]; // Return the matchup data
 		},
-
+		setChampionA({ commit }, payload) {
+			commit("SET_CHAMPION_A", payload);
+		},
+		setChampionB({ commit }, payload) {
+			commit("SET_CHAMPION_B", payload);
+		},
 		// custom data
 		saveNotes({ commit }, payload) {
 			axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes })

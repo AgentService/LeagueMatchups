@@ -35,8 +35,8 @@ export const champions = {
 				try {
 					const response = await axios.get(`${baseUrl}/api/champions`);
 					console.log("Champion data loaded from server:", response.data);
-					listChampionsData = response.data.list;
-					detailedChampionsData = response.data.details;
+					listChampionsData = response.data.data.list;
+					detailedChampionsData = response.data.data.details;
 					// Save the newly fetched data to local storage
 					saveToLocalStorage("championListData", listChampionsData);
 					saveToLocalStorage("championDetailedData", detailedChampionsData);

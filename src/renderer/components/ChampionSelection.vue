@@ -24,9 +24,8 @@
 					<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
 						alt="Champion Image" />
 					<!-- Insert more details here as needed -->
-					<h3>{{ selectedChampion.name }}</h3>
+					<p class="mt-3 fs-4">{{ selectedChampion.name }}</p>
 					<!-- For example, add lore, abilities, stats etc. -->
-					<p>{{ selectedChampion.lore }}</p>
 					<!-- ... -->
 				</div>
 			</div>
@@ -111,9 +110,9 @@ export default {
 		debug("Fetching champion data...");
 		store.dispatch("champions/fetchChampionData").then(() => {
 			const listChampionsData = store.state.champions.championList;
-			// const detailedChampionsData = store.state.champions.championDetails;
+			const detailedChampionsData = store.state.champions.championDetails;
 			// Store the full list of champions for filtering
-			this.champions = Object.values(listChampionsData);
+			this.champions = Object.values(detailedChampionsData);
 
 			// Optionally, initialize filteredChampions with the full list if you want
 			// all champions to be displayed before any search is performed.
@@ -180,7 +179,6 @@ export default {
 			this.$emit("championSelected", this.selectedChampion);
 		},
 		animateChampion() {
-			// Define your GSAP animations here
 			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
 		},
 		getChampionImageSource(type, championId) {
