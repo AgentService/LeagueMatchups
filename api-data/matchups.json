@@ -1622,5 +1622,383 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Akali-Annie",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Annie",
+        "name": "Annie"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aatrox-Annie",
+    "champions": [
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      },
+      {
+        "id": "Annie",
+        "name": "Annie"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Annie-Amumu",
+    "champions": [
+      {
+        "id": "Annie",
+        "name": "Annie"
+      },
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Pyke-Bard",
+    "champions": [
+      {
+        "id": "Pyke",
+        "name": "Pyke"
+      },
+      {
+        "id": "Bard",
+        "name": "Bard"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Bard-Pyke",
+    "champions": [
+      {
+        "id": "Bard",
+        "name": "Bard"
+      },
+      {
+        "id": "Pyke",
+        "name": "Pyke"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Camille-Ashe",
+    "champions": [
+      {
+        "id": "Camille",
+        "name": "Camille"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Kassadin-Ashe",
+    "champions": [
+      {
+        "id": "Kassadin",
+        "name": "Kassadin"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Lissandra-Ashe",
+    "champions": [
+      {
+        "id": "Lissandra",
+        "name": "Lissandra"
+      },
+      {
+        "id": "Ashe",
+        "name": "Ashe"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Lissandra-Ahri",
+    "champions": [
+      {
+        "id": "Lissandra",
+        "name": "Lissandra"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Cho'Gath",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Chogath",
+        "name": "Cho'Gath"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Camille",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Camille",
+        "name": "Camille"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Cho'Gath",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Chogath",
+        "name": "Cho'Gath"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Fizz",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Fizz",
+        "name": "Fizz"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Briar",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Briar",
+        "name": "Briar"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Anivia",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Amumu",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Anivia",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akali-Amumu",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Brand-Annie",
+    "champions": [
+      {
+        "id": "Brand",
+        "name": "Brand"
+      },
+      {
+        "id": "Annie",
+        "name": "Annie"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Brand-Trundle",
+    "champions": [
+      {
+        "id": "Brand",
+        "name": "Brand"
+      },
+      {
+        "id": "Trundle",
+        "name": "Trundle"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Trundle",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Trundle",
+        "name": "Trundle"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Vayne",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Vayne",
+        "name": "Vayne"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Aurelion Sol-Vel'Koz",
+    "champions": [
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      },
+      {
+        "id": "Velkoz",
+        "name": "Vel'Koz"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Fiddlesticks-Vel'Koz",
+    "champions": [
+      {
+        "id": "Fiddlesticks",
+        "name": "Fiddlesticks"
+      },
+      {
+        "id": "Velkoz",
+        "name": "Vel'Koz"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Akshan-Cassiopeia",
+    "champions": [
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      },
+      {
+        "id": "Cassiopeia",
+        "name": "Cassiopeia"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Braum-Aatrox",
+    "champions": [
+      {
+        "id": "Braum",
+        "name": "Braum"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Dr. Mundo-Aatrox",
+    "champions": [
+      {
+        "id": "DrMundo",
+        "name": "Dr. Mundo"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
   }
 ]

@@ -1,6 +1,6 @@
 <template>
-	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light']">
-		<div class="note-card">
+	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'align-items-stretch']">
+		<div class="note-card ">
 
 			<!-- Search Bar - Toggles the grid when clicked -->
 			<div class="search-bar">
@@ -8,23 +8,23 @@
 					class="form-control" />
 			</div>
 
-			<!-- Champion Grid - Visible when isGridVisible is true -->
-			<div class="champion-grid" v-show="isGridVisible">
-
-				<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
-					@click="selectChampion(champion)">
-					<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
-					<span>{{ champion.name }}</span>
+			<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
+				<!-- Champion Grid - Visible when isGridVisible is true -->
+				<div class="champion-grid" v-show="isGridVisible">
+					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
+						@click="selectChampion(champion)">
+						<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
+						<span>{{ champion.name }}</span>
+					</div>
 				</div>
 			</div>
-
 			<!-- Detail View - Shown when a champion is selected -->
 			<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
 				<div :class="[themeClass, 'champion-image-container']">
 					<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
 						alt="Champion Image" />
 					<!-- Insert more details here as needed -->
-					<p class="mt-3 fs-4">{{ selectedChampion.name }}</p>
+					<p class="mt-0 fs-4">{{ selectedChampion.name }}</p>
 					<!-- For example, add lore, abilities, stats etc. -->
 					<!-- ... -->
 				</div>
@@ -214,37 +214,50 @@ export default {
 <style scoped>
 .note-card {
 	width: 100%;
-	/* Full width of the card */
+	z-index: 1000;
 	height: 100%;
-	/* Full height of the card */
+	/* This will take the full height of the parent */
 	display: flex;
-	/* Use flexbox to manage the layout */
 	flex-direction: column;
-	/* Stack children vertically */
+	overflow: hidden;
+	/* Changed from auto to hidden to control overflow within child elements */
 }
 
+/* Adjust the grid container */
 .champion-grid-container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	overflow: auto;
-
-	/* Ensure the padding does not increase the total width of the element */
-	/* Other styles... */
-	/* Ensure the container fills the parent height */
+	overflow-y: auto;
+	overflow-x: hidden;
+	/* Scroll only if needed */
+	position: relative;
+	/* For absolute positioning of children */
 }
 
-/* Style for the champion grid container */
+.champion-grid-container.open {
+	flex: 1;
+	/* Grow when grid is open */
+}
+
+
+/* The grid itself */
 .champion-grid {
-	flex-grow: 1;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
 	gap: 0.6rem;
-	overflow-y: auto;
-	overflow-x: hidden;
 	padding: 1rem;
+	/* Padding inside the grid */
 	box-sizing: border-box;
-	margin-right: 20px;
+	position: absolute;
+	/* Positioned absolutely within the container */
+	top: 0;
+	/* Align to the top of the container */
+	left: 0;
+	/* Align to the left of the container */
+	right: 0;
+	/* Align to the right of the container */
+	bottom: 0;
+	/* Align to the bottom of the container */
+	z-index: 10;
+	/* Above the detail view */
 }
 
 .champion-grid.is-scrollable {
@@ -261,21 +274,21 @@ export default {
 	/* Let the content define the height */
 	flex-grow: 0;
 	/* Do not allow the row to grow */
-	padding: 0 2rem;
 }
 
 .search-bar {
 	box-sizing: border-box;
 	display: flex;
 	justify-content: center;
-	padding-bottom: 0rem;
 }
 
 .search-bar input.form-control {
 	background: var(--grey-cool);
 	width: 40%;
+	height: 2rem;
+	margin-bottom: 1rem;
+	border: none;
 	/* Set the width of the input to 50% of its parent */
-	border-bottom: 2px solid var(--gold-4);
 	color: var(--gold-3);
 }
 
@@ -305,7 +318,6 @@ export default {
 	/* Ensure the image does not exceed its container */
 	display: block;
 	/* Images are inline by default; change this to block to allow for margin */
-	margin-bottom: 0.5rem;
 	/* Space between the image and the name */
 }
 
@@ -319,40 +331,45 @@ export default {
 	color: var(--gold-2);
 	display: block;
 	font-size: 1rem;
-	margin-top: 0.25rem;
 }
 
 .champion-detail {
 	display: flex;
-	/* Establishes a flex container */
 	justify-content: center;
-	/* Centers children along the main axis (horizontal) */
 	align-items: center;
-	/* Centers children along the cross axis (vertical) */
-	height: 100%;
-	/* Ensures the container takes full height of its parent */
 	text-align: center;
-	/* Centers the text within the container */
 }
 
+/* This will contain the champion image and name centered */
 .champion-image-container {
 	display: flex;
 	flex-direction: column;
-	/* Aligns children (image and text) in a vertical stack */
+	align-items: center;
+	/* Center children horizontally */
+	justify-content: center;
+	/* Center children vertically */
+	text-align: center;
+	/* Center text for all children */
+	margin-top: 1rem;
+	/* Optional: adds some space above the container */
 }
 
+/* This will ensure the image fits well */
 .champion-image {
-	max-width: 150px;
-	/* Ensures the image is not larger than its container */
-	max-height: 150px;
-	/* Ensures the image does not exceed the container height */
-	object-fit: contain;
-	/* Ensures the image maintains aspect ratio without being cropped */
+	width: 100%;
+	/* Full width of the container */
+	max-width: 110px;
+	/* Maximum width */
+	height: auto;
+	/* Maintain aspect ratio */
+	margin-bottom: 0.5rem;
+	/* Space between the image and the name */
 }
-
 
 .blue-theme .champion-image {
 	border-radius: 50%;
+	display: block;
+
 	width: 150px;
 	overflow: hidden;
 	border: 2px solid var(--blue-laser-1);
@@ -370,11 +387,8 @@ export default {
 .red-theme .champion-image {
 	display: block;
 	border-radius: 50%;
-	width: 150px;
-	height: 150px;
 	overflow: hidden;
 	border: 3px solid var(--red-laser-1);
-	position: relative;
 }
 
 .blue-theme .champion-image {

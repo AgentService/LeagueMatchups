@@ -66,7 +66,6 @@ export default {
   height: 100%;
   width: 100%;
   border-color: var(--grey-4);
-  border-width: 0px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
   background:var(--background-1-gradient);
   color: var(--gold-2);

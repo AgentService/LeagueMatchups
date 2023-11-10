@@ -49,7 +49,7 @@
             </div>
           </div>
         </div>
-        <a class="navbar-brand me-auto ms-auto" href="#">Improve</a>
+        <a class="navbar-brand me-auto ms-auto" href="#"></a>
       </div>
     </nav>
   </div>

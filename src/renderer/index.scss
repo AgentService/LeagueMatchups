@@ -40,6 +40,14 @@
   --red-laser-1: #FF5D6B;
   --red-laser-2: #FF4C5A;
 
+  --tabs-background: #000406;
+  --tabs-active: #0D2029;
+  --tabs-hover: #0D2029;
+  --tabs-border: #0D2029;
+  --tabs-text: #A09B8C;
+  --tabs-text-active: #F0E6D2;
+  
+
   --navbar-background-elements: #13151b;
   --navbar-background-gradient: linear-gradient(135deg, #000507, #13151b, #000507);
   --background-1-gradient: linear-gradient(135deg, #000406, #000507);
@@ -55,6 +63,30 @@
   --border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF);
   /* Your gradient here */
 
+}
+/* Scrollbar für Webkit-Browser (Chrome, Safari) */
+::-webkit-scrollbar {
+  width: 8px; /* Breite des Scrollbalkens */
+  height: 8px; /* Höhe des horizontalen Scrollbalkens */
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grey-3); /* Farbe des Scrollbalken-Knopfes */
+  border-radius: 4px; /* Rundung des Scrollbalken-Knopfes */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: darkgrey; /* Farbe des Scrollbalken-Knopfes beim Hover */
+}
+
+::-webkit-scrollbar-track {
+  background: black; /* Farbe des Scrollbalken-Tracks */
+}
+
+/* Scrollbar für Firefox */
+* {
+  scrollbar-width: thin; /* "auto" oder "thin" */
+  scrollbar-color: grey transparent; /* Farbe des Scrollbalken-Knopfes und des Tracks */
 }
 
 html,
@@ -179,17 +211,13 @@ h1 {
 
 
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
     color: #213547;
   }
 
   a:hover {
     color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
   }
 }
 

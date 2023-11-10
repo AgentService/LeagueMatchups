@@ -1,5 +1,5 @@
 <template>
-  <div class="container-fluid p-4 m-1">
+  <div class="container-fluid p-2 m-1">
     <div class="row">
       <div class="d-flex align-items-center">
         <div class="flex-shrink-0">

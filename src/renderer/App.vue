@@ -13,27 +13,26 @@
       <div class="grid-container">
         <!-- Adjust the height to take up the remaining space after Navbar -->
         <!-- First Row -->
+        <!-- Existing rows for ChampionSearch components -->
+        <div class=" slim-row m-3">
+          <div class="col-12">
+            <div class="title-bar">
+              <h4>Select your Matchup</h4>
+            </div>
+          </div>
+        </div>
         <div class="row">
-          <div class="col-md-3 d-flex container-md gradient-border">
+          <div class="col-md-3 d-flex  gradient-border">
             <LearningObjectives></LearningObjectives>
-
           </div>
           <div class="col-md-6">
             <!-- New slim full-width row above ChampionSearch components -->
-            <div class="row slim-row ">
-              <div class="col-12">
-                <div class="title-bar">
-                  <h4>Select your Matchup</h4>
-                </div>
-              </div>
-            </div>
-            <!-- Existing rows for ChampionSearch components -->
-            <div class="row">
-              <div class="col-md-6 d-flex">
+            <div class="row ">
+              <div class="col-md-6 p-3 d-flex">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="col-md-6 d-flex">
-                <ChampionSearch class="gradient-border-laser" :instanceId="2" @championSelected="setChampionB" />
+              <div class="col-md-6 p-3 d-flex">
+                <ChampionSearch class="gradient-border-laser br-none" :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
@@ -46,25 +45,24 @@
           </div>
           <div class="col-md-6 d-flex flex-column align-items-stretch ">
             <div class="row">
-              <div class="col-md-6 gradient-border">
-                <ChampionStats :champion="championA" />
+              <div class="col-md-6 gradient-border h-100">
+                <ChampionStats :champion="championA" :instanceId="1" />
               </div>
-              <div class="col-md-6 gradient-border">
-                <ChampionStats :champion="championB" />
+              <div class="col-md-6 gradient-border h-100">
+                <ChampionStats :champion="championB" :instanceId="2" />
               </div>
             </div>
           </div>
-          <div class="col-md-3 d-flex align-items-stretch gradient-border gradient-top-border">
+          <div class="col-md-3 d-flex align-items-stretch gradient-border ">
           </div>
         </div>
         <div class="row ">
-          <div class="col-md-4 d-flex align-items-stretch gradient-top-border">
+          <div class="col-md-4 d-flex align-items-stretch gradient-border ">
           </div>
-          <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
+          <div class="col-md-4 d-flex align-items-stretch gradient-border ">
             <MatchupNotes></MatchupNotes>
-
           </div>
-          <div class="col-md-4 d-flex align-items-stretch gradient-border gradient-top-border">
+          <div class="col-md-4 d-flex align-items-stretch gradient-border">
           </div>
         </div>
       </div>
@@ -172,17 +170,17 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   --row-gutter: 0px;
 }
 
-
-.title-bar {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: var(--gold-3);
-	border-bottom: 1px solid var(--gold-4);
-	margin-bottom: 1rem;
+* {
+  box-sizing: border-box;
 }
 
+.title-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--gold-3);
 
+}
 
 
 /* .app-wrapper is the main wrapper that contains all content including the navbar and banner */
@@ -214,22 +212,10 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   border-top: 2px solid var(--blue-laser-gradient);
 }
 
-/* Gradient Top Border Class */
-.gradient-top-border::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  /* Align it to the top of the element */
-  height: 2px;
-  /* Height of the border */
-  background: var(--border-grey-gradient-horizontal);
-}
+
 
 /* .grid-container holds the main grid and should fill the available space in .app-container */
 .grid-container {
-
   flex-grow: 1;
   /* Takes up all available space within .app-container */
   display: flex;
@@ -241,13 +227,13 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 /* Each .row should take up an equal amount of space within .grid-container */
 .row {
+  /* border: 1px solid red; */
   justify-content: center;
   /* Center columns horizontally */
   height: 350px;
-  /* flex-grow: 1; */
-  /* Flex grow to fill the container */
-  min-height: 0;
-  /* Override the default min-height to ensure flex-grow works */
+  flex-grow: 1;
+
+  /* Add space between rows */
   --bs-gutter-x: 0;
 
 }
@@ -255,26 +241,18 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 /* For slim rows */
 .slim-row {
   justify-content: center;
-  height: auto;
+  height: 30px;
   /* Let the content define the height */
-  flex-grow: 0;
   /* Do not allow the row to grow */
-  padding: 0 2rem;
 }
 
 
 .background-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  z-index: 999;
-  background: var(--navbar-background-gradient);
-  opacity: 0;
-  animation: none;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+  position: static;
+  /* or 'relative' based on your needs */
+  height: auto;
+  /* Adjust based on content or set to a specific height */
+  opacity: 1;
 }
 
 .row.front {
@@ -299,49 +277,92 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   }
 }
 
+/* Set the parent elements to position relative for the pseudo-elements to position correctly */
+.col-md-3,
+.col-md-6,
+.col-md-4,
+.row,
+.background-container {
+  position: relative;
+  /* This is important for the absolute positioning of pseudo-elements */
+  /* ... other styles ... */
+}
 
+/* Gradient Top Border Class */
+.gradient-top-border::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  /* Height of the border */
+  background: var(--border-grey-gradient-horizontal);
+  z-index: 2;
+  /* Ensure it's above the content but below any floating elements */
+}
 
-/* Gradient Border Class */
+/* Gradient Border Class for left border */
 .gradient-border::before {
   content: "";
   position: absolute;
+  top: 0;
+  bottom: 0;
   left: 0;
-  height: 60%;
   width: 1px;
   /* Width of the border */
   background: var(--border-grey-gradient);
-  top: 20%;
-  /* Center the border vertically */
+  z-index: 2;
 }
 
-.gradient-border-laser::before {
-  position: relative;
+/* Gradient Border Class for right border */
+.gradient-border::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  /* Width of the border */
+  background: var(--border-grey-gradient);
+  z-index: 2;
 }
 
+/* Gradient Border Laser Class for vertical border */
 .gradient-border-laser::before {
   content: "";
   position: absolute;
+  top: 20%;
+  /* Adjust as necessary */
+  bottom: 20%;
+  /* Adjust as necessary */
   left: 0;
-  height: 60%;
   width: 1px;
   /* Width of the border */
   background: linear-gradient(to top, #000406, var(--gold-3), var(--gold-3), #000406);
-  /* Your gradient here */
-  top: 20%;
-  /* Center the border vertically */
+  z-index: 2;
 }
 
+/* Apply left border only to the first column and right border only to the last column within each row */
+.row {
+  display: flex;
+}
 
-/* Ensure the columns are positioned relatively to position the gradient border correctly */
+.gradient-border:not(:last-child)::after {
+  display: none;
+  /* This hides the right border for all but the last child */
+}
+
+.gradient-border:not(:first-child)::before {
+  display: none;
+  /* This hides the left border for all but the first child */
+}
+
+/* Set the columns to grow and fill the available space */
 .col-md-3,
-.col-md-4,
 .col-md-6 {
-  position: relative;
-  height: 100%;
-  /* Full height of the row */
-  padding: 0;
-  /* Set to 0 or any specific value you need */
-  margin: auto;
-  /* Auto margins on left and right to center the block */
-}
-</style>
+  /* Adjust based on content */
+  flex-grow: 1;
+  /* Allow columns to grow */
+  /* Provide some spacing inside the columns */
+}</style>
