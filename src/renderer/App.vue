@@ -24,22 +24,23 @@
         <div class="row">
           <div class="col-md-2 gradient-border">
           </div>
-          <div class="col-md-1  gradient-border ">
+          <div class="col-md-1  d-flex flex-column   gradient-border ">
+            <ChampionTips :champion="championA" :instanceId="1" />
+
           </div>
           <div class="col-md-6">
             <!-- New slim full-width row above ChampionSearch components -->
             <div class="row ">
               <div class="col-md-6 p-3 d-flex flex-column">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-                <ChampionTips :champion="championA" :instanceId="1" />
               </div>
               <div class="col-md-6 p-3 d-flex flex-column">
                 <ChampionSearch class="gradient-border-laser br-none " :instanceId="2" @championSelected="setChampionB" />
-                <ChampionTips :champion="championB" :instanceId="2" />
               </div>
             </div>
           </div>
-          <div class="col-md-1 d-flex align-items-stretch gradient-border">
+          <div class="col-md-1 d-flex flex-column gradient-border">
+            <ChampionTips :champion="championB" :instanceId="2" />
           </div>
           <div class="col-md-2 d-flex align-items-stretch gradient-border">
           </div>

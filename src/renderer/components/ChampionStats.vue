@@ -87,7 +87,7 @@
                     </div>
 
                     <!-- Tips Tab Pane -->
-                    <!-- <div :id="`tips-tab-pane-${props.instanceId}`" class="tab-pane fade"
+                    <div :id="`tips-tab-pane-${props.instanceId}`" class="tab-pane fade"
                         :class="{ show: activeTab === 'Tips', active: activeTab === 'Tips' }" role="tabpanel"
                         aria-labelledby="`tab-tips-${props.instanceId}`">
                         <div class="champion-enemy-tips">
@@ -98,7 +98,7 @@
                                 </ul>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,7 +153,7 @@ const selectTab = (tab) => {
 watch(() => props.instanceId, (newVal, oldVal) => {
     // Logic here if you need to do something when instanceId changes
 });
-const tabs = ['Stats'];
+const tabs = ['Abilities', 'Stats', 'Tips'];
 const activeTab = ref('Abilities'); // Default active tab, could be 'Stats' or 'Tips' based on your logic
 
 const enemyTips = computed(() => {

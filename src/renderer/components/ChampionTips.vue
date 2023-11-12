@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-3 d-flex" v-if="championTips && Object.keys(championTips).length > 0">
+  <div class="container mt-3" v-if="championTips && Object.keys(championTips).length > 0">
     <!-- <h2>{{ championName }}'s Tips</h2> -->
     <!-- Buttons with hints as a second line -->
     <div v-for="(keys, groupName) in groupedTips" :key="groupName" class="mb-3">

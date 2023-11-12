@@ -1,34 +1,44 @@
 <template>
-	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'align-items-stretch']">
-		<div class="note-card ">
-			<!-- Search Bar - Toggles the grid when clicked -->
-			<div class="search-bar">
-				<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
-					class="form-control" />
-			</div>
+	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light']">
+		<!-- Search Bar -->
+		<div class="search-bar">
+			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
+				class="form-control" />
+		</div>
 
-			<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
-				<!-- Champion Grid - Visible when isGridVisible is true -->
-				<div class="champion-grid" v-show="isGridVisible">
-					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
-						@click="selectChampion(champion)">
-						<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
-						<span>{{ champion.name }}</span>
-					</div>
-				</div>
-			</div>
-			<!-- Detail View - Shown when a champion is selected -->
-			<div class="champion-detail " v-if="selectedChampion" v-show="!isGridVisible">
-				<div :class="[themeClass, 'champion-image-container']">
-					<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
-						alt="Champion Image" />
-					<!-- Insert more details here as needed -->
-					<p class="mt-0 fs-4">{{ selectedChampion.name }}</p>
-					<!-- For example, add lore, abilities, stats etc. -->
-					<!-- ... -->
+		<!-- Champion Grid Container -->
+		<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
+			<!-- Champion Grid -->
+			<div class="champion-grid" v-show="isGridVisible">
+				<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
+					@click="selectChampion(champion)">
+					<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
+					<span>{{ champion.name }}</span>
 				</div>
 			</div>
 		</div>
+
+		<!-- Detail View -->
+		<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
+			<!-- Stats Container -->
+			<div class="stats-container pt-4 ms-0">
+				<!-- Iterate through your selected stats -->
+				<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
+					<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+					<div class="stat-value">{{ selectedChampion?.stats[statKey] }}</div>
+				</div>
+			</div>
+
+			<!-- Champion Image Container -->
+			<div :class="[themeClass, 'champion-image-container']">
+				<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
+					alt="Champion Image" />
+				<p class="champion-name mt-0 fs-4">{{ selectedChampion.name }}</p>
+			</div>
+
+			
+		</div>
+		
 	</div>
 </template>
   
@@ -103,6 +113,8 @@ export default {
 			selectedChampions: [], // Initialize empty array
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
+			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed']
+
 		};
 	},
 
@@ -144,6 +156,20 @@ export default {
 		},
 	},
 	methods: {
+		getStatImageUrl(statKey) {
+			const statIcons = {
+				AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
+				armor: 'StatModsArmorIcon.png',
+				attackdamage: 'StatModsAttackDamageIcon.png',
+				// CDR: 'StatModsCDRScalingIcon.png',
+				hp: 'StatModsHealthScalingIcon.png',
+				spellblock: 'StatModsMagicResIcon.png',
+				// abilitypower: 'StatModsAbilityPowerIcon.png',
+				movespeed: 'StatModsMovementSpeedIcon.png',
+			};
+			return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
+		},
+
 		checkScrollable() {
 			const gridContainer = this.$refs.gridContainer; // You'll need to add a ref="gridContainer" to the element
 			if (gridContainer.scrollHeight > gridContainer.clientHeight) {
@@ -218,6 +244,8 @@ export default {
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	align-items: stretch;
+
 	/* Changed from auto to hidden to control overflow within child elements */
 }
 
@@ -309,7 +337,10 @@ export default {
 	border: 1px solid var(--blue-7);
 	/* Add more styles for padding, margins, etc. as needed */
 }
-
+.champion-name {
+  margin-top: 0.5rem; /* Adds space above the champion name */
+  font-size: 1.25rem; /* Sets the font size of the champion name */
+}
 /* Champion tile image */
 .champion-tile img {
 	max-width: 100%;
@@ -333,20 +364,19 @@ export default {
 
 .champion-detail {
 	display: flex;
-	justify-content: center;
-	align-items: center;
+	/* Spaces out the stats and image */
 	text-align: center;
 }
 
 /* This will contain the champion image and name centered */
 .champion-image-container {
+	flex-grow: 1;
+	/* Prevents the image container from shrinking */
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	/* Center children horizontally */
-	justify-content: center;
 	/* Center children vertically */
-	text-align: center;
 	/* Center text for all children */
 	margin-top: 1rem;
 	/* Optional: adds some space above the container */
@@ -356,7 +386,7 @@ export default {
 .champion-image {
 	width: 100%;
 	/* Full width of the container */
-	max-width: 110px;
+	max-width: 130px;
 	/* Maximum width */
 	height: auto;
 	/* Maintain aspect ratio */
@@ -456,5 +486,31 @@ export default {
 	background-color: var(--red-laser-1);
 	border-radius: 6px;
 	height: 2rem;
+}
+
+.stat-item {
+	display: flex;
+	align-items: center;
+}
+
+.stats-container {
+	flex-grow: 0;
+	/* Allows the stats container to grow as needed */
+	align-items: flex-start;
+	/* Aligns stats to the start of the flex container */
+}
+
+.stat-icon {
+	width: 24px;
+	/* Smaller icon width */
+	height: 24px;
+	/* Smaller icon height */
+}
+
+.stat-value {
+	margin-left: 0.5rem;
+	/* Space between icon and value */
+	font-size: 0.9rem;
+	/* Smaller font size for stat value */
 }
 </style>

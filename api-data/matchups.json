@@ -2070,5 +2070,33 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Cassiopeia-Akali",
+    "champions": [
+      {
+        "id": "Cassiopeia",
+        "name": "Cassiopeia"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Katarina-Akali",
+    "champions": [
+      {
+        "id": "Katarina",
+        "name": "Katarina"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
   }
 ]
