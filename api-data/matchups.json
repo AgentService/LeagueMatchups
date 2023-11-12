@@ -2098,5 +2098,89 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Anivia-Akshan",
+    "champions": [
+      {
+        "id": "Anivia",
+        "name": "Anivia"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Annie-Akshan",
+    "champions": [
+      {
+        "id": "Annie",
+        "name": "Annie"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Azir-Akshan",
+    "champions": [
+      {
+        "id": "Azir",
+        "name": "Azir"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ekko-Akshan",
+    "champions": [
+      {
+        "id": "Ekko",
+        "name": "Ekko"
+      },
+      {
+        "id": "Akshan",
+        "name": "Akshan"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Sejuani-Aatrox",
+    "champions": [
+      {
+        "id": "Sejuani",
+        "name": "Sejuani"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Wukong-Aatrox",
+    "champions": [
+      {
+        "id": "MonkeyKing",
+        "name": "Wukong"
+      },
+      {
+        "id": "Aatrox",
+        "name": "Aatrox"
+      }
+    ],
+    "notes": ""
   }
 ]

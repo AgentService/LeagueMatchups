@@ -1,5 +1,5 @@
 <template>
-	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light']">
+	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'h-100']">
 		<!-- Search Bar -->
 		<div class="search-bar">
 			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
@@ -33,12 +33,61 @@
 			<div :class="[themeClass, 'champion-image-container']">
 				<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
 					alt="Champion Image" />
-				<p class="champion-name mt-0 fs-4">{{ selectedChampion.name }}</p>
+				<!-- <p class="champion-name mt-0 fs-4">{{ selectedChampion.name }}</p> -->
 			</div>
-
-			
 		</div>
-		
+
+		<!-- Abilities Section -->
+		<div class="champion-abilities-card " v-if="selectedChampion" v-show="!isGridVisible">
+			<div class="abilities-container justify-content-center">
+
+				<!-- Passive with tooltip -->
+				<div class="ability me-sm-0 pe-3" v-if="selectedChampion?.passive">
+					<div class="ability-icon-wrapper">
+						<img :src="getPassiveImageUrl(selectedChampion?.passive)" :alt="selectedChampion?.passive.name"
+							class="tooltip-spell-icon" />
+						<span class="ability-label">P</span>
+					</div>
+					<div class="tooltip">
+						<div class="tooltip-content">
+							<div class="tooltip-header">
+								<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+									:alt="selectedChampion?.passive.name" class="tooltip-spell-icon" />
+								<span class="ability-label">P</span>
+							</div>
+							<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
+							<p class="spell-description">{{ selectedChampion?.passive.description }}</p>
+						</div> <!-- ... -->
+					</div>
+				</div>
+				<!-- Skills with tooltip -->
+				<!-- Abilities -->
+				<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability pe-1 ">
+					<div class="ability-icon-wrapper ">
+						<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
+						<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
+					</div>
+					<div class="tooltip">
+						<div class="tooltip-content">
+							<div class="tooltip-header">
+								<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="tooltip-spell-icon" />
+								<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
+							</div>
+							<h5 class="spell-name">{{ spell.name }}</h5>
+							<div>
+								<p class="spell-cooldown">Cooldown: <span class="value-text">{{
+									spell.cooldownBurn
+								}}</span></p>
+								<p class="spell-cost">Cost: <span class="value-text">{{ spell.costBurn
+								}}</span>
+								</p>
+							</div>
+							<p class="spell-description">{{ spell.description }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
   
@@ -113,8 +162,8 @@ export default {
 			selectedChampions: [], // Initialize empty array
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
-			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed']
-
+			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'],
+			abilityLabels: ['Q', 'W', 'E', 'R']
 		};
 	},
 
@@ -156,6 +205,17 @@ export default {
 		},
 	},
 	methods: {
+		getPassiveImageUrl(passive) {
+			// Construct the URL for the passive image
+			const path = `./img/dragontail/13.21.1/img/passive/${passive?.image.full}`;
+			return path;
+		},
+		getSpellImageUrl(spell) {
+			return `./img/dragontail/13.21.1/img/spell/${spell.image.full}`;
+		},
+		getAbilityLabelByIndex(index) {
+			return this.abilityLabels[index] || ''; // Fallback to empty string if index is out of range
+		},
 		getStatImageUrl(statKey) {
 			const statIcons = {
 				AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
@@ -236,17 +296,130 @@ export default {
 </script>
 
 <style scoped>
+/* Container for both passive and abilities */
+.abilities-container {
+	display: flex;
+	padding: 0 10px;
+}
+
+.champion-abilities-card {
+	margin-top: auto; /* Pushes the abilities to the bottom */
+}
+
+.ability {
+	display: flex;
+	align-items: center;
+	position: relative;
+}
+
+.ability-icon-wrapper {
+	position: relative;
+	display: flex;
+	cursor: pointer;
+}
+
+.ability-label {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background-color: #000;
+	color: #fff;
+	padding: 2px 5px;
+	font-size: 0.75rem;
+	border-radius: 2px 0 0 0;
+	/* Rounded top-left corner */
+}
+
+.ability-icon {
+	display: block;
+	width: 45px;
+	height: 45px;
+}
+
+.tooltip {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translate(-50%, 0);
+	visibility: hidden;
+	opacity: 0;
+	background-color: black;
+	color: var(--grey-1);
+	padding: 1rem 2rem;
+	border-radius: 0.25rem;
+	z-index: 100;
+	min-width: 300px;
+	transition: visibility 0.2s, opacity 0.2s ease-in-out;
+	/* Other styles */
+}
+
+.tooltip .ability-label {
+	left: 2.7rem;
+}
+
+
+.tooltip div {
+	margin-bottom: 0.5rem;
+}
+
+.tooltip div:last-child {
+	margin-bottom: 0;
+}
+
+.tooltip-content {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.tooltip-header {
+	position: relative;
+	width: 100%;
+}
+
+.tooltip-spell-icon,
+.ability-icon {
+	width: 45px;
+	/* Adjust the size as needed */
+	height: 45px;
+}
+
+.spell-name {
+	color: var(--gold-1);
+	font-weight: bold;
+	margin-top: 10px;
+	margin-bottom: 5px;
+}
+
+.spell-cooldown,
+.spell-cost {
+	font-size: 0.875rem;
+	margin-bottom: 2px;
+}
+
+.spell-description {
+	font-size: 0.875rem;
+	margin-top: 10px;
+}
+
+.ability:hover .tooltip,
+.stat-item:hover .tooltip {
+	visibility: visible;
+	opacity: 1;
+}
+
+.value-text {
+	color: var(--blue-laser-1);
+	/* Replace with your preferred shade of blue if needed */
+}
+
 .note-card {
 	width: 100%;
-	z-index: 1000;
-	height: 100%;
+	z-index: 9;
 	/* This will take the full height of the parent */
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
-	align-items: stretch;
-
-	/* Changed from auto to hidden to control overflow within child elements */
+	justify-content: flex-start; /* Align children to the start of the flex container */
 }
 
 /* Adjust the grid container */
@@ -305,7 +478,7 @@ export default {
 .search-bar {
 	box-sizing: border-box;
 	display: flex;
-	justify-content: center;
+	justify-content: start;
 }
 
 .search-bar input.form-control {
@@ -337,10 +510,14 @@ export default {
 	border: 1px solid var(--blue-7);
 	/* Add more styles for padding, margins, etc. as needed */
 }
+
 .champion-name {
-  margin-top: 0.5rem; /* Adds space above the champion name */
-  font-size: 1.25rem; /* Sets the font size of the champion name */
+	margin-top: 0.5rem;
+	/* Adds space above the champion name */
+	font-size: 1.25rem;
+	/* Sets the font size of the champion name */
 }
+
 /* Champion tile image */
 .champion-tile img {
 	max-width: 100%;
@@ -512,5 +689,4 @@ export default {
 	/* Space between icon and value */
 	font-size: 0.9rem;
 	/* Smaller font size for stat value */
-}
-</style>
+}</style>

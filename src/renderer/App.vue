@@ -21,28 +21,24 @@
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-md-2 gradient-border">
-          </div>
-          <div class="col-md-1  d-flex flex-column   gradient-border ">
+        <div class="row d-flex">
+          <div class="col-md-3 d-flex gradient-border h-100">
             <ChampionTips :champion="championA" :instanceId="1" />
 
           </div>
           <div class="col-md-6">
             <!-- New slim full-width row above ChampionSearch components -->
             <div class="row ">
-              <div class="col-md-6 p-3 d-flex flex-column">
+              <div class="col-md-6 p-3 d-flex flex-column h-100 ">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="col-md-6 p-3 d-flex flex-column">
+              <div class="col-md-6 p-3 d-flex flex-column h-100">
                 <ChampionSearch class="gradient-border-laser br-none " :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
-          <div class="col-md-1 d-flex flex-column gradient-border">
+          <div class="col-md-3 d-flex gradient-border h-100">
             <ChampionTips :champion="championB" :instanceId="2" />
-          </div>
-          <div class="col-md-2 d-flex align-items-stretch gradient-border">
           </div>
         </div>
         <!-- Second Row -->
@@ -52,10 +48,10 @@
           <div class="col-md-6 d-flex flex-column align-items-stretch ">
             <div class="row">
               <div class="col-md-6 gradient-border h-100">
-                <ChampionStats :champion="championA" :instanceId="1" />
+                <!-- <ChampionStats :champion="championA" :instanceId="1" /> -->
               </div>
               <div class="col-md-6 gradient-border h-100">
-                <ChampionStats :champion="championB" :instanceId="2" />
+                <!-- <ChampionStats :champion="championB" :instanceId="2" /> -->
               </div>
             </div>
           </div>
@@ -238,12 +234,11 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 /* Each .row should take up an equal amount of space within .grid-container */
 .row {
+  display: flex;
   /* border: 1px solid red; */
   justify-content: center;
   /* Center columns horizontally */
   height: 350px;
-  flex-grow: 1;
-
   /* Add space between rows */
   --bs-gutter-x: 0;
 

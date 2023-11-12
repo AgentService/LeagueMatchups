@@ -1,49 +1,42 @@
 <template>
-  <div class="container mt-3" v-if="championTips && Object.keys(championTips).length > 0">
-    <!-- <h2>{{ championName }}'s Tips</h2> -->
-    <!-- Buttons with hints as a second line -->
-    <div v-for="(keys, groupName) in groupedTips" :key="groupName" class="mb-3">
-      <button type="button" class="btn btn-primary btn-block" data-bs-toggle="modal"
-        :data-bs-target="'#modal-' + groupName + '-' + instanceId">
-        <div class="button-content">
-          <i :class="getIconForCategory(groupName)" aria-hidden="true"></i>
-          <div class="text-content text-center">
-            <!-- <small class="d-block text-white-50">{{ getSubCategoryHints(keys) }}</small> -->
-            {{ groupName }}
+  <div class="container d-flex" v-if="championTips && Object.keys(championTips).length > 0">
+    <div class="card">
+      <div class="card-header">
+        General Tips <!-- Header title -->
+      </div>
+      <transition name="fade" mode="out-in">
+        <div class="card-body" :key="selectedTip">
+          <div v-if="!selectedTip" class="flex-container">
+          <!-- Iterate over each key in championTips -->
+          <div v-for="(value, key) in championTips" :key="key" class="flex-item">
+            <!-- Button for each tip -->
+            <button type="button" class="btn btn-primary btn-full-width" @click="selectedTip = key">
+              <div class="button-content">
+                <i :class="getIconForKey(key)" aria-hidden="true"></i>
+                <div class="ms-3 text-content">{{ formatCategory(key) }}</div>
+              </div>
+            </button>
           </div>
         </div>
-      </button>
-    </div>
-
-    <!-- Modals for each group with instanceId -->
-    <div v-for="(keys, groupName) in groupedTips" :key="'modal-' + groupName + '-' + instanceId" class="modal fade"
-      :id="'modal-' + groupName + '-' + instanceId" tabindex="-1"
-      aria-labelledby="'modal-' + groupName + '-' + instanceId + '-label'" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" :id="'modal-' + groupName + '-' + instanceId + '-label'">{{ groupName }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div v-else class="content-container">
+          <div class="details-header mb-1">
+            <!-- Back Button -->
+            <button type="button" class="btn btn-secondary mb-1" @click="selectedTip = null">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <!-- Title next to back button -->
+            <h6 class="details-title title-bar">{{ formatCategory(selectedTip) }}</h6>
           </div>
-          <div class="modal-body">
-
-            <div v-for="tipKey in keys" :key="tipKey">
-              <h5>{{ formatCategory(tipKey) }}</h5>
-              <p>{{ championTips[tipKey]?.long }}</p>
-            </div>
-            <div v-if="groupName === 'Character' && championTips['additionalInsights']">
-              <h5>Additional Insights</h5>
-              <div v-for="(info, key) in championTips['additionalInsights']" :key="key">
-                <h6>{{ formatCategory(key) }}</h6>
-                <p>{{ info }}</p>
-              </div>
-            </div>
+          <div class="tip-details">
+            <p>{{ championTips[selectedTip]?.long }}</p>
           </div>
         </div>
       </div>
+      </transition>
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { computed, ref, defineProps, watch, onMounted } from 'vue';
@@ -56,15 +49,10 @@ const props = defineProps({
 
 const store = useStore();
 const championId = ref(props.champion?.id);
-const championName = computed(() => props.champion?.name);
-const groupedTips = {
-  'Overview': ['strengths', 'weaknesses', 'counterplay'],
-  'Gameplan': ['earlyGame', 'midGame', 'lateGame', 'teamFightRole'],
-  'Mindset': ['identity', 'mindsetAndPsychology']
-};
 const championTips = computed(() => {
   return store.getters['champions/getChampionTips'](championId.value);
 });
+const selectedTip = ref(null);
 
 const formatCategory = (key) => {
   if (!key) return '';
@@ -73,11 +61,18 @@ const formatCategory = (key) => {
   return key.trim();
 };
 
-const getIconForCategory = (category) => {
+const getIconForKey = (category) => {
   const icons = {
-    'Gameplan': 'fa-solid fa-chess',
-    'Overview': 'fa-solid fa-magic',
-    'Mindset': 'fa-solid fa-user',
+    'identity': 'fa-solid fa-user-circle',
+    'strengths': 'fa-solid fa-thumbs-up',
+    'weaknesses': 'fa-solid fa-thumbs-down',
+    'earlygame': 'fa-solid fa-hourglass-start',
+    'midgame': 'fa-solid fa-hourglass-half',
+    'lategame': 'fa-solid fa-hourglass-end',
+    'teamfight': 'fa-solid fa-shield-alt',
+    'counter': 'fa-solid fa-ban',
+    'mindset': 'fa-solid fa-brain',
+    'insights': 'fa-solid fa-lightbulb',
     // Define more icons for other categories if needed
   };
   return icons[category] || 'fa-solid fa-question-circle'; // Fallback icon
@@ -94,6 +89,63 @@ watch(() => props.champion, (newChampion) => {
 
 
 <style>
+.title-bar {
+  text-align: left;
+  color: var(--gold-1);
+  border-bottom: 0px solid var(--gold-4);
+}
+
+.container {
+  width: 100%;
+  /* Full width of the parent element */
+  height: 100%;
+  /* Full height of the parent element */
+  /* Add if the parent of the container has a defined height, or use vh for viewport height */
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+}
+
+.flex-item {
+  flex: 1 0;
+  /* default for smaller screens - 2 items per row */
+}
+
+/* Enter and leave transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.10s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.btn-full-width {
+  min-width: 150px;
+  width: 100%;
+}
+
+.btn-full-height {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-item {
+  display: flex;
+  /* Make the grid item a flex container */
+  flex-direction: column;
+  /* Stack children vertically */
+  height: 100%;
+  /* Full height */
+}
 
 .btn small {
   color: aliceblue;
@@ -102,47 +154,51 @@ watch(() => props.champion, (newChampion) => {
   opacity: 0.75;
   /* Slightly transparent for less prominence */
 }
-.modal-dialog {
-  max-width: 90%;
-  z-index: 9999;
 
-  background-color: yellowgreen;
-}
 .button-content {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
 }
-.button-content i {
-  margin-bottom: 10px; /* Adjust the margin as needed */
+
+.tip-details {
+  overflow: auto;
+  flex-grow: 1;
 }
 
-.text-content {
-  text-align: center;
+.details-header {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.button-content .text-content {
+.details-title {
+  margin-left: 0.5rem;
+  /* Spacing between button and title */
+  flex-grow: 1;
+  /* Allow the title to take up remaining space if needed */
+}
+
+.content-container {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  flex-grow: 1;
+  height: 0;
 }
 
-.modal-body {
-  background: linear-gradient(145deg, #1b2735 0%, #090a0f 100%);
-  color: #c7d3dc;
-}
-.modal-content {
-  color: #f8f9fa;
-}
-.modal-header {
-  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-  color: #f8f9fa;
-}
-.modal-header .btn {
-  background: linear-gradient(145deg, #3a3a6e50, #5656b957);
-  /* Subtle gradient for buttons */
-  border: none;
-  color: #fff;
+/* Custom scrollbar styles */
+.tip-details::-webkit-scrollbar {
+  width: 0.75rem;
+  /* Width of the scrollbar */
 }
 
-</style>
+.tip-details::-webkit-scrollbar-thumb {
+  background-color: #00aaff;
+  /* Replace with your desired thumb color */
+  border-radius: 6px;
+}
+
+.tip-details::-webkit-scrollbar-track {
+  background-color: #000000;
+  /* Replace with your desired track color */
+}</style>

@@ -36,7 +36,7 @@ Viktor
 Vladimir
 
 
-For each of the following champions: [Taliyah]:
+For each of the following champions: [Zoe]:
 
 Describe the identity and playstyle of the champion.
 State the well-defined strengths of the champion.
@@ -53,37 +53,35 @@ Output Format only in JSON!
 [Champion-Name]": {
     "championTips": {
       "identity": {
-        "short": "Brief description...",
+        "short": "Very Brief description...",
         "long": "Detailed description..."
       },
       "strengths": {
-        "short": "Brief strengths...",
+        "short": "Very Brief strengths...",
         "long": "Detailed strengths..."
       },
       "weaknesses": {
-        "short": "Brief weaknesses...",
+        "short": "Very Brief weaknesses...",
         "long": "Detailed weaknesses..."
       },
-      "gameStrategy": {
-        "earlyGame": {
-          "short": "Brief early game strategy...",
-          "long": "Detailed early game strategy..."
-        },
-        "midGame": {
-          "short": "Brief mid game strategy...",
-          "long": "Detailed mid game strategy..."
-        },
-        "lateGame": {
-          "short": "Brief late game strategy...",
-          "long": "Detailed late game strategy..."
-        }
+      "earlyGame": {
+        "short": "Very brief early game strategy...",
+        "long": "Detailed early game strategy..."
+      },
+      "midGame": {
+        "short": "Very Brief mid game strategy...",
+        "long": "Detailed mid game strategy..."
+      },
+      "lateGame": {
+        "short": "Very Brief late game strategy...",
+        "long": "Detailed late game strategy..."
       },
       "teamFightRole": {
-        "short": "Brief role...",
+        "short": "Very Brief role...",
         "long": "Detailed role..."
       },
       "mindsetAndPsychology": {
-        "short": "Brief mindset...",
+        "short": "Very Brief mindset...",
         "long": "Detailed mindset..."
       },
       "counterplay": {

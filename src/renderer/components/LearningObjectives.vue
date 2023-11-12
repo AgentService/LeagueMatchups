@@ -2,14 +2,15 @@
   <div class="container-fluid p-2 m-1">
     <div class="row">
       <div class="d-flex align-items-center">
-        <div class="flex-shrink-0">
-          <div class="btn btn-default edit-button" href="path/to/settings" aria-label="Settings">
-            <i class="fa fa-lg fa-cog" @click="toggleLOs(lo)" aria-hidden="true"></i>
-          </div>
-        </div>
+
         <div class="flex-grow-1 me-5">
           <div class="title-bar flex-grow-1 text-start">
             <span class="fw-bolder fs-5">Learning Objectives</span>
+          </div>
+        </div>
+        <div class="flex-shrink-0">
+          <div class="btn btn-default edit-button" href="path/to/settings" aria-label="Settings">
+            <i class="fa fa-lg fa-cog" @click="toggleLOs(lo)" aria-hidden="true"></i>
           </div>
         </div>
       </div>
@@ -239,7 +240,8 @@ export default {
 .lo-card,
 .lo-cards-container,
 .lo-category-section {
-  box-sizing: border-box; /* Include padding and border in the element's total width */
+  box-sizing: border-box;
+  /* Include padding and border in the element's total width */
 }
 
 .lo-column {
@@ -380,6 +382,7 @@ export default {
   border-radius: 10px;
   /* Rounded corners */
 }
+
 /* 
 .banner-progress-bar.is-complete {
   background-color: green !important;
@@ -480,8 +483,8 @@ export default {
 .lo-column {
   scrollbar-color: #005cb8 #000000;
   /* Dark blue thumb on a black track */
-  scrollbar-width:thin
-  /* Adjust the width to your preference */
+  scrollbar-width: thin
+    /* Adjust the width to your preference */
 }
 
 /* Style for Firefox */

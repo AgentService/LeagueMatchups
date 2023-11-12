@@ -15,7 +15,7 @@
   --red-5: rgb(60, 10, 10);
   --red-6: #280909;
   --red-7: #140A0A;
-  
+
   /* Gold colors */
   --gold-1: #F0E6D2;
   --gold-2: #C8AA6E;
@@ -46,7 +46,7 @@
   --tabs-border: #0D2029;
   --tabs-text: #A09B8C;
   --tabs-text-active: #F0E6D2;
-  
+
 
   --navbar-background-elements: #13151b;
   --navbar-background-gradient: linear-gradient(135deg, #000507, #13151b, #000507);
@@ -64,29 +64,38 @@
   /* Your gradient here */
 
 }
+
 /* Scrollbar für Webkit-Browser (Chrome, Safari) */
 ::-webkit-scrollbar {
-  width: 8px; /* Breite des Scrollbalkens */
-  height: 8px; /* Höhe des horizontalen Scrollbalkens */
+  width: 8px;
+  /* Breite des Scrollbalkens */
+  height: 8px;
+  /* Höhe des horizontalen Scrollbalkens */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--grey-3); /* Farbe des Scrollbalken-Knopfes */
-  border-radius: 4px; /* Rundung des Scrollbalken-Knopfes */
+  background: var(--grey-3);
+  /* Farbe des Scrollbalken-Knopfes */
+  border-radius: 4px;
+  /* Rundung des Scrollbalken-Knopfes */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: darkgrey; /* Farbe des Scrollbalken-Knopfes beim Hover */
+  background: darkgrey;
+  /* Farbe des Scrollbalken-Knopfes beim Hover */
 }
 
 ::-webkit-scrollbar-track {
-  background: black; /* Farbe des Scrollbalken-Tracks */
+  background: black;
+  /* Farbe des Scrollbalken-Tracks */
 }
 
 /* Scrollbar für Firefox */
 * {
-  scrollbar-width: thin; /* "auto" oder "thin" */
-  scrollbar-color: grey transparent; /* Farbe des Scrollbalken-Knopfes und des Tracks */
+  scrollbar-width: thin;
+  /* "auto" oder "thin" */
+  scrollbar-color: grey transparent;
+  /* Farbe des Scrollbalken-Knopfes und des Tracks */
 }
 
 html,
@@ -123,16 +132,42 @@ body {
 }
 
 .card {
-  /*background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  background-color: transparent;
-  padding: 2rem;
-  color: #fff;
-  border-radius: 0px;
-  font-family: 'Arial', sans-serif;
+  display: flex;
+  /* Use flex layout */
+  flex-direction: column;
+  /* Stack children vertically */
+  background: #1a1a2e00;
+  /* Dark background */
+  border: none;
   height: 100%;
-  width: 100%;
-  color: white;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  color: #e7e7e7;
+  /* Light text for readability */
+  transition: box-shadow 0.3s ease;
+  /* Smooth transition for hover effect */
+
+
 }
+
+.card-header {
+  background: transparent;
+  /* Darker shade for the header */
+  color: var(--gold-3);
+  /* White text */
+  font-weight: bold;
+  font-size: 1.25rem;
+  /* Larger font size for the title */
+  border-radius: 15px 15px 0 0;
+  /* Rounded corners at the top */
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
 
 /* Text area styles */
 .textarea {
@@ -171,16 +206,59 @@ body {
 
 /* Button styles */
 .btn {
+  font-size: 1rem;
   background-color: transparent;
   border: none;
-  color: #ccc;
   transition: color 0.3s ease;
 }
 
-.btn:hover,
-.btn:focus {
-  color: #28a745;
-  /* Change color on hover/focus */
+/* Button Styles */
+.btn-primary {
+  padding: 0.5rem;
+  background: var(--grey-5);
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.3s ease;
+  /* Smooth transition for hover effect */
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+.btn-primary:hover {
+  background: var(--grey-4);
+}
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130%;
+  height: 130%;
+  background-color: rgba(0, 128, 255, 0.2);
+  /* Adjust color for glow */
+  filter: blur(5px);
+  z-index: -1;
+  transition: opacity 0.3s;
+  border-radius: inherit;
+  /* Match the button's border-radius */
+}
+
+.btn-secondary {
+  /* Back button should not grow and should remain visible */
+  flex-shrink: 0;
+  align-self: flex-start;
+  /* Align the back button to the start of the flex container */
+}
+
+/* Back Button Styles */
+.btn-secondary {
+  background: #16213e;
+  /* Darker background for the back button */
+  color: #fff;
+  /* White text */
+  border-radius: 10px;
+  /* Rounded corners */
 }
 
 a {
