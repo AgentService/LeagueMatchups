@@ -15,7 +15,15 @@ export const champions = {
 		championList: null, // This will store the list of all champions
 		championDetails: null, // This will store the detailed info for each champion
 		data: retrieveFromLocalStorage("championListData") || null, // Initialize state with data from local storage
+		championTips: {} // Dieses Objekt wird nur Tipps für jeden Champion speichern
 	}),
+	getters: {
+		getChampionTips: (state) => (championId) => {
+			debug("Getting tips for champion", championId);
+			// Gibt Tips für den angeforderten Champion zurück, falls vorhanden
+			return state.championTips[championId] || [];
+		}
+	},
 	mutations: {
 		SET_CHAMPION_LIST_DATA(state, listData) {
 			state.championList = listData;
@@ -23,6 +31,17 @@ export const champions = {
 		SET_CHAMPION_DETAILED_DATA(state, detailedData) {
 			state.championDetails = detailedData;
 		},
+		SET_CHAMPION_TIPS(state, { championId, tips }) {
+			// Nehmen wir an, `state.champions` ist ein Objekt, das Champions nach ihrer ID speichert
+			if (!state.championTips[championId]) {
+				// Initialisieren Sie den Eintrag für diesen Champion, falls noch nicht vorhanden
+				debug("Initializing tips for champion", championId);
+				state.championTips[championId] = tips.championTips;
+			}
+			// Setzen Sie die Tips für den spezifischen Champion
+			debug("Setting tips for champion", championId, tips);
+			state.championTips[championId] = tips.championTips;
+		}
 	},
 	actions: {
 		async fetchChampionData({ commit }) {
@@ -53,7 +72,20 @@ export const champions = {
 				commit("SET_CHAMPION_LIST_DATA", listChampionsData);
 				commit("SET_CHAMPION_DETAILED_DATA", detailedChampionsData);
 			}
-		}
+		},
+		fetchChampionTips({ commit }, champion) {
+			const championId = champion.id;
+			axios.get(`${baseUrl}/api/champions/${championId}`)
+				.then(response => {
+					console.log('Champion tips:', response.data);
+					commit("SET_CHAMPION_TIPS", { championId, tips: response.data });
+				})
+				.catch(error => {
+					console.error('Error fetching champion tips:', error);
+					// Handle error (e.g., show notification)
+				});
+		},
+
 	},
 	// ... other options ...
 };

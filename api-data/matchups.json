@@ -2000,5 +2000,75 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Sylas-Syndra",
+    "champions": [
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      },
+      {
+        "id": "Syndra",
+        "name": "Syndra"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Sylas-Neeko",
+    "champions": [
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      },
+      {
+        "id": "Neeko",
+        "name": "Neeko"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Syndra-Sylas",
+    "champions": [
+      {
+        "id": "Syndra",
+        "name": "Syndra"
+      },
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Sylas-Ahri",
+    "champions": [
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Amumu-Aurelion Sol",
+    "champions": [
+      {
+        "id": "Amumu",
+        "name": "Amumu"
+      },
+      {
+        "id": "AurelionSol",
+        "name": "Aurelion Sol"
+      }
+    ],
+    "notes": ""
   }
 ]

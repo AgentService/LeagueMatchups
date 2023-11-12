@@ -22,21 +22,26 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-3 d-flex  gradient-border">
-            <LearningObjectives></LearningObjectives>
+          <div class="col-md-2 gradient-border">
+          </div>
+          <div class="col-md-1  gradient-border ">
           </div>
           <div class="col-md-6">
             <!-- New slim full-width row above ChampionSearch components -->
             <div class="row ">
-              <div class="col-md-6 p-3 d-flex">
+              <div class="col-md-6 p-3 d-flex flex-column">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+                <ChampionTips :champion="championA" :instanceId="1" />
               </div>
-              <div class="col-md-6 p-3 d-flex">
-                <ChampionSearch class="gradient-border-laser br-none" :instanceId="2" @championSelected="setChampionB" />
+              <div class="col-md-6 p-3 d-flex flex-column">
+                <ChampionSearch class="gradient-border-laser br-none " :instanceId="2" @championSelected="setChampionB" />
+                <ChampionTips :champion="championB" :instanceId="2" />
               </div>
             </div>
           </div>
-          <div class="col-md-3 d-flex align-items-stretch gradient-border">
+          <div class="col-md-1 d-flex align-items-stretch gradient-border">
+          </div>
+          <div class="col-md-2 d-flex align-items-stretch gradient-border">
           </div>
         </div>
         <!-- Second Row -->
@@ -58,6 +63,8 @@
         </div>
         <div class="row ">
           <div class="col-md-4 d-flex align-items-stretch gradient-border ">
+            <LearningObjectives></LearningObjectives>
+
           </div>
           <div class="col-md-4 d-flex align-items-stretch gradient-border ">
             <MatchupNotes></MatchupNotes>
@@ -82,6 +89,7 @@ import Debug from "debug";
 
 import ChampionSearch from "./components/ChampionSelection.vue";
 import ChampionStats from "./components/ChampionStats.vue";
+import ChampionTips from "./components/ChampionTips.vue";
 
 import MatchupNotes from "./components/MatchupNotes.vue";
 import LearningObjectives from "./components/LearningObjectives.vue";
@@ -139,11 +147,13 @@ const handleMatchup = () => {
 const setChampionA = (champion) => {
   championA.value = champion;
   store.dispatch("matchups/setChampionA", champion);
+  store.dispatch("champions/fetchChampionTips", champion);
 };
 
 const setChampionB = (champion) => {
   championB.value = champion;
   store.dispatch("matchups/setChampionB", champion);
+  store.dispatch("champions/fetchChampionTips", champion);
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {
@@ -365,4 +375,5 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   flex-grow: 1;
   /* Allow columns to grow */
   /* Provide some spacing inside the columns */
-}</style>
+}
+</style>

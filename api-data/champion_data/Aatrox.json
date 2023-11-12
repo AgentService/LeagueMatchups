@@ -93,6 +93,51 @@
             ],
             "lore": "Once honored defenders of Shurima against the Void, Aatrox and his brethren would eventually become an even greater threat to Runeterra, and were defeated only by cunning mortal sorcery. But after centuries of imprisonment, Aatrox was the first to find freedom once more, corrupting and transforming those foolish enough to try and wield the magical weapon that contained his essence. Now, with stolen flesh, he walks Runeterra in a brutal approximation of his previous form, seeking an apocalyptic and long overdue vengeance.",
             "blurb": "Once honored defenders of Shurima against the Void, Aatrox and his brethren would eventually become an even greater threat to Runeterra, and were defeated only by cunning mortal sorcery. But after centuries of imprisonment, Aatrox was the first to find...",
+            "infos": {
+                "identity": {
+                  "short": "AP Bruiser with high outplay potential.",
+                  "long": "Sylas is an AP bruiser known for his high damage output, exceptional mobility, and unique ability to steal enemy ultimates with his 'Hijack' skill. His playstyle revolves around skirmishing, making picks, and utilizing his versatile kit to adapt to various situations on the battlefield."
+                },
+                "strengths": {
+                  "short": "Versatility, burst damage, ultimate utility.",
+                  "long": "Sylas excels in versatility thanks to his 'Hijack' ability, which allows him to adapt to any team composition by stealing ultimates. His burst damage, particularly with his 'Kingslayer' and 'Chain Lash', is formidable. His ability to engage, escape, and sustain in fights with 'Abscond/Abduct' and 'Kingslayer' makes him a constant threat."
+                },
+                "weaknesses": {
+                  "short": "High skill cap, weak against CC, reliant on ultimate theft.",
+                  "long": "Sylas's effectiveness heavily depends on the player's skill and ability to make the most out of stolen ultimates. He struggles against heavy crowd control and can be vulnerable if his 'E' (Abscond/Abduct) is dodged or on cooldown. His reliance on ultimate theft means he can be less effective if the enemy team has less impactful ultimates."
+                },
+                "gameStrategy": {
+                  "earlyGame": {
+                    "short": "Focus on farming and opportunistic trades.",
+                    "long": "In the early game, Sylas should focus on farming to reach his core items quickly. He can look for trades when his passive is available, using the AoE damage to his advantage. It's essential to manage his cooldowns and mana wisely and look for roams post-level 6 with his ultimate-stealing ability."
+                  },
+                  "midGame": {
+                    "short": "Skirmish and secure objectives.",
+                    "long": "During the mid-game, Sylas becomes more potent in skirmishes and team fights. He should look to secure objectives with his team and use his ultimate-stealing ability to turn fights in his favor. His mobility allows him to split push and join fights when necessary."
+                  },
+                  "lateGame": {
+                    "short": "Excel in team fights, exploit stolen ultimates.",
+                    "long": "In the late game, Sylas's role is to excel in team fights by using his AoE damage and sustain. He should aim to steal high-impact ultimates and use them to either engage, disengage, or turn the tides of battle. Positioning is key to avoid getting caught out and to maximize the impact of stolen ultimates."
+                  }
+                },
+                "teamFightRole": {
+                  "short": "Engager or follow-up initiator.",
+                  "long": "In team fights, Sylas can serve as an engager with his 'E' or follow up on teammates' initiation. His role is to disrupt the enemy backline, apply burst damage, and use stolen ultimates to impact the fight. His sustain allows him to stay in fights longer, making him a persistent threat."
+                },
+                "mindsetAndPsychology": {
+                  "short": "Adaptive, opportunistic, and aggressive.",
+                  "long": "Playing Sylas requires an adaptive mindset, always ready to exploit opportunities. Players need to be aggressive, seeking out chances to use his combo for burst damage or to catch out enemies. Tactical thinking is crucial for effective use of stolen ultimates, which can change the course of fights."
+                },
+                "counterplay": {
+                  "short": "Exploit his cooldowns, avoid clumping, CC focus.",
+                  "long": "To counter Sylas, exploit his cooldown windows, especially his 'E'. Avoid clumping up to minimize the impact of his AoE damage and stolen ultimates. Focusing him with crowd control can prevent him from using his mobility and sustain effectively. Picking champions with less impactful ultimates can also reduce his effectiveness."
+                },
+                "additionalInsights": {
+                  "skillSynergy": "Sylas's abilities synergize to chain combos for maximum burst damage. His passive works well with his basic abilities to deal AoE damage.",
+                  "uniqueMechanics": "Sylas's unique mechanic is his 'Hijack' ability, allowing him to steal and use enemy ultimates. This requires knowledge of all champions to maximize effectiveness.",
+                  "situationalTips": "Sylas is an excellent pick when facing teams with high-impact ultimates. He excels in compositions that require a versatile AP bruiser who can adapt to various roles in fights."
+                }
+              },
             "allytips": [
                 "Use Umbral Dash while casting The Darkin Blade to increase your chances of hitting the enemy.",
                 "Crowd Control abilities like Infernal Chains or your allies' immobilizing effects will help you set up The Darkin Blade.",

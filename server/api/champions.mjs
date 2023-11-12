@@ -2,6 +2,7 @@
 import express from 'express';
 import { RiotAPI, DDragon } from '@fightmegg/riot-api';
 import Debug from 'debug';
+import { readJsonFile, writeJsonFile } from '../utils/fileOperations.mjs';
 
 const debugApi = Debug('api');
 const router = express.Router();
@@ -50,7 +51,7 @@ async function updateChampionData() {
         }
 
         debugApi('Champion data updated successfully.');
-        debugApi('Champion data:', championsList['Aatrox'], championsDetails['Aatrox']);
+        // debugApi('Champion data:', championsList['Aatrox'], championsDetails['Aatrox']);
         // Return the structured data
         const result = {
             data: {
@@ -112,9 +113,35 @@ const serveChampionData = async (req, res) => {
     res.json(championDataCache);
 };
 
+const getChampionInfo = (req, res) => {
+    const championId = req.params.championId;
+    console.log('championId:', championId);
+    const filePath = './api-data/champion_data/ChampionInfos.json';
+    console.log(filePath);
+  
+    try {
+      const championData = readJsonFile(filePath);
+  
+      // Check if the requested champion exists in the data
+      if (championData[championId]) {
+        // Send the champion info as JSON response
+        res.json(championData[championId]);
+      } else {
+        // If the champion is not found, respond with an error
+        res.status(404).json({ error: 'Champion not found' });
+      }
+    } catch (error) {
+      // Handle file read or JSON parsing errors
+      console.error('Error reading JSON file:', error);
+      res.status(500).json({ error: 'Failed to read champion data file' });
+    }
+  };
+
+
 
 router.get('/', serveChampionData); // Handles GET /api/champions
 router.get('/update', updateChampionData); // Handles GET /api/champions/update
+router.get('/:championId', getChampionInfo);
 
 
 export default router;

@@ -8,6 +8,7 @@
 // DELETE /api/matchups/delete
 // PATCH /api/matchups/:id/notes
 
+// api-data/champion_data/ChampionInfos.json
 // project-root/
 // |-- api/
 // |   |-- champions.mjs

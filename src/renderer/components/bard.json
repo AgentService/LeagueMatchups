@@ -1,0 +1,100 @@
+Sylas, Orianna, Syndra, Viktor, Zed, Akali, Yasuo, Yone, Ahri, Vex,
+ Katarina, Lissandra, LeBlanc, Kassadin, Neeko
+
+Taliyah
+Talon
+Annie
+Xerath
+Zoe
+Veigar
+Vel'Koz
+Vladimir
+Twisted Fate
+Diana
+Ekko
+Fizz
+Galio
+Irelia
+Jayce
+Karma
+Karthus
+Kayle
+Kennen
+Lux
+Malphite
+Malzahar
+Morgana
+Nidalee
+Nocturne
+Pantheon
+Pyke
+Qiyana
+Ryze
+Swain
+Twisted Fate
+Viktor
+Vladimir
+
+
+For each of the following champions: [Taliyah]:
+
+Describe the identity and playstyle of the champion.
+State the well-defined strengths of the champion.
+Explain the weaknesses of the champion that enemies can exploit.
+Provide specific game strategies for Early, Mid, and Late Game.
+Describe the role of the champion in team fights.
+Offer additional, unique information about the champion, including skill synergy and unique mechanics.
+Elucidate the general approach and tactics to optimally use the champion's strengths.
+Provide counterplay strategies against the champion.
+
+Each key will include a "short" snippet for quick reference and a detailed "long" explanation for comprehensive understanding.
+Output Format only in JSON!
+
+[Champion-Name]": {
+    "championTips": {
+      "identity": {
+        "short": "Brief description...",
+        "long": "Detailed description..."
+      },
+      "strengths": {
+        "short": "Brief strengths...",
+        "long": "Detailed strengths..."
+      },
+      "weaknesses": {
+        "short": "Brief weaknesses...",
+        "long": "Detailed weaknesses..."
+      },
+      "gameStrategy": {
+        "earlyGame": {
+          "short": "Brief early game strategy...",
+          "long": "Detailed early game strategy..."
+        },
+        "midGame": {
+          "short": "Brief mid game strategy...",
+          "long": "Detailed mid game strategy..."
+        },
+        "lateGame": {
+          "short": "Brief late game strategy...",
+          "long": "Detailed late game strategy..."
+        }
+      },
+      "teamFightRole": {
+        "short": "Brief role...",
+        "long": "Detailed role..."
+      },
+      "mindsetAndPsychology": {
+        "short": "Brief mindset...",
+        "long": "Detailed mindset..."
+      },
+      "counterplay": {
+        "short": "Quick tips on countering this champion.",
+        "long": "In-depth strategies and tactics for playing against this champion."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Details...",
+        "uniqueMechanics": "Details...",
+        "situationalTips": "Advice on when to pick this champion based on team composition and enemy picks."
+      }
+    }
+  }
+  

@@ -1,0 +1,722 @@
+{
+  "Sylas": {
+    "championTips": {
+      "identity": {
+        "short": "AP Bruiser with high outplay potential.",
+        "long": "Sylas is an AP bruiser known for his high damage output, exceptional mobility, and unique ability to steal enemy ultimates with his 'Hijack' skill. His playstyle revolves around skirmishing, making picks, and utilizing his versatile kit to adapt to various situations on the battlefield."
+      },
+      "strengths": {
+        "short": "Versatility, burst damage, ultimate utility.",
+        "long": "Sylas excels in versatility thanks to his 'Hijack' ability, which allows him to adapt to any team composition by stealing ultimates. His burst damage, particularly with his 'Kingslayer' and 'Chain Lash', is formidable. His ability to engage, escape, and sustain in fights with 'Abscond/Abduct' and 'Kingslayer' makes him a constant threat."
+      },
+      "weaknesses": {
+        "short": "High skill cap, weak against CC, reliant on ultimate theft.",
+        "long": "Sylas's effectiveness heavily depends on the player's skill and ability to make the most out of stolen ultimates. He struggles against heavy crowd control and can be vulnerable if his 'E' (Abscond/Abduct) is dodged or on cooldown. His reliance on ultimate theft means he can be less effective if the enemy team has less impactful ultimates."
+      },
+      "earlyGame": {
+        "short": "Focus on farming and opportunistic trades.",
+        "long": "In the early game, Sylas should focus on farming to reach his core items quickly. He can look for trades when his passive is available, using the AoE damage to his advantage. It's essential to manage his cooldowns and mana wisely and look for roams post-level 6 with his ultimate-stealing ability."
+      },
+      "midGame": {
+        "short": "Skirmish and secure objectives.",
+        "long": "During the mid-game, Sylas becomes more potent in skirmishes and team fights. He should look to secure objectives with his team and use his ultimate-stealing ability to turn fights in his favor. His mobility allows him to split push and join fights when necessary."
+      },
+      "lateGame": {
+        "short": "Excel in team fights, exploit stolen ultimates.",
+        "long": "In the late game, Sylas's role is to excel in team fights by using his AoE damage and sustain. He should aim to steal high-impact ultimates and use them to either engage, disengage, or turn the tides of battle. Positioning is key to avoid getting caught out and to maximize the impact of stolen ultimates."
+      },
+      "teamFightRole": {
+        "short": "Engager or follow-up initiator.",
+        "long": "In team fights, Sylas can serve as an engager with his 'E' or follow up on teammates' initiation. His role is to disrupt the enemy backline, apply burst damage, and use stolen ultimates to impact the fight. His sustain allows him to stay in fights longer, making him a persistent threat."
+      },
+      "mindsetAndPsychology": {
+        "short": "Adaptive, opportunistic, and aggressive.",
+        "long": "Playing Sylas requires an adaptive mindset, always ready to exploit opportunities. Players need to be aggressive, seeking out chances to use his combo for burst damage or to catch out enemies. Tactical thinking is crucial for effective use of stolen ultimates, which can change the course of fights."
+      },
+      "counterplay": {
+        "short": "Exploit his cooldowns, avoid clumping, CC focus.",
+        "long": "To counter Sylas, exploit his cooldown windows, especially his 'E'. Avoid clumping up to minimize the impact of his AoE damage and stolen ultimates. Focusing him with crowd control can prevent him from using his mobility and sustain effectively. Picking champions with less impactful ultimates can also reduce his effectiveness."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Sylas's abilities synergize to chain combos for maximum burst damage. His passive works well with his basic abilities to deal AoE damage.",
+        "uniqueMechanics": "Sylas's unique mechanic is his 'Hijack' ability, allowing him to steal and use enemy ultimates. This requires knowledge of all champions to maximize effectiveness.",
+        "situationalTips": "Sylas is an excellent pick when facing teams with high-impact ultimates. He excels in compositions that require a versatile AP bruiser who can adapt to various roles in fights."
+      }
+    }
+  },
+  "Orianna": {
+    "championTips": {
+      "identity": {
+        "short": "Control mage with zone control.",
+        "long": "Orianna is a control mage known for her unique playstyle involving her ball ('The Ball'), which she uses to cast spells. Her playstyle revolves around positioning, zone control, and team utility. She excels in controlling the battlefield and setting up fights with her abilities, especially her ultimate, 'Command: Shockwave'."
+      },
+      "strengths": {
+        "short": "Zone control, team utility, strong teamfighting.",
+        "long": "Orianna's primary strengths lie in her exceptional zone control capabilities and team utility. Her ball acts as a zoning tool, threatening enemies with its presence. Her 'Command: Protect' offers a shield and her 'Command: Dissonance' provides a speed boost or slow, aiding in team mobility or disengagement. Her ultimate is a game-changing ability in team fights, capable of turning the tide with its crowd control and area damage."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to gap closers, high skill cap.",
+        "long": "Orianna's main weaknesses include her vulnerability to assassins and champions with gap closers, as she lacks inherent mobility. Her effectiveness heavily relies on skillful ball positioning and timing, making her a high skill cap champion. Mismanagement of her ball can lead to missed opportunities or being caught out of position."
+      },
+      "earlyGame": {
+        "short": "Focus on farming, poke with ball.",
+        "long": "In the early game, Orianna should focus on farming and using her ball to safely poke and harass the enemy laner. She needs to manage her mana carefully and look for opportunities to control the wave, setting up for potential ganks or to deny the enemy farm."
+      },
+      "midGame": {
+        "short": "Control objectives, look for skirmishes.",
+        "long": "During the mid-game, Orianna should use her zone control to secure objectives and control team fights. She can look for skirmishes where her AoE abilities and ultimate can have a significant impact. Roaming to other lanes to support her team and extend her influence is also beneficial."
+      },
+      "lateGame": {
+        "short": "Dominate team fights, protect carries.",
+        "long": "In the late game, Orianna's role is to dominate team fights with her ultimate and continuous AoE damage. She should position herself to protect her carries with 'Command: Protect' while looking for an opportunity to land a multi-target 'Command: Shockwave'. Positioning is crucial to avoid being caught out and to maximize her impact in fights."
+      },
+      "teamFightRole": {
+        "short": "Backline control, initiator or follow-up.",
+        "long": "In team fights, Orianna typically stays in the backline, using her ball to control space and threaten enemies. She can either initiate fights with her 'Command: Shockwave' or follow up on her team's initiation, locking down enemies and dealing substantial AoE damage."
+      },
+      "mindsetAndPsychology": {
+        "short": "Strategic, patient, opportunistic.",
+        "long": "Playing Orianna requires a strategic mindset, focusing on patience and positioning. Players need to be opportunistic, waiting for the right moment to unleash her ultimate. Orianna players should constantly assess the battlefield, positioning the ball for maximum impact while staying aware of their own vulnerability."
+      },
+      "counterplay": {
+        "short": "Exploit her immobility, dodge her ultimate.",
+        "long": "Counterplay against Orianna involves exploiting her lack of mobility by using gap closers or heavy crowd control. Dodging her 'Command: Shockwave' significantly reduces her teamfight impact. Pressure her in the laning phase to limit her scaling and control over the game."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Orianna's abilities synergize around 'The Ball'. Positioning it effectively is key to maximizing the impact of her skills.",
+        "uniqueMechanics": "Orianna's unique mechanic involves her ball, which she moves with her abilities. This offers a unique playstyle of indirect control and positioning.",
+        "situationalTips": "Orianna is a strong pick in compositions that benefit from AoE control and in scenarios where the team needs a reliable backline mage with both offensive and defensive capabilities."
+      }
+    }
+  },
+  "Syndra": {
+    "championTips": {
+      "identity": {
+        "short": "Burst mage with sphere manipulation.",
+        "long": "Syndra is a burst mage characterized by her ability to manipulate spheres with her dark powers. Her playstyle revolves around positioning these spheres to maximize damage and control. Syndra excels in delivering high burst damage, particularly with her ultimate, 'Unleashed Power', and in controlling zones with her 'Dark Sphere' and 'Scatter the Weak'."
+      },
+      "strengths": {
+        "short": "High burst damage, long-range stun, lane dominance.",
+        "long": "Syndra's key strengths include her potent burst damage, especially against single targets. She possesses a long-range stun using her 'Scatter the Weak', allowing for picks and disengagement. Her lane dominance stems from her ability to harass and zone opponents with 'Dark Sphere' and control the battlefield."
+      },
+      "weaknesses": {
+        "short": "Immobility, skillshot reliance, mana-intensive.",
+        "long": "Syndra's main weaknesses are her immobility, making her vulnerable to ganks and mobile champions, and her reliance on skillshots for her stun and burst damage. Additionally, her abilities are mana-intensive, requiring careful mana management, especially in the early game."
+      },
+      "earlyGame": {
+        "short": "Harass and zone in lane.",
+        "long": "In the early game, Syndra should focus on harassing her lane opponent with 'Dark Sphere' and setting up potential stuns with 'Scatter the Weak'. She aims to gain lane dominance and can look for early kills with her burst damage, while being mindful of her mana pool and vulnerability to ganks."
+      },
+      "midGame": {
+        "short": "Look for picks, control objectives.",
+        "long": "During mid-game, Syndra should seek opportunities to catch out enemies with her stun and contribute to team objectives. She can exert pressure in skirmishes and objective fights with her potential to burst down priority targets. Roaming to other lanes or securing vision control can amplify her impact."
+      },
+      "lateGame": {
+        "short": "Burst priority targets, zone control.",
+        "long": "In the late game, Syndra's role is to use her high burst potential to eliminate key enemy champions. Positioning is crucial to avoid getting caught while still being able to land critical stuns and burst combos. Her 'Dark Sphere' provides zone control in team fights and objective contests."
+      },
+      "teamFightRole": {
+        "short": "Artillery mage, backline damage dealer.",
+        "long": "In team fights, Syndra serves as an artillery mage, staying in the backline and dealing damage from a distance. Her primary role is to use her burst to take down high-priority targets and to use her stun to disrupt enemy formations or peel for herself and allies."
+      },
+      "mindsetAndPsychology": {
+        "short": "Calculated aggression, positioning awareness.",
+        "long": "Playing Syndra requires a mindset of calculated aggression, balancing between dealing damage and staying safe. Awareness of positioning is key, both for landing skillshots and for staying out of danger. Syndra players should continuously assess threats and opportunities, choosing the right moments to unleash their full damage potential."
+      },
+      "counterplay": {
+        "short": "Exploit immobility, dodge skillshots.",
+        "long": "Counterplay against Syndra involves exploiting her immobility with ganks and gap closers. Dodging her 'Scatter the Weak' reduces her stun threat. Applying pressure in lane can prevent her from freely harassing and scaling into a strong mid and late game."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Syndra's abilities synergize around her spheres. Proper sphere management is crucial for maximizing her stun potential and burst damage.",
+        "uniqueMechanics": "Syndra's unique mechanic is her ability to create and manipulate spheres, which interact with all her other abilities. This allows for creative play and combination of skills.",
+        "situationalTips": "Syndra is a strong pick against champions who struggle against burst damage and have limited mobility. She excels in team compositions that can capitalize on her stun and zoning capabilities."
+      }
+    }
+  },
+  "Viktor": {
+    "championTips": {
+      "identity": {
+        "short": "Control mage with scaling power.",
+        "long": "Viktor is a control mage known for his strong scaling into the late game. His playstyle revolves around area control with his 'Gravity Field' and high damage output from his laser, 'Death Ray'. Viktor's gameplay is focused on wave clear, zoning in team fights, and scaling into a late-game powerhouse with his unique item, the 'Hex Core'."
+      },
+      "strengths": {
+        "short": "Strong wave clear, high AoE damage, late-game scaling.",
+        "long": "Viktor's key strengths include his strong wave clear ability, making him excellent at controlling minion waves and pressuring lanes. His 'Death Ray' provides high AoE damage, useful in team fights and skirmishes. Viktor's scaling into the late game is formidable, especially after fully upgrading his 'Hex Core', enhancing his abilities."
+      },
+      "weaknesses": {
+        "short": "Immobile, reliant on skillshots, weak early game.",
+        "long": "Viktor's main weaknesses are his lack of mobility, making him susceptible to ganks and mobile assassins. He is heavily reliant on landing his skillshots, particularly his 'Death Ray', for damage output. His early game is relatively weak, with a need for gold to upgrade his 'Hex Core' and scale effectively."
+      },
+      "earlyGame": {
+        "short": "Focus on farming, wave control.",
+        "long": "In the early game, Viktor should prioritize farming to acquire his 'Hex Core' upgrades. His focus should be on wave control, using his 'Death Ray' to clear waves and prevent enemy roams. He should play cautiously, aware of his vulnerability to ganks."
+      },
+      "midGame": {
+        "short": "Wave clear, contribute to team fights.",
+        "long": "During the mid-game, Viktor becomes stronger with 'Hex Core' upgrades. He should continue to clear waves efficiently and start to contribute more significantly to team fights with his 'Gravity Field' for control and 'Death Ray' for damage. Objective control and vision are also important."
+      },
+      "lateGame": {
+        "short": "Dominate team fights, high damage output.",
+        "long": "In the late game, Viktor's power peaks. He should focus on dominating team fights with his high AoE damage and utility. Positioning is key to deliver maximum impact with his abilities while staying safe from threats. His burst damage can be decisive in taking out key targets."
+      },
+      "teamFightRole": {
+        "short": "Area control, high AoE damage dealer.",
+        "long": "In team fights, Viktor serves as an area control mage, using 'Gravity Field' to disrupt enemy movements and protect his team. His 'Death Ray' and 'Chaos Storm' provide high AoE damage, crucial for swaying team fights in his favor. His role is to position safely while maximizing his damage output."
+      },
+      "mindsetAndPsychology": {
+        "short": "Patient, positioning-focused, scaling mindset.",
+        "long": "Playing Viktor requires a patient mindset, focusing on scaling into the late game. Players must be mindful of their positioning due to his immobility and skillshot reliance. Viktor players should aim to control the battlefield with their abilities, setting the stage for their team's success."
+      },
+      "counterplay": {
+        "short": "Pressure early, exploit immobility, dodge skillshots.",
+        "long": "Counterplay against Viktor involves applying pressure in the early game before he scales. His immobility can be exploited with ganks and mobile champions. Dodging his 'Death Ray' and 'Gravity Field' significantly reduces his threat. Engaging him in close quarters where he can't effectively use his skillshots is also effective."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Viktor's abilities synergize for area control and damage. His 'Hex Core' upgrades enhance these abilities, making timing and positioning crucial.",
+        "uniqueMechanics": "Viktor's unique mechanic is his 'Hex Core', which allows him to augment his abilities, offering a unique scaling path and customization of his skillset.",
+        "situationalTips": "Viktor is an excellent pick in team compositions that require strong wave clear and late-game damage. He excels against teams that lack the mobility to dodge his 'Death Ray' and 'Gravity Field'."
+      }
+    }
+  },
+  "Zed": {
+    "championTips": {
+      "identity": {
+        "short": "Assassin with high outplay potential.",
+        "long": "Zed is an AD assassin known for his high mobility, outplay potential, and ability to burst down squishy targets. His playstyle revolves around using his shadows to outmaneuver opponents, create confusion, and deliver swift, lethal combos. Zed excels in picking off isolated targets and excels in 1v1 scenarios."
+      },
+      "strengths": {
+        "short": "Burst damage, mobility, split-pushing.",
+        "long": "Zed's main strengths include his incredible burst damage, especially against squishy targets. His mobility, granted by his 'Living Shadow' and 'Death Mark', allows him to outmaneuver enemies and escape tricky situations. He is also an effective split-pusher, capable of taking down turrets quickly and escaping enemy collapses."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to CC, struggles against tanks.",
+        "long": "Zed's weaknesses are his vulnerability to crowd control, which can hinder his ability to execute combos, and his struggles against tanky champions who can withstand his burst. He is also reliant on landing skillshots and can be predictable once his 'Living Shadow' is on cooldown."
+      },
+      "earlyGame": {
+        "short": "Harass with 'Razor Shuriken', look for kills.",
+        "long": "In the early game, Zed should focus on farming while harassing his opponent with 'Razor Shuriken'. He can look for kill opportunities at level 6 with 'Death Mark', especially against squishy targets. Managing energy and shadow positioning is crucial for lane dominance."
+      },
+      "midGame": {
+        "short": "Roam, secure objectives, pick off targets.",
+        "long": "During mid-game, Zed should roam to other lanes to apply pressure and secure kills. He excels in skirmishes and can help secure objectives with his team. Picking off isolated targets and applying side lane pressure can significantly impact the game's outcome."
+      },
+      "lateGame": {
+        "short": "Split-push, pick off key targets.",
+        "long": "In the late game, Zed's role shifts to split-pushing and picking off key targets before or during team fights. He should look to create map pressure and force the enemy team to respond, opening opportunities for his team to secure objectives or advantageous fights."
+      },
+      "teamFightRole": {
+        "short": "Eliminate high-value targets.",
+        "long": "In team fights, Zed's primary role is to eliminate high-value targets, usually the enemy ADC or mage. He should wait for major crowd control abilities to be used before engaging and aim to use his 'Death Mark' to burst down key enemies quickly."
+      },
+      "mindsetAndPsychology": {
+        "short": "Opportunistic, precise, adaptive.",
+        "long": "Playing Zed requires an opportunistic and precise mindset, constantly looking for chances to eliminate key targets. Zed players must adapt their approach based on the enemy's positioning and cooldowns, executing their combos with precision and timing."
+      },
+      "counterplay": {
+        "short": "CC focus, defensive items, group up.",
+        "long": "Counterplay against Zed involves focusing him with crowd control during his 'Death Mark' engage, building defensive items like 'Zhonya's Hourglass', and staying grouped to prevent him from isolating targets. Predicting and dodging his skillshots can also significantly reduce his threat."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Zed's abilities synergize to maximize burst damage. His shadows amplify his damage output and provide mobility for outplays.",
+        "uniqueMechanics": "Zed's unique mechanics revolve around his 'Living Shadow', which mirrors his abilities and offers a tool for mobility, juking, and increased damage.",
+        "situationalTips": "Zed is an excellent pick against squishy, immobile champions. He thrives in compositions that can distract or split the enemy team, allowing him to isolate and eliminate key targets."
+      }
+    }
+  },
+  "Akali": {
+    "championTips": {
+      "identity": {
+        "short": "Agile assassin with high outplay potential.",
+        "long": "Akali is an agile, burst-focused assassin known for her ability to weave in and out of combat using her mobility and stealth. Her playstyle revolves around using her shroud to obscure vision, executing precise ability combos for burst damage, and exploiting enemy weaknesses. Akali excels in skirmishes and taking down high-priority targets."
+      },
+      "strengths": {
+        "short": "Burst damage, mobility, stealth.",
+        "long": "Akali's strengths include her high burst damage potential, particularly against squishy targets. Her mobility, granted by 'Shuriken Flip' and 'Twilight Shroud', allows her to engage and disengage effectively. The stealth from her 'Twilight Shroud' provides unique outplay opportunities and makes her difficult to lock down in fights."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to CC, high skill cap.",
+        "long": "Akali's main weaknesses are her vulnerability to targeted crowd control and high skill cap requirements for effective play. Her energy resource needs careful management, and her impact can be diminished if she's unable to utilize her full combo or if her 'Twilight Shroud' is countered."
+      },
+      "earlyGame": {
+        "short": "Harass and sustain in lane.",
+        "long": "In the early game, Akali should focus on farming and using her 'Five Point Strike' for poke and sustain. She can look for trades when safe, utilizing her passive's energy restoration. Akali should play around her 'Twilight Shroud' for safety and outplay potential."
+      },
+      "midGame": {
+        "short": "Roam and pick off targets.",
+        "long": "During the mid-game, Akali becomes a significant threat in roams and skirmishes. She should look to roam to side lanes for picks and assist in securing objectives. Utilizing her mobility and stealth, Akali can catch out enemies and contribute to team skirmishes effectively."
+      },
+      "lateGame": {
+        "short": "Focus on high-value targets in team fights.",
+        "long": "In the late game, Akali's role is to target high-value enemies in team fights, using her burst to take them out quickly. She must position carefully to avoid crowd control and wait for opportunities to engage with her mobility and stealth. Split-pushing can also be an effective strategy, given her 1v1 strength."
+      },
+      "teamFightRole": {
+        "short": "Assassin, high-priority target eliminator.",
+        "long": "In team fights, Akali functions as an assassin, aiming to eliminate key targets like ADCs or mages. Her role involves weaving in and out of combat, using 'Twilight Shroud' for stealth and protection, and executing quick bursts to take down enemies before retreating to safety."
+      },
+      "mindsetAndPsychology": {
+        "short": "Opportunistic, elusive, precise.",
+        "long": "Playing Akali requires an opportunistic and precise mindset. Players must be adept at identifying the right moments to engage and disengage, using her mobility and stealth to outmaneuver opponents and strike at the most opportune moments."
+      },
+      "counterplay": {
+        "short": "CC focus, reveal stealth, exploit cooldowns.",
+        "long": "Counterplay against Akali involves focusing her with crowd control, using abilities or items that reveal stealth to counter her 'Twilight Shroud', and exploiting her cooldowns, especially after she uses her 'Shuriken Flip' or 'Perfect Execution'. Pressure her in lane to prevent her from scaling into a late-game threat."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Akali's abilities synergize to maximize her burst and mobility. Her 'Twilight Shroud' works in tandem with her other abilities to facilitate outplays.",
+        "uniqueMechanics": "Akali's unique mechanic is her 'Twilight Shroud', providing temporary stealth and a unique way to maneuver in fights. Her passive 'Assassin's Mark' enhances her burst and energy management.",
+        "situationalTips": "Akali is a strong pick against squishy targets and in team compositions that can distract or disorient the enemy, allowing her to isolate and eliminate key targets."
+      }
+    }
+  },
+  "Yasuo": {
+    "championTips": {
+      "identity": {
+        "short": "Skirmisher with high mobility and wind-themed abilities.",
+        "long": "Yasuo is a highly mobile skirmisher, adept at dueling and outplaying opponents with his wind-themed abilities. He is characterized by his unique ability to manipulate wind with his 'Wind Wall' and his critical strike-focused playstyle. Yasuo excels in sustained fights, weaving through battles with his dash and relying on precise movements and attacks."
+      },
+      "strengths": {
+        "short": "High damage output, wind wall utility, mobility.",
+        "long": "Yasuo's strengths lie in his high damage output, particularly with his critical strike synergy. His 'Wind Wall' provides unique utility, blocking enemy projectiles, which can be game-changing in team fights. His mobility, granted by 'Sweeping Blade', allows him to navigate through battles and skirmishes with ease."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to CC, requires precise execution.",
+        "long": "Yasuo's main weaknesses include vulnerability to crowd control, which can disrupt his mobility and damage output. He requires precise execution of his abilities to maximize effectiveness, making him a high skill cap champion. Yasuo also tends to push waves, making him susceptible to ganks."
+      },
+      "earlyGame": {
+        "short": "Harass with 'Steel Tempest', farm safely.",
+        "long": "In the early game, Yasuo should focus on farming and using 'Steel Tempest' to harass the enemy laner. He needs to manage his passive shield effectively for trades. Yasuo should be wary of enemy jungler presence due to his natural tendency to push the wave."
+      },
+      "midGame": {
+        "short": "Skirmish, roam, and secure objectives.",
+        "long": "During the mid-game, Yasuo becomes more potent in skirmishes and can roam to impact other lanes. He should look to secure objectives with his team and use his mobility and 'Wind Wall' to outplay opponents. Split pushing can also be an effective strategy, using his dueling strength."
+      },
+      "lateGame": {
+        "short": "Focus on team fight execution, protect carries.",
+        "long": "In the late game, Yasuo's role is to execute well in team fights, using his 'Last Breath' to capitalize on knock-ups and protect carries with 'Wind Wall'. His sustained damage output is critical in taking down tanks and bruisers. Positioning and timing of 'Wind Wall' are crucial."
+      },
+      "teamFightRole": {
+        "short": "Frontline fighter, carry protector.",
+        "long": "In team fights, Yasuo can play both as a frontline fighter and a protector for carries. His ability to block key enemy abilities with 'Wind Wall' and his 'Last Breath' to capitalize on knock-ups make him versatile in fights. He should aim to disrupt the enemy backline while also peeling for allies when necessary."
+      },
+      "mindsetAndPsychology": {
+        "short": "Aggressive, opportunistic, and calculated.",
+        "long": "Playing Yasuo requires an aggressive yet calculated mindset. Players need to be opportunistic, looking for chances to use 'Last Breath' on multiple enemies or to block crucial abilities with 'Wind Wall'. Mastery of Yasuo involves knowing when to engage and when to hold back, balancing aggression with caution."
+      },
+      "counterplay": {
+        "short": "Exploit his vulnerability to CC, manage waves.",
+        "long": "Counterplay against Yasuo involves exploiting his vulnerability to crowd control and managing waves to prevent him from farming safely. Baiting out his 'Wind Wall' before using key abilities can significantly reduce his effectiveness in fights. Coordinated ganks can punish his aggressive playstyle."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Yasuo's abilities synergize for combo potential, especially between 'Steel Tempest' and 'Last Breath'. 'Sweeping Blade' enhances his mobility and 'Steel Tempest' execution.",
+        "uniqueMechanics": "Yasuo's unique mechanics include his 'Wind Wall' for blocking projectiles and his double critical strike chance, emphasizing a build focused on critical hits.",
+        "situationalTips": "Yasuo is a strong pick in team compositions with other knock-up abilities to maximize his 'Last Breath' potential. He thrives against teams with important projectiles that his 'Wind Wall' can block."
+      }
+    }
+  },
+  "Yone": {
+    "championTips": {
+      "identity": {
+        "short": "Skirmisher with dual-damage output.",
+        "long": "Yone is a skirmishing champion known for his dual-damage output, dealing both physical and magic damage. He excels in extended trades and duels, using his unique swordplay and spirit form to outmaneuver opponents. His playstyle involves precise timing and execution of combos, balancing aggression with his ability to escape using his 'E - Soul Unbound'."
+      },
+      "strengths": {
+        "short": "Mixed damage, high burst, mobility.",
+        "long": "Yone's strengths include his ability to deal mixed damage, making him difficult to itemize against. He possesses high burst potential, especially when combining his 'Q - Mortal Steel' and 'R - Fate Sealed'. His mobility with 'E - Soul Unbound' allows for aggressive plays and the ability to retreat when necessary."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to CC, predictable escape.",
+        "long": "Yone's weaknesses include his vulnerability to crowd control, which can hinder his ability to execute combos and escape. His 'E - Soul Unbound' return point can be predictable, allowing enemies to set up traps or ambushes. Managing his two types of damage requires careful balance to maximize effectiveness."
+      },
+      "earlyGame": {
+        "short": "Farm safely, look for trades.",
+        "long": "In the early game, Yone should focus on farming and look for safe trading opportunities. His passive allows him to deal significant damage in trades, but he should be cautious of enemy jungler presence. Building up his 'Q - Mortal Steel' stacks before engaging can lead to successful trades."
+      },
+      "midGame": {
+        "short": "Skirmish and roam, apply side lane pressure.",
+        "long": "During the mid-game, Yone becomes more potent in skirmishes and can look to roam and impact other lanes. He excels in 1v1 situations and can apply pressure in side lanes. His ability to join team fights quickly with 'R - Fate Sealed' makes him a constant threat on the map."
+      },
+      "lateGame": {
+        "short": "Target key enemies, utilize 'R' in team fights.",
+        "long": "In the late game, Yone's role is to target key enemies, using his burst to take out high-value targets. In team fights, his 'R - Fate Sealed' can be a game-changer, capable of hitting multiple enemies. He should use his 'E - Soul Unbound' to navigate fights and escape when necessary."
+      },
+      "teamFightRole": {
+        "short": "Backline diver, AoE crowd control.",
+        "long": "In team fights, Yone functions as a backline diver, aiming to reach and eliminate key enemy carries. His 'R - Fate Sealed' provides AoE crowd control, which can turn the tide of a fight. He should look for opportunities to engage when enemy cooldowns are down and escape using 'E - Soul Unbound' if needed."
+      },
+      "mindsetAndPsychology": {
+        "short": "Aggressive, opportunistic, and calculated.",
+        "long": "Playing Yone requires a balance of aggression and calculation. Players need to be opportunistic, seizing moments to engage with 'R - Fate Sealed' or to finish off targets. A deep understanding of his damage potential and escape mechanics is crucial for successful plays."
+      },
+      "counterplay": {
+        "short": "Exploit his predictable escape, CC focus.",
+        "long": "Counterplay against Yone involves focusing him with crowd control, especially during his 'E - Soul Unbound' window. Predicting and ambushing his return point can catch him off guard. Engaging him when his 'E' is on cooldown or when he's overextended can be effective."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Yone's skills synergize to maximize damage and mobility. His 'Q - Mortal Steel' and 'W - Spirit Cleave' work in tandem for damage and shield generation.",
+        "uniqueMechanics": "Yone's unique mechanics include his dual-damage nature and his 'E - Soul Unbound', which allows for aggressive plays with a safety net. His 'R - Fate Sealed' is a powerful AoE knock-up tool.",
+        "situationalTips": "Yone is a strong pick in compositions that benefit from mixed damage and require a champion capable of reaching the backline. He's effective against teams with less mobility and fewer crowd control tools."
+      }
+    }
+  },
+  "Ahri": {
+    "championTips": {
+      "identity": {
+        "short": "Mobile burst mage with charm utility.",
+        "long": "Ahri is a highly mobile burst mage, known for her ability to charm enemies and execute quick, precise ability combos. Her playstyle revolves around using her mobility from 'Spirit Rush' to position effectively, landing skillshots, particularly her 'Charm', to control and burst down targets. Ahri is excellent at picking off isolated enemies and excels in mid-range skirmishes."
+      },
+      "strengths": {
+        "short": "Mobility, crowd control, pick potential.",
+        "long": "Ahri's strengths include her high mobility, which allows her to reposition, escape, or engage effectively. Her 'Charm' provides significant crowd control, setting up kills or peeling for herself and teammates. Ahri's pick potential is exceptional, capable of catching and bursting down targets caught out of position."
+      },
+      "weaknesses": {
+        "short": "Skillshot reliant, mana hungry early.",
+        "long": "Ahri's main weaknesses are her reliance on landing skillshots, particularly her 'Charm', to maximize her effectiveness. She can be mana hungry in the early game, requiring careful mana management. Ahri's burst potential is also diminished if she falls behind in levels or items."
+      },
+      "earlyGame": {
+        "short": "Harass with 'Orb of Deception', manage mana.",
+        "long": "In the early game, Ahri should focus on farming and harassing the enemy with 'Orb of Deception'. Managing mana is crucial to maintain lane presence. Ahri can look for opportunities to land 'Charm' for potential kills, but should be cautious of enemy ganks."
+      },
+      "midGame": {
+        "short": "Roam, secure picks, control objectives.",
+        "long": "During mid-game, Ahri should use her mobility to roam and secure picks in other lanes. Her ability to quickly move around the map makes her effective in securing objectives and contributing to skirmishes. She should look for opportunities to catch enemies with 'Charm' and burst them down."
+      },
+      "lateGame": {
+        "short": "Position for impactful charms, burst key targets.",
+        "long": "In the late game, Ahri's role is to find and charm high-value targets in team fights. She should position safely, using her 'Spirit Rush' to reposition and avoid danger while looking for opportunities to use her burst combo. Ahri can also split push effectively due to her mobility."
+      },
+      "teamFightRole": {
+        "short": "Backline damage dealer, initiator with charm.",
+        "long": "In team fights, Ahri functions as a backline damage dealer, using her abilities to burst down squishy targets. She can initiate fights or catch enemies out of position with her 'Charm'. Her mobility allows her to navigate through team fights and target priority enemies."
+      },
+      "mindsetAndPsychology": {
+        "short": "Opportunistic, agile, combo-focused.",
+        "long": "Playing Ahri requires an opportunistic and agile mindset, focusing on positioning and landing crucial skillshots. Ahri players should be adept at quickly executing ability combos and repositioning with 'Spirit Rush' to maximize damage output while maintaining safety."
+      },
+      "counterplay": {
+        "short": "Dodge charm, pressure early, vision control.",
+        "long": "Counterplay against Ahri involves dodging her 'Charm' to reduce her pick and burst potential. Applying early pressure can limit her ability to roam and impact the map. Maintaining good vision control can prevent surprise engagements and picks from Ahri."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Ahri's abilities synergize for burst and mobility. Landing 'Charm' enhances her damage potential, and 'Spirit Rush' provides mobility for positioning or escaping.",
+        "uniqueMechanics": "Ahri's unique mechanic is her 'Charm', which not only provides crowd control but also amplifies the damage of her other abilities on the charmed target.",
+        "situationalTips": "Ahri is a strong pick in compositions that require mobility and pick potential. She excels against squishy targets and teams that lack reliable ways to lock her down."
+      }
+    }
+  },
+  "Vex": {
+    "championTips": {
+      "identity": {
+        "short": "Control mage with anti-mobility focus.",
+        "long": "Vex is a control mage characterized by her anti-mobility spells and shadowy thematic. Her playstyle revolves around disrupting enemy advances, particularly targeting mobile champions. Vex excels in area denial with her abilities, punishing enemies for overextending or engaging with dashes and leaps."
+      },
+      "strengths": {
+        "short": "Strong anti-mobility, area control, burst damage.",
+        "long": "Vex's main strengths lie in her ability to counter high-mobility champions with her 'Doom 'n Gloom' passive and 'Personal Space'. She provides excellent area control and zoning with her 'Mistral Bolt' and 'Shadow Surge'. Vex also boasts significant burst damage potential, especially when chaining her abilities effectively."
+      },
+      "weaknesses": {
+        "short": "Skillshot reliant, vulnerable to CC.",
+        "long": "Vex's weaknesses include her reliance on landing skillshots to maximize her damage and control. She is vulnerable to crowd control, as it hinders her ability to reposition and cast spells effectively. Vex also struggles against long-range poke, as it can whittle her down before she can respond."
+      },
+      "earlyGame": {
+        "short": "Poke and control lane.",
+        "long": "In the early game, Vex should focus on controlling her lane with 'Mistral Bolt' and harassing her opponent. She can use her passive to deter enemy aggression and should look for opportunities to land her 'Looming Darkness' for additional poke and pressure."
+      },
+      "midGame": {
+        "short": "Roam, skirmish, secure objectives.",
+        "long": "During mid-game, Vex should look to roam and participate in skirmishes where her anti-mobility and area control can be highly effective. She should help her team secure objectives and look for picks with her 'Shadow Surge', especially against overextended enemies."
+      },
+      "lateGame": {
+        "short": "Provide teamfight control, burst key targets.",
+        "long": "In the late game, Vex's role shifts to controlling team fights with her abilities. She should focus on bursting down key targets, using her 'Shadow Surge' to engage or finish off low-health enemies. Positioning is key to avoid being caught out while still impacting fights with her area denial and burst."
+      },
+      "teamFightRole": {
+        "short": "Backline control mage, anti-engage.",
+        "long": "In team fights, Vex serves as a backline control mage, using her abilities to disrupt enemy engages and protect her team. Her role involves countering enemy mobility, providing area control with 'Mistral Bolt', and looking for opportunities to use 'Shadow Surge' on high-priority targets."
+      },
+      "mindsetAndPsychology": {
+        "short": "Tactical, reactive, control-focused.",
+        "long": "Playing Vex requires a tactical and reactive mindset, focusing on countering enemy movements and engagements. Vex players need to be adept at predicting enemy actions to effectively use her anti-mobility spells and control the battlefield."
+      },
+      "counterplay": {
+        "short": "Avoid clumping, exploit cooldowns, long-range poke.",
+        "long": "Counterplay against Vex involves avoiding clumping to minimize the impact of her area control spells. Exploiting her cooldowns, especially after she uses 'Shadow Surge', is key. Long-range poke can pressure Vex and reduce her effectiveness in fights."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Vex's abilities synergize for control and burst. Her passive 'Doom 'n Gloom' works well with her skillset to punish mobility and enhance her burst.",
+        "uniqueMechanics": "Vex's unique mechanic is her focus on countering mobility with her passive, making her particularly effective against dash-heavy champions.",
+        "situationalTips": "Vex is an excellent pick against teams with multiple mobile champions. She excels in controlling tight spaces and punishing over-aggressive plays."
+      }
+    }
+  },
+  "Katarina": {
+    "championTips": {
+      "identity": {
+        "short": "Assassin with high mobility and reset mechanics.",
+        "long": "Katarina is an agile assassin known for her high burst damage and reset mechanics. Her playstyle revolves around quick, decisive engagements, utilizing her daggers for maximum area-of-effect damage. Katarina excels in cleaning up fights and snowballing leads with her ability to reset cooldowns upon getting kills or assists."
+      },
+      "strengths": {
+        "short": "Reset potential, high AoE burst, snowball capability.",
+        "long": "Katarina's strengths include her reset potential through her passive, allowing her to chain kills in quick succession. She possesses high area-of-effect burst damage, especially effective in grouped team fights. Her snowball capability is formidable, with a strong lead she can dominate games."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to CC, requires precise positioning.",
+        "long": "Katarina's main weaknesses are her vulnerability to crowd control, which can interrupt her ultimate and prevent her from chaining resets. She requires precise positioning and timing to maximize her burst potential, making her high risk to play. She's also reliant on picking up daggers, which can be predictable."
+      },
+      "earlyGame": {
+        "short": "Farm cautiously, look for roam opportunities.",
+        "long": "In the early game, Katarina should focus on farming cautiously, using her 'Bouncing Blades' and 'Preparation' to safely secure minions. She can look for roaming opportunities to other lanes for potential kills or assists, which can help her snowball."
+      },
+      "midGame": {
+        "short": "Skirmish, pick off isolated targets.",
+        "long": "During mid-game, Katarina's objective is to participate in skirmishes and pick off isolated targets. Her mobility allows her to roam effectively and her damage potential can secure quick kills, leading to objective control and further snowballing."
+      },
+      "lateGame": {
+        "short": "Target backline in team fights, clean up.",
+        "long": "In the late game, Katarina's role is to target the enemy backline in team fights, using her mobility and burst to eliminate high-value targets. Post-engagement, she focuses on cleaning up the remaining enemies, utilizing her resets to stay a constant threat."
+      },
+      "teamFightRole": {
+        "short": "Backline assassin, fight cleaner.",
+        "long": "In team fights, Katarina functions as a backline assassin, aiming to quickly burst down squishy targets. She excels at cleaning up fights, utilizing her resets to chain kills. Proper use of her 'Shunpo' for positioning and dagger pickups is key to her success."
+      },
+      "mindsetAndPsychology": {
+        "short": "Opportunistic, aggressive, and precise.",
+        "long": "Playing Katarina requires an opportunistic and aggressive mindset, with a focus on precision. Players must be adept at identifying the right moments to engage, ensuring kills for resets, and using her mobility to navigate through team fights effectively."
+      },
+      "counterplay": {
+        "short": "CC to disrupt, spread out, focus early.",
+        "long": "Counterplay against Katarina involves disrupting her with crowd control, especially during her ultimate. Spreading out reduces her AoE effectiveness. Focusing her early in team fights can prevent her from getting resets and snowballing. Denying her early kills in lane can also hinder her scaling."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Katarina's abilities synergize for burst damage and resets. Her 'Bouncing Blades' and 'Preparation' set up her daggers for 'Shunpo' resets and 'Death Lotus' execution.",
+        "uniqueMechanics": "Katarina's unique mechanic revolves around her dagger pickups, which reset her 'Shunpo' and provide burst damage. Her ultimate 'Death Lotus' is a key tool for damage in team fights.",
+        "situationalTips": "Katarina is a strong pick against teams with limited crowd control and squishy compositions. She thrives in chaotic fights where she can utilize her mobility and resets effectively."
+      }
+    }
+  },
+  "Lissandra": {
+    "championTips": {
+      "identity": {
+        "short": "Control mage with strong engage and crowd control.",
+        "long": "Lissandra is a control mage known for her strong engage capabilities and potent crowd control. Her playstyle revolves around initiating team fights, locking down key targets, and disrupting enemy formations. Lissandra excels in close-quarters combat where she can maximize the impact of her AoE abilities."
+      },
+      "strengths": {
+        "short": "Engage, AoE crowd control, self-peel.",
+        "long": "Lissandra's strengths include her ability to engage fights with 'Glacial Path' and lock down multiple enemies with her ultimate, 'Frozen Tomb'. Her AoE crowd control is highly effective in team fights, and her 'Ring of Frost' provides excellent self-peel. Lissandra also possesses decent wave clear, aiding in lane control."
+      },
+      "weaknesses": {
+        "short": "Mana intensive, short range, vulnerable to ganks.",
+        "long": "Lissandra's weaknesses are her mana-intensive abilities, which require careful resource management. Her relatively short range puts her at risk during engagements. She is also vulnerable to ganks, especially pre-level 6, as her escape mechanism is limited."
+      },
+      "earlyGame": {
+        "short": "Farm safely, manage mana.",
+        "long": "In the early game, Lissandra should focus on farming safely and managing her mana. Using 'Ice Shard' for poke and wave clear is key, but overuse can deplete her mana quickly. She should look for opportunities to engage with her jungler post-level 6."
+      },
+      "midGame": {
+        "short": "Look for engages, control objectives.",
+        "long": "During mid-game, Lissandra should seek opportunities to engage in skirmishes and control objectives. Her ultimate can be a game-changer in small fights and objective contests. She should also look to roam and assist in securing turrets and dragons."
+      },
+      "lateGame": {
+        "short": "Initiate team fights, lock down key targets.",
+        "long": "In the late game, Lissandra's role is to initiate team fights and use her crowd control to lock down key targets. Her 'Frozen Tomb' can be used offensively to catch out high-value enemies or defensively to protect herself while disrupting the enemy team."
+      },
+      "teamFightRole": {
+        "short": "Primary engager, crowd control disruptor.",
+        "long": "In team fights, Lissandra serves as a primary engager, using her 'Glacial Path' to initiate and her 'Frozen Tomb' to control key enemies. She disrupts enemy formations with her AoE crowd control, playing a crucial role in controlling the battlefield and protecting her carries."
+      },
+      "mindsetAndPsychology": {
+        "short": "Strategic, opportunistic, team-oriented.",
+        "long": "Playing Lissandra requires a strategic mindset, focusing on opportunistic engagements and team-oriented plays. Lissandra players should be adept at identifying the right moments to initiate and using her abilities to control fights in favor of her team."
+      },
+      "counterplay": {
+        "short": "Dodge skillshots, exploit cooldowns, split push.",
+        "long": "Counterplay against Lissandra involves dodging her 'Ice Shard' and 'Glacial Path' to reduce her effectiveness. Exploiting her cooldowns, especially her ultimate, is key. Split pushing can also be effective, as Lissandra excels in team fights rather than 1v1 scenarios."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Lissandra's abilities synergize for control and burst. 'Ice Shard' provides poke, 'Ring of Frost' and 'Frozen Tomb' offer crowd control, and 'Glacial Path' serves as both engage and escape.",
+        "uniqueMechanics": "Lissandra's unique mechanic is her 'Frozen Tomb', which can be self-cast for invulnerability or on enemies for engage. Her passive, 'Iceborn Subjugation', creates a frozen thrall from fallen enemies, adding to her AoE control.",
+        "situationalTips": "Lissandra is a strong pick in compositions that require reliable engage and crowd control. She's effective against teams with high mobility or squishy compositions that can be easily locked down."
+      }
+    }
+  },
+  "LeBlanc": {
+    "championTips": {
+      "identity": {
+        "short": "Deceptive burst mage with high mobility.",
+        "long": "LeBlanc is a burst mage known for her deceptive playstyle and high mobility. She excels in creating confusion with her mirror images and dashing abilities, allowing her to weave in and out of combat while delivering significant burst damage. LeBlanc's playstyle is about outmaneuvering opponents, setting up ambushes, and quickly eliminating key targets."
+      },
+      "strengths": {
+        "short": "High burst damage, mobility, pick potential.",
+        "long": "LeBlanc's strengths lie in her ability to deal high burst damage, particularly against squishy targets. Her mobility, granted by 'Distortion', allows for swift engagements and escapes. She excels in creating pick opportunities, using her 'Ethereal Chains' to lock down targets and her deceptive abilities to mislead enemies."
+      },
+      "weaknesses": {
+        "short": "Fragile, weak against CC, skillshot reliant.",
+        "long": "LeBlanc's weaknesses include her fragility, making her vulnerable to burst damage and crowd control. Her reliance on skillshots, particularly 'Ethereal Chains', can be a disadvantage if missed. She is also less effective against tanky opponents and in prolonged fights."
+      },
+      "earlyGame": {
+        "short": "Harass in lane, look for roams.",
+        "long": "In the early game, LeBlanc should focus on harassing her lane opponent with her combo, using 'Sigil of Malice' and 'Distortion'. She should look for opportunities to roam and assist other lanes, capitalizing on her burst damage and mobility to secure kills."
+      },
+      "midGame": {
+        "short": "Secure picks, control vision, skirmish.",
+        "long": "During mid-game, LeBlanc's objective is to secure picks and control vision around the map. She should use her mobility to catch out isolated targets and participate in skirmishes, where her burst damage can quickly tilt fights in her favor."
+      },
+      "lateGame": {
+        "short": "Target key enemies, mislead opponents.",
+        "long": "In the late game, LeBlanc's role is to target key enemy carries and use her deceptive abilities to create confusion in team fights. She should look for flank opportunities and use her burst to eliminate high-value targets before slipping away."
+      },
+      "teamFightRole": {
+        "short": "Assassin, disruptor, flanker.",
+        "long": "In team fights, LeBlanc serves as an assassin, targeting key enemy champions. Her role involves disrupting the enemy's formation with her mobility and deceptive clones, and flanking to access the backline. Proper use of 'Distortion' is key for positioning and escape."
+      },
+      "mindsetAndPsychology": {
+        "short": "Deceptive, opportunistic, and calculated.",
+        "long": "Playing LeBlanc requires a deceptive and opportunistic mindset, focusing on creating confusion and finding the right moments to strike. Players must be calculated in their approach, balancing aggression with the need for safety due to her fragile nature."
+      },
+      "counterplay": {
+        "short": "Predict movements, focus with CC, avoid isolation.",
+        "long": "Counterplay against LeBlanc involves predicting her movements, especially her return pad from 'Distortion'. Focusing her with crowd control can prevent her from executing her combo. Avoiding isolation minimizes her pick potential and reduces her impact in fights."
+      },
+      "additionalInsights": {
+        "skillSynergy": "LeBlanc's abilities synergize for deception and burst. 'Sigil of Malice' and 'Distortion' provide her main damage combo, while 'Mimic' enhances her abilities' effects.",
+        "uniqueMechanics": "LeBlanc's unique mechanics include her ability to mimic spells with 'Mimic', creating opportunities for double casts and increased damage or deception. Her 'Distortion' ability allows for quick repositioning, essential for her playstyle.",
+        "situationalTips": "LeBlanc is a strong pick against squishy compositions and in scenarios where the enemy team lacks reliable crowd control. She thrives in games where she can roam freely and create pressure across the map."
+      }
+    }
+  },
+  "Kassadin": {
+    "championTips": {
+      "identity": {
+        "short": "Anti-mage assassin with scaling power.",
+        "long": "Kassadin is an assassin specializing in countering mages, known for his late-game scaling and rift-walking abilities. His playstyle revolves around exploiting enemy magic users, dodging abilities with his ultimate, 'Riftwalk', and bursting down targets. Kassadin thrives in situations where he can isolate and pick off vulnerable targets."
+      },
+      "strengths": {
+        "short": "High mobility, anti-mage, late-game powerhouse.",
+        "long": "Kassadin's key strengths include his incredible mobility with 'Riftwalk', making him difficult to pin down. His passive and 'Null Sphere' make him a formidable opponent for mages. In the late game, he becomes a powerhouse, capable of rapidly bursting down targets and cleaning up fights."
+      },
+      "weaknesses": {
+        "short": "Weak early game, mana-dependent.",
+        "long": "Kassadin's main weaknesses are his relatively weak early game and dependence on mana, especially for his ultimate. He requires time to scale and can be pressured early by physical damage dealers. His effectiveness is also reduced when his mana pool is low."
+      },
+      "earlyGame": {
+        "short": "Farm safely, manage resources.",
+        "long": "In the early game, Kassadin should focus on farming safely, using his 'Null Sphere' to mitigate magic damage and manage his mana carefully. He should avoid extended trades and focus on reaching his power spikes (level 6 and key items)."
+      },
+      "midGame": {
+        "short": "Roam for picks, capitalize on ult mobility.",
+        "long": "During mid-game, Kassadin should start looking for roaming opportunities, using his 'Riftwalk' to engage or escape. His goal is to find picks in side lanes or skirmishes and continue scaling towards his late-game potential."
+      },
+      "lateGame": {
+        "short": "Target backline, exploit Riftwalk in fights.",
+        "long": "In the late game, Kassadin becomes a significant threat in team fights. He should target the enemy backline, using 'Riftwalk' to dodge abilities and burst down priority targets. His mobility allows him to clean up fights and chase down fleeing enemies."
+      },
+      "teamFightRole": {
+        "short": "Backline diver, clean-up assassin.",
+        "long": "In team fights, Kassadin serves as a backline diver, using his 'Riftwalk' to bypass frontline defenses and target squishy enemies. His role is to deliver burst damage to high-priority targets and use his mobility to clean up fights."
+      },
+      "mindsetAndPsychology": {
+        "short": "Patient, opportunistic, and mobile.",
+        "long": "Playing Kassadin requires a patient and opportunistic mindset, focusing on scaling into the late game. Players must be adept at using 'Riftwalk' for mobility and engaging at the right moments, taking advantage of isolated targets and chaotic fights."
+      },
+      "counterplay": {
+        "short": "Pressure early, manage his mana, physical damage.",
+        "long": "Counterplay against Kassadin involves applying early game pressure to delay his scaling. Forcing him to use his mana pool defensively reduces his threat. Champions dealing physical damage can exploit his weaker early game. Coordinated crowd control can prevent him from escaping with 'Riftwalk'."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Kassadin's abilities synergize to maximize burst and mobility. His 'Nether Blade' helps with mana sustain, while 'Riftwalk' empowers his burst potential.",
+        "uniqueMechanics": "Kassadin's unique mechanic, 'Riftwalk', allows for unparalleled mobility and stacking damage, making him a threat the longer he stays in the fight.",
+        "situationalTips": "Kassadin is a strong pick against magic-heavy teams and excels in games where he can safely reach his late-game potential. He thrives in chaotic team fights where he can utilize 'Riftwalk' to its fullest."
+      }
+    }
+  },
+  "Neeko": {
+    "championTips": {
+      "identity": {
+        "short": "Trickster mage with crowd control.",
+        "long": "Neeko is a trickster mage known for her crowd control abilities and unique camouflage mechanic. She excels at deceiving enemies with her passive, 'Inherent Glamour', and setting up or following up on team fights with her AoE stun, 'Pop Blossom'. Neeko's playstyle involves misdirection, burst damage, and crowd control."
+      },
+      "strengths": {
+        "short": "Strong crowd control, burst damage, deception.",
+        "long": "Neeko's strengths include her ability to control large areas with her crowd control spells, 'Tangle-Barbs' and 'Pop Blossom'. She has significant burst potential with her combo. Her passive allows her to deceive opponents, often leading to surprise engagements or escapes."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to gap closers, reliant on skillshots.",
+        "long": "Neeko's weaknesses lie in her vulnerability to champions with gap closers, as she lacks reliable escape mechanisms. She is heavily reliant on landing her skillshots to deal damage or apply crowd control, making her less effective against highly mobile targets."
+      },
+      "earlyGame": {
+        "short": "Poke with abilities, farm safely.",
+        "long": "In the early game, Neeko should focus on poking her lane opponent with 'Blooming Burst' and 'Tangle-Barbs', while farming safely. She can use her passive to avoid enemy ganks or to set up her own ganks."
+      },
+      "midGame": {
+        "short": "Look for skirmishes, utilize CC in fights.",
+        "long": "During mid-game, Neeko should participate in skirmishes, using her crowd control to secure kills or save allies. She can roam to other lanes to help secure objectives or towers, leveraging her burst damage and CC."
+      },
+      "lateGame": {
+        "short": "Control team fights, use ult strategically.",
+        "long": "In the late game, Neeko's role is to control team fights with her AoE abilities. She should look for opportunities to use 'Pop Blossom' in crowded skirmishes or to catch multiple enemies. Her deceptive abilities can be used to mislead opponents during sieges or objectives."
+      },
+      "teamFightRole": {
+        "short": "Engager or disengager, AoE CC.",
+        "long": "In team fights, Neeko can function both as an engager with her 'Pop Blossom' and as a disengager using her 'Tangle-Barbs'. Her role involves controlling the battlefield with her AoE stun and burst damage, disrupting enemy formations and protecting her team."
+      },
+      "mindsetAndPsychology": {
+        "short": "Deceptive, patient, opportunistic.",
+        "long": "Playing Neeko requires a deceptive and patient mindset, focusing on baiting enemies with her passive and waiting for the right moment to engage. Neeko players should be opportunistic, using her crowd control and burst damage at key moments in fights."
+      },
+      "counterplay": {
+        "short": "Predict her ult, exploit her vulnerability.",
+        "long": "Counterplay against Neeko involves predicting her 'Pop Blossom' and moving out of its range. Focusing her when her abilities are on cooldown can be effective, as she's vulnerable without her crowd control. Watch for her deceptive plays and communicate with your team to reveal her true position."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Neeko's abilities synergize for control and burst. Her 'Tangle-Barbs' and 'Pop Blossom' are key for setting up her combo, while 'Blooming Burst' provides consistent damage.",
+        "uniqueMechanics": "Neeko's unique mechanic is her passive 'Inherent Glamour', which allows her to disguise as an ally, creating opportunities for surprise attacks or escapes.",
+        "situationalTips": "Neeko is a strong pick in compositions that benefit from AoE crowd control and burst damage. She excels against teams that clump together and can be easily caught in her ultimate."
+      }
+    }
+  },
+  "Taliyah": {
+    "championTips": {
+      "identity": {
+        "short": "Roaming control mage with terrain manipulation.",
+        "long": "Taliyah is a control mage known for her roaming capabilities and unique terrain manipulation. Her playstyle revolves around controlling space with her abilities, particularly 'Threaded Volley' and 'Seismic Shove'. Taliyah is excellent at roaming to other lanes with her ultimate, 'Weaver's Wall', which creates a long terrain that can block or divide opponents."
+      },
+      "strengths": {
+        "short": "Strong wave clear, roaming potential, zone control.",
+        "long": "Taliyah's strengths include strong wave clear with her 'Threaded Volley', making her effective at pushing lanes. Her roaming potential with 'Weaver's Wall' is exceptional, allowing her to impact other parts of the map quickly. She excels in zone control and can disrupt enemy positioning with 'Seismic Shove' and 'Unraveled Earth'."
+      },
+      "weaknesses": {
+        "short": "Vulnerable to ganks, reliant on skillshots.",
+        "long": "Taliyah's main weaknesses are her vulnerability to ganks, as she often pushes the wave to roam. She's heavily reliant on landing skillshots for her damage output, particularly 'Seismic Shove'. Ineffective use of her 'Worked Ground' from 'Threaded Volley' can also limit her damage potential."
+      },
+      "earlyGame": {
+        "short": "Wave clear and look for roaming opportunities.",
+        "long": "In the early game, Taliyah should focus on clearing waves quickly with 'Threaded Volley' and look for opportunities to roam with 'Weaver's Wall'. She should also try to land 'Seismic Shove' for poke and engage opportunities."
+      },
+      "midGame": {
+        "short": "Roam to sidelanes, control objectives.",
+        "long": "During the mid-game, Taliyah's objective is to utilize her strong roaming capabilities to assist sidelanes and secure objectives. Her 'Weaver's Wall' can be instrumental in cutting off escape routes or trapping enemies during objective fights."
+      },
+      "lateGame": {
+        "short": "Zone control in team fights, use wall strategically.",
+        "long": "In the late game, Taliyah's role is to control zones in team fights and use her 'Weaver's Wall' to divide the enemy team or block access to objectives. Her burst damage can be significant if she lands her combo on priority targets."
+      },
+      "teamFightRole": {
+        "short": "Zone controller, disruptor.",
+        "long": "In team fights, Taliyah serves as a zone controller, using her 'Unraveled Earth' and 'Seismic Shove' to disrupt enemy movements and protect her team. She can use her 'Weaver's Wall' to split the enemy team or to create advantageous positioning for her team."
+      },
+      "mindsetAndPsychology": {
+        "short": "Strategic, roam-focused, area denial.",
+        "long": "Playing Taliyah requires a strategic mindset, focusing on controlling space and timing roams effectively. Players need to manage 'Worked Ground' efficiently and capitalize on her strong wave clear and roaming potential to impact the map."
+      },
+      "counterplay": {
+        "short": "Exploit her vulnerability to ganks, dodge skillshots.",
+        "long": "Counterplay against Taliyah involves exploiting her vulnerability to ganks, especially when she overextends for wave clear. Dodging her 'Seismic Shove' significantly reduces her threat in fights. Interrupting or avoiding her 'Weaver's Wall' can mitigate her impact in roams and objective control."
+      },
+      "additionalInsights": {
+        "skillSynergy": "Taliyah's abilities synergize for wave clear, roaming, and burst. 'Threaded Volley' for wave clear, 'Seismic Shove' and 'Unraveled Earth' for burst and control, and 'Weaver's Wall' for map impact.",
+        "uniqueMechanics": "Taliyah's unique mechanic revolves around 'Worked Ground', which changes the way her 'Threaded Volley' works after use, and her ability to create terrain with 'Weaver's Wall'.",
+        "situationalTips": "Taliyah is a strong pick in compositions that benefit from roaming and objective control. She excels against teams that struggle with dealing with terrain manipulation and zone control."
+      }
+    }
+  }
+}

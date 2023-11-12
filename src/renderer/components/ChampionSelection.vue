@@ -1,7 +1,6 @@
 <template>
 	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'align-items-stretch']">
 		<div class="note-card ">
-
 			<!-- Search Bar - Toggles the grid when clicked -->
 			<div class="search-bar">
 				<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
@@ -19,7 +18,7 @@
 				</div>
 			</div>
 			<!-- Detail View - Shown when a champion is selected -->
-			<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
+			<div class="champion-detail " v-if="selectedChampion" v-show="!isGridVisible">
 				<div :class="[themeClass, 'champion-image-container']">
 					<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
 						alt="Champion Image" />
@@ -41,6 +40,7 @@ import { ref, computed, onMounted } from "vue";
 import gsap from "gsap";
 import Debug from "debug";
 const debug = Debug("app:component:ChampionSelection");
+import ChampionTips from './ChampionTips.vue';
 
 export default {
 	props: {
@@ -48,6 +48,9 @@ export default {
 			type: Number,
 			required: true
 		}
+	},
+	components: {
+		ChampionTips
 	},
 	setup() {
 		const elementToAnimate = ref(null);
@@ -202,12 +205,7 @@ export default {
 		closeDropdown() {
 			this.isDropdownOpen = false;
 		},
-	},
-	computed: {
-		themeClass() {
-			return this.instanceId === 1 ? "blue-theme" : "red-theme";
-		},
-	},
+	}
 };
 </script>
 
@@ -458,4 +456,5 @@ export default {
 	background-color: var(--red-laser-1);
 	border-radius: 6px;
 	height: 2rem;
-}</style>
+}
+</style>
