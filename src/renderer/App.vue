@@ -21,19 +21,19 @@
             </div>
           </div>
         </div>
-        <div class="row d-flex">
+        <div class="row">
           <div class="col-md-3 d-flex gradient-border h-100">
             <ChampionTips :champion="championA" :instanceId="1" />
-
           </div>
           <div class="col-md-6">
-            <!-- New slim full-width row above ChampionSearch components -->
             <div class="row ">
-              <div class="col-md-6 p-3 d-flex flex-column h-100 ">
+              <div class="col-md-5 d-flex flex-column h-100 w-50">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="col-md-6 p-3 d-flex flex-column h-100">
-                <ChampionSearch class="gradient-border-laser br-none " :instanceId="2" @championSelected="setChampionB" />
+              <div class="gold-border">
+              </div>
+              <div class="col-md-5 d-flex flex-column h-100 w-50">
+                <ChampionSearch :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
@@ -162,6 +162,20 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 </script>
 
 <style scoped>
+.gold-border {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Style your indicator as needed */
+  display: flex;
+  background: linear-gradient(to bottom, #000406, var(--gold-3), var(--gold-3), #000406);
+  max-width: 2px;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+  /* Size, color, etc. */
+}
+
 :root {
   --primary-color: #1a202c;
   --secondary-color: #2d3748;
@@ -335,7 +349,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 /* Gradient Border Laser Class for vertical border */
-.gradient-border-laser::before {
+.gradient-border-laser::after {
   content: "";
   position: absolute;
   top: 20%;
@@ -346,7 +360,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
   width: 1px;
   /* Width of the border */
   background: linear-gradient(to top, #000406, var(--gold-3), var(--gold-3), #000406);
-  z-index: 2;
+  z-index: 0;
 }
 
 /* Apply left border only to the first column and right border only to the last column within each row */
@@ -367,9 +381,13 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 /* Set the columns to grow and fill the available space */
 .col-md-3,
 .col-md-6 {
+  z-index: 1;
+  position: relative;
   /* Adjust based on content */
   flex-grow: 1;
   /* Allow columns to grow */
   /* Provide some spacing inside the columns */
 }
+
+
 </style>

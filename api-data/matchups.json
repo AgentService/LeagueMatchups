@@ -2182,5 +2182,47 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Akali-Azir",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "Azir",
+        "name": "Azir"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Yasuo-Ahri",
+    "champions": [
+      {
+        "id": "Yasuo",
+        "name": "Yasuo"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Cassiopeia-Alistar",
+    "champions": [
+      {
+        "id": "Cassiopeia",
+        "name": "Cassiopeia"
+      },
+      {
+        "id": "Alistar",
+        "name": "Alistar"
+      }
+    ],
+    "notes": ""
   }
 ]

@@ -1,11 +1,10 @@
 <template>
 	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'h-100']">
 		<!-- Search Bar -->
-		<div class="search-bar">
-			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search..."
+		<div class="search-bar m-3">
+			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search"
 				class="form-control" />
 		</div>
-
 		<!-- Champion Grid Container -->
 		<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
 			<!-- Champion Grid -->
@@ -17,72 +16,102 @@
 				</div>
 			</div>
 		</div>
+		<div class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
+			<div class="champion-detail-wrapper">
 
-		<!-- Detail View -->
-		<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
-			<!-- Stats Container -->
-			<div class="stats-container pt-4 ms-0">
-				<!-- Iterate through your selected stats -->
-				<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
-					<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
-					<div class="stat-value">{{ selectedChampion?.stats[statKey] }}</div>
-				</div>
-			</div>
-
-			<!-- Champion Image Container -->
-			<div :class="[themeClass, 'champion-image-container']">
-				<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
-					alt="Champion Image" />
-				<!-- <p class="champion-name mt-0 fs-4">{{ selectedChampion.name }}</p> -->
-			</div>
-		</div>
-
-		<!-- Abilities Section -->
-		<div class="champion-abilities-card " v-if="selectedChampion" v-show="!isGridVisible">
-			<div class="abilities-container justify-content-center">
-
-				<!-- Passive with tooltip -->
-				<div class="ability me-sm-0 pe-3" v-if="selectedChampion?.passive">
-					<div class="ability-icon-wrapper">
-						<img :src="getPassiveImageUrl(selectedChampion?.passive)" :alt="selectedChampion?.passive.name"
-							class="tooltip-spell-icon" />
-						<span class="ability-label">P</span>
+				<!-- Champion Detail View -->
+				<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
+					<!-- Use a single row for both instances -->
+					<!-- Champion Image Container - This will always be on the left or right based on instanceId -->
+				
+					<div v-if="instanceId === 1"
+						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-cennter align-items-center">
+						<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
+							alt="Champion Image" />
 					</div>
-					<div class="tooltip">
-						<div class="tooltip-content">
-							<div class="tooltip-header">
+					<!-- Stats Container - This will be on the opposite side of the image -->
+					<div v-if="instanceId === 1"
+						class="stats-container col-md-3 order-md-1 d-flex justify-content-center align-items-center">
+					</div>
+					<div v-if="instanceId === 1"
+						class="stats-container col-md-3 order-md-3 d-flex justify-content-center align-items-center">
+						<!-- Iterate through your selected stats -->
+						<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
+							<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+							<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+						</div>
+					</div>
+					<div v-if="instanceId === 2"
+						class="stats-container justify-content-center align-items-center col-md-3 order-md-3">
+					</div>
+					<!-- For instanceId 2, the order is naturally reversed -->
+					<div v-if="instanceId === 2"
+						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-center align-items-center">
+						<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
+							alt="Champion Image" />
+					</div>
+					<div v-if="instanceId === 2"
+						class="stats-container justify-content-center align-items-center col-md-3 order-md-1">
+						<!-- Iterate through your selected stats -->
+						<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
+							<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+							<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+						</div>
+					</div>
+					
+				</div>
+
+				<!-- Abilities Section -->
+				<div class="champion-abilities-card " v-if="selectedChampion" v-show="!isGridVisible">
+					<div class="abilities-container">
+
+						<!-- Passive with tooltip -->
+						<div class="ability " v-if="selectedChampion?.passive">
+							<div class="ability-icon-wrapper">
 								<img :src="getPassiveImageUrl(selectedChampion?.passive)"
 									:alt="selectedChampion?.passive.name" class="tooltip-spell-icon" />
 								<span class="ability-label">P</span>
 							</div>
-							<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
-							<p class="spell-description">{{ selectedChampion?.passive.description }}</p>
-						</div> <!-- ... -->
-					</div>
-				</div>
-				<!-- Skills with tooltip -->
-				<!-- Abilities -->
-				<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability pe-1 ">
-					<div class="ability-icon-wrapper ">
-						<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
-						<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
-					</div>
-					<div class="tooltip">
-						<div class="tooltip-content">
-							<div class="tooltip-header">
-								<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="tooltip-spell-icon" />
+							<div class="tooltip">
+								<div class="tooltip-content">
+									<div class="tooltip-header">
+										<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+											:alt="selectedChampion?.passive.name" class="tooltip-spell-icon" />
+										<span class="ability-label">P</span>
+									</div>
+									<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
+									<p class="spell-description">{{ selectedChampion?.passive.description }}</p>
+								</div> <!-- ... -->
+							</div>
+						</div>
+						<!-- Skills with tooltip -->
+						<!-- Abilities -->
+						<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability pe-1  ">
+							<div class="ability-icon-wrapper ">
+								<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
 								<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
 							</div>
-							<h5 class="spell-name">{{ spell.name }}</h5>
-							<div>
-								<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-									spell.cooldownBurn
-								}}</span></p>
-								<p class="spell-cost">Cost: <span class="value-text">{{ spell.costBurn
-								}}</span>
-								</p>
+							<div class="tooltip-container">
+								<div class="tooltip">
+									<div class="tooltip-content">
+										<div class="tooltip-header">
+											<img :src="getSpellImageUrl(spell)" :alt="spell.name"
+												class="tooltip-spell-icon" />
+											<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
+										</div>
+										<h5 class="spell-name">{{ spell.name }}</h5>
+										<div>
+											<p class="spell-cooldown">Cooldown: <span class="value-text">{{
+												spell.cooldownBurn
+											}}</span></p>
+											<p class="spell-cost">Cost: <span class="value-text">{{ spell.costBurn
+											}}</span>
+											</p>
+										</div>
+										<p class="spell-description">{{ spell.description }}</p>
+									</div>
+								</div>
 							</div>
-							<p class="spell-description">{{ spell.description }}</p>
 						</div>
 					</div>
 				</div>
@@ -118,7 +147,7 @@ export default {
 			// Define the animation for the blue theme
 			const blueAnimation = () => {
 				gsap.to(elementToAnimate.value, {
-					boxShadow: "0 0 20px rgba(0, 253, 255, 0.75)", // Blue glow
+					boxShadow: "0 0 15px 5px rgba(0, 253, 255, 1)", // Blue glow
 					borderColor: "#10FEFF", // Light blue
 					repeat: -1, // repeat indefinitely
 					yoyo: true, // go back and forth
@@ -130,7 +159,7 @@ export default {
 			// Define the animation for the red theme
 			const redAnimation = () => {
 				gsap.to(elementToAnimate.value, {
-					boxShadow: "0 0 28px rgba(255, 0, 0, 0.75)", // Red glow
+					boxShadow: "0 0 28px 10px rgba(255, 0, 0, 1)", // Red glow
 					borderColor: "#FE1010", // Light red
 					repeat: -1, // repeat indefinitely
 					yoyo: true, // go back and forth
@@ -246,6 +275,7 @@ export default {
 		},
 		showGrid() {
 			this.isGridVisible = true;
+			this.selectedChampion = null; // Optionally reset the selected champion when showing the grid
 		},
 
 		// Method to hide the grid if you need it
@@ -296,19 +326,64 @@ export default {
 </script>
 
 <style scoped>
+.champion-detail-container {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.champion-detail-wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	/* Or whatever maximum width you prefer */
+	margin: 0 auto;
+	/* Center the wrapper if it's not as wide as its parent */
+}
+
+.champion-image {
+	max-width: 100%;
+	/* Ensure the image is responsive and does not overflow its container */
+	max-height: 100%;
+	/* Optional, if you want to restrict the image's height */
+	/* Remove absolute positioning if it's set */
+}
+
+.stats-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+}
+
+
+.stat-item {
+	display: flex;
+	justify-content: center;
+	/* Center stat items */
+	align-items: center;
+}
+
+.tooltip-container {
+	position: absolute;
+	/* or 'absolute' or 'fixed' */
+	z-index: 11;
+	/* or any positive value */
+}
+
 /* Container for both passive and abilities */
 .abilities-container {
 	display: flex;
-	padding: 0 10px;
 }
 
 .champion-abilities-card {
-	margin-top: auto; /* Pushes the abilities to the bottom */
+	margin: auto;
+	/* Pushes the abilities to the bottom */
 }
 
 .ability {
 	display: flex;
-	align-items: center;
 	position: relative;
 }
 
@@ -322,7 +397,7 @@ export default {
 	position: absolute;
 	bottom: 0;
 	right: 0;
-	background-color: #000;
+	background-color: black;
 	color: #fff;
 	padding: 2px 5px;
 	font-size: 0.75rem;
@@ -338,16 +413,16 @@ export default {
 
 .tooltip {
 	position: absolute;
-	top: 100%;
+	bottom: 50%;
 	left: 50%;
 	transform: translate(-50%, 0);
 	visibility: hidden;
 	opacity: 0;
-	background-color: black;
+	background-color: var(--hextech-black);
 	color: var(--grey-1);
 	padding: 1rem 2rem;
 	border-radius: 0.25rem;
-	z-index: 100;
+	z-index: 1050;
 	min-width: 300px;
 	transition: visibility 0.2s, opacity 0.2s ease-in-out;
 	/* Other styles */
@@ -359,6 +434,7 @@ export default {
 
 
 .tooltip div {
+
 	margin-bottom: 0.5rem;
 }
 
@@ -402,8 +478,7 @@ export default {
 	margin-top: 10px;
 }
 
-.ability:hover .tooltip,
-.stat-item:hover .tooltip {
+.ability:hover .tooltip {
 	visibility: visible;
 	opacity: 1;
 }
@@ -415,11 +490,9 @@ export default {
 
 .note-card {
 	width: 100%;
-	z-index: 9;
-	/* This will take the full height of the parent */
+	z-index: 119;
 	display: flex;
 	flex-direction: column;
-	justify-content: flex-start; /* Align children to the start of the flex container */
 }
 
 /* Adjust the grid container */
@@ -478,7 +551,7 @@ export default {
 .search-bar {
 	box-sizing: border-box;
 	display: flex;
-	justify-content: start;
+	justify-content: center;
 }
 
 .search-bar input.form-control {
@@ -486,6 +559,7 @@ export default {
 	width: 40%;
 	height: 2rem;
 	margin-bottom: 1rem;
+	text-align: center;
 	border: none;
 	/* Set the width of the input to 50% of its parent */
 	color: var(--gold-3);
@@ -546,38 +620,19 @@ export default {
 }
 
 /* This will contain the champion image and name centered */
-.champion-image-container {
-	flex-grow: 1;
-	/* Prevents the image container from shrinking */
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	/* Center children horizontally */
-	/* Center children vertically */
-	/* Center text for all children */
-	margin-top: 1rem;
-	/* Optional: adds some space above the container */
-}
 
 /* This will ensure the image fits well */
 .champion-image {
-	width: 100%;
 	/* Full width of the container */
-	max-width: 130px;
+	max-width: 165px;
 	/* Maximum width */
 	height: auto;
-	/* Maintain aspect ratio */
-	margin-bottom: 0.5rem;
-	/* Space between the image and the name */
 }
 
 .blue-theme .champion-image {
-	border-radius: 50%;
 	display: block;
-
-	width: 150px;
 	overflow: hidden;
-	border: 2px solid var(--blue-laser-1);
+	border: 3px solid var(--blue-laser-1);
 }
 
 /* .blue-theme .note-card {
@@ -591,8 +646,6 @@ export default {
 
 .red-theme .champion-image {
 	display: block;
-	border-radius: 50%;
-	overflow: hidden;
 	border: 3px solid var(--red-laser-1);
 }
 
@@ -612,7 +665,7 @@ export default {
 	100% {
 		border-color: var(--red-laser-2);
 		/* Red */
-		box-shadow: 0 0 14px 4px var(--red-laser-1);
+		box-shadow: 0 0 18px 4px var(--red-laser-1);
 		/* Red glow */
 	}
 
@@ -629,7 +682,7 @@ export default {
 	100% {
 		border-color: var(--blue-laser-2);
 		/* Blue */
-		box-shadow: 0 0 14px 4px var(--blue-laser-1);
+		box-shadow: 0 0 18px 4px var(--blue-laser-1);
 		/* Blue glow */
 	}
 
@@ -665,28 +718,21 @@ export default {
 	height: 2rem;
 }
 
-.stat-item {
-	display: flex;
-	align-items: center;
-}
 
-.stats-container {
-	flex-grow: 0;
-	/* Allows the stats container to grow as needed */
-	align-items: flex-start;
-	/* Aligns stats to the start of the flex container */
+.champion-image-container {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	/* Set a specific height if needed */
 }
 
 .stat-icon {
 	width: 24px;
-	/* Smaller icon width */
 	height: 24px;
-	/* Smaller icon height */
 }
 
 .stat-value {
-	margin-left: 0.5rem;
-	/* Space between icon and value */
 	font-size: 0.9rem;
-	/* Smaller font size for stat value */
 }</style>
