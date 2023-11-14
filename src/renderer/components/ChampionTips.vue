@@ -1,37 +1,37 @@
 <template>
   <div class="container d-flex" v-if="championTips && Object.keys(championTips).length > 0">
     <div class="card">
-      <div class="card-header">
+      <div class="card-header title-bar">
         General Tips <!-- Header title -->
       </div>
       <transition name="fade" mode="out-in">
         <div class="card-body" :key="selectedTip">
           <div v-if="!selectedTip" class="flex-container">
-          <!-- Iterate over each key in championTips -->
-          <div v-for="(value, key) in championTips" :key="key" class="flex-item">
-            <!-- Button for each tip -->
-            <button type="button" class="btn btn-primary btn-full-width" @click="selectedTip = key">
-              <div class="button-content">
-                <i :class="getIconForKey(key)" aria-hidden="true"></i>
-                <div class="ms-3 text-content">{{ formatCategory(key) }}</div>
-              </div>
-            </button>
+            <!-- Iterate over each key in championTips -->
+            <div v-for="(value, key) in championTips" :key="key" class="flex-item">
+              <!-- Button for each tip -->
+              <button type="button"
+                class="btn btn-primary btn-full-width d-flex justify-content-center align-items-center"
+                @click="selectedTip = key">
+                <i :class="['me-3', getIconForKey(key)]" aria-hidden="true"></i>
+                <div class="text-content">{{ formatCategory(key) }}</div>
+              </button>
+            </div>
+          </div>
+          <div v-else class="content-container">
+            <div class="details-header mb-1">
+              <!-- Back Button -->
+              <button type="button" class="btn btn-secondary mb-1" @click="selectedTip = null">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <!-- Title next to back button -->
+              <h6 class="details-title title-bar">{{ formatCategory(selectedTip) }}</h6>
+            </div>
+            <div class="tip-details">
+              <p>{{ championTips[selectedTip]?.long }}</p>
+            </div>
           </div>
         </div>
-        <div v-else class="content-container">
-          <div class="details-header mb-1">
-            <!-- Back Button -->
-            <button type="button" class="btn btn-secondary mb-1" @click="selectedTip = null">
-              <i class="fas fa-chevron-left"></i>
-            </button>
-            <!-- Title next to back button -->
-            <h6 class="details-title title-bar">{{ formatCategory(selectedTip) }}</h6>
-          </div>
-          <div class="tip-details">
-            <p>{{ championTips[selectedTip]?.long }}</p>
-          </div>
-        </div>
-      </div>
       </transition>
     </div>
   </div>
@@ -90,7 +90,7 @@ watch(() => props.champion, (newChampion) => {
 
 <style>
 .title-bar {
-  text-align: left;
+  text-align: center;
   color: var(--gold-1);
   border-bottom: 0px solid var(--gold-4);
 }
@@ -111,7 +111,7 @@ watch(() => props.champion, (newChampion) => {
 }
 
 .flex-item {
-  flex: 1 0;
+  flex: 1 1;
   /* default for smaller screens - 2 items per row */
 }
 

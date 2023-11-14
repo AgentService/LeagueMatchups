@@ -2,6 +2,7 @@
   <Navbar>
 
   </Navbar>
+  <Login></Login>
   <div class="app-wrapper">
     <div class="app-container">
       <div class="background-container gradient-top-border ">
@@ -14,36 +15,38 @@
         <!-- Adjust the height to take up the remaining space after Navbar -->
         <!-- First Row -->
         <!-- Existing rows for ChampionSearch components -->
-        <div class=" slim-row m-3">
+        <div class="slim-row m-3">
           <div class="col-12">
             <div class="title-bar">
-              <h4>Select your Matchup</h4>
+              <h4 v-show="!bothChampionsSelected">Select your Matchup</h4>
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-3 d-flex gradient-border h-100">
+          <div class="col-md-3 h-100 ">
             <ChampionTips :champion="championA" :instanceId="1" />
           </div>
           <div class="col-md-6">
             <div class="row ">
-              <div class="col-md-5 d-flex flex-column h-100 w-50">
+              <div class="col-md-5 d-flex flex-column h-100 w-50  gradient-border ">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
               <div class="gold-border">
               </div>
-              <div class="col-md-5 d-flex flex-column h-100 w-50">
+              <div class="col-md-5 d-flex flex-column h-100 w-50  gradient-border ">
                 <ChampionSearch :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
-          <div class="col-md-3 d-flex gradient-border h-100">
+          <div class="col-md-3 h-100">
             <ChampionTips :champion="championB" :instanceId="2" />
           </div>
         </div>
         <!-- Second Row -->
         <div class="row">
           <div class="col-md-3 d-flex align-items-stretch gradient-top-border">
+            <LearningObjectives></LearningObjectives>
+
           </div>
           <div class="col-md-6 d-flex flex-column align-items-stretch ">
             <div class="row">
@@ -59,14 +62,23 @@
           </div>
         </div>
         <div class="row ">
-          <div class="col-md-4 d-flex align-items-stretch gradient-border ">
-            <LearningObjectives></LearningObjectives>
-
+          <div class="col-md-3 gradient-border ">
+            <ChampionNotes></ChampionNotes>
           </div>
-          <div class="col-md-4 d-flex align-items-stretch gradient-border ">
-            <MatchupNotes></MatchupNotes>
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-md-2 gradient-border ">
+                <MatchupRating> </MatchupRating>
+              </div>
+              <div class="col-md-8  gradient-top-border ">
+                <MatchupNotes></MatchupNotes>
+              </div>
+              <div class="col-md-2  gradient-border ">
+                <MatchupRating> </MatchupRating>
+              </div>
+            </div>
           </div>
-          <div class="col-md-4 d-flex align-items-stretch gradient-border">
+          <div class="col-md-3">
           </div>
         </div>
       </div>
@@ -78,17 +90,22 @@
 
 <script setup>
 
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 
 // Debug
 import Debug from "debug";
 
+import Login from "./components/Login.vue";
+
 import ChampionSearch from "./components/ChampionSelection.vue";
 import ChampionStats from "./components/ChampionStats.vue";
 import ChampionTips from "./components/ChampionTips.vue";
+import ChampionNotes from "./components/ChampionNotes.vue";
 
 import MatchupNotes from "./components/MatchupNotes.vue";
+import MatchupRating from "./components/MatchupRating.vue";
+
 import LearningObjectives from "./components/LearningObjectives.vue";
 import Template from "./components/Template.vue";
 import Navbar from "./components/TopNavbar.vue";
@@ -98,6 +115,10 @@ const debug = Debug("app:component:App");
 
 const championA = ref(null);
 const championB = ref(null);
+
+const bothChampionsSelected = computed(() => {
+  return championA.value && championB.value;
+});
 
 // const backgroundStyle2 = computed(() => {
 // 	const champAImage = championA.value ? `/img/champion_loading/${championA.value.id}.png` : "";
@@ -381,13 +402,10 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 /* Set the columns to grow and fill the available space */
 .col-md-3,
 .col-md-6 {
-  z-index: 1;
   position: relative;
   /* Adjust based on content */
   flex-grow: 1;
   /* Allow columns to grow */
   /* Provide some spacing inside the columns */
 }
-
-
 </style>

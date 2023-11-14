@@ -1,5 +1,5 @@
 <template>
-	<div :class="[themeClass, 'note-card', 'gradient-border', 'text-light', 'h-100']">
+	<div :class="[themeClass, 'note-card', 'text-light', 'h-100']">
 		<!-- Search Bar -->
 		<div class="search-bar m-3">
 			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search"
@@ -21,24 +21,26 @@
 
 				<!-- Champion Detail View -->
 				<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
-					<!-- Use a single row for both instances -->
-					<!-- Champion Image Container - This will always be on the left or right based on instanceId -->
-				
 					<div v-if="instanceId === 1"
-						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-cennter align-items-center">
+						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-center align-items-center">
 						<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
 							alt="Champion Image" />
 					</div>
 					<!-- Stats Container - This will be on the opposite side of the image -->
-					<div v-if="instanceId === 1"
-						class="stats-container col-md-3 order-md-1 d-flex justify-content-center align-items-center">
+					<div v-if="instanceId === 1" class="stats-container col-md-3 order-md-1 d-flex">
 					</div>
 					<div v-if="instanceId === 1"
-						class="stats-container col-md-3 order-md-3 d-flex justify-content-center align-items-center">
-						<!-- Iterate through your selected stats -->
-						<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
-							<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
-							<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+						class="stats-container col-md-3 order-md-3 d-flex justify-content-start align-items-start">
+						<button type="button" class="btn btn-outline-secondary btn-sm"
+							@click="isStatsCollapsed = !isStatsCollapsed">
+							<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" />
+						</button>
+
+						<div class="stats-container collapse align-items-start" :class="{ show: !isStatsCollapsed }">
+							<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
+								<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+								<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+							</div>
 						</div>
 					</div>
 					<div v-if="instanceId === 2"
@@ -51,14 +53,21 @@
 							alt="Champion Image" />
 					</div>
 					<div v-if="instanceId === 2"
-						class="stats-container justify-content-center align-items-center col-md-3 order-md-1">
-						<!-- Iterate through your selected stats -->
-						<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
-							<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
-							<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+						class="stats-container justify-content-start col-md-3 order-md-1 align-items-end">
+						<button type="button" class="btn btn-outline-secondary btn-sm"
+							@click="isStatsCollapsed = !isStatsCollapsed">
+							<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" />
+						</button>
+
+						<div class="stats-container align-items-end collapse" :class="{ show: !isStatsCollapsed }">
+							<!-- Iterate through your selected stats -->
+							<div class="stat-item" v-for="statKey in selectedStatKeys" :key="statKey">
+								<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+								<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+							</div>
 						</div>
 					</div>
-					
+
 				</div>
 
 				<!-- Abilities Section -->
@@ -66,7 +75,7 @@
 					<div class="abilities-container">
 
 						<!-- Passive with tooltip -->
-						<div class="ability " v-if="selectedChampion?.passive">
+						<div class="ability" v-if="selectedChampion?.passive">
 							<div class="ability-icon-wrapper">
 								<img :src="getPassiveImageUrl(selectedChampion?.passive)"
 									:alt="selectedChampion?.passive.name" class="tooltip-spell-icon" />
@@ -86,7 +95,7 @@
 						</div>
 						<!-- Skills with tooltip -->
 						<!-- Abilities -->
-						<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability pe-1  ">
+						<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability ps-1">
 							<div class="ability-icon-wrapper ">
 								<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
 								<span class="ability-label">{{ getAbilityLabelByIndex(index) }}</span>
@@ -124,11 +133,10 @@
   
 <script>
 import { useStore } from "vuex";
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import gsap from "gsap";
 import Debug from "debug";
 const debug = Debug("app:component:ChampionSelection");
-import ChampionTips from './ChampionTips.vue';
 
 export default {
 	props: {
@@ -136,9 +144,6 @@ export default {
 			type: Number,
 			required: true
 		}
-	},
-	components: {
-		ChampionTips
 	},
 	setup() {
 		const elementToAnimate = ref(null);
@@ -186,13 +191,13 @@ export default {
 		return {
 			searchTerm: "",
 			champions: [],
-			filteredChampions: [],
 			selectedChampion: null,
 			selectedChampions: [], // Initialize empty array
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
 			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'],
-			abilityLabels: ['Q', 'W', 'E', 'R']
+			abilityLabels: ['Q', 'W', 'E', 'R'],
+			isStatsCollapsed: true,
 		};
 	},
 
@@ -209,7 +214,7 @@ export default {
 
 			// Optionally, initialize filteredChampions with the full list if you want
 			// all champions to be displayed before any search is performed.
-			this.filteredChampions = [...this.champions];
+			// this.filteredChampions = [...this.champions];
 
 			// Determine and select a preselected champion based on instanceId
 			// Ensure there is a valid champion at the index before selecting
@@ -230,10 +235,13 @@ export default {
 			);
 		},
 		themeClass() {
-			return this.instanceId === 1 ? "blue-theme" : "red-theme";
+			return this.instanceId === 1 ? "blue-theme1" : "red-theme1";
 		},
 	},
 	methods: {
+		toggleStats() {
+			this.isStatsCollapsed = !this.isStatsCollapsed;
+		},
 		getPassiveImageUrl(passive) {
 			// Construct the URL for the passive image
 			const path = `./img/dragontail/13.21.1/img/passive/${passive?.image.full}`;
@@ -255,6 +263,7 @@ export default {
 				spellblock: 'StatModsMagicResIcon.png',
 				// abilitypower: 'StatModsAbilityPowerIcon.png',
 				movespeed: 'StatModsMovementSpeedIcon.png',
+				statToggle: 'StatModsButton.png'
 			};
 			return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
 		},
@@ -326,6 +335,16 @@ export default {
 </script>
 
 <style scoped>
+.stat-toggle-icon {
+	width: 24px;
+	/* Size of the collapse icon */
+	height: 24px;
+	/* Size of the collapse icon */
+	cursor: pointer;
+	/* Indicates the image is clickable */
+	/* Additional styles for hover effects, transitions, etc. */
+}
+
 .champion-detail-container {
 	flex: 1;
 	display: flex;
@@ -344,6 +363,7 @@ export default {
 }
 
 .champion-image {
+	border-radius: 10%;
 	max-width: 100%;
 	/* Ensure the image is responsive and does not overflow its container */
 	max-height: 100%;
@@ -385,6 +405,7 @@ export default {
 .ability {
 	display: flex;
 	position: relative;
+
 }
 
 .ability-icon-wrapper {
@@ -405,11 +426,6 @@ export default {
 	/* Rounded top-left corner */
 }
 
-.ability-icon {
-	display: block;
-	width: 45px;
-	height: 45px;
-}
 
 .tooltip {
 	position: absolute;
@@ -430,6 +446,8 @@ export default {
 
 .tooltip .ability-label {
 	left: 2.7rem;
+	background-color: transparent;
+
 }
 
 
@@ -501,7 +519,6 @@ export default {
 	overflow-x: hidden;
 	/* Scroll only if needed */
 	position: relative;
-	/* For absolute positioning of children */
 }
 
 .champion-grid-container.open {
@@ -515,7 +532,7 @@ export default {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
 	gap: 0.6rem;
-	padding: 1rem;
+	padding: 2rem;
 	/* Padding inside the grid */
 	box-sizing: border-box;
 	position: absolute;
@@ -533,7 +550,7 @@ export default {
 }
 
 .champion-grid.is-scrollable {
-	padding-right: 10px;
+	padding-right: 1rem;
 	/* Add some padding to the right to make room for the scrollbar */
 }
 
@@ -624,7 +641,7 @@ export default {
 /* This will ensure the image fits well */
 .champion-image {
 	/* Full width of the container */
-	max-width: 165px;
+	max-width: 155px;
 	/* Maximum width */
 	height: auto;
 }

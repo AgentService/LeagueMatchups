@@ -28,6 +28,10 @@ import Debug from 'debug';
 import championsRouter from './api/champions.mjs';
 import summonerRouter from './api/summoner.mjs';
 import matchupsRouter from './api/matchups.mjs';
+import authRouter from './api/auth.mjs';
+
+// Other imports and code
+
 
 const app = express();
 const PORT = 3001;
@@ -56,6 +60,7 @@ app.use((req, res, next) => {
 app.use('/api/champions', championsRouter); // Assuming championsRouter handles both GET and update routes
 app.use('/summoner', summonerRouter);
 app.use('/api/matchups', matchupsRouter);
+app.use('/api/auth', authRouter);
 
 // Start the server
 app.listen(PORT, () => {

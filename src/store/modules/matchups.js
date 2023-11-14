@@ -5,7 +5,13 @@ import Debug from "debug";
 
 const debug = Debug("app:store:matchups");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const authToken = 'x'; // Replace with your actual authentication token
 
+const config = {
+  headers: {
+    Authorization: `Bearer ${authToken}`, // Include the token in the "Authorization" header
+  },
+};
 export const matchups = {
 	namespaced: true,
 	state: {
@@ -18,6 +24,7 @@ export const matchups = {
 		getChampionA: state => state.championA,
 		getChampionB: state => state.championB,
 		getCurrentMatchup: (state) => {
+			console.log('getCurrentMatchup', state.currentMatchup);
 			return state.currentMatchup;
 		},    // ...other getters
 	},
@@ -38,6 +45,7 @@ export const matchups = {
 			state.championA = matchup.champions[0];
 			state.championB = matchup.champions[1];
 			state.currentMatchup = matchup;
+			debug("Current matchup:", state.currentMatchup)
 		},
 		ADD_OR_UPDATE_MATCHUP(state, oMatchup) {
 			const index = state.matchups.findIndex((m) => m.id === oMatchup.id);
@@ -114,9 +122,8 @@ export const matchups = {
 			}
 
 			// At this point, matchups[id] is either loaded from local storage, fetched from the server, or created new
-			saveToLocalStorage("matchupsData", matchups); // Save updated matchups object to local storage
 			commit("SET_CURRENT_MATCHUP", matchups[id]); // Commit to Vuex state
-
+			debug("Matchup data:", matchups[id])
 			// If you need to update the list of matchups in the state as well
 			commit("ADD_OR_UPDATE_MATCHUP", matchups[id]);
 
@@ -129,11 +136,18 @@ export const matchups = {
 			commit("SET_CHAMPION_B", payload);
 		},
 		// custom data
-		saveNotes({ commit }, payload) {
-			axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes })
+		saveNotes({ commit, state }, payload) {
+			axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes }, config)
 				.then(response => {
 					debug("Notes updated:", response.data);
 					commit("UPDATE_NOTES", payload);
+
+					// Save the entire updated matchups object to LocalStorage
+					saveToLocalStorage("matchupsData", state.matchups);
+				})
+				.catch(error => {
+					console.error("Error updating notes:", error);
+					// Handle error appropriately
 				});
 		},
 	},

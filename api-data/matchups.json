@@ -11,7 +11,7 @@
         "name": "Akali"
       }
     ],
-    "notes": "Start Dorans and 3 Stack\n- \n-"
+    "notes": "789"
   },
   {
     "id": "Aatrox-Akali",
@@ -501,7 +501,7 @@
         "name": "Akshan"
       }
     ],
-    "notes": ""
+    "notes": "xxxx"
   },
   {
     "id": "Aatrox-Akshan",
@@ -2224,5 +2224,75 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "Akali-Dr. Mundo",
+    "champions": [
+      {
+        "id": "Akali",
+        "name": "Akali"
+      },
+      {
+        "id": "DrMundo",
+        "name": "Dr. Mundo"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Annie-Ahri",
+    "champions": [
+      {
+        "id": "Annie",
+        "name": "Annie"
+      },
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Orianna-Akali",
+    "champions": [
+      {
+        "id": "Orianna",
+        "name": "Orianna"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Annie",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Annie",
+        "name": "Annie"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Ahri-Caitlyn",
+    "champions": [
+      {
+        "id": "Ahri",
+        "name": "Ahri"
+      },
+      {
+        "id": "Caitlyn",
+        "name": "Caitlyn"
+      }
+    ],
+    "notes": "qwe"
   }
 ]
