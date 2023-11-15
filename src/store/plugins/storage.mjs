@@ -53,6 +53,14 @@ export function retrieveFromLocalStorage(key) {
 	}
 }
 
+export function removeFromLocalStorage(key) {
+	try {
+		localStorage.removeItem(key);
+	} catch (error) {
+		console.error(`Error removing data from sessionStorage for key: ${key}`, error);
+	}
+}
+
 // Usage Example
 // saveToSessionStorage('summonerData', { summonerName: 'Azateq', otherDetails: '...' });
 // const summonerData = retrieveFromSessionStorage('summonerData');

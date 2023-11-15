@@ -1,6 +1,7 @@
 <template>
   <form @submit.prevent="handleSubmit">
     <div>
+      user@example.com password123
       <label for="email">Email:</label>
       <input type="email" id="email" v-model="email" required>
     </div>

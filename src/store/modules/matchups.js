@@ -5,7 +5,7 @@ import Debug from "debug";
 
 const debug = Debug("app:store:matchups");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
-const authToken = 'x'; // Replace with your actual authentication token
+const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTk5OTU5NzcsImV4cCI6MTY5OTk5OTU3N30.WMrnsoUvfmDF9hgTRPcvwZpzrd8bPmYW4o1RCBhzzRo'; // Replace with your actual authentication token
 
 const config = {
   headers: {

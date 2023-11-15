@@ -1,31 +1,47 @@
 // api/auth.mjs
 import Debug from 'debug';
 import express from 'express';
+import passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import jwt from 'jsonwebtoken';
+
 const debugApi = Debug('api');
 
-const router = express.Router();
-
-// Mock user data
 const users = [
   { email: 'user@example.com', password: 'password123', name: 'John Doe' },
 ];
 
-router.post('/login', (req, res) => {
-  debugApi('Login request received');
-  const { email, password } = req.body;
-  debugApi(`Login request for ${email}`);
-  const user = users.find(u => u.email === email && u.password === password);
-  debugApi(`User found: ${user}`);
-  if (user) {
-    // User found and password matches
-    debugApi(`Login successful for ${email}`);
-    res.json({ message: 'Login successful', user: { name: user.name, email } });
-  } else {
-    // User not found or password does not match
-    debugApi(`Login failed for ${email}`);
-    res.status(401).json({ message: 'Invalid credentials' });
-  }
-});
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password'
+},
+  (email, password, done) => {
+    debugApi(`Received email: ${email}, password: ${password}`);
 
+    // Directly check hardcoded credentials
+    if (email === 'user@example.com' && password === 'password123') {
+      debugApi('Hardcoded credentials matched');
+      return done(null, { email: 'user@example.com', name: 'John Doe' });
+    } else {
+      debugApi('Hardcoded credentials did not match');
+      return done(null, false, { message: 'Incorrect username or password.' });
+    }
+  }
+));
+
+const router = express.Router();
+
+// Mock user data
+
+
+
+// Example server-side login route
+router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
+  const user = req.user; // Your authenticated user
+  const token = jwt.sign({ id: user.id }, 'your JWT secret', { expiresIn: '1h' });
+
+  // Send both the user and the token in the response
+  res.json({ user, token });
+});
 
 export default router;

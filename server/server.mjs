@@ -22,6 +22,7 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
+import passport from 'passport';
 
 import Debug from 'debug';
 
@@ -41,8 +42,9 @@ const debugApi = Debug(process.env.VITE_DEBUG);
 
 app.use(cors());
 app.use(express.json());
+app.use(passport.initialize());
 
-console.log('111:', process.env);
+// console.log('111:', process.env);
 
 // Centralized error handling
 app.use((error, req, res, next) => {

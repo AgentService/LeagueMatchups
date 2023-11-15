@@ -221,7 +221,7 @@
         "name": "Ahri"
       }
     ],
-    "notes": ""
+    "notes": "sdsd"
   },
   {
     "id": "Akshan-Ahri",
@@ -2294,5 +2294,33 @@
       }
     ],
     "notes": "qwe"
+  },
+  {
+    "id": "Sylas-Akali",
+    "champions": [
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      },
+      {
+        "id": "Akali",
+        "name": "Akali"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "Sylas-Naafiri",
+    "champions": [
+      {
+        "id": "Sylas",
+        "name": "Sylas"
+      },
+      {
+        "id": "Naafiri",
+        "name": "Naafiri"
+      }
+    ],
+    "notes": ""
   }
 ]

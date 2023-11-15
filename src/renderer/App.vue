@@ -15,32 +15,48 @@
         <!-- Adjust the height to take up the remaining space after Navbar -->
         <!-- First Row -->
         <!-- Existing rows for ChampionSearch components -->
-        <div class="slim-row m-3">
-          <div class="col-12">
-            <div class="title-bar">
-              <h4 v-show="!bothChampionsSelected">Select your Matchup</h4>
+        <div class="row slim-row">
+          <div class="col-md-3 h-100 ">
+          </div>
+          <div class="col-md-9">
+            <div class="row ">
+              <div class="col-md-6 d-flex flex-column h-100   gradient-border ">
+                <div class="title-bar">
+                  <h4 v-show="!bothChampionsSelected">Select your Champion</h4>
+                </div>
+              </div>
+              <!-- <div class="gold-border">
+              </div> -->
+              <div class="col-md-3 d-flex flex-column h-100  gradient-border ">
+                <div class="title-bar">
+                  <h4 v-show="!bothChampionsSelected">Select your Matchup</h4>
+                </div>
+              </div>
             </div>
           </div>
+          <!-- <div class="col-md-3 h-100">
+            <ChampionTips :champion="championB" :instanceId="2" />
+          </div> -->
         </div>
         <div class="row">
           <div class="col-md-3 h-100 ">
             <ChampionTips :champion="championA" :instanceId="1" />
           </div>
-          <div class="col-md-6">
+          <div class="col-md-9">
             <div class="row ">
-              <div class="col-md-5 d-flex flex-column h-100 w-50  gradient-border ">
+              <div class="col-md-6 d-flex flex-column h-100   gradient-border ">
                 <ChampionSearch :instanceId="1" @championSelected="setChampionA" />
               </div>
-              <div class="gold-border">
-              </div>
-              <div class="col-md-5 d-flex flex-column h-100 w-50  gradient-border ">
+              <!-- <div class="gold-border">
+              </div> -->
+              <div class="col-md-3 d-flex flex-column h-100  gradient-border ">
                 <ChampionSearch :instanceId="2" @championSelected="setChampionB" />
               </div>
             </div>
           </div>
-          <div class="col-md-3 h-100">
+          <!-- <div class="col-md-3 h-100">
             <ChampionTips :champion="championB" :instanceId="2" />
-          </div>
+          </div> -->
         </div>
         <!-- Second Row -->
         <div class="row">
@@ -55,15 +71,18 @@
               </div>
               <div class="col-md-6 gradient-border h-100">
                 <!-- <ChampionStats :champion="championB" :instanceId="2" /> -->
+                <ChampionNotes></ChampionNotes>
+
               </div>
             </div>
           </div>
           <div class="col-md-3 d-flex align-items-stretch gradient-border ">
+            <!-- <ChampionTips :champion="championB" :instanceId="2" /> -->
+
           </div>
         </div>
         <div class="row ">
           <div class="col-md-3 gradient-border ">
-            <ChampionNotes></ChampionNotes>
           </div>
           <div class="col-md-6">
             <div class="row">
