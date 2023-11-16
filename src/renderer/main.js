@@ -9,6 +9,8 @@ import "./custom.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
 
 import { initializeSummonerDataFetching } from "../services/summonerDataService";
+import { retrieveFromLocalStorage } from "../store/plugins/storage.mjs";
+
 import Debug from "debug";
 
 if (import.meta.env.MODE !== "production") {
@@ -23,4 +25,12 @@ vueApp.use(VueLazyload, {
   
 vueApp.use(store);
 vueApp.mount("#app");
+
+// Check for token in local storage
+const tokenJson = retrieveFromLocalStorage('token');
+if (tokenJson) {
+    // Re-authenticate the user with the token's data
+    store.dispatch('auth/reauthenticate', tokenJson);
+}
+
 initializeSummonerDataFetching();

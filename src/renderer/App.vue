@@ -1,8 +1,6 @@
 <template>
   <Navbar>
-
   </Navbar>
-  <Login></Login>
   <div class="app-wrapper">
     <div class="app-container">
       <div class="background-container gradient-top-border ">
@@ -115,7 +113,6 @@ import { useStore } from "vuex";
 // Debug
 import Debug from "debug";
 
-import Login from "./components/Login.vue";
 
 import ChampionSearch from "./components/ChampionSelection.vue";
 import ChampionStats from "./components/ChampionStats.vue";

@@ -31,6 +31,8 @@ import summonerRouter from './api/summoner.mjs';
 import matchupsRouter from './api/matchups.mjs';
 import authRouter from './api/auth.mjs';
 
+import { verifyToken } from './utils/authMiddleware.mjs';
+
 // Other imports and code
 
 
@@ -57,6 +59,10 @@ app.use((req, res, next) => {
   debugApi(`Incoming request on ${req.path} with method ${req.method}`);
   next();
 });
+
+
+app.use('/api/matchups', verifyToken);
+
 
 // Routes
 app.use('/api/champions', championsRouter); // Assuming championsRouter handles both GET and update routes

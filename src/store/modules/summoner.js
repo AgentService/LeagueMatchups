@@ -12,6 +12,9 @@ export const summoner = {
 		playerDetails: retrieveFromLocalStorage("playerDetails") || "",
 	}),
 	getters: {
+		getPlayerDetails: (state) => {
+			return state.playerDetails;
+		},
 		accountData: (state) => {
 			return state.playerDetails?.accountData || {};
 		},
@@ -47,6 +50,7 @@ export const summoner = {
 		async fetchSummonerData({ commit }, { region, gameName, tagLine }) {
 			const playerDetailsKey = "playerDetails";
 			const cachedData = retrieveFromLocalStorage(playerDetailsKey);
+			console.log("fetchSummonerData", cachedData);
 			if (cachedData) {
 				debug("Summoner data loaded from cache:", cachedData);
 				commit("setPlayerDetails", cachedData);
@@ -73,12 +77,15 @@ export const summoner = {
 				}
 			}
 		},
-		// getSummonerData({ state }) {
-		//     // This will trigger a re-fetch from localStorage if needed
-		//     return state.playerDetails || retrieveFromLocalStorage('playerDetails');
-		//     // const summonerData = this.$store.dispatch('getSummonerData');
-
-		// },
+		getSummonerData({ state, commit }) {
+			if (!state.playerDetails) {
+				const cachedData = retrieveFromLocalStorage('playerDetails', true);
+				if (cachedData) {
+					commit('setPlayerDetails', cachedData);
+				}
+			}
+			return state.playerDetails;
+		}
 	},
 };
 

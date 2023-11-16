@@ -2,6 +2,8 @@
   <div class="main-container">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <Login></Login>
+
       <div class="container-fluid justify-content-start" style="max-width: 1280px;">
         <div class="d-flex position-relative justify-content-start">
           <!-- Loading spinner or dropdown based on summonerIcon's state -->
@@ -56,7 +58,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import Login from "./Login.vue";
+
+import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
 import ProgressBar from "./utility/ProgressBar.vue";
 
@@ -66,11 +70,15 @@ const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 // const accountData = computed(() => store.getters["summoner/accountData"]);
 // const summonerData = computed(() => store.getters["summoner/summonerData"]);
 const riotIdParts = computed(() => store.getters["summoner/riotIdParts"]);
-
+console.log(riotIdParts.value);
 const profileIconId = computed(() => store.getters["summoner/profileIconId"]);
 const level = computed(() => store.getters["summoner/level"]);
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 
+onMounted(async () => {
+  console.log("SummonerInfo mounted");
+  await store.dispatch("summoner/getSummonerData");
+});
 const summonerIcon = computed(() => {
 	const iconId = profileIconId.value;
 	if (!iconId) {

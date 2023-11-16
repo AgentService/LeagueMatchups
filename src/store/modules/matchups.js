@@ -5,13 +5,18 @@ import Debug from "debug";
 
 const debug = Debug("app:store:matchups");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
-const authToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTk5OTU5NzcsImV4cCI6MTY5OTk5OTU3N30.WMrnsoUvfmDF9hgTRPcvwZpzrd8bPmYW4o1RCBhzzRo'; // Replace with your actual authentication token
 
-const config = {
-  headers: {
-    Authorization: `Bearer ${authToken}`, // Include the token in the "Authorization" header
-  },
-};
+function getAuthConfig() {
+	const token = retrieveFromLocalStorage('token');
+	console.log("xxx", token.data)
+	return {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	};
+}
+
+
 export const matchups = {
 	namespaced: true,
 	state: {
@@ -102,7 +107,8 @@ export const matchups = {
 				// Matchup not found in local storage, check the server
 				try {
 					debug("Fetching matchup from server");
-					const response = await axios.get(`${baseUrl}/api/matchups/${id}`);
+					const config = getAuthConfig();
+					const response = await axios.get(`${baseUrl}/api/matchups/${id}`, config);
 					if (response.data.message === "Matchup not found") {
 						// Create new matchup if it doesn't exist on the server
 						const newMatchupData = {
@@ -136,19 +142,17 @@ export const matchups = {
 			commit("SET_CHAMPION_B", payload);
 		},
 		// custom data
-		saveNotes({ commit, state }, payload) {
-			axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes }, config)
-				.then(response => {
-					debug("Notes updated:", response.data);
-					commit("UPDATE_NOTES", payload);
-
-					// Save the entire updated matchups object to LocalStorage
-					saveToLocalStorage("matchupsData", state.matchups);
-				})
-				.catch(error => {
-					console.error("Error updating notes:", error);
-					// Handle error appropriately
-				});
+		async saveNotes({ commit, state }, payload) {
+			try {
+				const config = getAuthConfig();
+				const response = await axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes }, config);
+				debug("Notes updated:", response.data);
+				commit("UPDATE_NOTES", payload);
+				saveToLocalStorage("matchupsData", state.matchups);
+			} catch (error) {
+				console.error("Error updating notes:", error);
+				// Handle error appropriately
+			}
 		},
 	},
 };

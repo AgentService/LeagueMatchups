@@ -40,18 +40,22 @@ export function saveToLocalStorage(key, value) {
 	}
 }
 
-// Utility to retrieve data from sessionStorage
-export function retrieveFromLocalStorage(key) {
+export function retrieveFromLocalStorage(key, skipCacheValidation = false) {
 	try {
-		const cachedDataString = localStorage.getItem(key);
-		if (!cachedDataString) return null;
-		const cachedData = JSON.parse(cachedDataString);
-		return isCacheValid(cachedData) ? cachedData.data : null;
+	  const cachedDataString = localStorage.getItem(key);
+	  if (!cachedDataString) return null;
+	  const cachedData = JSON.parse(cachedDataString);
+  
+	  if (skipCacheValidation || isCacheValid(cachedData)) {
+		return cachedData.data;
+	  }
+	  return null;
 	} catch (error) {
-		console.error(`Error retrieving data from sessionStorage for key: ${key}`, error);
-		return null;
+	  console.error(`Error retrieving data from localStorage for key: ${key}`, error);
+	  return null;
 	}
-}
+  }
+  
 
 export function removeFromLocalStorage(key) {
 	try {
