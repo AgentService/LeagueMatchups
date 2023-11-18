@@ -24,43 +24,42 @@
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue';
-import { useStore } from 'vuex';
+import { ref, computed, reactive } from "vue";
+import { useStore } from "vuex";
 
 const store = useStore();
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 const userEmail = computed(() => store.state.auth.user?.email);
 const userName = computed(() => store.state.auth.user?.name);
-
 const form = reactive({
-  email: '',
-  password: '',
-  isSubmitting: false,
-  errorMessage: ''
+	email: "",
+	password: ""
 });
 
-const handleSubmit = async () => {
-  form.isSubmitting = true;
-  form.errorMessage = '';
+const isSubmitting = ref(false);
+const errorMessage = ref("");
 
-  try {
-    await store.dispatch('auth/login', {
-      email: form.email,
-      password: form.password,
-      // riotId: form.riotId,
-      // tag: form.tag
-    });
-    // Handle successful login
-  } catch (error) {
-    form.errorMessage = error.message || 'Failed to login';
-  } finally {
-    form.isSubmitting = false;
-  }
+const handleSubmit = async () => {
+	form.isSubmitting = true;
+	form.errorMessage = "";
+
+	try {
+		await store.dispatch("auth/login", {
+			email: form.email,
+			password: form.password
+			// Additional fields if needed
+		});
+		// Handle successful login
+	} catch (error) {
+		errorMessage.value = error.message || "Failed to login";
+	} finally {
+		isSubmitting.value = false;
+	}
 };
 
 const logout = () => {
-  store.dispatch('auth/logout');
-  // Handle logout process (like redirecting to login page)
+	store.dispatch("auth/logout");
+	// Handle logout process (like redirecting to login page)
 };
 </script>
 

@@ -110,86 +110,83 @@
 </template>
   
 <script setup>
-import { ref, computed, watch } from 'vue';
-import axios from 'axios';
-import { useStore } from 'vuex';
-import { debug } from 'debug';
+import { ref, computed } from "vue";
+import axios from "axios";
+import { useStore } from "vuex";
+import { debug } from "debug";
 
 // Define props
 const props = defineProps({
-    champion: {
-        type: Object,
-        default: () => ({ /* default object structure */ })
-    },
-    instanceId: {
-        type: Number,
-        required: true
-    }
+	champion: {
+		type: Object,
+		default: () => ({ /* default object structure */ })
+	},
+	instanceId: {
+		type: Number,
+		required: true
+	}
 });
 
 
-const championIdx = 'Sylas';
+const championIdx = "Sylas";
 const apiUrl = `http://localhost:3001/api/champions/${championIdx}`;
 const store = useStore();
 const championId = ref(props.champion?.id);
 
 const championTips = computed(() => {
-  // Zugriff auf den Getter im "matchups"-Modul
-  return store.getters['champions/getChampionTips'](championId.value);
+	// Zugriff auf den Getter im "matchups"-Modul
+	return store.getters["champions/getChampionTips"](championId.value);
 });
 
-debug('championTips', championTips.value);
+debug("championTips", championTips.value);
 axios.get(apiUrl)
-    .then((response) => {
-        console.log('Champion Info:', response.data);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+	.then((response) => {
+		console.log("Champion Info:", response.data);
+	})
+	.catch((error) => {
+		console.error("Error:", error);
+	});
 const selectTab = (tab) => {
-    activeTab.value = tab; // This now simply updates the local reactive state
+	activeTab.value = tab; // This now simply updates the local reactive state
 };
 
-watch(() => props.instanceId, (newVal, oldVal) => {
-    // Logic here if you need to do something when instanceId changes
-});
-const tabs = ['Abilities', 'Stats', 'Tips'];
-const activeTab = ref('Abilities'); // Default active tab, could be 'Stats' or 'Tips' based on your logic
+const tabs = ["Abilities", "Stats", "Tips"];
+const activeTab = ref("Abilities"); // Default active tab, could be 'Stats' or 'Tips' based on your logic
 
 const enemyTips = computed(() => {
-    console.log(props.champion);
-    return props.champion?.enemytips || [];
+	console.log(props.champion);
+	return props.champion?.enemytips || [];
 });
-const abilityLabels = ['Q', 'W', 'E', 'R'];
+const abilityLabels = ["Q", "W", "E", "R"];
 
 const getAbilityLabelByIndex = (index) => {
-    return abilityLabels[index] || ''; // Fallback to empty string if index is out of range
+	return abilityLabels[index] || ""; // Fallback to empty string if index is out of range
 };
 // Fixed selected stats keys
-const selectedStatKeys = ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'];
+const selectedStatKeys = ["hp", "armor", "spellblock", "attackdamage", "movespeed"];
 
 const getSpellImageUrl = (spell) => {
-    // Construct the URL for the spell image
-    return `./img/dragontail/13.21.1/img/spell/${spell.image.full}`;
+	// Construct the URL for the spell image
+	return `./img/dragontail/13.21.1/img/spell/${spell.image.full}`;
 };
 
 const getPassiveImageUrl = (passive) => {
-    // Construct the URL for the passive image
-    const path = `./img/dragontail/13.21.1/img/passive/${passive?.image.full}`;
-    return path;
+	// Construct the URL for the passive image
+	const path = `./img/dragontail/13.21.1/img/passive/${passive?.image.full}`;
+	return path;
 };
 const getStatImageUrl = (statKey) => {
-    const statIcons = {
-        AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
-        armor: 'StatModsArmorIcon.png',
-        attackdamage: 'StatModsAttackDamageIcon.png',
-        // CDR: 'StatModsCDRScalingIcon.png',
-        hp: 'StatModsHealthScalingIcon.png',
-        spellblock: 'StatModsMagicResIcon.png',
-        // abilitypower: 'StatModsAbilityPowerIcon.png',
-        movespeed: 'StatModsMovementSpeedIcon.png',
-    };
-    return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
+	const statIcons = {
+		AdaptiveForce: "StatModsAdaptiveForceIcon.png",
+		armor: "StatModsArmorIcon.png",
+		attackdamage: "StatModsAttackDamageIcon.png",
+		// CDR: 'StatModsCDRScalingIcon.png',
+		hp: "StatModsHealthScalingIcon.png",
+		spellblock: "StatModsMagicResIcon.png",
+		// abilitypower: 'StatModsAbilityPowerIcon.png',
+		movespeed: "StatModsMovementSpeedIcon.png",
+	};
+	return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
 };
 
 

@@ -80,147 +80,152 @@
 import Debug from "debug";
 const debug = Debug("app:component:LearingObjectives");
 export default {
-  data() {
-    return {
-      showLOs: false,
-      maxLOs: 3,
-      errorMessage: "", // To store and display error messages
-      categories: ["In-Game", "Out-of-Game"],
-      newLO: { name: "", weeks: 1, progress: 0, category: "In-Game" },
-      learningObjectives: [
-        { name: "Focus on first 10 min", startDate: new Date(), progress: 10, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
-        { name: "Lasthitting", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
-        { name: "Lasthitting", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+	data() {
+		return {
+			showLOs: false,
+			maxLOs: 3,
+			errorMessage: "", // To store and display error messages
+			categories: ["In-Game", "Out-of-Game"],
+			newLO: { name: "", weeks: 1, progress: 0, category: "In-Game" },
+			learningObjectives: [
+				{ name: "Skillshot Accuracy", startDate: new Date(), progress: 10, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Lasthitting", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Wave Management", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Thread Assesment", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Roaming", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Positioning", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Map Awareness", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
+				{ name: "Lane Assignments / Sidelaning", startDate: new Date(), progress: 55, started: true, category: "In-Game", endDate: this.addWeeksToDate(new Date(), 4) },
 
-        { name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
-        { name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
-        { name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
+				{ name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
+				{ name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
+				{ name: "Teamfights", startDate: new Date(), completed: true, progress: 100, started: true, category: "Out-of-Game", endDate: this.addWeeksToDate(new Date(), 6) },
 
 
-        // ... other placeholder LOs ...   
-      ]
-    };
-  },
+				// ... other placeholder LOs ...   
+			]
+		};
+	},
 
-  methods: {
-    toggleLOs() {
-      this.showLOs = !this.showLOs;
-    },
-    startLO(lo) {
-      debug("startLO", lo);
-      lo.started = true;
-      lo.startDate = new Date(); // Set the start date to now
-      lo.endDate = this.addWeeksToDate(lo.startDate, lo.weeks); // Set the endDate
-      this.calculateProgress(lo); // Calculate initial progress
-    },
-    addNewLO() {
-      debug("addNewLO", this.newLO);
-      const categoryLOs = this.learningObjectives.filter(lo => lo.category === this.newLO.category);
+	methods: {
+		toggleLOs() {
+			this.showLOs = !this.showLOs;
+		},
+		startLO(lo) {
+			debug("startLO", lo);
+			lo.started = true;
+			lo.startDate = new Date(); // Set the start date to now
+			lo.endDate = this.addWeeksToDate(lo.startDate, lo.weeks); // Set the endDate
+			this.calculateProgress(lo); // Calculate initial progress
+		},
+		addNewLO() {
+			debug("addNewLO", this.newLO);
+			const categoryLOs = this.learningObjectives.filter(lo => lo.category === this.newLO.category);
 
-      if (categoryLOs.length >= this.maxLOs) {
-        this.errorMessage = `You can only add up to ${this.maxLOs} Learning Objectives per category. Focus on the ones you have!`;
-      } else {
-        this.errorMessage = "";
-        if (this.newLO.name && this.newLO.weeks) {
-          this.calculateProgress(this.newLO);
-          const endDate = this.addWeeksToDate(new Date(), this.newLO.weeks);
+			if (categoryLOs.length >= this.maxLOs) {
+				this.errorMessage = `You can only add up to ${this.maxLOs} Learning Objectives per category. Focus on the ones you have!`;
+			} else {
+				this.errorMessage = "";
+				if (this.newLO.name && this.newLO.weeks) {
+					this.calculateProgress(this.newLO);
+					const endDate = this.addWeeksToDate(new Date(), this.newLO.weeks);
 
-          const newObjective = {
-            name: this.newLO.name,
-            weeks: this.newLO.weeks,
-            progress: 0,
-            started: true,
-            startDate: new Date(),
-            endDate: endDate, // Set the endDate property
-            category: this.newLO.category,
-          };
-          debug("addNewLO", newObjective);
-          this.learningObjectives.push(newObjective);
-          // Sort after adding
-          this.sortLOs();
-          // Reset the form
-          this.newLO = { name: "", weeks: 1, progress: 0, category: "In-Game", endDate: null };
-          // Provide visual feedback
-          this.provideFeedback("added");
-        }
-      }
+					const newObjective = {
+						name: this.newLO.name,
+						weeks: this.newLO.weeks,
+						progress: 0,
+						started: true,
+						startDate: new Date(),
+						endDate: endDate, // Set the endDate property
+						category: this.newLO.category,
+					};
+					debug("addNewLO", newObjective);
+					this.learningObjectives.push(newObjective);
+					// Sort after adding
+					this.sortLOs();
+					// Reset the form
+					this.newLO = { name: "", weeks: 1, progress: 0, category: "In-Game", endDate: null };
+					// Provide visual feedback
+					this.provideFeedback("added");
+				}
+			}
 
-    },
-    addWeeksToDate(date, weeks) {
-      return new Date(date.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
-    },
-    removeLO(index) {
-      debug("removeLO", index);
-      const removedLO = this.learningObjectives.splice(index, 1)[0];
-      this.provideFeedback("remove", removedLO);
-    },
-    calculateProgress(lo) {
-      if (!lo.started) return; // Skip calculation if the LO hasn't started
+		},
+		addWeeksToDate(date, weeks) {
+			return new Date(date.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+		},
+		removeLO(index) {
+			debug("removeLO", index);
+			const removedLO = this.learningObjectives.splice(index, 1)[0];
+			this.provideFeedback("remove", removedLO);
+		},
+		calculateProgress(lo) {
+			if (!lo.started) return; // Skip calculation if the LO hasn't started
 
-      const startDate = lo.startDate;
-      const endDate = new Date(startDate.getTime() + lo.weeks * 7 * 24 * 60 * 60 * 1000);
-      const now = new Date();
-      const totalDuration = endDate - startDate;
-      const timeElapsed = now - startDate;
-      lo.progress = Math.min(100, (timeElapsed / totalDuration) * 100);
-      lo.endDate = endDate; // Store the end date for sorting
-      if (lo.progress >= 100) {
-        lo.progress = 100;
-        lo.completed = true; // Set the completed flag
-        this.provideFeedback("add", this.newLO);
-      }
-    },
-    provideFeedback(type) {
-      // Trigger an animation or emit an event
-      // ... implementation depends on the type of feedback you want to provide ...
-    },
-    sortLOs() {
-      if (!this.learningObjectives || !Array.isArray(this.learningObjectives)) {
-        console.error("learningObjectives is undefined or not an array");
-        return; // Stop the function if learningObjectives is not an array
-      }
+			const startDate = lo.startDate;
+			const endDate = new Date(startDate.getTime() + lo.weeks * 7 * 24 * 60 * 60 * 1000);
+			const now = new Date();
+			const totalDuration = endDate - startDate;
+			const timeElapsed = now - startDate;
+			lo.progress = Math.min(100, (timeElapsed / totalDuration) * 100);
+			lo.endDate = endDate; // Store the end date for sorting
+			if (lo.progress >= 100) {
+				lo.progress = 100;
+				lo.completed = true; // Set the completed flag
+				this.provideFeedback("add", this.newLO);
+			}
+		},
+		provideFeedback(/*type, lo*/) {
+			// Trigger an animation or emit an event
+			// ... implementation depends on the type of feedback you want to provide ...
+		},
+		sortLOs() {
+			if (!this.learningObjectives || !Array.isArray(this.learningObjectives)) {
+				console.error("learningObjectives is undefined or not an array");
+				return; // Stop the function if learningObjectives is not an array
+			}
 
-      // Perform the sorting only if learningObjectives is an array
-      this.learningObjectives.sort((a, b) => {
-        // Make sure both a.endDate and b.endDate are valid Date objects
-        const aTime = a.endDate instanceof Date ? a.endDate.getTime() : 0;
-        const bTime = b.endDate instanceof Date ? b.endDate.getTime() : 0;
-        return aTime - bTime;
-      });
-    },
-  },
-  computed: {
-    categorizedObjectives() {
-      // This computed property organizes the LOs into categories
-      const categorized = this.categories.reduce((acc, category) => {
-        acc[category] = this.learningObjectives.filter(lo => lo.category === category);
-        return acc;
-      }, {});
+			// Perform the sorting only if learningObjectives is an array
+			this.learningObjectives.sort((a, b) => {
+				// Make sure both a.endDate and b.endDate are valid Date objects
+				const aTime = a.endDate instanceof Date ? a.endDate.getTime() : 0;
+				const bTime = b.endDate instanceof Date ? b.endDate.getTime() : 0;
+				return aTime - bTime;
+			});
+		},
+	},
+	computed: {
+		categorizedObjectives() {
+			// This computed property organizes the LOs into categories
+			const categorized = this.categories.reduce((acc, category) => {
+				acc[category] = this.learningObjectives.filter(lo => lo.category === category);
+				return acc;
+			}, {});
 
-      // Add any additional processing here if necessary
-      return categorized;
-    },
-    sortedObjectives() {
-      return this.learningObjectives
-        .filter(lo => lo.started && lo.endDate) // Filter for LOs that have started and have an endDate
-        .sort((a, b) => {
-          // Safely access the getTime method only on defined endDate properties
-          const aTime = a.endDate ? a.endDate.getTime() : 0;
-          const bTime = b.endDate ? b.endDate.getTime() : 0;
-          return aTime - bTime;
-        });
-    },
-    // sortedObjectives() {
-    // 	return this.learningObjectives
-    // 		.filter(lo => lo.started)
-    // 		.sort((a, b) => a.endDate.getTime() - b.endDate.getTime());
-    // },
-  },
-  mounted() {
-    this.learningObjectives.forEach((lo) => {
-      this.calculateProgress(lo);
-    });
-  },
+			// Add any additional processing here if necessary
+			return categorized;
+		},
+		sortedObjectives() {
+			return this.learningObjectives
+				.filter(lo => lo.started && lo.endDate) // Filter for LOs that have started and have an endDate
+				.sort((a, b) => {
+					// Safely access the getTime method only on defined endDate properties
+					const aTime = a.endDate ? a.endDate.getTime() : 0;
+					const bTime = b.endDate ? b.endDate.getTime() : 0;
+					return aTime - bTime;
+				});
+		},
+		// sortedObjectives() {
+		// 	return this.learningObjectives
+		// 		.filter(lo => lo.started)
+		// 		.sort((a, b) => a.endDate.getTime() - b.endDate.getTime());
+		// },
+	},
+	mounted() {
+		this.learningObjectives.forEach((lo) => {
+			this.calculateProgress(lo);
+		});
+	},
 };
 </script>
 

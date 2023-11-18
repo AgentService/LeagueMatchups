@@ -16,13 +16,11 @@
     },
     "plugins": [
       "@typescript-eslint",
-      "vue"
+      "vue",
+      "@stylistic" 
     ],
     "rules": {
-      "indent": [
-        "error",
-        "tab"
-      ],
+      "@stylistic/indent": ["error", "tab"], 
       "linebreak-style": [
         "error",
         "windows"

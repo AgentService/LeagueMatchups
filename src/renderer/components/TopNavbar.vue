@@ -3,6 +3,8 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <Login></Login>
+      <router-link to="/userJourney">User Journey</router-link>
+      <router-link to="/championMatchup">Champion Matchup</router-link>
 
       <div class="container-fluid justify-content-start" style="max-width: 1280px;">
         <div class="d-flex position-relative justify-content-start">
@@ -58,7 +60,7 @@
 </template>
 
 <script setup>
-import Login from "./Login.vue";
+import Login from "./LoginForm.vue";
 
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";
@@ -76,8 +78,8 @@ const level = computed(() => store.getters["summoner/level"]);
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 
 onMounted(async () => {
-  console.log("SummonerInfo mounted");
-  await store.dispatch("summoner/getSummonerData");
+	console.log("SummonerInfo mounted");
+	await store.dispatch("summoner/getSummonerData");
 });
 const summonerIcon = computed(() => {
 	const iconId = profileIconId.value;

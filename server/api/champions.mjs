@@ -1,147 +1,89 @@
-// ./api/champions.mjs
-import express from 'express';
-import { RiotAPI, DDragon } from '@fightmegg/riot-api';
-import Debug from 'debug';
-import { readJsonFile, writeJsonFile } from '../utils/fileOperations.mjs';
+import express from "express";
+import { RiotAPI, DDragon } from "@fightmegg/riot-api";
+import Debug from "debug";
+import { getLatestVersion } from "./utilities.mjs";
+import { readJsonFile } from "../utils/fileOperations.mjs";
+import schedule from "node-schedule"; // Make sure to install node-schedule package
 
-const debugApi = Debug('api');
+const debugApi = Debug("api");
 const router = express.Router();
 
 const rAPI = new RiotAPI(process.env.VITE_RIOT_API_KEY);
-const ddragon = new DDragon();
-const cacheDuration = 24 * 60 * 60; // 1 day in seconds
-let championDataCache;
-let isCacheBeingUpdated = false;
+const ddragon = new DDragon(rAPI);
+let championListCache = { data: null, version: null };
+let championDetailsCache = { data: null, version: null };
 
-async function getLatestVersion() {
-    try {
-        debugApi('Fetching latest version');
-        const versions = await rAPI.ddragon.versions.latest();
-        return versions;
-    } catch (error) {
-        console.log('Error fetching latest version:', error);
-        return null;
-    }
+async function fetchChampionList(currentVersion) {
+	try {
+		debugApi("Fetching champion list");
+		const listChampionsResponse = await ddragon.champion.all(currentVersion);
+		return listChampionsResponse.data;
+	} catch (error) {
+		console.error("Error fetching champion list:", error);
+		throw error;
+	}
 }
 
-async function updateChampionData() {
-    let championsList = {};
-    let championsDetails = {};
+async function fetchAllChampionDetails(currentVersion) {
+	let championsList = await fetchChampionList(currentVersion);
+	const allChampionDetails = {};
 
-    try {
-        const version = await getLatestVersion();
-        if (!version) {
-            throw new Error('Failed to retrieve the latest version.');
-        }
-        debugApi(`Updating champion data for version ${version}`);
-        const listChampionsResponse = await ddragon.champion.all(version);
-
-        // Store the basic data
-        championsList = listChampionsResponse.data;
-
-        // Fetch and store detailed data for each champion
-        for (const championKey in championsList) {
-            const championName = championsList[championKey].id;
-            const detailedDataResponse = await ddragon.champion.byName({
-                championName: championName,
-                version: version
-            });
-            // Assuming detailedDataResponse.data contains the details
-            championsDetails[championKey] = detailedDataResponse.data[championName];
-        }
-
-        debugApi('Champion data updated successfully.');
-        // debugApi('Champion data:', championsList['Aatrox'], championsDetails['Aatrox']);
-        // Return the structured data
-        const result = {
-            data: {
-                list: championsList,
-                details: championsDetails
-            },
-            timestamp: Date.now(),
-            version: version
-        };
-        return result;
-
-    } catch (error) {
-        console.error('Error updating champion data:', error);
-        return null;
-    }
+	for (const championKey in championsList) {
+		const championName = championsList[championKey].id;
+		const detailedDataResponse = await ddragon.champion.byName({ championName: championName, version: currentVersion });
+		allChampionDetails[championKey] = detailedDataResponse.data[championName];
+	}
+	return allChampionDetails;
 }
-
-
-// Initialize the cache on startup
-debugApi('Initializing champion data cache on startup.');
-initializeChampionDataCache();
-
-// Periodically update cache
-debugApi(`Updating champion data cache every ${cacheDuration} seconds.`);
-setInterval(initializeChampionDataCache, cacheDuration * 1000);
 
 async function initializeChampionDataCache() {
-    if (!isCacheBeingUpdated) {
-        debugApi('Updating champion data cache...');
-        isCacheBeingUpdated = true;
-        try {
-            const data = await updateChampionData();
-            if (data) {
-                championDataCache = data;
-                debugApi('Champion data cache updated successfully.');
-            }
-        } catch (error) {
-            console.log('Error updating champion data cache:', error);
-        }
-        isCacheBeingUpdated = false;
-    }
+	const currentVersion = await getLatestVersion();
+	if (currentVersion !== championListCache.version) {
+		try {
+			const championsList = await fetchChampionList(currentVersion);
+			const allChampionDetails = await fetchAllChampionDetails(currentVersion);
+
+			championListCache = { data: championsList, version: currentVersion };
+			championDetailsCache = { data: allChampionDetails, version: currentVersion };
+		} catch (error) {
+			console.log("Error updating champion data cache:", error);
+		}
+	}
 }
 
-const serveChampionData = async (req, res) => {
-    debugApi('Serving champion data...');
-    if (!championDataCache) {
-        try {
-            debugApi('Champion data cache is empty, fetching from server...');
-            championDataCache = await updateChampionData();
-            debugApi('Champion data cache updated successfully.');
-        } catch (error) {
-            console.log('Error fetching champion data:', error);
-            res.status(500).json({ error: 'Failed to fetch champion data' });
-            return;
-        }
-    }
-    res.set('Cache-Control', `public, max-age=${cacheDuration}`);
-    debugApi('Serving champion data from cache.');
-    res.json(championDataCache);
+const getChampionTips = (req, res) => {
+	const championId = req.params.championId;
+	const filePath = "./api-data/champion_data/ChampionInfos.json";
+
+	try {
+		const championData = readJsonFile(filePath);
+		if (championData[championId] && championData[championId]) {
+			res.json(championData[championId]);
+		} else {
+			console.log("Champion tips not found");
+			res.status(404).json({ error: "Champion tips not found" });
+		}
+	} catch (error) {
+		console.error("Error reading JSON file:", error);
+		res.status(500).json({ error: "Failed to read champion data file" });
+	}
 };
 
-const getChampionInfo = (req, res) => {
-    const championId = req.params.championId;
-    console.log('championId:', championId);
-    const filePath = './api-data/champion_data/ChampionInfos.json';
-    console.log(filePath);
-  
-    try {
-      const championData = readJsonFile(filePath);
-  
-      // Check if the requested champion exists in the data
-      if (championData[championId]) {
-        // Send the champion info as JSON response
-        res.json(championData[championId]);
-      } else {
-        // If the champion is not found, respond with an error
-        res.status(404).json({ error: 'Champion not found' });
-      }
-    } catch (error) {
-      // Handle file read or JSON parsing errors
-      console.error('Error reading JSON file:', error);
-      res.status(500).json({ error: 'Failed to read champion data file' });
-    }
-  };
+// Schedule cache updates every two weeks on Wednesday
+schedule.scheduleJob({ dayOfWeek: 3, hour: 0, minute: 0 }, initializeChampionDataCache);
+
+router.get("/list", (req, res) => {
+	res.json(championListCache);
+});
+
+router.get("/details", (req, res) => {
+	res.json(championDetailsCache);
+});
+
+router.get("/:championId/tips", getChampionTips); // New endpoint for champion tips
 
 
-
-router.get('/', serveChampionData); // Handles GET /api/champions
-router.get('/update', updateChampionData); // Handles GET /api/champions/update
-router.get('/:championId', getChampionInfo);
-
+// Initialize the cache on server startup
+initializeChampionDataCache();
 
 export default router;

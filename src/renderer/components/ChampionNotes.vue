@@ -26,7 +26,7 @@ export default {
 		const notes = ref(currentMatchup.value ? currentMatchup.value.notes : "");
 		const timeout = ref(null);
 
-		function saveNotes(newNotes) {
+		function saveNotes(/*newNotes*/) {
 			// store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
 			autoSaved.value = false;
 			// setTimeout(() => autoSaved.value = false, 3000);

@@ -1,7 +1,7 @@
 <template>
-	<div :class="[themeClass, 'note-card', 'text-light', 'h-100']">
+	<div :class="[themeClass, 'note-card', 'text-light', 'h-100', 'gradient-border']">
 		<!-- Search Bar -->
-		<div class="search-bar m-3">
+		<div class="search-bar m-3 ">
 			<input type="text" v-model="searchTerm" @input="filterChampions" @click="showGrid" placeholder="Search"
 				class="form-control" />
 		</div>
@@ -23,8 +23,8 @@
 				<div class="champion-detail" v-if="selectedChampion" v-show="!isGridVisible">
 					<div v-if="instanceId === 1"
 						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-center align-items-center">
-						<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
-							alt="Champion Image" />
+						<img class="champion-image" :ref="getInstanceIdRef"
+							:src="getChampionImageSource('tiles', selectedChampion.id)" alt="Champion Image" />
 					</div>
 					<!-- Stats Container - This will be on the opposite side of the image -->
 					<div v-if="instanceId === 1" class="stats-container col-md-3 order-md-1 d-flex">
@@ -49,8 +49,8 @@
 					<!-- For instanceId 2, the order is naturally reversed -->
 					<div v-if="instanceId === 2"
 						class="champion-image-container col-md-6 order-md-2 d-flex justify-content-center align-items-center">
-						<img class="champion-image" :src="getChampionImageSource('tiles', selectedChampion.id)"
-							alt="Champion Image" />
+						<img class="champion-image" :ref="getInstanceIdRef"
+							:src="getChampionImageSource('tiles', selectedChampion.id)" alt="Champion Image" />
 					</div>
 					<div v-if="instanceId === 2"
 						class="stats-container justify-content-start col-md-3 order-md-1 align-items-end">
@@ -133,7 +133,7 @@
   
 <script>
 import { useStore } from "vuex";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import gsap from "gsap";
 import Debug from "debug";
 const debug = Debug("app:component:ChampionSelection");
@@ -145,46 +145,38 @@ export default {
 			required: true
 		}
 	},
-	setup() {
+	setup(props) {
 		const elementToAnimate = ref(null);
-		onMounted(() => {
-			debug("Mounted");
-			// Define the animation for the blue theme
-			const blueAnimation = () => {
-				gsap.to(elementToAnimate.value, {
-					boxShadow: "0 0 15px 5px rgba(0, 253, 255, 1)", // Blue glow
-					borderColor: "#10FEFF", // Light blue
-					repeat: -1, // repeat indefinitely
-					yoyo: true, // go back and forth
-					ease: "power1.inOut",
-					duration: 1
-				});
-			};
 
-			// Define the animation for the red theme
-			const redAnimation = () => {
-				gsap.to(elementToAnimate.value, {
-					boxShadow: "0 0 28px 10px rgba(255, 0, 0, 1)", // Red glow
-					borderColor: "#FE1010", // Light red
-					repeat: -1, // repeat indefinitely
-					yoyo: true, // go back and forth
-					ease: "power1.inOut",
-					duration: 1
-				});
-			};
-
-			// Check the instanceId and apply the corresponding animation
-			if (this?.instanceId) {
-				debug("instanceId:", this.instanceId);
-				if (this.instanceId === 1) {
-					blueAnimation();
-				} else if (this.instanceId === 2) {
-					redAnimation();
-				}
+		const getInstanceIdRef = el => {
+			if (props.instanceId === 1 || props.instanceId === 2) {
+				elementToAnimate.value = el;
 			}
-		});
+		};
 
-		return { elementToAnimate };
+		const blueAnimation = () => {
+			gsap.to(elementToAnimate.value, {
+				boxShadow: "0 0 4px 5px rgba(0, 253, 255, 0.7)", // Blue glow
+				borderColor: "#41fcfc", // Light blue
+				repeat: -1, // repeat indefinitely
+				yoyo: true, // go back and forth
+				ease: "power1.inOut",
+				duration: 3
+			});
+		};
+
+		// Define the animation for the red theme
+		const redAnimation = () => {
+			gsap.to(elementToAnimate.value, {
+				boxShadow: "0 0 6px 5px rgba(255, 0, 0, 0.7)", // Red glow
+				borderColor: "#fa6969", // Light red
+				repeat: -1, // repeat indefinitely
+				yoyo: true, // go back and forth
+				ease: "power1.inOut",
+				duration: 3
+			});
+		};
+		return { elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef };
 	},
 	data() {
 
@@ -195,38 +187,36 @@ export default {
 			selectedChampions: [], // Initialize empty array
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
-			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'],
-			abilityLabels: ['Q', 'W', 'E', 'R'],
-			isStatsCollapsed: true,
+			selectedStatKeys: ["hp", "armor", "spellblock", "attackdamage", "movespeed"],
+			abilityLabels: ["Q", "W", "E", "R"],
+			isStatsCollapsed: false,
 		};
 	},
 
 	mounted() {
 		const store = useStore();
 
-		// Dispatch the action to fetch champion data
-		debug("Fetching champion data...");
-		store.dispatch("champions/fetchChampionData").then(() => {
-			const listChampionsData = store.state.champions.championList;
-			const detailedChampionsData = store.state.champions.championDetails;
-			// Store the full list of champions for filtering
-			this.champions = Object.values(detailedChampionsData);
+		debug("Retrieving champion data...");
 
-			// Optionally, initialize filteredChampions with the full list if you want
-			// all champions to be displayed before any search is performed.
-			// this.filteredChampions = [...this.champions];
+		store.dispatch("champions/retrieveChampionDetails").then(championsData => {
+
+			// const listChampionsData = championsData;
+			const detailedChampionsData = championsData.data;
+
+			// Use Object.values if the data is stored as an object
+			this.champions = detailedChampionsData ? Object.values(detailedChampionsData) : [];
 
 			// Determine and select a preselected champion based on instanceId
-			// Ensure there is a valid champion at the index before selecting
-			const preselectedChampionIndex = this.instanceId === 1 ? 0 : 1;
+			const preselectedChampionIndex = this.instanceId === 1 ? 1 : 2;
 			if (this.champions.length > preselectedChampionIndex) {
 				const preselectedChampion = this.champions[preselectedChampionIndex];
-				//this.selectChampion(preselectedChampion);
+				this.selectChampion(preselectedChampion);
 			}
 		}).catch(error => {
 			console.error("Error fetching champions:", error);
 		});
 	},
+
 	computed: {
 		filteredChampions() {
 			if (!this.searchTerm) return this.champions;
@@ -235,7 +225,7 @@ export default {
 			);
 		},
 		themeClass() {
-			return this.instanceId === 1 ? "blue-theme1" : "red-theme1";
+			return this.instanceId === 1 ? "blue-theme" : "red-theme";
 		},
 	},
 	methods: {
@@ -251,19 +241,19 @@ export default {
 			return `./img/dragontail/13.21.1/img/spell/${spell.image.full}`;
 		},
 		getAbilityLabelByIndex(index) {
-			return this.abilityLabels[index] || ''; // Fallback to empty string if index is out of range
+			return this.abilityLabels[index] || ""; // Fallback to empty string if index is out of range
 		},
 		getStatImageUrl(statKey) {
 			const statIcons = {
-				AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
-				armor: 'StatModsArmorIcon.png',
-				attackdamage: 'StatModsAttackDamageIcon.png',
+				AdaptiveForce: "StatModsAdaptiveForceIcon.png",
+				armor: "StatModsArmorIcon.png",
+				attackdamage: "StatModsAttackDamageIcon.png",
 				// CDR: 'StatModsCDRScalingIcon.png',
-				hp: 'StatModsHealthScalingIcon.png',
-				spellblock: 'StatModsMagicResIcon.png',
+				hp: "StatModsHealthScalingIcon.png",
+				spellblock: "StatModsMagicResIcon.png",
 				// abilitypower: 'StatModsAbilityPowerIcon.png',
-				movespeed: 'StatModsMovementSpeedIcon.png',
-				statToggle: 'StatModsButton.png'
+				movespeed: "StatModsMovementSpeedIcon.png",
+				statToggle: "StatModsButton.png"
 			};
 			return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
 		},
@@ -271,9 +261,9 @@ export default {
 		checkScrollable() {
 			const gridContainer = this.$refs.gridContainer; // You'll need to add a ref="gridContainer" to the element
 			if (gridContainer.scrollHeight > gridContainer.clientHeight) {
-				gridContainer.classList.add('is-scrollable');
+				gridContainer.classList.add("is-scrollable");
 			} else {
-				gridContainer.classList.remove('is-scrollable');
+				gridContainer.classList.remove("is-scrollable");
 			}
 		},
 		syncWithClient() {
@@ -302,12 +292,20 @@ export default {
 			this.hideGrid();
 			debug("Selected champion:", this.selectedChampion);
 			// Trigger the GSAP animation for the selected champion
-			this.animateChampion();
+			this.$nextTick(() => {
+				// Trigger the GSAP animation for the selected champion
+				this.animateChampion();
+			});
 			// Emit an event if you need to notify the parent component
 			this.$emit("championSelected", this.selectedChampion);
 		},
 		animateChampion() {
 			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
+			console.log("elementToAnimate:", this.elementToAnimate);
+
+			if (animation && this.elementToAnimate) {
+				animation();
+			}
 		},
 		getChampionImageSource(type, championId) {
 			switch (type) {
@@ -582,13 +580,11 @@ export default {
 	color: var(--gold-3);
 }
 
-/* Change the placeholder color */
 .search-bar input.form-control::placeholder {
 	color: var(--gold-3);
 	/* Set the placeholder text color to gold */
 }
 
-/* For the placeholder image */
 .champion-placeholder-image {
 	/* Your styles for the placeholder image */
 	color: var(--gold-3);
@@ -604,21 +600,14 @@ export default {
 
 .champion-name {
 	margin-top: 0.5rem;
-	/* Adds space above the champion name */
 	font-size: 1.25rem;
-	/* Sets the font size of the champion name */
 }
 
-/* Champion tile image */
 .champion-tile img {
 	max-width: 100%;
-	/* Ensure the image does not exceed its container */
 	display: block;
-	/* Images are inline by default; change this to block to allow for margin */
-	/* Space between the image and the name */
 }
 
-/* Champion tile name */
 .champion-tile span {
 	display: block;
 	text-shadow: 1px 1px 2px var(--blue-6);
@@ -636,9 +625,7 @@ export default {
 	text-align: center;
 }
 
-/* This will contain the champion image and name centered */
 
-/* This will ensure the image fits well */
 .champion-image {
 	/* Full width of the container */
 	max-width: 155px;
@@ -646,70 +633,6 @@ export default {
 	height: auto;
 }
 
-.blue-theme .champion-image {
-	display: block;
-	overflow: hidden;
-	border: 3px solid var(--blue-laser-1);
-}
-
-/* .blue-theme .note-card {
-	color: var(--blue-laser-1);
-}
-
-.red-theme .note-card {
-	color: var(--red-laser-1);
-} */
-
-
-.red-theme .champion-image {
-	display: block;
-	border: 3px solid var(--red-laser-1);
-}
-
-.blue-theme .champion-image {
-	border: 3px solid var(--blue-laser-2);
-	animation: blue-glow 2s infinite alternate;
-}
-
-.red-theme .champion-image {
-	border: 3px solid var(--red-laser-1);
-	animation: red-glow 2s infinite alternate;
-}
-
-@keyframes red-glow {
-
-	0%,
-	100% {
-		border-color: var(--red-laser-2);
-		/* Red */
-		box-shadow: 0 0 18px 4px var(--red-laser-1);
-		/* Red glow */
-	}
-
-	50% {
-		border-color: var(--red-laser-1);
-		box-shadow: 0 0 14px 4px var(--red-laser-2);
-		/* Constant Red glow */
-	}
-}
-
-@keyframes blue-glow {
-
-	0%,
-	100% {
-		border-color: var(--blue-laser-2);
-		/* Blue */
-		box-shadow: 0 0 18px 4px var(--blue-laser-1);
-		/* Blue glow */
-	}
-
-	50% {
-		border-color: var(--blue-laser-1);
-		box-shadow: 0 0 14px 4px var(--blue-laser-2);
-		/* Constant Blue glow */
-		/* Red glow */
-	}
-}
 
 /* Scrollbar styles for the search bar or its container */
 .champion-grid::-webkit-scrollbar {
@@ -735,6 +658,48 @@ export default {
 	height: 2rem;
 }
 
+.blue-theme .champion-image {
+	will-change: box-shadow, border-color;
+
+	box-shadow: 0 0 5px 5px rgba(0, 253, 255, 1);
+	border-color: #10FEFF;
+	border: 2px solid #10FEFF;
+	/* animation: blue-glow 1s ease-in infinite ; */
+}
+
+.red-theme .champion-image {
+	will-change: box-shadow, border-color;
+	box-shadow: 0 0 5px 5px rgba(255, 0, 0, 1);
+	border-color: #FE1010;
+	border: 2px solid #fe1010;
+}
+
+@keyframes blue-glow {
+
+	0% {
+		box-shadow: 0 0 3px 3px rgba(0, 253, 255, 1);
+		border-color: #10FEFF;
+	}
+
+	100% {
+		box-shadow: 0 0 3px 3px rgba(0, 253, 255, 10);
+		border-color: #10FEFF;
+	}
+}
+
+@keyframes red-glow {
+
+	0% {
+		box-shadow: 0 0 3px 3px rgba(255, 0, 0, 1);
+		border-color: #FE1010;
+	}
+
+	100% {
+		box-shadow: 0 0 3px 3px rgb(255, 0, 0);
+		border-color: #FE1010;
+	}
+}
+
 
 .champion-image-container {
 	position: relative;
@@ -752,4 +717,5 @@ export default {
 
 .stat-value {
 	font-size: 0.9rem;
-}</style>
+}
+</style>

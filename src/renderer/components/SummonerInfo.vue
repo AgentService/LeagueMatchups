@@ -49,8 +49,8 @@ const level = computed(() => store.state.summonerData?.summonerLevel);
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 
 onMounted(async () => {
-  console.log("SummonerInfo mounted");
-  await store.dispatch("summonerData/getSummonerData");
+	console.log("SummonerInfo mounted");
+	await store.dispatch("summonerData/getSummonerData");
 });
 
 </script>

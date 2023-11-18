@@ -1,5 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import router from './router';
+
 import VueLazyload from "vue3-lazy";
 import { store } from "../store/index.js"; // Import your Vuex store
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -22,7 +24,7 @@ const vueApp = createApp(App);
 vueApp.use(VueLazyload, {
 	// options...
 });
-  
+vueApp.use(router);  
 vueApp.use(store);
 vueApp.mount("#app");
 
