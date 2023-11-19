@@ -42,7 +42,8 @@
         "uniqueMechanics": "Sylas's unique mechanic is his 'Hijack' ability, allowing him to steal and use enemy ultimates. This requires knowledge of all champions to maximize effectiveness.",
         "situationalTips": "Sylas is an excellent pick when facing teams with high-impact ultimates. He excels in compositions that require a versatile AP bruiser who can adapt to various roles in fights."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Orianna": {
     "championTips": {
@@ -87,7 +88,8 @@
         "uniqueMechanics": "Orianna's unique mechanic involves her ball, which she moves with her abilities. This offers a unique playstyle of indirect control and positioning.",
         "situationalTips": "Orianna is a strong pick in compositions that benefit from AoE control and in scenarios where the team needs a reliable backline mage with both offensive and defensive capabilities."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Syndra": {
     "championTips": {
@@ -132,7 +134,8 @@
         "uniqueMechanics": "Syndra's unique mechanic is her ability to create and manipulate spheres, which interact with all her other abilities. This allows for creative play and combination of skills.",
         "situationalTips": "Syndra is a strong pick against champions who struggle against burst damage and have limited mobility. She excels in team compositions that can capitalize on her stun and zoning capabilities."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Viktor": {
     "championTips": {
@@ -177,7 +180,8 @@
         "uniqueMechanics": "Viktor's unique mechanic is his 'Hex Core', which allows him to augment his abilities, offering a unique scaling path and customization of his skillset.",
         "situationalTips": "Viktor is an excellent pick in team compositions that require strong wave clear and late-game damage. He excels against teams that lack the mobility to dodge his 'Death Ray' and 'Gravity Field'."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Zed": {
     "championTips": {
@@ -222,7 +226,8 @@
         "uniqueMechanics": "Zed's unique mechanics revolve around his 'Living Shadow', which mirrors his abilities and offers a tool for mobility, juking, and increased damage.",
         "situationalTips": "Zed is an excellent pick against squishy, immobile champions. He thrives in compositions that can distract or split the enemy team, allowing him to isolate and eliminate key targets."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Akali": {
     "championTips": {
@@ -267,7 +272,8 @@
         "uniqueMechanics": "Akali's unique mechanic is her 'Twilight Shroud', providing temporary stealth and a unique way to maneuver in fights. Her passive 'Assassin's Mark' enhances her burst and energy management.",
         "situationalTips": "Akali is a strong pick against squishy targets and in team compositions that can distract or disorient the enemy, allowing her to isolate and eliminate key targets."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Yasuo": {
     "championTips": {
@@ -312,7 +318,8 @@
         "uniqueMechanics": "Yasuo's unique mechanics include his 'Wind Wall' for blocking projectiles and his double critical strike chance, emphasizing a build focused on critical hits.",
         "situationalTips": "Yasuo is a strong pick in team compositions with other knock-up abilities to maximize his 'Last Breath' potential. He thrives against teams with important projectiles that his 'Wind Wall' can block."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Yone": {
     "championTips": {
@@ -357,7 +364,8 @@
         "uniqueMechanics": "Yone's unique mechanics include his dual-damage nature and his 'E - Soul Unbound', which allows for aggressive plays with a safety net. His 'R - Fate Sealed' is a powerful AoE knock-up tool.",
         "situationalTips": "Yone is a strong pick in compositions that benefit from mixed damage and require a champion capable of reaching the backline. He's effective against teams with less mobility and fewer crowd control tools."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Ahri": {
     "championTips": {
@@ -402,7 +410,8 @@
         "uniqueMechanics": "Ahri's unique mechanic is her 'Charm', which not only provides crowd control but also amplifies the damage of her other abilities on the charmed target.",
         "situationalTips": "Ahri is a strong pick in compositions that require mobility and pick potential. She excels against squishy targets and teams that lack reliable ways to lock her down."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Vex": {
     "championTips": {
@@ -447,7 +456,8 @@
         "uniqueMechanics": "Vex's unique mechanic is her focus on countering mobility with her passive, making her particularly effective against dash-heavy champions.",
         "situationalTips": "Vex is an excellent pick against teams with multiple mobile champions. She excels in controlling tight spaces and punishing over-aggressive plays."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Katarina": {
     "championTips": {
@@ -492,7 +502,8 @@
         "uniqueMechanics": "Katarina's unique mechanic revolves around her dagger pickups, which reset her 'Shunpo' and provide burst damage. Her ultimate 'Death Lotus' is a key tool for damage in team fights.",
         "situationalTips": "Katarina is a strong pick against teams with limited crowd control and squishy compositions. She thrives in chaotic fights where she can utilize her mobility and resets effectively."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Lissandra": {
     "championTips": {
@@ -537,7 +548,8 @@
         "uniqueMechanics": "Lissandra's unique mechanic is her 'Frozen Tomb', which can be self-cast for invulnerability or on enemies for engage. Her passive, 'Iceborn Subjugation', creates a frozen thrall from fallen enemies, adding to her AoE control.",
         "situationalTips": "Lissandra is a strong pick in compositions that require reliable engage and crowd control. She's effective against teams with high mobility or squishy compositions that can be easily locked down."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "LeBlanc": {
     "championTips": {
@@ -582,7 +594,8 @@
         "uniqueMechanics": "LeBlanc's unique mechanics include her ability to mimic spells with 'Mimic', creating opportunities for double casts and increased damage or deception. Her 'Distortion' ability allows for quick repositioning, essential for her playstyle.",
         "situationalTips": "LeBlanc is a strong pick against squishy compositions and in scenarios where the enemy team lacks reliable crowd control. She thrives in games where she can roam freely and create pressure across the map."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Kassadin": {
     "championTips": {
@@ -627,7 +640,8 @@
         "uniqueMechanics": "Kassadin's unique mechanic, 'Riftwalk', allows for unparalleled mobility and stacking damage, making him a threat the longer he stays in the fight.",
         "situationalTips": "Kassadin is a strong pick against magic-heavy teams and excels in games where he can safely reach his late-game potential. He thrives in chaotic team fights where he can utilize 'Riftwalk' to its fullest."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Neeko": {
     "championTips": {
@@ -672,7 +686,8 @@
         "uniqueMechanics": "Neeko's unique mechanic is her passive 'Inherent Glamour', which allows her to disguise as an ally, creating opportunities for surprise attacks or escapes.",
         "situationalTips": "Neeko is a strong pick in compositions that benefit from AoE crowd control and burst damage. She excels against teams that clump together and can be easily caught in her ultimate."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Taliyah": {
     "championTips": {
@@ -717,7 +732,8 @@
         "uniqueMechanics": "Taliyah's unique mechanic revolves around 'Worked Ground', which changes the way her 'Threaded Volley' works after use, and her ability to create terrain with 'Weaver's Wall'.",
         "situationalTips": "Taliyah is a strong pick in compositions that benefit from roaming and objective control. She excels against teams that struggle with dealing with terrain manipulation and zone control."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Talon": {
     "championTips": {
@@ -762,7 +778,8 @@
         "uniqueMechanics": "Talon's E ability, 'Assassin's Path,' allows him to leap over walls, unique to his kit and crucial for his playstyle. His passive, 'Blade's End,' applies bleed stacks, culminating in significant damage.",
         "situationalTips": "Talon is a strong pick against squishy mid-laners and in team compositions lacking crowd control. He's less effective against tank-heavy teams and in games with strong early vision control."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Annie": {
     "championTips": {
@@ -807,7 +824,8 @@
         "uniqueMechanics": "Annie's unique mechanic revolves around her passive 'Pyromania,' which provides a stun every four spell casts. Her ultimate summons Tibbers, which can be controlled and deals continuous damage around him.",
         "situationalTips": "Annie is a strong pick against teams with low mobility and in compositions that benefit from AoE crowd control. She can struggle against high mobility teams or those with strong engage/disengage tools."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Xerath": {
     "championTips": {
@@ -852,7 +870,8 @@
         "uniqueMechanics": "Xerath's unique mechanic is his incredible range, particularly with his Q and ultimate. His Q 'Arcanopulse' charges for increased range, and his ultimate 'Rite of the Arcane' has one of the longest ranges in the game.",
         "situationalTips": "Xerath is a strong pick against teams lacking mobility or hard engage. He thrives in compositions that can protect him and allow him to freely poke from a distance. He struggles against high-mobility assassins and teams with strong engage."
       }
-    }
+    },
+    "version": "13.22.1"
   },
   "Zoe": {
     "championTips": {
@@ -897,6 +916,7 @@
         "uniqueMechanics": "Zoe's unique mechanics include her ability to pick up and use enemy summoner spells and item actives with her W. Her R 'Portal Jump' allows her to briefly teleport to a location and then return, which can be used creatively for positioning and skillshot setups.",
         "situationalTips": "Zoe is a strong pick against teams with low mobility and squishy targets. She can struggle against tanky teams and champions with strong engage or lockdown capabilities."
       }
-    }
+    },
+    "version": "13.22.1"
   }
 }
