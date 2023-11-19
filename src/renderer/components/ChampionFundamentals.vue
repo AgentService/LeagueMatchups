@@ -46,15 +46,15 @@ const autoSaved = ref(false);
 const localNotes = ref(""); // Initially empty
 const isSaved = ref(false); // Reactive state for save status
 
-watch(currentMatchup, (newMatchup) => {
-	debug("New matchup:", newMatchup);
-	localNotes.value = newMatchup?.notes || "";
-}, { immediate: true });
+// watch(currentMatchup, (newMatchup) => {
+// 	debug("New matchup:", newMatchup);
+// 	localNotes.value = newMatchup?.notes || "";
+// }, { immediate: true });
 
-watch(localNotes, () => {
-	// Reset save status when notes are edited
-	isSaved.value = false;
-});
+// watch(localNotes, () => {
+// 	// Reset save status when notes are edited
+// 	isSaved.value = false;
+// });
 
 function saveNotes() {
 	if (currentMatchup.value && currentMatchup.value.id) {

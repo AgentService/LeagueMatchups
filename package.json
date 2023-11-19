@@ -58,9 +58,11 @@
     "node-schedule": "^2.1.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "volar-service-vetur": "^0.0.17",
     "vue": "^3.2.47",
     "vue-router": "^4.2.5",
     "vue3-lazy": "^1.0.0-alpha.1",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persist": "^3.1.3"
   }
 }

@@ -51,8 +51,9 @@ app.use(passport.initialize());
 // console.log('111:', process.env);
 
 // Centralized error handling
-app.use((error, req, res, ) => {
-	console.error(error);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((error, req, res, next ) => {
+	//console.error(error);
 	res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
 });
 

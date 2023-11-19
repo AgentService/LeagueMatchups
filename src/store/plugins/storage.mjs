@@ -1,10 +1,4 @@
 // storage.js
-import axios from "axios";
-//@ts-check
-
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
-const VERSION_ENDPOINT = `${baseUrl}/api/utilities/version`; // Adjust the URL as needed
-
 const cacheDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 
@@ -19,58 +13,14 @@ fetchDataAndCache('championData', '/api/champions', '/api/version', 'SET_CHAMPIO
 fetchDataAndCache('temporaryStats', '/api/tempStats', '/api/version', 'SET_TEMP_STATS', 'session');
 */
 
-/* Fetches data from an API endpoint and caches it. If the data is already cached
- * and is valid, it uses the cached data instead of fetching from the API.
- * 
- * @param {Object} options - The options for fetching and caching data.
- * @param {string} options.type - The type of data being handled (e.g., 'championData').
- * @param {string} options.apiEndpoint - The API endpoint to fetch data from.
- * @param {string} options.vuexMutation - The Vuex mutation type to commit the fetched data.
- * @param {Function} options.commit - The Vuex `commit` function to update the state.
- * @param {string} [options.storageType='local'] - The type of storage to use ('local' or 'session').
- * @param {boolean} [options.skipCacheValidation=false] - Whether to skip cache validation and always fetch new data.
- * @returns {Promise<Object>} A promise that resolves to the fetched (or cached) data.
- */
-export async function fetchDataAndCache(options) {
-	const {
-		type,
-		apiEndpoint,
-		vuexMutation,
-		commit,
-		storageType = "local",
-		skipCacheValidation = false
-	} = options;
-
-	let data = retrieveData(storageType, type);
-	const storedVersion = retrieveData(storageType, type + "Version");
-	const response = await axios.get(VERSION_ENDPOINT);
-	const currentVersion = response.data.version;
-
-	if (!data || currentVersion !== storedVersion || skipCacheValidation) {
-		const dataResponse = await axios.get(`${baseUrl}${apiEndpoint}`);
-		data = dataResponse.data;
-		saveData(storageType, type, data);
-		saveData(storageType, type + "Version", currentVersion);
-		commit(vuexMutation, data);
-	} else {
-		// Retrieve and use cached data if it's valid and cache validation is not skipped
-		const cachedData = retrieveData(storageType, type);
-		if (cachedData) {
-			commit(vuexMutation, cachedData);
-			data = cachedData; // Update 'data' to be the cached data
-		}
-	}
-	return data;
-}
-
 
 const storageOperations = {
-	"local": {
+	'local': {
 		save: saveToLocalStorage,
 		retrieve: retrieveFromLocalStorage,
 		remove: removeFromLocalStorage
 	},
-	"session": {
+	'session': {
 		save: saveToSessionStorage,
 		retrieve: retrieveFromSessionStorage,
 		remove: removeFromSessionStorage

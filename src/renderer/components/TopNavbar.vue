@@ -72,13 +72,11 @@ const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 // const accountData = computed(() => store.getters["summoner/accountData"]);
 // const summonerData = computed(() => store.getters["summoner/summonerData"]);
 const riotIdParts = computed(() => store.getters["summoner/riotIdParts"]);
-console.log(riotIdParts.value);
 const profileIconId = computed(() => store.getters["summoner/profileIconId"]);
 const level = computed(() => store.getters["summoner/level"]);
 const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
 
 onMounted(async () => {
-	console.log("SummonerInfo mounted");
 	await store.dispatch("summoner/getSummonerData");
 });
 const summonerIcon = computed(() => {

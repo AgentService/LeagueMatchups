@@ -133,7 +133,7 @@
   
 <script>
 import { useStore } from "vuex";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import gsap from "gsap";
 import Debug from "debug";
 const debug = Debug("app:component:ChampionSelection");
@@ -195,28 +195,17 @@ export default {
 
 	mounted() {
 		const store = useStore();
+        const championsData = computed(() => store.state.champions.championList);
 
-		debug("Retrieving champion data...");
+		this.champions = championsData ? Object.values(championsData.value) : [];
 
-		store.dispatch("champions/retrieveChampionDetails").then(championsData => {
-
-			// const listChampionsData = championsData;
-			const detailedChampionsData = championsData.data;
-
-			// Use Object.values if the data is stored as an object
-			this.champions = detailedChampionsData ? Object.values(detailedChampionsData) : [];
-
-			// Determine and select a preselected champion based on instanceId
-			const preselectedChampionIndex = this.instanceId === 1 ? 1 : 2;
-			if (this.champions.length > preselectedChampionIndex) {
-				const preselectedChampion = this.champions[preselectedChampionIndex];
-				this.selectChampion(preselectedChampion);
-			}
-		}).catch(error => {
-			console.error("Error fetching champions:", error);
-		});
+		// Determine and select a preselected champion based on instanceId
+		const preselectedChampionIndex = this.instanceId === 1 ? 1 : 2;
+		if (this.champions.length > preselectedChampionIndex) {
+			const preselectedChampion = this.champions[preselectedChampionIndex];
+			this.selectChampion(preselectedChampion);
+		}
 	},
-
 	computed: {
 		filteredChampions() {
 			if (!this.searchTerm) return this.champions;
@@ -301,8 +290,6 @@ export default {
 		},
 		animateChampion() {
 			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
-			console.log("elementToAnimate:", this.elementToAnimate);
-
 			if (animation && this.elementToAnimate) {
 				animation();
 			}

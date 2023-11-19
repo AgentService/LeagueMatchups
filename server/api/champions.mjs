@@ -57,8 +57,8 @@ const getChampionTips = (req, res) => {
 
 	try {
 		const championData = readJsonFile(filePath);
-		if (championData[championId] && championData[championId]) {
-			res.json(championData[championId]);
+		if (championData[championId]) {
+			res.json({ championId, ...championData[championId] });
 		} else {
 			console.log("Champion tips not found");
 			res.status(404).json({ error: "Champion tips not found" });

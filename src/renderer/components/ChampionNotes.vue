@@ -7,7 +7,7 @@
       </transition>
     </div>
     <div class="card-body">
-      <textarea v-model="notes" placeholder="Reference Points, Midgame, Threadassesment, Next spike,  CHALLENGE:  2 week SLOW DOWN EARLY" class="note-textarea " rows="4"></textarea>
+      <textarea v-model="personalNotes" placeholder="Reference Points, Midgame, Threadassesment, Next spike,  CHALLENGE:  2 week SLOW DOWN EARLY" class="note-textarea " rows="4"></textarea>
     </div>
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
 		const store = useStore();
 		const currentMatchup = computed(() => store.getters.getCurrentMatchup);
 		const autoSaved = ref(false);
-		const notes = ref(currentMatchup.value ? currentMatchup.value.notes : "");
+		const personalNotes = ref(currentMatchup.value ? currentMatchup.value.personalNotes : "");
 		const timeout = ref(null);
 
 		function saveNotes(/*newNotes*/) {
@@ -32,7 +32,7 @@ export default {
 			// setTimeout(() => autoSaved.value = false, 3000);
 		}
 
-		watch(notes, (newNotes) => {
+		watch(personalNotes, (newNotes) => {
 			clearTimeout(timeout.value);
 			timeout.value = setTimeout(() => {
 				saveNotes(newNotes);
@@ -42,12 +42,12 @@ export default {
 		watch(currentMatchup, (newMatchup, oldMatchup) => {
 			if (newMatchup !== oldMatchup) {
 				debug("Matchup changed, updating notes...");
-				notes.value = newMatchup?.notes;
+				personalNotes.value = newMatchup?.personalNotes;
 			}
 		});
 
 		return {
-			notes,
+			personalNotes,
 			autoSaved,
 			saveNotes,
 		};

@@ -16,23 +16,29 @@ import { retrieveFromLocalStorage } from "../store/plugins/storage.mjs";
 import Debug from "debug";
 
 if (import.meta.env.MODE !== "production") {
-	Debug.enable(import.meta.env.VITE_DEBUG);
+  Debug.enable(import.meta.env.VITE_DEBUG);
+}
+const vueApp = createApp(App);
+async function initializeApp() {
+  await store.dispatch('utilities/initializeApp');
 }
 
-const vueApp = createApp(App);
+initializeApp().then(() => {
+  const vueApp = createApp(App);
+  vueApp.use(VueLazyload, {
+    // options...
+  });
 
-vueApp.use(VueLazyload, {
-	// options...
+  vueApp.use(router);
+  vueApp.use(store); // Use the Vuex store
+
+  vueApp.mount('#app');
 });
-vueApp.use(router);  
-vueApp.use(store);
-vueApp.mount("#app");
 
-// Check for token in local storage
+// Check for token in local storage and re-authenticate if present
 const tokenJson = retrieveFromLocalStorage('token');
 if (tokenJson) {
-    // Re-authenticate the user with the token's data
-    store.dispatch('auth/reauthenticate', tokenJson);
+  store.dispatch('auth/reauthenticate', tokenJson);
 }
 
 initializeSummonerDataFetching();

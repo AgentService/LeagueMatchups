@@ -8,7 +8,6 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 function getAuthConfig() {
 	const token = retrieveFromLocalStorage('token');
-	console.log("xxx", token.data)
 	return {
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -22,16 +21,13 @@ export const matchups = {
 	state: {
 		championA: null,
 		championB: null,
-		matchups: [],
+		matchupList: [],
 		currentMatchup: null, // Holds the currently selected matchup
 	},
 	getters: {
 		getChampionA: state => state.championA,
 		getChampionB: state => state.championB,
-		getCurrentMatchup: (state) => {
-			console.log('getCurrentMatchup', state.currentMatchup);
-			return state.currentMatchup;
-		},    // ...other getters
+		getCurrentMatchup: (state) => state.currentMatchup,
 	},
 	mutations: {
 		SET_CHAMPION_A(state, champion) {
@@ -40,11 +36,8 @@ export const matchups = {
 		SET_CHAMPION_B(state, champion) {
 			state.championB = champion;
 		},
-		SET_MATCHUPS_DATA(state, matchups) {
-			state.matchups = matchups;
-		},
 		CLEAR_MATCHUPS(state) {
-			state.matchups = [];
+			state.matchupList = [];
 		},
 		SET_CURRENT_MATCHUP(state, matchup) {
 			state.championA = matchup.champions[0];
@@ -53,87 +46,50 @@ export const matchups = {
 			debug("Current matchup:", state.currentMatchup)
 		},
 		ADD_OR_UPDATE_MATCHUP(state, oMatchup) {
-			const index = state.matchups.findIndex((m) => m.id === oMatchup.id);
+			const index = state.matchupList.findIndex((m) => m.id === oMatchup.id);
 
 			if (index !== -1) {
-				state.matchups[index] = oMatchup;
+				state.matchupList[index] = oMatchup;
 			} else {
-				state.matchups.push(oMatchup);
+				state.matchupList.push(oMatchup);
 			}
 		},
 		UPDATE_NOTES(state, payload) {
 			// Find the matchup with the given id
-			const matchup = state.matchups.find(m => m.id === payload.matchupId);
+			const matchup = state.matchupList.find(m => m.id === payload.matchupId);
 
 			if (matchup) {
 				// Update the notes of the found matchup
-				matchup.notes = payload.notes;
+				matchup.personalNotes = payload.notes;
 			}
 		}
 	},
 	actions: {
-		// async fetchSelectedMatchup({ commit }, matchupId) {
-		//     debug('Fetching matchup with id:', matchupId);
-		//     try {
-		//         const response = await axios.get(`${baseUrl}/api/matchups/${matchupId}`);
-		//         commit('SET_CURRENT_MATCHUP', response.data);
-		//     } catch (error) {
-		//         console.error('Error fetching the matchup:', error);
-		//     }
-		// },
-		// async fetchMatchups({ commit }) {
-		//     debug('Fetching matchups');
-		//     let matchupsData = retrieveFromLocalStorage('matchupsData');
-
-		//     if (!matchupsData) {
-		//         try {
-		//             debug('Fetching matchups from server');
-		//             const response = await axios.get('/api/matchups');
-		//             matchupsData = response.data;
-		//             saveToLocalStorage('matchupsData', matchupsData);
-		//             commit('SET_MATCHUPS_DATA', matchupsData);
-		//         } catch (error) {
-		//             console.error('Error fetching matchups data:', error);
-		//         }
-		//     } else {
-		//         debug('Matchups loaded from local storage');
-		//         commit('SET_MATCHUPS_DATA', matchupsData);
-		//     }
-		// },
-		async handleMatchupCreation({ commit }, { id, champions: [championA, championB] }) {
-			// Check if the matchup is already in local storage
-			let matchups = retrieveFromLocalStorage("matchupsData") || {};
-			if (!matchups[id]) {
-				// Matchup not found in local storage, check the server
-				try {
-					debug("Fetching matchup from server");
-					const config = getAuthConfig();
-					const response = await axios.get(`${baseUrl}/api/matchups/${id}`, config);
-					if (response.data.message === "Matchup not found") {
-						// Create new matchup if it doesn't exist on the server
-						const newMatchupData = {
-							id: id,
-							champions: [{ id: championA.id, name: championA.name }, { id: championB.id, name: championB.name }],
-							notes: ""
-						};
-						await axios.post(`${baseUrl}/api/matchups`, newMatchupData);
-						matchups[id] = newMatchupData; // Add new matchup to local object
-					} else {
-						matchups[id] = response.data; // Use existing matchup from server
-					}
-				} catch (error) {
-					console.error("Error fetching or creating matchup data:", error);
-					// Handle error appropriately
+		async handleMatchupCreation({ commit, rootState, dispatch }, { id, champions: [championA, championB] }) {
+			// Check if the matchup is already in vuex state
+			if (rootState.matchups.matchupList && rootState.matchups.matchupList.length > 0) {
+				const existingMatchup = rootState.matchups.matchupList.find((matchup) => matchup.id === id);
+				if (existingMatchup) {
+					commit("SET_CURRENT_MATCHUP", existingMatchup);
+					return existingMatchup;
 				}
 			}
 
-			// At this point, matchups[id] is either loaded from local storage, fetched from the server, or created new
-			commit("SET_CURRENT_MATCHUP", matchups[id]); // Commit to Vuex state
-			debug("Matchup data:", matchups[id])
-			// If you need to update the list of matchups in the state as well
-			commit("ADD_OR_UPDATE_MATCHUP", matchups[id]);
+			const config = getAuthConfig();
+			// Fetch the matchup data using fetchDataAndCache
+			var matchupData = await dispatch('fetchDataAndCache', {
+				module: 'matchups',
+				type: 'currentMatchup',
+				apiEndpoint: `/api/matchups/${id}`,
+				vuexMutation: 'matchups/ADD_OR_UPDATE_MATCHUP',
+				skipCacheValidation: true,
+				auth: config,
+			}, { root: true });
 
-			return matchups[id]; // Return the matchup data
+			// Commit the fetched matchup data to Vuex state
+			commit("SET_CURRENT_MATCHUP", matchupData);
+
+			return matchupData;
 		},
 		setChampionA({ commit }, payload) {
 			commit("SET_CHAMPION_A", payload);
@@ -145,10 +101,9 @@ export const matchups = {
 		async saveNotes({ commit, state }, payload) {
 			try {
 				const config = getAuthConfig();
-				const response = await axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { notes: payload.notes }, config);
+				const response = await axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { personalNotes: payload.personalNotes }, config);
 				debug("Notes updated:", response.data);
-				commit("UPDATE_NOTES", payload);
-				saveToLocalStorage("matchupsData", state.matchups);
+				commit("UPDATE_NOTES", response.data);
 			} catch (error) {
 				console.error("Error updating notes:", error);
 				// Handle error appropriately

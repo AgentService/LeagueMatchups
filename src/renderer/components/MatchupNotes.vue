@@ -28,7 +28,7 @@ const isSaved = ref(false); // Reactive state for save status
 
 watch(currentMatchup, (newMatchup) => {
 	debug("New matchup:", newMatchup);
-	localNotes.value = newMatchup?.notes || "";
+	localNotes.value = newMatchup?.personalNotes || "";
 }, { immediate: true });
 
 watch(localNotes, () => {
@@ -37,8 +37,10 @@ watch(localNotes, () => {
 });
 
 function saveNotes() {
+  console.log('saveNotes')
+  console.log(currentMatchup.value)
 	if (currentMatchup.value && currentMatchup.value.id) {
-		store.dispatch("matchups/saveNotes", { matchupId: currentMatchup.value.id, notes: localNotes.value });
+		store.dispatch("matchups/saveNotes", { matchupId: currentMatchup.value.id, personalNotes: localNotes.value });
 		isSaved.value = true; // Indicate that notes are saved
 	}
 }

@@ -43,45 +43,45 @@ import { computed, ref, defineProps, watch } from "vue";
 import { useStore } from "vuex";
 
 const props = defineProps({
-	champion: Object,
-	instanceId: Number
+  champion: Object,
+  instanceId: Number
 });
 
 const store = useStore();
 const championId = ref(props.champion?.id);
 const championTips = computed(() => {
-	return store.getters["champions/getChampionTips"](championId.value);
+  return store.getters["champions/getChampionTips"](championId);
 });
 const selectedTip = ref(null);
 
 const formatCategory = (key) => {
-	if (!key) return "";
-	key = key.replace(/([A-Z])/g, " $1").toLowerCase();
-	key = key.replace(/^\w|\s\w/g, (str) => str.toUpperCase());
-	return key.trim();
+  if (!key) return "";
+  key = key.replace(/([A-Z])/g, " $1").toLowerCase();
+  key = key.replace(/^\w|\s\w/g, (str) => str.toUpperCase());
+  return key.trim();
 };
 
 const getIconForKey = (category) => {
-	const icons = {
-		"identity": "fa-solid fa-user-circle",
-		"strengths": "fa-solid fa-thumbs-up",
-		"weaknesses": "fa-solid fa-thumbs-down",
-		"earlygame": "fa-solid fa-hourglass-start",
-		"midgame": "fa-solid fa-hourglass-half",
-		"lategame": "fa-solid fa-hourglass-end",
-		"teamfight": "fa-solid fa-shield-alt",
-		"counter": "fa-solid fa-ban",
-		"mindset": "fa-solid fa-brain",
-		"insights": "fa-solid fa-lightbulb",
-		// Define more icons for other categories if needed
-	};
-	return icons[category] || "fa-solid fa-question-circle"; // Fallback icon
+  const icons = {
+    "identity": "fa-solid fa-user-circle",
+    "strengths": "fa-solid fa-thumbs-up",
+    "weaknesses": "fa-solid fa-thumbs-down",
+    "earlygame": "fa-solid fa-hourglass-start",
+    "midgame": "fa-solid fa-hourglass-half",
+    "lategame": "fa-solid fa-hourglass-end",
+    "teamfight": "fa-solid fa-shield-alt",
+    "counter": "fa-solid fa-ban",
+    "mindset": "fa-solid fa-brain",
+    "insights": "fa-solid fa-lightbulb",
+    // Define more icons for other categories if needed
+  };
+  return icons[category] || "fa-solid fa-question-circle"; // Fallback icon
 };
 
 watch(() => props.champion, (newChampion) => {
-	if (newChampion && newChampion.id !== championId.value) {
-		championId.value = newChampion.id;
-	}
+  if (newChampion && newChampion.id !== championId.value) {
+    championId.value = newChampion.id;
+  }
 }, { immediate: true });
 
 </script>
@@ -200,4 +200,5 @@ watch(() => props.champion, (newChampion) => {
 .tip-details::-webkit-scrollbar-track {
   background-color: #000000;
   /* Replace with your desired track color */
-}</style>
+}
+</style>
