@@ -10,7 +10,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./custom.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
 
-import { initializeSummonerDataFetching } from "../services/summonerDataService";
+import { initializeSummonerDataFetching, startSummonerNameCheck } from "../services/summonerDataService";
 import { retrieveFromLocalStorage } from "../store/plugins/storage.mjs";
 
 import Debug from "debug";
@@ -45,3 +45,4 @@ if (tokenJsonString) {
 }
 
 initializeSummonerDataFetching();
+startSummonerNameCheck();

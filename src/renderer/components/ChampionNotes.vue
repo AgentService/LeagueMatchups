@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="card-body ">
-        <textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea zeee" rows="8"></textarea>
+        <textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea zeee" rows="11"></textarea>
     </div>
 </template>
 

@@ -6,17 +6,24 @@
 		</div>
 	</div>
 	<div class="card-header d-flex justify-content-between align-items-center">
-		<span class="mt-2">Match History</span>
-		<div class="buttons-container">
-			<button class="btn" v-if="!selectedMatch" @click="fetchAndShowLastMatch">
-				<i class="fas fa-refresh"></i></button>
-			<button class="btn" @click="clearFilter">
-				Clear Filter
+		<span class="d-flex align-items-center">Match History
+			<button class="btn " v-if="!selectedMatch" @click="fetchAndShowLastMatch">
+				<i class="fas fa-refresh"></i>
 			</button>
-			<button class="btn" @click="filterMatchesByChampion">
-				<img :src="getChampionImageSource('small', championB.id)" alt="Champion" class="champion-icon">
-				Only
-			</button>
+		</span>
+		<div class="filter-container">
+			<div class="filter-header">
+				<i class="text-secondary fa-solid fa-filter"></i>
+			</div>
+			<div class="buttons-container d-flex align-items-center justify-content-between">
+				<button class="btn" @click="clearFilter">
+					<i class="fa-solid fa-ban fa-lg"></i>
+				</button>
+				<button class="btn" @click="filterMatchesByChampion">
+					<img :src="getChampionImageSource('small', championB?.id)" alt="Champion" class="champion-icon-filter">
+				</button>
+			</div>
+
 		</div>
 	</div>
 	<!-- List of matches -->
@@ -29,7 +36,7 @@
 
 			<div class="match-card-body">
 
-				<img :src="getChampionImageSource('small', getChampionNameById(getPlayerChampion(match).championId))"
+				<img :src="getChampionImageSource('small', getChampionNameById(getPlayerChampion(match)?.championId))"
 					alt="Your Champion" class="champion-icon">
 				<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">
 					{{ isWin(match) ? 'Win' : 'Loss' }}
@@ -109,7 +116,7 @@
 					class="participant-row">
 					<div class="participant-stats">
 						<div class="champion-column">
-							<img :src="getChampionImageSource('small', getChampionNameById(participant.championId))"
+							<img :src="getChampionImageSource('small', getChampionNameById(participant?.championId))"
 								alt="Champion Image" class="champion-image">
 						</div>
 						<div class="summoner-name">
@@ -131,7 +138,7 @@
 	</div>
 </template>
 <script>
-import { computed, ref, reactive } from 'vue';
+import { computed, ref, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { onMounted } from 'vue';
 
@@ -139,8 +146,10 @@ export default {
 	name: 'MatchHistory',
 	setup() {
 		const store = useStore();
-		const summonerData = computed(() => store.getters['summoner/summonerData']);
+
+		const summonerData = computed(() => store.getters['summoner/currentSummonerData']);
 		const summonerId = computed(() => summonerData.value ? summonerData.value.puuid : '');
+
 		const championDetails = computed(() => store.state.champions.championDetails);
 		const championB = computed(() => store.getters['matchups/getChampionB']);
 		const filterApplied = ref(false);
@@ -148,8 +157,14 @@ export default {
 		const selectedMatch = ref(null);
 		const filteredMatches = ref([]);
 
+		watch(summonerId, (newId, oldId) => {
+			if (newId && newId !== oldId) {
+				fetchAndShowLastMatch(newId);
+			}
+		});
+
 		const showAllMatches = () => {
-			filteredMatches.value = store.getters['matches/getLastMatch'];
+			filteredMatches.value = store.getters['matches/getMatchHistory'];
 		};
 
 		const clearFilter = () => {
@@ -158,7 +173,7 @@ export default {
 		};
 
 		const filterMatchesByChampion = () => {
-			filteredMatches.value = store.getters['matches/getLastMatch'].filter(match => {
+			filteredMatches.value = store.getters['matches/getMatchHistory'].filter(match => {
 				const myParticipant = match.info.participants.find(p => p.puuid === summonerId.value);
 				const isMyTeamFirstHalf = myParticipant.participantId <= 5;
 				const enemyParticipants = match.info.participants.slice(isMyTeamFirstHalf ? 5 : 0, isMyTeamFirstHalf ? 10 : 5);
@@ -182,7 +197,7 @@ export default {
 				return [];
 			}
 			// If filteredMatches is empty and filter has not been applied, return all matches
-			return store.getters['matches/getLastMatch'].filter(match =>
+			return store.getters['matches/getMatchHistory']?.filter(match =>
 				match.info.gameType === 'MATCHED_GAME'
 			);
 		});
@@ -196,6 +211,7 @@ export default {
 
 		onMounted(() => {
 			store.dispatch('items/fetchAllItems');
+			fetchAndShowLastMatch();
 		});
 		const hideTooltip = () => {
 			tooltip.itemId = null; // Reset the currently hovered item when mouse leaves
@@ -230,9 +246,6 @@ export default {
 			}
 		};
 
-
-
-
 		const fetchAndShowLastMatch = async () => {
 			if (summonerId.value) {
 				await store.dispatch('matches/fetchLastMatch', { summonerId: summonerId.value, region: 'euw1' });
@@ -255,7 +268,7 @@ export default {
 
 		const getChampionNameById = (championId) => {
 			for (const key in championDetails.value) {
-				if (championDetails.value[key].key === championId.toString()) {
+				if (championDetails.value[key].key === championId?.toString()) {
 					return key; // Der Schlüsselname entspricht dem Champion-Namen
 				}
 			}
@@ -290,6 +303,9 @@ export default {
 
 		const getPlayerChampion = (match) => {
 			const participant = match.info.participants.find((p) => p.puuid === summonerId.value);
+			if (!participant) {
+				return "";
+			}
 			return participant;
 		};
 
@@ -308,7 +324,7 @@ export default {
 
 		// Funktion, um den Pfad zum Champion-Bild zu erhalten
 		const getChampionImageSource = (type, championId) => {
-			const sanitizedChampionId = championId.replace(/\s+/g, '');
+			const sanitizedChampionId = championId?.replace(/\s+/g, '');
 
 			switch (type) {
 				case 'small':
@@ -407,6 +423,23 @@ export default {
 
 
 <style scoped>
+.filter-container {
+	border: 1px solid var(--grey-3);
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	padding: 0 1rem;
+}
+
+.filter-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-right: 1px solid var(--grey-3);
+	padding-right: .5rem;
+}
+
 .tooltips {
 	position: absolute;
 	background-color: var(--hextech-black);
@@ -622,6 +655,13 @@ export default {
 	height: 50px;
 	border-radius: 50%;
 	border: 3px solid #333;
+}
+
+.champion-icon-filter {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 3px solid var(--grey-2);
 }
 
 .stat-header {

@@ -39,7 +39,6 @@ async function fetchAllChampionDetails(currentVersion) {
 
 async function initializeChampionDataCache() {
 	const currentVersion = await getLatestVersion();
-	if (currentVersion !== championListCache.version) {
 		try {
 			const championsList = await fetchChampionList(currentVersion);
 			const allChampionDetails = await fetchAllChampionDetails(currentVersion);
@@ -49,7 +48,6 @@ async function initializeChampionDataCache() {
 		} catch (error) {
 			console.log("Error updating champion data cache:", error);
 		}
-	}
 }
 
 const getChampionTips = (req, res) => {

@@ -13,6 +13,7 @@ import Navbar from './components/TopNavbar.vue';
 
 
 onMounted(() => {
+	console.log('App mounted');
 	// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 	// store.dispatch("champions/retrieveChampionData");
 });

@@ -166,7 +166,7 @@ export const champions = {
           type: "championTips",
           apiEndpoint: `/api/champions/${championId}/tips`,
           vuexMutation: "champions/SET_CHAMPION_TIPS",
-          skipCacheValidation: false,
+          skipCacheValidation: true,
           itemId: championId,
         },
         { root: true }

@@ -18,6 +18,9 @@ ipcMain.on('get-summoner-name', async (event) => {
     console.log('Summoner Name:', summonerName);
     // Send the summoner name back to the renderer process
     event.reply('summoner-name-response', summonerName);
+  } else {
+	// Send an error message back to the renderer process
+	event.reply('summoner-name-response', null);
   }
 });
 

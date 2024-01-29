@@ -1,47 +1,58 @@
-import axios from 'axios';
+import axios from "axios";
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import { getAuthConfig } from "./utilities.js";
 
 export const matches = {
   namespaced: true,
   state: () => ({
-    lastMatch: null,
-	lastThirtyGames: [],
+    matchHistory: null,
+    lastThirtyGames: [],
   }),
   getters: {
-    getLastMatch: (state) => state.lastMatch,
+    getMatchHistory: (state) => state.matchHistory,
   },
   mutations: {
-    SET_LAST_MATCH(state, match) {
-      state.lastMatch = match;
+    SET_MATCH_HISTORY(state, match) {
+      state.matchHistory = match;
     },
-	SET_LAST_THIRTY_GAMES(state, games) { 
-		state.lastThirtyGames = games;
-	  },
+    SET_LAST_THIRTY_GAMES(state, games) {
+      state.lastThirtyGames = games;
+    },
   },
   // In deinem Vuex-Store-Modul (z.B. matches.js)
-actions: {
-	async fetchLastMatch({ commit, rootGetters }) {
-	  const puuid = rootGetters['summoner/summonerData'].puuid;
-	  const count = 5; // Anzahl der abzurufenden Spiele ändern auf 5
+  actions: {
+    async fetchLastMatch({ commit, state, rootGetters, dispatch }) {
+      const puuid = rootGetters["summoner/currentSummonerData"]?.puuid || "";
+      const count = 8; // Number of matches to fetch
 
-	  console.log('Fetching last match for PUUID:', puuid); // Überprüfe die PUUID
+      if (!puuid) {
+        console.error("PUUID is missing");
+        return;
+      }
 
-	  if (!puuid) {
-		console.error('PUUID is missing');
-		return;
-	  }
-  
-	  try {
-        const response = await axios.get(`${baseUrl}/api/matches/last-match/${puuid}`);
-		console.log('Response:', response.data); // Überprüfe die Server-Antwort
+      const config = getAuthConfig();
 
-		commit('SET_LAST_MATCH', response.data);
-	  } catch (error) {
-		console.error('Error fetching the last match:', error);
-	  }
-	},
+      const options = {
+        module: "matches", // Assuming 'match' is the Vuex module where this data will be stored
+        type: "matchHistory", // A specific type identifier for this data
+        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`, // API endpoint to fetch data
+        vuexMutation: "matches/SET_MATCH_HISTORY", // Mutation type to commit the fetched data
+        itemId: puuid, // Unique identifier for caching purposes
+        commit, // Passing the Vuex commit function
+        state, // Passing the Vuex state
+        auth: config,
+      };
+
+      try {
+        const data = await dispatch("fetchDataAndCache", options, {
+          root: true,
+        });
+        console.log("Fetched Last Match Data:", data);
+      } catch (error) {
+        console.error("Error fetching the last match:", error);
+      }
+    },
   },
-  
 };
 
 export default matches;

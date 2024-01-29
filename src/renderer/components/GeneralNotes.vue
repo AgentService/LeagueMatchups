@@ -6,7 +6,7 @@
 		</transition>
 		<div class="buttons-container">
 			<button @click="createNewNote" class="btn add-button">
-				<i class="fas fa-plus"></i> <!-- Changed icon for adding -->
+				<i class="fas fa-plus"></i> 
 			</button>
 		</div>
 	</div>
@@ -81,7 +81,6 @@ const formatDate = (date) => {
 };
 
 const fetchNotes = async () => {
-	// Fetch notes logic
 	noteText.value = store.state.generalNotes.notesByDate;
 };
 

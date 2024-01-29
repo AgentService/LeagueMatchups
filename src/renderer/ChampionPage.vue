@@ -34,7 +34,7 @@
 								</div> -->
 								<div class="row position-relative">
 									<!-- Champion Search for User's Champion -->
-									<div class="col-xxl-7">
+									<div class="col-xxl-6">
 										<div class="card card-top mb-0 ">
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 										</div>
@@ -47,7 +47,7 @@
 										<span>vs</span>
 									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-5">
+									<div class="col-xxl-6">
 										<div class="card card-top mb-0">
 											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 										</div>
@@ -149,6 +149,7 @@ function getBackgroundStyle(champion) {
 }
 
 onMounted(async () => {
+	console.log('ChampionPage mounted');
 });
 const handleMatchup = () => {
 
@@ -232,7 +233,6 @@ function getChampionImageSource(type, championId) {
 
 .buttons-container {
 	display: flex;
-	justify-content: flex-end;
 	gap: 5px;
 }
 
@@ -244,7 +244,7 @@ function getChampionImageSource(type, championId) {
 	z-index: 100;
 	font-size: 3rem;
 	top: 20%;
-	right: 450px;
+	right: 48%;
 	width: 40px;
 	height: 40px;
 	padding: 1rem;
@@ -291,7 +291,7 @@ function getChampionImageSource(type, championId) {
 .card-container {
 	display: flex;
 	flex-direction: column;
-	background-image: linear-gradient(to right, #030608, #060d12);
+	background: var(--card-background);
 	padding: 1rem;
 	margin-bottom: 1rem;
 	border-radius: 6px;
@@ -303,12 +303,13 @@ function getChampionImageSource(type, championId) {
 	display: flex;
 	flex-direction: column;
 	border: 2px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #030608, #060d12);
+	background-image: linear-gradient(to right, #091014, #0a141c);
 	box-shadow: 4px 8px 12px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 400px;
+	max-height: 370px;
+	min-height: 370px;
 	z-index: auto;
 }
 
