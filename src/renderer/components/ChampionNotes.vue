@@ -1,107 +1,85 @@
 <template>
-  <div class="card">
-    <div class="card-header d-flex justify-content-center align-items-center">
-      <h5 class="mb-0">Champion Notes</h5>
-      <transition name="fade">
-        <i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
-      </transition>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Champion Notes</span>
+        <transition name="fade">
+            <i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
+        </transition>
+        <div class="buttons-container">
+            <button @click="saveChampionNotes" :class="['btn', 'save-button', { 'btn-success': isSaved }]">
+                <i class="far fa-save"></i>
+            </button>
+        </div>
     </div>
-    <div class="card-body">
-      <textarea v-model="personalNotes" placeholder="Reference Points, Midgame, Threadassesment, Next spike,  CHALLENGE:  2 week SLOW DOWN EARLY" class="note-textarea " rows="4"></textarea>
+    <div class="card-body ">
+        <textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea zeee" rows="8"></textarea>
     </div>
-  </div>
 </template>
 
-<script>
-import { computed, ref, watch } from "vue";
-import { useStore } from "vuex";
-import Debug from "debug";
-const debug = Debug("app:component:MatchupNotes");
 
-export default {
-	setup() {
-		const store = useStore();
-		const currentMatchup = computed(() => store.getters.getCurrentMatchup);
-		const autoSaved = ref(false);
-		const personalNotes = ref(currentMatchup.value ? currentMatchup.value.personalNotes : "");
-		const timeout = ref(null);
+<script setup>
+import { computed, ref, watch, onMounted } from 'vue';
+import { useStore } from 'vuex';
 
-		function saveNotes(/*newNotes*/) {
-			// store.dispatch('saveNotes', { matchupId: currentMatchup.value.id, notes: newNotes });
-			autoSaved.value = false;
-			// setTimeout(() => autoSaved.value = false, 3000);
-		}
+import Debug from 'debug';
+const debug = Debug('app:component:ChampionNotes');
+const store = useStore();
 
-		watch(personalNotes, (newNotes) => {
-			clearTimeout(timeout.value);
-			timeout.value = setTimeout(() => {
-				saveNotes(newNotes);
-			}, 1000);
+// Computed property for getting current champion A
+const championA = computed(() => store.getters['matchups/getChampionA']);
+const championId = ref(''); // Initialize as an empty string
+const editableNotes = ref('');
+
+const autoSaved = ref(false);
+const isSaved = ref(false);
+
+// Function to fetch and set the notes for the current champion
+async function fetchAndSetNotes(currentChampionId) {
+	await store.dispatch('champions/fetchCustomChampionData', { championId: currentChampionId });
+	editableNotes.value = store.getters['champions/getChampionCustomData'](currentChampionId).personalNotes || '';
+	isSaved.value = false;
+}
+
+// Watch for changes in championA and update championId and notes accordingly
+watch(championA, async (newChampionA) => {
+	if (newChampionA && newChampionA.id !== championId.value) {
+		championId.value = newChampionA.id;
+		await fetchAndSetNotes(championId.value);
+	}
+}, { immediate: true });
+
+onMounted(async () => {
+	if (championA.value && championA.value.id) {
+		championId.value = championA.value.id;
+		await fetchAndSetNotes(championId.value);
+	}
+});
+
+async function saveChampionNotes() {
+	try {
+		await store.dispatch('champions/updateCustomChampionData', {
+			championId: championId.value,
+			dataToUpdate: editableNotes.value,
+			type: 'notes'
 		});
+		isSaved.value = true;
 
-		watch(currentMatchup, (newMatchup, oldMatchup) => {
-			if (newMatchup !== oldMatchup) {
-				debug("Matchup changed, updating notes...");
-				personalNotes.value = newMatchup?.personalNotes;
-			}
-		});
+		// Set a timer to revert isSaved back to false after 2 seconds
+		setTimeout(() => {
+			isSaved.value = false;
+		}, 1000);
 
-		return {
-			personalNotes,
-			autoSaved,
-			saveNotes,
-		};
-	},
-};
+	} catch (error) {
+		console.error('Error saving notes:', error);
+		// Handle error
+	}
+}
+
 </script>
 
+
+
 <style scoped>
-   
 
-.note-textarea {
-  border-radius: 10px;
-  resize:none;
-  height: 100%;
-  width: 100%;
-  border-color: var(--grey-4);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  background:var(--background-1-gradient);
-  color: var(--gold-2);
-  font-family: 'Arial', sans-serif;
-  line-height: 1.5;
-  padding: 0.5rem;
 
-}
-.note-textarea:focus {
-  outline: none;
-  border-color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 1); /* Slightly more opaque on focus */
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); /* Adding a glow effect */
-}
-.note-textarea::placeholder {
-  color: #A9A9A9; /* Lighter than the text color for subtlety */
-  font-style: italic;
-}
-.note-textarea {
-  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
-}
-.note-textarea:hover {
-  background-color: rgba(255, 255, 255, 1); /* Slightly more visible on hover */
-}
-.card-header {
-  padding: 0.75rem 1.25rem;
-}
 
-/* Transition styles for fade effect */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-
-.fade-enter-to, .fade-leave-from {
-  opacity: 1;
-}
 </style>

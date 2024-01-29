@@ -1,130 +1,164 @@
 // store/index.js
-import { createStore } from 'vuex';
-import { summoner } from './modules/summoner.js';
-import { matchups } from './modules/matchups.js'; // Import the new matchups module
-import { champions } from './modules/champions.js';
-import { auth } from './modules/auth.js';
-import { init } from './modules/init.js';
-import { validateApiResponse, handleApiError } from './modules/utilities.js';
+import { createStore } from "vuex";
+import { summoner } from "./modules/summoner.js";
+import { matchups } from "./modules/matchups.js"; // Import the new matchups module
+import { matches } from "./modules/matches.js"; // Import the new matchups module
+import { items } from "./modules/items";
+import { generalNotes } from "./modules/generalNotes.js";
 
-import VuexPersistence from 'vuex-persist';
-import axios from 'axios';
+import { champions } from "./modules/champions.js";
+import { auth } from "./modules/auth.js";
+import { init } from "./modules/init.js";
+import { validateApiResponse, handleApiError } from "./modules/utilities.js";
+
+import VuexPersistence from "vuex-persist";
+import axios from "axios";
 
 const vuexLocal = new VuexPersistence({
-	storage: window.localStorage, // or window.sessionStorage
-	modules: ['champions', 'matchups', 'init', 'auth'],
-	reducer: (state) => ({
-		champions: state.champions,
-		matchups: state.matchups,
-		init: state.init,
-		auth: {
-			...state.auth,
-			token: undefined, // Exclude the token
-		},
-	})
+  storage: window.localStorage, // or window.sessionStorage
+  modules: [
+    "champions",
+    "matchups",
+    "init",
+    "auth",
+    "matches",
+    "items",
+    "generalNotes",
+  ],
+  reducer: (state) => ({
+    champions: state.champions,
+    matchups: state.matchups,
+    init: state.init,
+    auth: {
+      ...state.auth,
+      token: undefined, // Exclude the token
+    },
+    matches: state.matches,
+    items: state.items,
+    generalNotes: state.generalNotes,
+  }),
 });
-const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export const store = createStore({
-	modules: {
-		summoner: summoner,
-		champions: champions,
-		matchups: matchups,
-		auth: auth,
-		init: init
-	},
+  modules: {
+    summoner: summoner,
+    champions: champions,
+    matchups: matchups,
+    auth: auth,
+    init: init,
+    matches: matches,
+    items: items,
+	generalNotes: generalNotes,
+  },
 
-	actions: {
-		/* GENERIC UTILITY FUNCTION
-		* Fetches data from an API endpoint and caches it. If the data is already cached
-		* and is valid, it uses the cached data instead of fetching from the API.
-		* 
-		* @param {Object} options - The options for fetching and caching data.
-		* @param {string} options.type - The type of data being handled (e.g., 'championData').
-		* @param {string} options.apiEndpoint - The API endpoint to fetch data from.
-		* @param {string} options.vuexMutation - The Vuex mutation type to commit the fetched data.
-		* @param {string} [options.itemId] - The id of the item to fetch (e.g., champion id).
-		* @param {Function} options.commit - The Vuex `commit` function to update the state.
-		* @param {string} [options.storageType='local'] - The type of storage to use ('local' or 'session').
-		* @param {boolean} [options.skipCacheValidation=false] - Whether to skip cache validation and always fetch new data.
-		* @returns {Promise<Object>} A promise that resolves to the fetched (or cached) data.
-		*/
-		// Modify fetchDataAndCache to only fetch data based on options
-		async fetchDataAndCache({ commit, state }, options) {
-			const {
-				module,
-				type,
-				apiEndpoint,
-				vuexMutation,
-				itemId,
-				skipCacheValidation = false,
-				authConfig = {},
-			} = options;
+  actions: {
+    /* GENERIC UTILITY FUNCTION
+     * Fetches data from an API endpoint and caches it. If the data is already cached
+     * and is valid, it uses the cached data instead of fetching from the API.
+     *
+     * @param {Object} options - The options for fetching and caching data.
+     * @param {string} options.type - The type of data being handled (e.g., 'championData').
+     * @param {string} options.apiEndpoint - The API endpoint to fetch data from.
+     * @param {string} options.vuexMutation - The Vuex mutation type to commit the fetched data.
+     * @param {string} [options.itemId] - The id of the item to fetch (e.g., champion id).
+     * @param {Function} options.commit - The Vuex `commit` function to update the state.
+     * @param {string} [options.storageType='local'] - The type of storage to use ('local' or 'session').
+     * @param {boolean} [options.skipCacheValidation=false] - Whether to skip cache validation and always fetch new data.
+     * @returns {Promise<Object>} A promise that resolves to the fetched (or cached) data.
+     */
+    // Modify fetchDataAndCache to only fetch data based on options
+    async fetchDataAndCache({ commit, state }, options) {
+      const {
+        module,
+        type,
+        apiEndpoint,
+        vuexMutation,
+        itemId,
+        skipCacheValidation = false,
+        authConfig = {},
+      } = options;
 
-			// Check cache validity based on the specific item
-			const cachedItem = itemId ? state[module][type][itemId] : state[module][type];
+      // Check cache validity based on the specific item
+      let cachedItem;
 
-			// Use data from Vuex state if available and valid
-			if (!skipCacheValidation && cachedItem && !isEmpty(cachedItem)) {
-				return cachedItem;
-			}
+      if (state[module] && state[module][type]) {
+        cachedItem = itemId ? state[module][type][itemId] : state[module][type];
+      }
+      // Use data from Vuex state if available and valid
+      if (!skipCacheValidation && cachedItem && !isEmpty(cachedItem)) {
+        return cachedItem;
+      }
 
-			// Fetch data based on provided options
-			try {
-				const response = await axios.get(`${baseUrl}` + apiEndpoint, authConfig);
-				const data = validateApiResponse(response);
-				commit(vuexMutation, data);
-				return data;
-			} catch (error) {
-				return handleApiError(error);
-			}
-		},
+      // Fetch data based on provided options
+      try {
+        const response = await axios.get(
+          `${baseUrl}` + apiEndpoint,
+          authConfig
+        );
+        const data = validateApiResponse(response);
+        commit(vuexMutation, data);
+        return data;
+      } catch (error) {
+        return handleApiError(error);
+      }
+    },
 
-		async postDataAndCache({ commit }, options) {
-			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+    async postDataAndCache({ commit }, options) {
+      const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
 
-			try {
-				const response = await axios.post(`${baseUrl}` + apiEndpoint, data, authConfig);
-				const newData = validateApiResponse(response);
-				commit(vuexMutation, newData);
-				return newData;
-			} catch (error) {
-				return handleApiError(error);
-			}
-		},
+      try {
+        console.log("Full URL:", `${baseUrl}${apiEndpoint}`);
 
-		async putDataAndCache({ commit }, options) {
-			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+        const response = await axios.post(
+          `${baseUrl}` + apiEndpoint,
+          data,
+          authConfig
+        );
+        const newData = validateApiResponse(response);
+        commit(vuexMutation, newData);
+        return newData;
+      } catch (error) {
+        return handleApiError(error);
+      }
+    },
 
-			try {
-				const response = await axios.put(`${baseUrl}` + apiEndpoint, data, authConfig);
-				const updatedData = validateApiResponse(response);
-				commit(vuexMutation, updatedData);
-				return updatedData;
-			} catch (error) {
-				return handleApiError(error);
-			}
-		}
-		,
-		async patchDataAndCache({ commit }, options) {
-			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+    async putDataAndCache({ commit }, options) {
+      const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
 
-			try {
-				const response = await axios.patch(`${baseUrl}` + apiEndpoint, data, authConfig);
-				const updatedData = validateApiResponse(response);
-				commit(vuexMutation, updatedData);
-				return updatedData;
-			} catch (error) {
-				return handleApiError(error);
-			}
-		},
+      try {
+        const response = await axios.put(
+          `${baseUrl}` + apiEndpoint,
+          data,
+          authConfig
+        );
+        const updatedData = validateApiResponse(response);
+        commit(vuexMutation, updatedData);
+        return updatedData;
+      } catch (error) {
+        return handleApiError(error);
+      }
+    },
+    async patchDataAndCache({ commit }, options) {
+      const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
 
-
-	},
-	plugins: [vuexLocal.plugin],
-
+      try {
+        const response = await axios.patch(
+          `${baseUrl}` + apiEndpoint,
+          data,
+          authConfig
+        );
+        const updatedData = validateApiResponse(response);
+        commit(vuexMutation, updatedData);
+        return updatedData;
+      } catch (error) {
+        return handleApiError(error);
+      }
+    },
+  },
+  plugins: [vuexLocal.plugin],
 });
 function isEmpty(obj) {
-	return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 }
 export default store; // Make sure this line is present

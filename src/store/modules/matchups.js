@@ -44,11 +44,11 @@ export const matchups = {
 		},
 		UPDATE_NOTES(state, payload) {
 			// Find the matchup with the given id
-			const matchup = state.matchupList.find(m => m.id === payload.matchupId);
+			const matchup = state.matchupList.find(m => m.id === payload.id);
 
 			if (matchup) {
 				// Update the notes of the found matchup
-				matchup.personalNotes = payload.notes;
+				matchup.personalNotes = payload.personalNotes;
 			}
 		}
 	},

@@ -2,7 +2,8 @@ import express from "express";
 import { RiotAPI, DDragon } from "@fightmegg/riot-api";
 import Debug from "debug";
 import { getLatestVersion } from "./utilities.mjs";
-import { readJsonFile } from "../utils/fileOperations.mjs";
+import { extractEmailFromToken } from "../utils/authMiddleware.mjs";
+import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
 import schedule from "node-schedule"; // Make sure to install node-schedule package
 
 const debugApi = Debug("api");
@@ -53,7 +54,8 @@ async function initializeChampionDataCache() {
 
 const getChampionTips = (req, res) => {
 	const championId = req.params.championId;
-	const filePath = "./api-data/champion_data/ChampionInfos.json";
+	const filePath = `./api-data/champion_data/ChampionInfos.json`;
+	console.log(filePath);
 
 	try {
 		const championData = readJsonFile(filePath);
@@ -68,6 +70,106 @@ const getChampionTips = (req, res) => {
 		res.status(500).json({ error: "Failed to read champion data file" });
 	}
 };
+
+router.get("/:championId/custom-data", extractEmailFromToken, async (req, res) => {
+	const championId = req.params.championId;
+	console.log(championId);
+	console.log(req.params);
+	const userEmail = req.userEmail; // Extracted email from the token
+	console.log(userEmail);
+
+	const filePath = `./user_data/${userEmail}/champions_data.json`;
+	console.log(filePath);
+	try {
+		const championsData = readJsonFile(filePath);
+		// Check if the champion's custom data exists; if not, create a default entry
+		if (!championsData[championId]) {
+			championsData[championId] = {
+				summonerSpells: [],
+				notes: "",
+				// ... other default properties
+			};
+			writeJsonFile(filePath, championsData);
+		}
+		res.json({
+			championId: championId,
+			data: championsData[championId]
+		});
+	} catch (error) {
+		console.error("Error reading JSON file:", error);
+		res.status(500).json({ error: "Failed to read champion data file" });
+	}
+});
+
+// Endpoint to update custom data for a champion
+router.post("/:championId/custom-data/summoner-spells", extractEmailFromToken,  async (req, res) => {
+	const championId = req.params.championId;
+	const customData = req.body; // Ensure you have body-parser middleware set up to parse JSON body
+	const userEmail = req.userEmail; // Extracted email from the token
+	const filePath = `./user_data/${userEmail}/champions_data.json`;
+
+	try {
+		const championsData = readJsonFile(filePath);
+		if (!championsData[championId]) {
+			championsData[championId] = { summonerSpells: [], personalNotes: "" };
+		}
+
+		// Update the champion's custom data
+		championsData[championId].summonerSpells = customData;
+		writeJsonFile(filePath, championsData);
+		res.json({
+			success: true,
+			championId: championId,
+			data: championsData[championId]
+		});
+	} catch (error) {
+		console.error("Error updating JSON file:", error);
+		res.status(500).json({ error: "Failed to update champion data file" });
+	}
+});
+
+router.post("/:championId/custom-data/notes", extractEmailFromToken,  async (req, res) => {
+	const championId = req.params.championId;
+	const customData = req.body; // Ensure you have body-parser middleware set up to parse JSON body
+	const userEmail = req.userEmail; // Extracted email from the token
+	const filePath = `./user_data/${userEmail}/champions_data.json`;
+
+	try {
+		const championsData = readJsonFile(filePath);
+		if (!championsData[championId]) {
+			championsData[championId] = { summonerSpells: [], personalNotes: "" };
+		}
+
+		// Update the champion's custom data
+		championsData[championId].personalNotes = customData.personalNotes;
+		console.log(championsData[championId].personalNotes);
+		console.log(championsData);
+		writeJsonFile(filePath, championsData);
+		res.json({
+			success: true,
+			championId: championId,
+			data: championsData[championId]
+		});
+	} catch (error) {
+		console.error("Error updating JSON file:", error);
+		res.status(500).json({ error: "Failed to update champion data file" });
+	}
+});
+
+router.get("/custom-data", extractEmailFromToken, async (req, res) => {
+	const userEmail = req.userEmail; // Extracted email from the token
+	const filePath = `./user_data/${userEmail}/champions_data.json`;
+
+	try {
+		const championData = readJsonFile(filePath);
+		res.json(championData); // Return the entire file content
+	} catch (error) {
+		console.error("Error reading JSON file:", error);
+		res.status(500).json({ error: "Failed to read champion data file" });
+	}
+});
+
+
 
 // Schedule cache updates every two weeks on Wednesday
 schedule.scheduleJob({ dayOfWeek: 3, hour: 0, minute: 0 }, initializeChampionDataCache);

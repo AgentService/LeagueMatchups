@@ -1,40 +1,46 @@
 <template>
-  <div class="container d-flex" v-if="championTips && Object.keys(championTips).length > 0">
-    <div class="card">
-      <div class="card-header title-bar">
-        General Tips <!-- Header title -->
-      </div>
-      <transition name="fade" mode="out-in">
-        <div class="card-body" :key="selectedTip">
-          <div v-if="!selectedTip" class="flex-container">
-            <!-- Iterate over each key in championTips -->
-            <div v-for="(value, key) in championTips" :key="key" class="flex-item">
-              <!-- Button for each tip -->
-              <button type="button"
-                class="btn btn-primary btn-full-width d-flex justify-content-center align-items-center"
-                @click="selectedTip = key">
-                <i :class="['me-3', getIconForKey(key)]" aria-hidden="true"></i>
-                <div class="text-content">{{ formatCategory(key) }}</div>
-              </button>
-            </div>
-          </div>
-          <div v-else class="content-container">
-            <div class="details-header mb-1">
-              <!-- Back Button -->
-              <button type="button" class="btn btn-secondary mb-1" @click="selectedTip = null">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <!-- Title next to back button -->
-              <h6 class="details-title title-bar">{{ formatCategory(selectedTip) }}</h6>
-            </div>
-            <div class="tip-details">
-              <p>{{ championTips[selectedTip]?.long }}</p>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </div>
-  </div>
+		<div class="card-header">
+			General Tips <!-- Header title -->
+		</div>
+		<transition name="fade" mode="out-in">
+			<div class="overflow-auto d-flex  flex-grow-1" v-if="championTips && Object.keys(championTips).length > 0">
+				<div class="card-body tips-card" :key="selectedTip">
+					<div v-if="!selectedTip" class="flex-container d-flex ">
+						<!-- Iterate over each key in championTips -->
+						<div v-for="(value, key) in championTips" :key="key" class="flex-item">
+							<!-- Button for each tip -->
+							<button type="button"
+								class="btn text-secondary justify-content-center align-items-center"
+								@click="selectedTip = key">
+								<i :class="['me-2', getIconForKey(key)]" aria-hidden="true"></i>
+								<div class="text-content">{{ formatCategory(key) }}</div>
+							</button>
+						</div>
+					</div>
+					<div v-else class="content-container">
+						<div class="details-header d-flex align-items-center">
+							<!-- Back Button -->
+							<button type="button" class="btn" @click="selectedTip = null">
+								<i class="fas fa-chevron-left"></i>
+							</button>
+							<!-- Title next to back button -->
+							<h6 class="details-title">{{ formatCategory(selectedTip) }}</h6>
+						</div>
+						<div class="tip-details">
+							<!-- Debugging-Log -->
+							<p>{{ championTips[selectedTip]?.long }}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div v-else class="card-body tips-card">
+				<div class="content-container d-flex align-items-center justify-content-center">
+					<div class="no-tips-message text-center">
+						<p>No tips available for this champion.</p>
+					</div>
+				</div>
+			</div>
+		</transition>
 </template>
 
 
@@ -88,117 +94,77 @@ watch(() => props.champion, (newChampion) => {
 
 
 <style>
+.tips-card {
+	display: flex;
+	min-height: 100%;
+	flex-direction: column;
+	padding: 1rem;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	hyphens: auto; 
+	text-align: justify;
+}
 .title-bar {
-  text-align: center;
-  color: var(--gold-1);
-  border-bottom: 0px solid var(--gold-4);
+	text-align: center;
 }
 
-.container {
-  width: 100%;
-  /* Full width of the parent element */
-  height: 100%;
-  /* Full height of the parent element */
-  /* Add if the parent of the container has a defined height, or use vh for viewport height */
-}
+
 
 .flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: start;
 }
 
 .flex-item {
-  flex: 1 1;
-  /* default for smaller screens - 2 items per row */
+	flex: 0 1 calc(50% - 10px); /* 2 items per row for smaller screens */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	
 }
 
 /* Enter and leave transitions */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.10s;
+	transition: opacity 0.10s;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-  opacity: 0;
-}
-
-.btn-full-width {
-  min-width: 150px;
-  width: 100%;
-}
-
-.btn-full-height {
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	opacity: 0;
 }
 
 .grid-item {
-  display: flex;
-  /* Make the grid item a flex container */
-  flex-direction: column;
-  /* Stack children vertically */
-  height: 100%;
-  /* Full height */
-}
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 
-.btn small {
-  color: aliceblue;
-  font-size: 0.65em;
-  /* Smaller font size for hints */
-  opacity: 0.75;
-  /* Slightly transparent for less prominence */
-}
-
-.button-content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
 }
 
 .tip-details {
-  overflow: auto;
-  flex-grow: 1;
+	overflow: auto;
+	flex-grow: 1;
+	padding: 1rem;
+	font-weight: 400;
 }
 
 .details-header {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
 }
 
 .details-title {
-  margin-left: 0.5rem;
-  /* Spacing between button and title */
-  flex-grow: 1;
-  /* Allow the title to take up remaining space if needed */
+	flex-grow: 1;
+	font-weight: 600;
+	margin-bottom: .1rem;
 }
 
 .content-container {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 0;
-}
-
-/* Custom scrollbar styles */
-.tip-details::-webkit-scrollbar {
-  width: 0.75rem;
-  /* Width of the scrollbar */
-}
-
-.tip-details::-webkit-scrollbar-thumb {
-  background-color: #00aaff;
-  /* Replace with your desired thumb color */
-  border-radius: 6px;
-}
-
-.tip-details::-webkit-scrollbar-track {
-  background-color: #000000;
-  /* Replace with your desired track color */
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	height: 100%;
 }
 </style>

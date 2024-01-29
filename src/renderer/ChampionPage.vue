@@ -1,77 +1,85 @@
 <template>
 	<div class="app-wrapper">
 		<div class="app-container">
-			<div class="background-container gradient-top-border ">
+			<div class="background-container ">
 				<!--
         <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
         <img v-if="championB" :src="`/img/champion_splash/${championB.id}.png`" class="background-image right" alt="Champion B" />
         -->
 			</div>
-			<div class="grid-container">
-				<!-- First Row -->
-				<div class="row slim-row">
-					<div class="col-md-2 h-100 ">
-					</div>
-					<div class="col-md-7">
-						<div class="title-bar">
-							<h4>Select your Champion</h4>
+			<div class="grid-container ">
+				<div class="container-fluid">
+					<!-- Summoner Info Row -->
+					<div class="row">
+						<div class="col-12">
+							<SummonerInfo />
 						</div>
 					</div>
-
-					<div class="col-md-3 d-flex flex-column h-100  gradient-border ">
-						<div class="title-bar">
-							<h4>Select your Matchup</h4>
-						</div>
-					</div>
-					<!-- <div class="col-md-3 h-100">
-            <ChampionTips :champion="championB" :instanceId="2" />
-          </div> -->
-				</div>
-				<div class="row">
-					<div class="col-md-2">
-						<ChampionFundamentals></ChampionFundamentals>
-					</div>
-					<div class="col-md-7 ">
-						<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-						<!-- <div class="gold-border">
-              </div> -->
-					</div>
-					<div class="col-md-3">
-						<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-					</div>
-					<!-- <div class="col-md-3 h-100">
-            <ChampionTips :champion="championB" :instanceId="2" />
-          </div> -->
-				</div>
-				<!-- Second Row -->
-				<div class="row">
-					<div class="col-md-2 d-flex h-100">
-						<ChampionTips :champion="championA" :instanceId="1" />
-					</div>
-					<div class="col-md-7 d-flex flex-column align-items-stretch ">
-						<div class="row gradient-top-border">
-							<div class="col-md-6 gradient-border h-100">
+					<div class="row justify-content-evenly">
+						<div class="col-xxl-3 col-xl-3">
+							<div class="card">
+								<SummonerRankedInfo />
 							</div>
-							<div class="col-md-6 gradient-border h-100">
-								<ChampionNotes></ChampionNotes>
-
+							<div class="card">
+								<LearningObjectives></LearningObjectives>
+							</div>
+							<div class="card">
+								<GeneralNotes />
 							</div>
 						</div>
-					</div>
-					<div class="col-md-3 align-items-stretch gradient-border">
-						<MatchupNotes></MatchupNotes>
-					</div>
-				</div>
-				<div class="row ">
-					<div class="col-md-2 gradient-border ">
-						<MatchupRating> </MatchupRating>
-					</div>
-					<div class="col-md-7 ">
-						<div class="row gradient-top-border">
+						<div class="col-xxl-9 col-xl-9">
+							<div class="card-container">
+								<!-- <div class="card-container-header">
+									<span>Champion Selection</span>
+								</div> -->
+								<div class="row position-relative">
+									<!-- Champion Search for User's Champion -->
+									<div class="col-xxl-7">
+										<div class="card card-top mb-0 ">
+											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+										</div>
+										<div class="card card-bottom mb-0">
+											<ChampionNotes />
+										</div>
+									</div>
+									<!-- VS Divider -->
+									<div class="vs-container position-absolute">
+										<span>vs</span>
+									</div>
+									<!-- Matchup Notes and Search for Enemy Champion -->
+									<div class="col-xxl-5">
+										<div class="card card-top mb-0">
+											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+										</div>
+										<div class="card card-bottom mb-0">
+											<MatchupNotes />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xxl-4">
+									<div class="card">
+										<ChampionTips :champion="championA" />
+									</div>
+								</div>
+								<div class="col-xxl-8">
+									<div class="card">
+										<MatchHistory />
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xxl-4">
+									<div class="card">
+									</div>
+								</div>
+								<div class="col-xxl-8">
+									<div class="card">
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-					<div class="col-md-3 gradient-top-border ">
-						<MatchupRating> </MatchupRating>
 					</div>
 				</div>
 			</div>
@@ -82,7 +90,7 @@
 
 
 <script setup>
-import { ref, watch, onMounted, } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
 
 // Debug
@@ -90,11 +98,21 @@ import Debug from 'debug';
 
 import ChampionSearch from './components/ChampionSelection.vue';
 import ChampionTips from './components/ChampionTips.vue';
+import SummonerInfo from './components/SummonerInfo.vue';
+import SummonerRankedInfo from './components/SummonerRankedInfo.vue';
+import LearningObjectives from "./components/LearningObjectives.vue";
+
+
+import xxx from './components/xxx.vue';
+
 import ChampionNotes from './components/ChampionNotes.vue';
 import ChampionFundamentals from './components/ChampionFundamentals.vue';
 
 import MatchupNotes from './components/MatchupNotes.vue';
 import MatchupRating from './components/MatchupRating.vue';
+
+import MatchHistory from './components/MatchHistory.vue';
+import GeneralNotes from './components/GeneralNotes.vue';
 
 
 const debug = Debug('app:page:ChampionPage');
@@ -104,6 +122,31 @@ const championB = ref(null);
 
 const store = useStore();
 let bothSelected = false;
+
+const championBackgroundStyleA = computed(() => {
+	if (championA.value) {
+		const imageUrl = getChampionImageSource('splash', championA.value.id);
+		return `background-image: url('${imageUrl}');`;
+	}
+	return '';
+});
+
+const championBackgroundStyleB = computed(() => {
+	if (championB.value) {
+		const imageUrl = getChampionImageSource('splash', championB.value.id);
+		return `background-image: url('${imageUrl}');`;
+	}
+	return '';
+});
+
+function getBackgroundStyle(champion) {
+	if (champion) {
+		const imageUrl = getChampionImageSource('splash', champion.id);
+		// Return a class name or a style object that references the image URL
+		return `background-${champion.id}`; // Example class name
+	}
+	return '';
+}
 
 onMounted(async () => {
 });
@@ -135,38 +178,184 @@ const handleMatchup = () => {
 const setChampionA = (champion) => {
 	championA.value = champion;
 	store.dispatch('matchups/setChampionA', champion);
-	store.dispatch('champions/fetchChampionTips', champion);
+	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
+	store.dispatch('champions/fetchCustomChampionData', { championId: champion.id });
+
 };
 
 const setChampionB = (champion) => {
 	championB.value = champion;
 	store.dispatch('matchups/setChampionB', champion);
-	store.dispatch('champions/fetchChampionTips', champion);
+	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
+	store.dispatch('champions/fetchCustomChampionData', { championId: champion.id });
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {
 	bothSelected = false;
 	handleMatchup();
 });
-
+// Function to get the image source URL
+function getChampionImageSource(type, championId) {
+	switch (type) {
+		case 'small':
+			return `/img/champions/${championId}.png`;
+		case 'loading':
+			return `/img/champion_loading/${championId}.png`;
+		case 'splash':
+			return `/img/champion_splash/${championId}.png`;
+		case 'tiles':
+			return `/img/tiles/${championId}_0.jpg`;
+		default:
+			return ''; // or some default path
+	}
+}
 
 </script>
 
-<style scoped>
-.gold-border {
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
-	/* Style your indicator as needed */
-	display: flex;
-	background: linear-gradient(to bottom, #000406, var(--gold-3), var(--gold-3), #000406);
-	max-width: 2px;
-	min-height: 100%;
-	align-items: center;
-	justify-content: center;
-	/* Size, color, etc. */
+<style>
+/* Save and delete buttons */
+.save-button,
+.add-button,
+.delete-button {
+	opacity: 0.5;
+	color: var(--grey-1);
 }
 
+.save-button:hover,
+.add-button:hover,
+.delete-button:hover,
+.show-more-button:hover {
+	opacity: 1;
+	color: var(--gold-2);
+	background: var(--grey-cool);
+}
+
+.buttons-container {
+	display: flex;
+	justify-content: flex-end;
+	gap: 5px;
+}
+
+
+.vs-container {
+	display: flex;
+	justify-content: center;
+	align-items: start;
+	z-index: 100;
+	font-size: 3rem;
+	top: 20%;
+	right: 450px;
+	width: 40px;
+	height: 40px;
+	padding: 1rem;
+	color: #fff;
+	text-shadow: 0 0 5px #00ffeacd,
+		0 0 10px #00ffeac2,
+		0 0 20px #00ffeac3;
+	transform: scale(1);
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.vs-container:hover {
+	cursor: pointer;
+	transform: scale(1.1);
+}
+
+.card-header {
+	text-transform: uppercase;
+	font-weight: 700;
+	text-align: start;
+	font-size: 1.2rem;
+	padding: .5rem 1rem;
+	display: flex;
+	color: #e7e7e7;
+	background-color: rgba(0, 0, 0, 0.0);
+}
+
+.card-container-header {
+	text-transform: uppercase;
+	font-weight: 700;
+	text-align: start;
+	padding: 1rem .5rem;
+	padding-top: 0rem;
+	display: flex;
+	color: #e7e7e7;
+
+}
+
+.card-body {
+	padding: 0rem .5rem;
+	margin-bottom: 0rem;
+}
+
+.card-container {
+	display: flex;
+	flex-direction: column;
+	background-image: linear-gradient(to right, #030608, #060d12);
+	padding: 1rem;
+	margin-bottom: 1rem;
+	border-radius: 6px;
+	border: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 2px solid rgba(128, 128, 128, 0.1);
+	background-image: linear-gradient(to right, #030608, #060d12);
+	box-shadow: 4px 8px 12px rgba(0, 0, 1, 1);
+	color: #e7e7e7;
+	padding: .5rem;
+	margin-bottom: 1rem;
+	max-height: 400px;
+	z-index: auto;
+}
+
+
+.card-top {
+	border-radius: 6px 6px 0 0;
+}
+
+.card-bottom {
+	border-radius: 0 0 6px 6px;
+}
+
+.card-header h5 {
+	margin: 0;
+	/* Adjust as needed */
+}
+
+/* Textarea for the note content */
+.note-textarea {
+	border-radius: 10px;
+	resize: none;
+	width: 100%;
+	height: 100%;
+	border-color: rgba(128, 128, 128, 0.1);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+	background: var(--background-1-gradient);
+	color: var(--gold-1);
+	line-height: 1.5;
+	padding: 0.5rem;
+	transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.note-textarea:focus {
+	outline: none;
+	border-color: #FFFFFF;
+	background-color: rgba(255, 255, 255, 1);
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.note-textarea::placeholder {
+	color: #A9A9A9;
+	font-style: italic;
+}
+
+.note-textarea:hover {
+	background-color: rgba(255, 255, 255, 1);
+}
 
 
 * {
@@ -175,39 +364,35 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 .title-bar {
 	display: flex;
-	justify-content: center;
+	justify-content: start;
 	align-items: center;
 	color: var(--gold-3);
 
 }
 
+.title-bar h5 {
+	margin: 0;
+	padding: 0.5rem 0;
+}
 
-/* .app-wrapper is the main wrapper that contains all content including the navbar and banner */
 .app-wrapper {
 	flex: 1;
-	/* Flex grow to fill available space */
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
-	/* Auto margins on left and right to center the block */
-	width: 100%;
-	max-width: 1600px;
+	width: 95%;
+	max-width: 1900px;
+	min-height: 100%;
+
 }
 
-/* .app-container is a flex container for the main content area below the navbar and banner */
 .app-container {
 	flex: 1;
-	/* Flex grow to take up all available space */
 	position: relative;
 	justify-content: center;
-	/* Centers children horizontally */
 	align-items: center;
-	/* Centers children vertically */
 	flex-grow: 1;
-	/* Fill the available space */
-	/* Establishes a flex context for children */
 	flex-direction: column;
-	/* Stacks children vertically */
 	border-top: 2px solid var(--blue-laser-gradient);
 }
 
@@ -216,40 +401,26 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 /* .grid-container holds the main grid and should fill the available space in .app-container */
 .grid-container {
 	flex-grow: 1;
-	/* Takes up all available space within .app-container */
 	display: flex;
-	/* Establish a flex context */
 	flex-direction: column;
-	/* Align children in a column */
-
 }
 
-/* Each .row should take up an equal amount of space within .grid-container */
+/* Each .row should take up an equal amount ofca space within .grid-container */
 .row {
 	display: flex;
-	/* border: 1px solid red; */
 	justify-content: center;
-	/* Center columns horizontally */
-	height: 350px;
-	/* Add space between rows */
-	--bs-gutter-x: 0;
-
 }
 
-/* For slim rows */
-.slim-row {
+.row2 {
+	display: flex;
 	justify-content: center;
-	height: 30px;
-	/* Let the content define the height */
-	/* Do not allow the row to grow */
 }
+
 
 
 .background-container {
 	position: static;
-	/* or 'relative' based on your needs */
 	height: auto;
-	/* Adjust based on content or set to a specific height */
 	opacity: 1;
 }
 
@@ -257,33 +428,15 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	z-index: 0;
 }
 
-@media (max-height: 780px) {
-	.row {
-		min-height: 0;
+@media (max-height: 1440px) {
+	.background-container {
+		height: 100%;
 	}
 
-	.app-wrapper {
-		width: 100%;
-		/* Full width on smaller screens */
-		margin: 10px 0;
-		/* Adjusted margin for smaller screens */
+	.card-container {
+		max-height: 100%;
 	}
 
-	/* Adjust the app-container padding for smaller screens if needed */
-	.app-wrapper {
-		padding: 0 10px;
-	}
-}
-
-/* Set the parent elements to position relative for the pseudo-elements to position correctly */
-.col-md-3,
-.col-md-6,
-.col-md-4,
-.row,
-.background-container {
-	position: relative;
-	/* This is important for the absolute positioning of pseudo-elements */
-	/* ... other styles ... */
 }
 
 /* Gradient Top Border Class */
@@ -294,34 +447,30 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	right: 0;
 	top: 0;
 	height: 2px;
-	/* Height of the border */
 	background: var(--border-grey-gradient-horizontal);
 	z-index: 2;
-	/* Ensure it's above the content but below any floating elements */
 }
 
 /* Gradient Border Class for left border */
-.gradient-border::before {
+.gradient-border1::before {
 	content: "";
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	width: 1px;
-	/* Width of the border */
 	background: var(--border-grey-gradient);
 	z-index: 2;
 }
 
 /* Gradient Border Class for right border */
-.gradient-border::after {
+.gradient-border2::after {
 	content: "";
 	position: absolute;
 	top: 0;
 	bottom: 0;
 	right: 0;
 	width: 1px;
-	/* Width of the border */
 	background: var(--border-grey-gradient);
 	z-index: 2;
 }
@@ -331,19 +480,11 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	content: "";
 	position: absolute;
 	top: 20%;
-	/* Adjust as necessary */
 	bottom: 20%;
-	/* Adjust as necessary */
 	left: 0;
 	width: 1px;
-	/* Width of the border */
 	background: linear-gradient(to top, #000406, var(--gold-3), var(--gold-3), #000406);
 	z-index: 0;
-}
-
-/* Apply left border only to the first column and right border only to the last column within each row */
-.row {
-	display: flex;
 }
 
 .gradient-border:not(:last-child)::after {
@@ -354,15 +495,5 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .gradient-border:not(:first-child)::before {
 	display: none;
 	/* This hides the left border for all but the first child */
-}
-
-/* Set the columns to grow and fill the available space */
-.col-md-3,
-.col-md-6 {
-	position: relative;
-	/* Adjust based on content */
-	flex-grow: 1;
-	/* Allow columns to grow */
-	/* Provide some spacing inside the columns */
 }
 </style>

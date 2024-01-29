@@ -31,6 +31,8 @@ import summonerRouter from "./api/summoner.mjs";
 import matchupsRouter from "./api/matchups.mjs";
 import authRouter from "./api/auth.mjs";
 import utilitiesRouter from "./api/utilities.mjs";
+import matchesRouter from './api/matches.mjs';
+import generalNotes from './api/generalNotes.mjs'; // Adjust the path as necessary
 
 import { verifyToken } from "./utils/authMiddleware.mjs";
 
@@ -71,6 +73,10 @@ app.use("/api/matchups", matchupsRouter);
 app.use("/api/auth", authRouter);
 
 app.use("/api/utilities", utilitiesRouter); 
+
+app.use('/api/matches', matchesRouter);
+app.use('/api/generalNotes', generalNotes);
+
 
 // Start the server
 app.listen(PORT, () => {

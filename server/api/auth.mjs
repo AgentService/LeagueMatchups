@@ -37,7 +37,7 @@ const router = express.Router();
 router.post("/login", passport.authenticate("local", { session: false }), (req, res) => {
 	const user = req.user; // Your authenticated user
 	const email = user.email; // Get the user's email from the authenticated user
-	const token = jwt.sign({ email }, "your JWT secret", { expiresIn: "48h" });
+	const token = jwt.sign({ email }, "your JWT secret", { expiresIn: "148h" });
 	debugApi("asd", user,  email, token);
 
 	// Send both the user and the token in the response

@@ -38,7 +38,7 @@ node_modules/
 jspm_packages/
 
 user_data/
-
+public/
 # TypeScript v1 declaration files
 typings/
 

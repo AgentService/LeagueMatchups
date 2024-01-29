@@ -19,5 +19,5 @@ onMounted(() => {
 </script>
   
 <style>
-/* Global styles */
+
 </style>
