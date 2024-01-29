@@ -1,20 +1,29 @@
 // store/index.js
 import { createStore } from 'vuex';
 import { summoner } from './modules/summoner.js';
-import matchups from './modules/matchups.js'; // Import the new matchups module
+import { matchups } from './modules/matchups.js'; // Import the new matchups module
 import { champions } from './modules/champions.js';
 import { auth } from './modules/auth.js';
-import { utilities } from './modules/utilities.js';
+import { init } from './modules/init.js';
+import { validateApiResponse, handleApiError } from './modules/utilities.js';
 
 import VuexPersistence from 'vuex-persist';
 import axios from 'axios';
 
 const vuexLocal = new VuexPersistence({
 	storage: window.localStorage, // or window.sessionStorage
-	modules: ['champions', 'matchups', 'utilities'] // Specify modules to persist
+	modules: ['champions', 'matchups', 'init', 'auth'],
+	reducer: (state) => ({
+		champions: state.champions,
+		matchups: state.matchups,
+		init: state.init,
+		auth: {
+			...state.auth,
+			token: undefined, // Exclude the token
+		},
+	})
 });
 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
-const VERSION_ENDPOINT = `${baseUrl}/api/utilities/version`; // Adjust the URL as needed
 
 export const store = createStore({
 	modules: {
@@ -22,7 +31,7 @@ export const store = createStore({
 		champions: champions,
 		matchups: matchups,
 		auth: auth,
-		utilities: utilities
+		init: init
 	},
 
 	actions: {
@@ -34,6 +43,7 @@ export const store = createStore({
 		* @param {string} options.type - The type of data being handled (e.g., 'championData').
 		* @param {string} options.apiEndpoint - The API endpoint to fetch data from.
 		* @param {string} options.vuexMutation - The Vuex mutation type to commit the fetched data.
+		* @param {string} [options.itemId] - The id of the item to fetch (e.g., champion id).
 		* @param {Function} options.commit - The Vuex `commit` function to update the state.
 		* @param {string} [options.storageType='local'] - The type of storage to use ('local' or 'session').
 		* @param {boolean} [options.skipCacheValidation=false] - Whether to skip cache validation and always fetch new data.
@@ -41,23 +51,75 @@ export const store = createStore({
 		*/
 		// Modify fetchDataAndCache to only fetch data based on options
 		async fetchDataAndCache({ commit, state }, options) {
-			const { module, type, apiEndpoint, vuexMutation, skipCacheValidation = false, authConfig = {} } = options;
+			const {
+				module,
+				type,
+				apiEndpoint,
+				vuexMutation,
+				itemId,
+				skipCacheValidation = false,
+				authConfig = {},
+			} = options;
+
+			// Check cache validity based on the specific item
+			const cachedItem = itemId ? state[module][type][itemId] : state[module][type];
 
 			// Use data from Vuex state if available and valid
-			if (!skipCacheValidation && state[module][type] !== null && !isEmpty(state[module][type])) {
-				return state[module][type];
+			if (!skipCacheValidation && cachedItem && !isEmpty(cachedItem)) {
+				return cachedItem;
 			}
 
 			// Fetch data based on provided options
-			const dataResponse = await axios.get(`${baseUrl}` + apiEndpoint, authConfig);
-			if (dataResponse.status === 200 || dataResponse.status === 201) {
-				const data = dataResponse.data;
+			try {
+				const response = await axios.get(`${baseUrl}` + apiEndpoint, authConfig);
+				const data = validateApiResponse(response);
 				commit(vuexMutation, data);
 				return data;
+			} catch (error) {
+				return handleApiError(error);
 			}
-
-			return null; // Handle errors or no data found
 		},
+
+		async postDataAndCache({ commit }, options) {
+			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+
+			try {
+				const response = await axios.post(`${baseUrl}` + apiEndpoint, data, authConfig);
+				const newData = validateApiResponse(response);
+				commit(vuexMutation, newData);
+				return newData;
+			} catch (error) {
+				return handleApiError(error);
+			}
+		},
+
+		async putDataAndCache({ commit }, options) {
+			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+
+			try {
+				const response = await axios.put(`${baseUrl}` + apiEndpoint, data, authConfig);
+				const updatedData = validateApiResponse(response);
+				commit(vuexMutation, updatedData);
+				return updatedData;
+			} catch (error) {
+				return handleApiError(error);
+			}
+		}
+		,
+		async patchDataAndCache({ commit }, options) {
+			const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
+
+			try {
+				const response = await axios.patch(`${baseUrl}` + apiEndpoint, data, authConfig);
+				const updatedData = validateApiResponse(response);
+				commit(vuexMutation, updatedData);
+				return updatedData;
+			} catch (error) {
+				return handleApiError(error);
+			}
+		},
+
+
 	},
 	plugins: [vuexLocal.plugin],
 

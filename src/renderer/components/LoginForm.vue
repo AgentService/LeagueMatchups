@@ -1,10 +1,7 @@
 <template>
   <div class="container">
-    <div v-if="isLoggedIn" class="greeting-message">
-      Hello, {{ userName }}!
-      <select>
-        <option>{{ userEmail }}</option>
-      </select>
+    <div v-if="!authLoading && isLoggedIn" class="greeting-message">
+      {{ userEmail }}!
       <button @click="logout" class="logout-button">Logout</button>
     </div>
     <form v-else @submit.prevent="handleSubmit" class="login-form">
@@ -24,41 +21,41 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from "vue";
-import { useStore } from "vuex";
+import { ref, computed, reactive } from 'vue';
+import { useStore } from 'vuex';
 
 const store = useStore();
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
+const authLoading = computed(() => store.state.auth.loading);
 const userEmail = computed(() => store.state.auth.user?.email);
-const userName = computed(() => store.state.auth.user?.name);
 const form = reactive({
-	email: "",
-	password: ""
+	email: '',
+	password: ''
 });
 
 const isSubmitting = ref(false);
-const errorMessage = ref("");
+const errorMessage = ref('');
 
 const handleSubmit = async () => {
 	form.isSubmitting = true;
-	form.errorMessage = "";
+	form.errorMessage = '';
 
 	try {
-		await store.dispatch("auth/login", {
+		await store.dispatch('auth/login', {
 			email: form.email,
 			password: form.password
 			// Additional fields if needed
 		});
 		// Handle successful login
 	} catch (error) {
-		errorMessage.value = error.message || "Failed to login";
+		errorMessage.value = error.message || 'Failed to login';
 	} finally {
 		isSubmitting.value = false;
 	}
 };
 
 const logout = () => {
-	store.dispatch("auth/logout");
+	store.dispatch('auth/logout');
 	// Handle logout process (like redirecting to login page)
 };
 </script>

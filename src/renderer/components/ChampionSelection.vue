@@ -132,11 +132,11 @@
   
   
 <script>
-import { useStore } from "vuex";
-import { ref, computed } from "vue";
-import gsap from "gsap";
-import Debug from "debug";
-const debug = Debug("app:component:ChampionSelection");
+import { useStore } from 'vuex';
+import { ref, computed } from 'vue';
+import gsap from 'gsap';
+import Debug from 'debug';
+const debug = Debug('app:component:ChampionSelection');
 
 export default {
 	props: {
@@ -156,11 +156,11 @@ export default {
 
 		const blueAnimation = () => {
 			gsap.to(elementToAnimate.value, {
-				boxShadow: "0 0 4px 5px rgba(0, 253, 255, 0.7)", // Blue glow
-				borderColor: "#41fcfc", // Light blue
+				boxShadow: '0 0 4px 5px rgba(0, 253, 255, 0.7)', // Blue glow
+				borderColor: '#41fcfc', // Light blue
 				repeat: -1, // repeat indefinitely
 				yoyo: true, // go back and forth
-				ease: "power1.inOut",
+				ease: 'power1.inOut',
 				duration: 3
 			});
 		};
@@ -168,11 +168,11 @@ export default {
 		// Define the animation for the red theme
 		const redAnimation = () => {
 			gsap.to(elementToAnimate.value, {
-				boxShadow: "0 0 6px 5px rgba(255, 0, 0, 0.7)", // Red glow
-				borderColor: "#fa6969", // Light red
+				boxShadow: '0 0 6px 5px rgba(255, 0, 0, 0.7)', // Red glow
+				borderColor: '#fa6969', // Light red
 				repeat: -1, // repeat indefinitely
 				yoyo: true, // go back and forth
-				ease: "power1.inOut",
+				ease: 'power1.inOut',
 				duration: 3
 			});
 		};
@@ -181,23 +181,23 @@ export default {
 	data() {
 
 		return {
-			searchTerm: "",
+			searchTerm: '',
 			champions: [],
 			selectedChampion: null,
 			selectedChampions: [], // Initialize empty array
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
-			selectedStatKeys: ["hp", "armor", "spellblock", "attackdamage", "movespeed"],
-			abilityLabels: ["Q", "W", "E", "R"],
+			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'],
+			abilityLabels: ['Q', 'W', 'E', 'R'],
 			isStatsCollapsed: false,
 		};
 	},
 
 	mounted() {
 		const store = useStore();
-        const championsData = computed(() => store.state.champions.championList);
+		const championsData = computed(() => store.state.champions.championList);
 
-		this.champions = championsData ? Object.values(championsData.value) : [];
+		this.champions = championsData.value ? Object.values(championsData.value) : [];
 
 		// Determine and select a preselected champion based on instanceId
 		const preselectedChampionIndex = this.instanceId === 1 ? 1 : 2;
@@ -214,7 +214,7 @@ export default {
 			);
 		},
 		themeClass() {
-			return this.instanceId === 1 ? "blue-theme" : "red-theme";
+			return this.instanceId === 1 ? 'blue-theme' : 'red-theme';
 		},
 	},
 	methods: {
@@ -230,19 +230,19 @@ export default {
 			return `./img/dragontail/13.21.1/img/spell/${spell.image.full}`;
 		},
 		getAbilityLabelByIndex(index) {
-			return this.abilityLabels[index] || ""; // Fallback to empty string if index is out of range
+			return this.abilityLabels[index] || ''; // Fallback to empty string if index is out of range
 		},
 		getStatImageUrl(statKey) {
 			const statIcons = {
-				AdaptiveForce: "StatModsAdaptiveForceIcon.png",
-				armor: "StatModsArmorIcon.png",
-				attackdamage: "StatModsAttackDamageIcon.png",
+				AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
+				armor: 'StatModsArmorIcon.png',
+				attackdamage: 'StatModsAttackDamageIcon.png',
 				// CDR: 'StatModsCDRScalingIcon.png',
-				hp: "StatModsHealthScalingIcon.png",
-				spellblock: "StatModsMagicResIcon.png",
+				hp: 'StatModsHealthScalingIcon.png',
+				spellblock: 'StatModsMagicResIcon.png',
 				// abilitypower: 'StatModsAbilityPowerIcon.png',
-				movespeed: "StatModsMovementSpeedIcon.png",
-				statToggle: "StatModsButton.png"
+				movespeed: 'StatModsMovementSpeedIcon.png',
+				statToggle: 'StatModsButton.png'
 			};
 			return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
 		},
@@ -250,9 +250,9 @@ export default {
 		checkScrollable() {
 			const gridContainer = this.$refs.gridContainer; // You'll need to add a ref="gridContainer" to the element
 			if (gridContainer.scrollHeight > gridContainer.clientHeight) {
-				gridContainer.classList.add("is-scrollable");
+				gridContainer.classList.add('is-scrollable');
 			} else {
-				gridContainer.classList.remove("is-scrollable");
+				gridContainer.classList.remove('is-scrollable');
 			}
 		},
 		syncWithClient() {
@@ -279,14 +279,14 @@ export default {
 		selectChampion(champion) {
 			this.selectedChampion = champion;
 			this.hideGrid();
-			debug("Selected champion:", this.selectedChampion);
+			debug('Selected champion:', this.selectedChampion);
 			// Trigger the GSAP animation for the selected champion
 			this.$nextTick(() => {
 				// Trigger the GSAP animation for the selected champion
 				this.animateChampion();
 			});
 			// Emit an event if you need to notify the parent component
-			this.$emit("championSelected", this.selectedChampion);
+			this.$emit('championSelected', this.selectedChampion);
 		},
 		animateChampion() {
 			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
@@ -296,17 +296,17 @@ export default {
 		},
 		getChampionImageSource(type, championId) {
 			switch (type) {
-				case "small":
+				case 'small':
 					return `/img/champions/${championId}.png`;
-				case "loading":
+				case 'loading':
 					return `/img/champion_loading/${championId}.png`;
-				case "splash":
+				case 'splash':
 					return `/img/champion_splash/${championId}.png`;
-				case "tiles":
+				case 'tiles':
 					return `/img/tiles/${championId}_0.jpg`;
 				default:
 					// Handle the case where the type does not match 'small' or 'loading'
-					return ""; // or some default path
+					return ''; // or some default path
 			}
 		},
 		toggleDropdown() {

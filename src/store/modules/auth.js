@@ -1,77 +1,83 @@
 // store/modules/auth.js
-import axios from "axios";
-import Debug from "debug";
-import { saveToLocalStorage, removeFromLocalStorage } from "../plugins/storage";
+import axios from 'axios';
+import Debug from 'debug';
+import { saveToLocalStorage, removeFromLocalStorage } from '../plugins/storage';
+import { validateApiResponse, handleApiError, getAuthConfig } from './utilities';
 
-const debug = Debug("app:store:auth");
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+const debug = Debug('app:store:auth');
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export const auth = {
 	namespaced: true,
 	state: () => ({
 		user: null,
 		isLoggedIn: false,
-		token: null // Add token to the state
+		token: null,
+		authLoading: true, // Indicates whether authentication is in progress
 	}),
-	mutations: {
-		SET_USER(state, user) {
-			state.user = user;
-			state.isLoggedIn = !!user;
-			debug("User set", user);
-		},
-		SET_TOKEN(state, token) {
-			state.token = token;
-			debug("Token set", token);
-		}
-	},
-	actions: {
-		async login({ commit }, credentials) {
-			try {
-				const response = await axios.post(`${baseUrl}/api/auth/login`, credentials);
-				commit("SET_USER", response.data.user);
-				commit("SET_TOKEN", response.data.token); // Assuming the token is returned in the response
-
-				saveToLocalStorage("token", response.data.token); // Or use the storage plugin
-				// Set the Axios Authorization header
-				axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-
-				debug("Login successful", response.data.user);
-			} catch (error) {
-				console.error("Login failed", error.response);
-				// Handle login errors
-			}
-		},
-		async reauthenticate({ commit }, token) {
-			try {
-				// Verify the token with your backend
-				const response = await axios.post(`${baseUrl}/api/auth/verifyToken`, {}, {
-					headers: { "Authorization": `Bearer ${token}` }
-				});
-				commit("SET_USER", response.data.user);
-				axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-				// ... other necessary state updates ...
-			} catch (error) {
-				console.error("Token verification failed:", error);
-				// Handle token verification failure
-				localStorage.removeItem("token");
-			}
-		},
-		logout({ commit }) {
-			commit("SET_USER", null);
-			commit("SET_TOKEN", null);
-
-			// Remove the token from sessionStorage or localStorage
-			removeFromLocalStorage("token");
-
-			// Remove the Axios default Authorization header
-			delete axios.defaults.headers.common["Authorization"];
-
-			debug("Logout successful");
-		}
-	},
 	getters: {
 		isLoggedIn: state => state.isLoggedIn,
 		user: state => state.user,
 		token: state => state.token
+	},
+	mutations: {
+		SET_USER(state, user) {
+			state.user = user;
+			state.isLoggedIn = !!user;
+			debug('User set', user);
+		},
+		SET_TOKEN(state, token) {
+			state.token = token;
+			debug('Token set', token);
+		},
+		SET_AUTH_LOADING(state, loading) {
+			state.authLoading = loading;
+		},
+	},
+	actions: {
+		// In your `auth.js` module
+		async login({ commit }, credentials) {
+			try {
+				const response = await axios.post(`${baseUrl}/api/auth/login`, credentials);
+				const data = validateApiResponse(response);
+
+				commit('SET_USER', data.user);
+				commit('SET_TOKEN', data.token);
+
+				saveToLocalStorage('token', data.token);
+				axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+				debug('Login successful', data.user);
+			} catch (error) {
+				return handleApiError(error);
+			}
+		},
+
+		async reauthenticate({ commit }, token) {
+			commit('SET_AUTH_LOADING', true);
+			try {
+				// Verify the token with your backend
+				const response = await axios.post(`${baseUrl}/api/auth/verifyToken`, {}, getAuthConfig());
+				const data = validateApiResponse(response);
+				commit('SET_USER', data.user);
+
+				axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+			} catch (error) {
+				console.error('Token verification failed:', error);
+				removeFromLocalStorage('token');
+			} finally {
+				commit('SET_AUTH_LOADING', false);
+			}
+		},
+		logout({ commit }) {
+			commit('SET_USER', null);
+			commit('SET_TOKEN', null);
+
+			removeFromLocalStorage('token');
+
+			delete axios.defaults.headers.common['Authorization'];
+
+			debug('Logout successful');
+		}
 	}
 };

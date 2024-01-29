@@ -7,13 +7,6 @@ export function isCacheValid(cachedData) {
 	return cachedData && (now - cachedData.timestamp) < cacheDuration;
 }
 
-
-/*
-fetchDataAndCache('championData', '/api/champions', '/api/version', 'SET_CHAMPION_DATA', 'local');
-fetchDataAndCache('temporaryStats', '/api/tempStats', '/api/version', 'SET_TEMP_STATS', 'session');
-*/
-
-
 const storageOperations = {
 	'local': {
 		save: saveToLocalStorage,
@@ -28,28 +21,6 @@ const storageOperations = {
 	// Add more storage types and their operations as needed
 };
 
-// Unified function to save data
-/*
-function saveUserPreferences(preferences) {
-	saveData('local', 'userPreferences', key);
-}
-function getUserPreferences() {
-	return retrieveData('local', 'key');
-}
-function resetUserPreferences() {
-	removeData('local', 'key');
-}
-
-SESSION
-
-function saveSessionSettings(settings) {
-	saveData('session', 'sessionSettings', key);
-}
-
-function getSessionSettings() {
-	return retrieveData('session', 'key');
-}
-*/
 export function saveData(storageType, key, value) {
 	const operation = storageOperations[storageType]?.save;
 	if (operation) {

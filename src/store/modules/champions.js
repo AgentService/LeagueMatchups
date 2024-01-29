@@ -87,8 +87,9 @@ export const champions = {
 				apiEndpoint: `/api/champions/${champion.id}/tips`,
 				vuexMutation: 'champions/SET_CHAMPION_TIPS',
 				skipCacheValidation: false,
+				itemId: champion.id,
 			}, { root: true });
-
+			debug('Champion tips:', championTips);
 			return championTips;
 		},
 

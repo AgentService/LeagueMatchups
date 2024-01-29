@@ -41,7 +41,7 @@ router.post("/login", passport.authenticate("local", { session: false }), (req, 
 	debugApi("asd", user,  email, token);
 
 	// Send both the user and the token in the response
-	res.json({ user, token });
+	res.status(200).json({ user, token });
 });
 
 // Token Verification Endpoint

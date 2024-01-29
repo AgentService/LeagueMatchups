@@ -1,20 +1,8 @@
 // store/modules/matchups.js
-import axios from "axios";
-import { saveToLocalStorage, retrieveFromLocalStorage } from "../plugins/storage.mjs";
-import Debug from "debug";
+import Debug from 'debug';
+import { getAuthConfig } from './utilities.js';
 
-const debug = Debug("app:store:matchups");
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
-
-function getAuthConfig() {
-	const token = retrieveFromLocalStorage('token');
-	return {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	};
-}
-
+const debug = Debug('app:store:matchups');
 
 export const matchups = {
 	namespaced: true,
@@ -43,7 +31,7 @@ export const matchups = {
 			state.championA = matchup.champions[0];
 			state.championB = matchup.champions[1];
 			state.currentMatchup = matchup;
-			debug("Current matchup:", state.currentMatchup)
+			debug('Current matchup:', state.currentMatchup);
 		},
 		ADD_OR_UPDATE_MATCHUP(state, oMatchup) {
 			const index = state.matchupList.findIndex((m) => m.id === oMatchup.id);
@@ -65,12 +53,12 @@ export const matchups = {
 		}
 	},
 	actions: {
-		async handleMatchupCreation({ commit, rootState, dispatch }, { id, champions: [championA, championB] }) {
+		async handleMatchupCreation({ commit, rootState, dispatch }, { id }) {
 			// Check if the matchup is already in vuex state
 			if (rootState.matchups.matchupList && rootState.matchups.matchupList.length > 0) {
 				const existingMatchup = rootState.matchups.matchupList.find((matchup) => matchup.id === id);
 				if (existingMatchup) {
-					commit("SET_CURRENT_MATCHUP", existingMatchup);
+					commit('SET_CURRENT_MATCHUP', existingMatchup);
 					return existingMatchup;
 				}
 			}
@@ -87,29 +75,34 @@ export const matchups = {
 			}, { root: true });
 
 			// Commit the fetched matchup data to Vuex state
-			commit("SET_CURRENT_MATCHUP", matchupData);
+			commit('SET_CURRENT_MATCHUP', matchupData);
 
 			return matchupData;
 		},
 		setChampionA({ commit }, payload) {
-			commit("SET_CHAMPION_A", payload);
+			commit('SET_CHAMPION_A', payload);
 		},
 		setChampionB({ commit }, payload) {
-			commit("SET_CHAMPION_B", payload);
+			commit('SET_CHAMPION_B', payload);
 		},
 		// custom data
-		async saveNotes({ commit, state }, payload) {
+		async saveNotes({ dispatch }, payload) {
 			try {
-				const config = getAuthConfig();
-				const response = await axios.patch(`${baseUrl}/api/matchups/${payload.matchupId}/notes`, { personalNotes: payload.personalNotes }, config);
-				debug("Notes updated:", response.data);
-				commit("UPDATE_NOTES", response.data);
+				await dispatch('patchDataAndCache', {
+					module: 'matchups',
+					type: 'notes',
+					apiEndpoint: `/api/matchups/${payload.matchupId}/notes`,
+					vuexMutation: 'matchups/UPDATE_NOTES',
+					data: { personalNotes: payload.notes },
+					authConfig: getAuthConfig()
+				}, { root: true });
+				// Optionally, provide user feedback for success
 			} catch (error) {
-				console.error("Error updating notes:", error);
-				// Handle error appropriately
+				// Error handling will be managed by patchDataAndCache
+				// Optionally, provide user feedback for error
 			}
 		},
+
 	},
 };
-
 export default matchups; // Make sure this line is present

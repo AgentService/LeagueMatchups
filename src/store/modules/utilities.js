@@ -1,80 +1,52 @@
-// store/modules/auth.js
-import Debug from "debug";
-import axios from "axios";
+// utilities.js
+import Debug from 'debug';
+import { retrieveData } from '../plugins/storage';
+const debug = Debug('app:store:utilities');
 
-const debug = Debug("app:store:auth");
-const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+/**
+ * Validates the API response.
+ * @param {Object} response - The response from the API.
+ * @returns {Object} - The response data if valid.
+ * @throws {Error} - If the response status is not valid.
+ * @exampleUsage in store/modules/utilities.js
+ */
+export function validateApiResponse(response) {
+	const validStatusCodes = [200, 201, 204];
 
-export const utilities = {
-	namespaced: true,
-	state: {
-		currentGameVersion: null,
-	},
-	getters: {
-		currentGameVersion: state => state.currentGameVersion
-	},
-	mutations: {
-		// ... other mutations
-		SET_GAME_VERSION(state, version) {
-			state.currentGameVersion = version;
-		},
-	},
-	actions: {
-		async checkAndUpdateVersion({ commit, dispatch, state }) {
-			try {
-				// Fetch the current game version from the server
-				const response = await axios.get(`${baseUrl}/api/utilities/version`);
-				const currentVersion = response.data.version;
-
-				// Set the current game version in Vuex
-				commit('SET_GAME_VERSION', currentVersion);
-
-				// Additional logic if the version has changed
-				if (state.currentGameVersion !== currentVersion) {
-					// Dispatch other actions if needed based on version change
-					// For example, dispatch('updateGameData') to fetch updated game data
-				}
-			} catch (error) {
-				console.error('Error checking and updating game version:', error);
-				// Handle error appropriately
-			}
-		},
-		async initializeApp({ commit, dispatch, state }) {
-			if (!localStorage.getItem('dataInitialized')) {
-				await dispatch('fetchDataAndCache', {
-					module: 'champions',
-					type: 'championList',
-					apiEndpoint: '/api/champions/list',
-					vuexMutation: 'champions/SET_CHAMPION_LIST_DATA',
-					skipCacheValidation: false,
-				}, { root: true });
-				// ... fetch other necessary data
-				await dispatch('fetchDataAndCache', {
-					module: 'champions',
-					type: 'championDetails',
-					apiEndpoint: '/api/champions/details',
-					vuexMutation: 'champions/SET_ALL_CHAMPION_DETAILS',
-					skipCacheValidation: false,
-				}, { root: true });
-				try {
-					// Fetch the current game version from the server
-					const response = await axios.get(`${baseUrl}/api/utilities/version`);
-					const currentVersion = response.data.version;
-
-					// Set the current game version in Vuex
-					commit('SET_GAME_VERSION', currentVersion);
-
-					// Additional logic if the version has changed
-					if (state.currentGameVersion !== currentVersion) {
-						// Dispatch other actions if needed based on version change
-						// For example, dispatch('updateGameData') to fetch updated game data
-					}
-				} catch (error) {
-					console.error('Error checking and updating game version:', error);
-					// Handle error appropriately
-				}
-				localStorage.setItem('dataInitialized', 'true');
-			}
-		},
+	if (!validStatusCodes.includes(response.status)) {
+		throw new Error(`Unexpected response status: ${response.status}`);
 	}
-};
+
+	// Additional validation can be added here
+
+	return response.data;
+}
+
+/**
+ * Handles errors that occur during API requests.
+ * @param {Object} error - The error object.
+ * @returns {null} - Returns null or any appropriate value on error.
+ * @throws {Error} - If the error needs to be rethrown.
+ */
+export function handleApiError(error) {
+	debug('API Request error:', error);
+	// Additional error handling logic can be added here
+	
+	// Return a default value or rethrow the error as needed
+	return null;
+}
+
+/**
+ * Gets the auth config object for API requests.
+ * @returns {Object} - The auth config object.
+ * @throws {Error} - If the token is not available.
+ * @exampleUsage in store/modules/matchups.js
+ */
+export function getAuthConfig() {
+	const token = retrieveData('local', 'token');
+	return {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		}
+	};
+}
