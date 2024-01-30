@@ -1,10 +1,10 @@
 // store/index.js
 import { createStore } from "vuex";
 import { summoner } from "./modules/summoner.js";
-import { matchups } from "./modules/matchups.js"; // Import the new matchups module
-import { matches } from "./modules/matches.js"; // Import the new matchups module
-import { items } from "./modules/items";
+import { matchups } from "./modules/matchups.js";
+import { matches } from "./modules/matches.js";
 import { generalNotes } from "./modules/generalNotes.js";
+import { items } from "./modules/items.js";
 
 import { champions } from "./modules/champions.js";
 import { auth } from "./modules/auth.js";

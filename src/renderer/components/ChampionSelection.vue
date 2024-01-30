@@ -389,8 +389,13 @@ export default {
 
 		if (!championA && !championB) {
 			// If no champions are selected, sync with the client
-			championA = "Bard";
-			championB = "Pyke";
+			championA = {
+				id: "Bard"
+			}
+			"Bard";
+			championB = {
+				id: "Pyke"
+			}
 		}
 		// Retrieve champion details
 		const championDetails = store.state.champions.championDetails;

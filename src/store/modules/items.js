@@ -1,35 +1,38 @@
 // items.js
-import axios from "axios";
-
 export const items = {
   namespaced: true,
   state: () => ({
-    allItems: {},
+    items: {},
   }),
   getters: {
     getItemDescription: (state) => (id) => {
-      return state.allItems[id]?.description || "Description not found";
+      return state.items[id]?.description || "Description not found";
     },
     getItemById: (state) => (id) => {
-      return state.allItems[id] || null;
+      return state.items[id] || null;
     },
   },
   mutations: {
     SET_ALL_ITEMS(state, items) {
-      state.allItems = items;
+      state.items = items;
     },
   },
   actions: {
-    async fetchAllItems({ commit }) {
-      try {
-        const response = await axios.get(
-          "https://ddragon.leagueoflegends.com/cdn/14.1.1/data/en_US/item.json"
-        );
-        commit("SET_ALL_ITEMS", response.data.data);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      }
-    },
+    async fetchAllItems({ dispatch, commit }) {
+      const championsData = await dispatch(
+        "fetchDataAndCache",
+        {
+          module: "items",
+          type: "items",
+          apiEndpoint: "/api/items/all",
+          vuexMutation: "SET_ALL_ITEMS",
+          commit,
+        },
+        { root: true }
+      );
+
+      return championsData;
+    }
   },
 };
 

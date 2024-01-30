@@ -33,6 +33,7 @@ import authRouter from "./api/auth.mjs";
 import utilitiesRouter from "./api/utilities.mjs";
 import matchesRouter from './api/matches.mjs';
 import generalNotes from './api/generalNotes.mjs'; // Adjust the path as necessary
+import itemRouter from './api/items.mjs'; // Adjust the path as needed
 
 import { verifyToken } from "./utils/authMiddleware.mjs";
 
@@ -76,6 +77,7 @@ app.use("/api/utilities", utilitiesRouter);
 
 app.use('/api/matches', matchesRouter);
 app.use('/api/generalNotes', generalNotes);
+app.use('/api/items', itemRouter);
 
 // Start the server
 app.listen(PORT, () => {
