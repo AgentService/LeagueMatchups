@@ -2,7 +2,6 @@
 	<div>
 		<div class="note-card champion-card">
 			<div class="background-image-container" :style="championBackgroundStyle"></div>
-
 			<div class="d-flex justify-content-start align-items-start">
 				<div class="search-container">
 					<div class="search-bar position-relative">
@@ -23,7 +22,7 @@
 				<div class="champion-grid" v-show="isGridVisible">
 					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
 						@click="selectChampion(champion)">
-						<img :src="getChampionImageSource('small', champion.id)" alt="Champion Image" />
+						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
 						<!-- <span>{{ champion.name }}</span> -->
 					</div>
 				</div>
@@ -35,10 +34,9 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="getChampionImageSource('small', selectedChampion.id)"
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
 								alt="Champion Image" />
 						</div>
-
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
@@ -60,15 +58,13 @@
 									</div>
 								</div>
 							</div>
-
-
 							<div class="abilities-container">
 								<div class="champion-abilities">
 									<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
 										<div class="ability-content">
 											<div class="ability-icon-wrapper">
-												<img :src="getPassiveImageUrl(selectedChampion?.passive)"
-													:alt="selectedChampion?.passive.full" class="ability-icon-passive" />
+												<img :src="selectedChampionPassiveUrl" :alt="selectedChampion?.passive.full"
+													class="ability-icon-passive" />
 											</div>
 										</div>
 										<div class="tooltip-container">
@@ -87,30 +83,30 @@
 											</div>
 										</div>
 									</div>
-									<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability">
+									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
 										<div class="ability-icon-wrapper">
-											<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
+											<img :src="spellData.url" class="ability-icon" />
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
 														<div class="tooltip-header">
-															<img :src="getSpellImageUrl(spell)" :alt="spell.name"
+															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{ getAbilityLabelByIndex(index)
 															}}</span>
 														</div>
-														<h5 class="spell-name">{{ spell.name }}</h5>
+														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
 															<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-																spell.cooldownBurn
+																spellData.spell.cooldownBurn
 															}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																spell.costBurn
+																spellData.spell.costBurn
 															}}</span>
 															</p>
 														</div>
-														<p class="spell-description">{{ spell.description }}</p>
+														<p class="spell-description">{{ spellData.spell.description }}</p>
 													</div>
 												</div>
 											</div>
@@ -128,10 +124,9 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="getChampionImageSource('small', selectedChampion.id)"
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
 								alt="Champion Image" />
 						</div>
-
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
@@ -153,8 +148,6 @@
 									</div>
 								</div>
 							</div>
-
-
 							<div class="abilities-container">
 								<div class="champion-abilities">
 									<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
@@ -180,30 +173,30 @@
 											</div>
 										</div>
 									</div>
-									<div v-for="(spell, index) in selectedChampion?.spells" :key="spell.id" class="ability">
+									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
 										<div class="ability-icon-wrapper">
-											<img :src="getSpellImageUrl(spell)" :alt="spell.name" class="ability-icon" />
+											<img :src="spellData.url" class="ability-icon" />
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
 														<div class="tooltip-header">
-															<img :src="getSpellImageUrl(spell)" :alt="spell.name"
+															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{ getAbilityLabelByIndex(index)
 															}}</span>
 														</div>
-														<h5 class="spell-name">{{ spell.name }}</h5>
+														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
 															<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-																spell.cooldownBurn
+																spellData.spell.cooldownBurn
 															}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																spell.costBurn
+																spellData.spell.costBurn
 															}}</span>
 															</p>
 														</div>
-														<p class="spell-description">{{ spell.description }}</p>
+														<p class="spell-description">{{ spellData.spell.description }}</p>
 													</div>
 												</div>
 											</div>
@@ -212,12 +205,10 @@
 								</div>
 							</div>
 						</div>
-						<!-- Instance 1: Icon Right + Icons Left -->
 					</div>
 				</div>
 			</div>
 		</div>
-
 	</div>
 	<!-- Overlay for Summoner Spell Selection -->
 	<!-- 
@@ -274,15 +265,16 @@
 							</div>
 						</div> -->
 </template>
-  
-  
-  
+
 <script>
 import { useStore, mapState, mapActions } from 'vuex';
 import { ref, computed, watch } from 'vue';
+import { getUrlHelper } from '../globalSetup'; // Adjust the import path as needed
+
 import gsap from 'gsap';
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionSelection');
+import path from 'path';
 
 export default {
 	props: {
@@ -344,11 +336,16 @@ export default {
 	data() {
 
 		return {
+			baseUrl: '', // Initialize the baseUrl
+			championImageUrls: {},
+			championImageUrl: '',
 			isGridOpen: false,
 			searchTerm: '',
 			isStatsVisible: false,
 			champions: [],
 			selectedChampion: null,
+			selectedChampionPassiveUrl: '',
+			selectedChampionSpell: [],
 			selectedChampions: [],
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
@@ -381,8 +378,15 @@ export default {
 
 	async mounted() {
 		const store = useStore();
-		const { championA, championB } = store.state.matchups;
-		
+
+		if (import.meta.env.MODE !== 'development') {
+			this.baseUrl = await window.electron.ipcRenderer.invoke('get-base-url');
+		} else {
+			this.baseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+		}
+
+		let { championA, championB } = store.state.matchups;
+
 		if (!championA && !championB) {
 			// If no champions are selected, sync with the client
 			championA = "Bard";
@@ -402,10 +406,16 @@ export default {
 		if (preselectedChampion) {
 			await this.selectChampion(preselectedChampion);
 		}
+		await Promise.all(this.filteredChampions.map(async (champion) => {
+			this.championImageUrls[champion.id] = await this.getChampionImageSource('small', champion.id);
+		}));
 	},
 
 
 	computed: {
+		championImageSource(type, championId) {
+			return this.getChampionImageSource(type, championId);
+		},
 		availableSummonerSpells() {
 			// Filter out the currently selected spells from the allSummonerSpells array
 			return this.allSummonerSpells.filter(spell => {
@@ -423,14 +433,16 @@ export default {
 		},
 		championBackgroundStyle() {
 			if (this.selectedChampion) {
-				const imageUrl = this.getChampionImageSource('splash', this.selectedChampion.id);
+				const urlHelper = getUrlHelper();
+				const imageUrl = urlHelper.getChampionImageSource('splash', this.selectedChampion.id);
+
 				return {
 					backgroundImage: `url('${imageUrl}')`,
 					opacity: 0.05
 				};
 			}
 			return {};
-		}
+		},
 	},
 	methods: {
 		async selectSpell(selectedSpell, index) {
@@ -467,11 +479,13 @@ export default {
 		},
 		getPassiveImageUrl(passive) {
 			// Construct the URL for the passive image
-			const path = `./img/passive/${passive?.image.full}`;
-			return path;
+			const imagePath = `./passive/${passive?.image.full}`;
+			return this.baseUrl && imagePath ? `${this.baseUrl}/${imagePath}` : '';
 		},
 		getSpellImageUrl(spell) {
-			return `./img/spell/${spell.image.full}`;
+			const imagePath = `./spell/${spell.image.full}`;
+			return this.baseUrl && imagePath ? `${this.baseUrl}/${imagePath}` : '';
+
 		},
 		getSummonerSpellImageUrl(spell) {
 			const baseImgPath = './img/dragontail/13.21.1/img/spell/';
@@ -541,6 +555,17 @@ export default {
 		},
 		async selectChampion(champion) {
 			this.selectedChampion = champion;
+
+			// Fetch and store passive image URL
+			this.selectedChampionPassiveUrl = this.getPassiveImageUrl(champion.passive);
+
+			// Fetch and store spell image URLs
+			// Fetch and store spell image URLs along with spell data
+			this.selectedChampionSpell = champion.spells.map(spell => ({
+				spell: spell,
+				url: this.getSpellImageUrl(spell)
+			}));
+
 			this.hideGrid();
 			debug('Selected champion:', this.selectedChampion);
 
@@ -585,40 +610,28 @@ export default {
 			}
 		},
 		// getChampionImageSource(type, championId) {
-		// 	const ddragonBaseUrl = 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/';
+		// 	const ddragonBaseUrl = 'https://ddragon.leagueoflegends.com/';
 		// 	switch (type) {
 		// 		case 'small':
 		// 			// Assuming 'small' refers to the champion square assets
-		// 			return `${ddragonBaseUrl}champion/${championId}.png`;
+		// 			return `${ddragonBaseUrl}cdn/14.1.1/img/champion/${championId}.png`;
 		// 		case 'loading':
 		// 			// Loading screen images
-		// 			return `${ddragonBaseUrl}champion/loading/${championId}_0.jpg`;
+		// 			return `${ddragonBaseUrl}img/champion/loading/${championId}_0.jpg`;
 		// 		case 'splash':
 		// 			// Full splash images
-		// 			return `${ddragonBaseUrl}champion/splash/${championId}_0.jpg`;
+		// 			return `${ddragonBaseUrl}img/champion/splash/${championId}_0.jpg`;
 		// 		case 'tiles':
 		// 			// If 'tiles' refer to another type of image, adjust the path accordingly
-		// 			return `${ddragonBaseUrl}tiles/${championId}_0.jpg`;
+		// 			return `${ddragonBaseUrl}cdn/14.1.1/img/tiles/${championId}_0.jpg`;
 		// 		default:
 		// 			return ''; // or some default path
 		// 	}
 		// }
-		getChampionImageSource(type, championId) {
-			switch (type) {
-				case 'small':
-					return `/img/champions/${championId}.png`;
-				case 'loading':
-					return `/img/champion_loading/${championId}.png`;
-				case 'splash':
-					return `/img/champion_splash/${championId}.png`;
-				case 'tiles':
-					return `/img/tiles/${championId}_0.jpg`;
-				default:
-					// Handle the case where the type does not match 'small' or 'loading'
-					return ''; // or some default path
-			}
-		},
-
+		async getChampionImageSource(type, championId) {
+			const urlHelper = getUrlHelper();
+			return urlHelper.getChampionImageSource(type, championId);
+		}
 	}
 };
 </script>
@@ -1310,5 +1323,4 @@ export default {
 		0 0 35px rgba(223, 58, 58, 0.35),
 		0 0 45px rgba(223, 58, 58, 0.35);
 }
-
 </style>

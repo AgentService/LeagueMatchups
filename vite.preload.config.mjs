@@ -1,3 +1,5 @@
+//vite.preload.config
+
 import { defineConfig } from 'vite';
 
 // https://vitejs.dev/config

@@ -141,6 +141,7 @@
 import { computed, ref, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 import { onMounted } from 'vue';
+import { getUrlHelper } from '../globalSetup'; // Adjust the import path as needed
 
 export default {
 	name: 'MatchHistory',
@@ -289,16 +290,15 @@ export default {
 				items.push(participant[`item${i}`] || null);
 			}
 			items.push(participant.item6 || null); // Trinket slot
-
 			return {
 				champion: participant.championName, // Or however you wish to represent the champion
 				items: items,
 			};
 		};
 
-
 		const getItemImageSource = (itemId) => {
-			return itemId ? `/img/items/${itemId}.png` : '';
+			const urlHelper = getUrlHelper();
+			return urlHelper.getItemImageUrl(itemId);
 		};
 
 		const getPlayerChampion = (match) => {
@@ -322,22 +322,9 @@ export default {
 			selectedMatch.value = null;
 		};
 
-		// Funktion, um den Pfad zum Champion-Bild zu erhalten
 		const getChampionImageSource = (type, championId) => {
-			const sanitizedChampionId = championId?.replace(/\s+/g, '');
-
-			switch (type) {
-				case 'small':
-					return `/img/champions/${sanitizedChampionId}.png`;
-				case 'loading':
-					return `/img/champion_loading/${sanitizedChampionId}.png`;
-				case 'splash':
-					return `/img/champion_splash/${sanitizedChampionId}.png`;
-				case 'tiles':
-					return `/img/tiles/${sanitizedChampionId}_0.jpg`;
-				default:
-					return ''; // Standardpfad oder Fehlerbehandlung
-			}
+			const urlHelper = getUrlHelper();
+			return urlHelper.getChampionImageSource(type, championId);
 		};
 
 		const formatTimePlayed = (timeInSeconds) => {

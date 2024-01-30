@@ -77,7 +77,6 @@ app.use("/api/utilities", utilitiesRouter);
 app.use('/api/matches', matchesRouter);
 app.use('/api/generalNotes', generalNotes);
 
-
 // Start the server
 app.listen(PORT, () => {
 	debugApi(`Server started on port ${PORT}`);

@@ -36,8 +36,8 @@
 									<div class="dropdown-item">
 										<div class="d-flex justify-content-between align-items-center">
 											<!-- Rank image on the left -->
-											<img src="/img/tier-icons/tier-icons-base/platinum.png" alt="Rank Image"
-												class="rank-image">
+											<!-- <img src="/img/tier-icons/tier-icons-base/platinum.png" alt="Rank Image"
+												class="rank-image"> -->
 											<!-- Rank text on the right, above the progress bar -->
 											<div class="text-end flex-grow-1">
 												<div class="d-flex justify-content-between align-items-center">

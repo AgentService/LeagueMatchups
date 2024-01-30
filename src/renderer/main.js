@@ -9,6 +9,7 @@ import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./custom.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
+import { setupBaseUrl } from './globalSetup';
 
 import { initializeSummonerDataFetching, startSummonerNameCheck } from "../services/summonerDataService";
 import { retrieveFromLocalStorage } from "../store/plugins/storage.mjs";
@@ -19,10 +20,12 @@ if (import.meta.env.MODE !== "production") {
   Debug.enable(import.meta.env.VITE_DEBUG);
 }
 async function initializeApp() {
+  await setupBaseUrl(); 
   await store.dispatch("init/initializeApp");
 }
 
 initializeApp().then(() => {
+
   const vueApp = createApp(App);
   vueApp.use(VueLazyload, {
     // options...

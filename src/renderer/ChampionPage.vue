@@ -197,15 +197,19 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 });
 // Function to get the image source URL
 function getChampionImageSource(type, championId) {
+	let baseUrl;
+	baseUrl = window.electronAPI.getAssetBaseUrl();
+	// In production, use a dynamic path
+	baseUrl = `file://${process.resourcesPath}/app/.vite/renderer/main_window`;
 	switch (type) {
 		case 'small':
-			return `/img/champions/${championId}.png`;
+			return `${baseUrl}/img/champions/${championId}.png`;
 		case 'loading':
-			return `/img/champion_loading/${championId}.png`;
+			return `${baseUrl}/img/champion_loading/${championId}.png`;
 		case 'splash':
-			return `/img/champion_splash/${championId}.png`;
+			return `${baseUrl}/img/champion_splash/${championId}.png`;
 		case 'tiles':
-			return `/img/tiles/${championId}_0.jpg`;
+			return `${baseUrl}/img/tiles/${championId}_0.jpg`;
 		default:
 			return ''; // or some default path
 	}

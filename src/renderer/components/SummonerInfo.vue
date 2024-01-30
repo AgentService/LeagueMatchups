@@ -23,11 +23,12 @@
 		</div>
 	</div>
 </template>
-  
+
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useStore } from 'vuex';
-const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+import { getUrlHelper } from '../globalSetup'; // Adjust path as needed
+
 const dropdownContainer = ref(null);
 
 const store = useStore();
@@ -36,11 +37,12 @@ const profileIconId = computed(() => store.getters['summoner/profileIconId']);
 
 const currentSummonerName = computed(() => store.getters['summoner/currentSummonerName']);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
+// Somewhere in your Vue component
+let baseUrl = '';
+
 const getSummonerIcon = (iconId) => {
-	if (!iconId) {
-		return undefined;
-	}
-	return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
+	const urlHelper = getUrlHelper();
+	return urlHelper.getSummonerIconUrl(iconId);
 };
 
 const summonerNames = store.getters['summoner/allSummonerNames'];
