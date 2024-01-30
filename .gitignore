@@ -32,13 +32,12 @@ coverage
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
-
+public/
 # Dependency directories
 node_modules/
 jspm_packages/
 
 user_data/
-public/
 # TypeScript v1 declaration files
 typings/
 

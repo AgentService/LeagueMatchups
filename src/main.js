@@ -99,7 +99,7 @@ function createWindow(x = 0, y = 0) {
   });
 
   // Open the DevTools automatically if in development environment
-  if (process.env.NODE_ENV === 'x') {
+  if (process.env.NODE_ENV === 'DEVELOPMENT') {
     mainWindow.webContents.openDevTools();
   }
   debug('Loading main window');

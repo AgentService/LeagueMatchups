@@ -382,7 +382,12 @@ export default {
 	async mounted() {
 		const store = useStore();
 		const { championA, championB } = store.state.matchups;
-
+		
+		if (!championA && !championB) {
+			// If no champions are selected, sync with the client
+			championA = "Bard";
+			championB = "Pyke";
+		}
 		// Retrieve champion details
 		const championDetails = store.state.champions.championDetails;
 		this.champions = championDetails ? Object.values(championDetails) : [];
