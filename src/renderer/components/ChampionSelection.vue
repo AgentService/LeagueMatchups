@@ -388,11 +388,10 @@ export default {
 		let { championA, championB } = store.state.matchups;
 
 		if (!championA && !championB) {
-			// If no champions are selected, sync with the client
+			// If no champions are selected initially
 			championA = {
 				id: "Bard"
 			}
-			"Bard";
 			championB = {
 				id: "Pyke"
 			}

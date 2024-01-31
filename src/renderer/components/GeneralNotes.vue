@@ -1,23 +1,26 @@
 <template>
-    <div class="card-header d-flex justify-content-between align-items-center">
+	<div class="card-header d-flex justify-content-between align-items-center">
 		<span>Review Notes</span>
 		<transition name="fade">
 			<i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
 		</transition>
 		<div class="buttons-container">
 			<button @click="createNewNote" class="btn add-button">
-				<i class="fas fa-plus"></i> 
+				<i class="fas fa-plus"></i>
 			</button>
 		</div>
 	</div>
 	<!-- Notes list -->
 	<div class="notes-list card-body">
-		<li v-for="item in limitedNotes" :key="item.date" class="note-item  mb-4">
-			<textarea spellcheck="false" v-model="noteText[item.date]" class="note-textarea" placeholder="Type your notes here..."
-				rows="6"></textarea>
+		<li v-for="item in limitedNotes" :key="item.date" class="note-item mb-4">
+			<textarea spellcheck="false" v-model="notesByDate[item.date]" class="note-textarea"
+				placeholder="Type your notes here..." rows="6"></textarea>
 			<div class="note-footer d-flex">
 				<div class="note-date">{{ formatDate(item.date) }}</div>
 				<div class="buttons-container d-flex justify-content-end">
+					<button @click="deleteNote(item.date)" class="btn delete-button">
+						<i class="far fa-trash-alt"></i>
+					</button>
 					<button @click="saveNote(item.date)" class="btn save-button">
 						<i class="far fa-save"></i>
 					</button>
@@ -46,6 +49,7 @@ const newNoteText = ref('');
 const noteText = ref({});
 const notesDisplayLimit = ref(2);
 const isExpanded = ref(false);
+const notesByDate = computed(() => store.state.generalNotes.notesByDate);
 
 const limitedNotes = computed(() => {
 	return notesOrdered.value.slice(0, notesDisplayLimit.value);
@@ -66,8 +70,7 @@ const showLessNotes = () => {
 
 
 const notesOrdered = computed(() => {
-	const notes = store.state.generalNotes.notesByDate || {};
-	return Object.entries(notes)
+	return Object.entries(notesByDate.value)
 		.sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
 		.map(([date, note]) => ({ date, note }));
 });
@@ -81,26 +84,33 @@ const formatDate = (date) => {
 };
 
 const fetchNotes = async () => {
-	noteText.value = store.state.generalNotes.notesByDate;
+	try {
+		await store.dispatch('generalNotes/fetchNotes');
+		// The Vuex state is automatically updated, so your UI should react to these changes
+	} catch (error) {
+		console.error('Error while fetching notes:', error);
+		// Handle the error as needed
+	}
 };
 
 const createNewNote = () => {
 	const currentDate = new Date().toISOString().split('T')[0];
 	if (!store.state.generalNotes.notesByDate[currentDate]) {
-		// Create a new note entry for the current day
-		store.commit('generalNotes/SET_NOTE', { date: currentDate, note: '' });
-		fetchNotes(); // Fetch notes to update the UI
+		const newNote = ''; // Default content for the new note
+		// Commit the new note to the Vuex state and save it to the backend
+		store.commit('generalNotes/SET_NOTE', { date: currentDate, note: newNote });
+		store.dispatch('generalNotes/saveNote', { date: currentDate, note: newNote });
 	} else {
-		// Handle the case where a note for the current day already exists
-		console.log("A note for today already exists."); // Optionally show a message or handle this case differently
+		console.log("A note for today already exists.");
 	}
 };
 
+
 const deleteNote = (date) => {
 	store.dispatch('generalNotes/deleteNote', date).then(() => {
-		fetchNotes(); // Re-fetch notes to update the UI
 	});
 };
+
 const saveNote = (date) => {
 	const note = noteText.value[date];
 	store.dispatch('generalNotes/saveNote', { date, note });
@@ -165,5 +175,4 @@ onMounted(() => {
 	justify-content: space-between;
 	align-items: center;
 }
-
 </style>

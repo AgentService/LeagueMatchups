@@ -20,6 +20,9 @@ export const generalNotes = {
     SET_NOTE(state, { date, note }) {
       state.notesByDate[date] = note;
     },
+    SET_NOTES(state, notes) {
+      state.notesByDate = notes;
+    },
     DELETE_NOTE(state, date) {
       delete state.notesByDate[date];
     },
@@ -55,6 +58,23 @@ export const generalNotes = {
         }
       } catch (error) {
         console.error("Error deleting the note:", error);
+        // Handle the error appropriately
+      }
+    },
+    async fetchNotes({ commit }) {
+      try {
+        console.log("Fetching notes");
+        const authConfig = getAuthConfig();
+        const response = await axios.get(
+          `${baseUrl}/api/generalNotes/notes`,
+          authConfig
+        );
+
+        if (response.status === 200) {
+          commit("SET_NOTES", response.data.notes);
+        }
+      } catch (error) {
+        console.error("Error fetching notes:", error);
         // Handle the error appropriately
       }
     },

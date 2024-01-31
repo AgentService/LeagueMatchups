@@ -25,7 +25,7 @@ export const items = {
           module: "items",
           type: "items",
           apiEndpoint: "/api/items/all",
-          vuexMutation: "SET_ALL_ITEMS",
+          vuexMutation: "items/SET_ALL_ITEMS",
           commit,
         },
         { root: true }
