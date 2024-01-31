@@ -34,8 +34,8 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" />
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]" alt="Champion Image"
+								@click="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -854,6 +854,7 @@ export default {
 }
 
 .champion-image {
+	cursor: pointer;
 	border: px solid #fff;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 	border-radius: 5px;
