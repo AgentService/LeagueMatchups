@@ -34,7 +34,7 @@
 								</div> -->
 								<div class="row position-relative">
 									<!-- Champion Search for User's Champion -->
-									<div class="col-xxl-6">
+									<div class="col-xxl-7">
 										<div class="card card-top mb-0 ">
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 										</div>
@@ -47,7 +47,7 @@
 										<span>vs</span>
 									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-6">
+									<div class="col-xxl-5">
 										<div class="card card-top mb-0">
 											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 										</div>
@@ -248,7 +248,7 @@ function getChampionImageSource(type, championId) {
 	z-index: 100;
 	font-size: 3rem;
 	top: 20%;
-	right: 48%;
+	right: 40%;
 	width: 40px;
 	height: 40px;
 	padding: 1rem;

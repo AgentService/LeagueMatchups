@@ -2,7 +2,7 @@
 	<div>
 		<div class="note-card champion-card">
 			<div class="background-image-container" :style="championBackgroundStyle"></div>
-			<div class="d-flex justify-content-start align-items-center">
+			<div class="d-flex justify-content-between align-items-center">
 				<div class="search-container">
 					<div class="search-bar position-relative">
 						<div class="input-group">
@@ -14,10 +14,12 @@
 						</div>
 					</div>
 				</div>
-				<div class="d-flex w-50"></div>
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
-					<i class="fa-solid fa-star fa-xs"></i>
+					<div class="fav-header">
+						<i class="fa-solid fa-star fa-xl"></i>
+						<span></span>
+					</div>
 					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
 						@mouseleave="handlePopupMouseLeave">
 						<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
@@ -697,6 +699,11 @@ export default {
 </script>
 
 <style scoped>
+.favorite-icon {
+	cursor: pointer;
+	margin: 5px;
+}
+
 .favorite-icon,
 .favorite-icon .fa {
 	cursor: pointer;
@@ -706,15 +713,45 @@ export default {
 	color: gold;
 }
 
+.favorite-icon.is-favorite .fa:active {
+	color: darkgoldenrod;
+	/* Slightly darken the color when pressed */
+}
+
+/* Scale down when active/pressed to simulate a button press */
+.favorite-icon:active {
+	transform: scale(0.9);
+}
+
+.favorite-icon:hover .fa-star {
+	transform: scale(1.2);
+}
+
 .fav-button {
 	position: relative;
 	cursor: pointer;
+	border-radius: 6px;
+	color: var(--grey-1);
+}
+
+.fav-button:hover {
+	color: var(--gold-2)
+}
+
+.fav-header {
+	display: flex;
+	font-size: 1.25rem;
+}
+
+.fav-header span {
+	display: flex;
+	margin-left: 2px;
 }
 
 .fav-popup {
 	position: absolute;
-	top: -50%;
-	right: 150%;
+	top: -100%;
+	right: 110%;
 	background: var(--grey-4);
 	border: 1px solid var(--grey-3);
 	display: flex;
@@ -730,8 +767,11 @@ export default {
 .fav-item {
 	display: flex;
 	align-items: center;
-	gap: 5px;
+	/* Maintain gap between items */
+	width: calc(25%);
+	/* Adjust width to fit 4 items per row, accounting for gap */
 }
+
 
 .fav-item img {
 	display: flex;
