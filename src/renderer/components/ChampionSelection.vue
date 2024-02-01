@@ -15,7 +15,8 @@
 					</div>
 				</div>
 				<div class="d-flex w-50"></div>
-				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
+					v-if="instanceId === 1">
 					<i class="fa-solid fa-star fa-xs"></i>
 					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
 						@mouseleave="handlePopupMouseLeave">
@@ -68,7 +69,7 @@
 									:class="{ 'is-favorite': isFavorite(selectedChampion) }">
 									<i class="fa fa-star fa-xs"></i>
 								</div>
-								
+
 							</div>
 							<div class="abilities-container">
 								<div class="champion-abilities">
@@ -129,7 +130,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 
 				<!-- Instance 2: Icon Left + Icons Right -->
 				<div class="champion-detail-wrapper champion-detail--instance2 " v-if="instanceId === 2">
@@ -713,14 +714,18 @@ export default {
 .fav-popup {
 	position: absolute;
 	top: -50%;
-	right: 100%;
-	background-color: var(--navbar-background-elements);
-	padding: 5px;
+	right: 150%;
+	background: var(--grey-4);
+	border: 1px solid var(--grey-3);
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
+	/* Allow items to wrap to the next line */
 	align-items: center;
 	z-index: 5;
+	min-width: 182px;
 }
+
 
 .fav-item {
 	display: flex;
@@ -1430,5 +1435,4 @@ export default {
 		0 0 25px rgba(223, 58, 58, 0.35),
 		0 0 35px rgba(223, 58, 58, 0.35),
 		0 0 45px rgba(223, 58, 58, 0.35);
-}
-</style>
+}</style>
