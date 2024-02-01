@@ -7,7 +7,7 @@
 					<Login></Login>
 				</div>
 				<div class="mx-auto d-flex justify-content-center">
-					<router-link to="/championMatchup" class="nav-link">Matchup</router-link>
+					<router-link to="/championMatchup" class="nav-link">Prepare</router-link>
 					<router-link to="/userJourney" class="nav-link">Journey</router-link>
 				</div>
 				<div class="d-flex justify-content-end">

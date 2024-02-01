@@ -2,7 +2,7 @@
 	<div>
 		<div class="note-card champion-card">
 			<div class="background-image-container" :style="championBackgroundStyle"></div>
-			<div class="d-flex justify-content-start align-items-start">
+			<div class="d-flex justify-content-start align-items-center">
 				<div class="search-container">
 					<div class="search-bar position-relative">
 						<div class="input-group">
@@ -11,6 +11,17 @@
 							</span>
 							<input type="text" @click="showGrid" v-model="searchTerm" @input="filterChampions"
 								placeholder="Search Champion" class="form-control" />
+						</div>
+					</div>
+				</div>
+				<div class="d-flex w-50"></div>
+				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+					<i class="fa-solid fa-star fa-xs"></i>
+					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
+						@mouseleave="handlePopupMouseLeave">
+						<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
+							@click="selectChampion(champion)">
+							<img :src="championImageUrls[champion.id]" alt="Champion Image" />
 						</div>
 					</div>
 				</div>
@@ -30,7 +41,6 @@
 
 			<div class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
-
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
@@ -40,23 +50,25 @@
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
-								<div class="stats-container">
+								<!-- <div class="stats-container">
 									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
-										<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats"
-											class="stat-toggle-icon" />
-										<!-- <img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" /> -->
+										<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" />
 									</div>
 									<div class="stats-tooltip-container collapse" :class="{ show: !isStatsCollapsed }">
 										<div v-show="isStatsVisible" class="stats-tooltip">
-											<!-- Iterate through your selected stats -->
-											<div class="stat-item d-flex align-items-center"
-												v-for="statKey in selectedStatKeys" :key="statKey">
+											<div class="stat-item d-flex align-items-center" v-for="statKey in selectedStatKeys"
+												:key="statKey">
 												<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
 												<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
 											</div>
 										</div>
 									</div>
+								</div> -->
+								<div @click="toggleFavorite(selectedChampion)" class="favorite-icon"
+									:class="{ 'is-favorite': isFavorite(selectedChampion) }">
+									<i class="fa fa-star fa-xs"></i>
 								</div>
+								
 							</div>
 							<div class="abilities-container">
 								<div class="champion-abilities">
@@ -115,9 +127,10 @@
 								</div>
 							</div>
 						</div>
-						<!-- Instance 1: Icon Right + Icons Left -->
 					</div>
 				</div>
+				
+
 				<!-- Instance 2: Icon Left + Icons Right -->
 				<div class="champion-detail-wrapper champion-detail--instance2 " v-if="instanceId === 2">
 					<!-- Champion Image Container -->
@@ -286,7 +299,11 @@ export default {
 	setup(props) {
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
+		const store = useStore();
 
+		const favoriteChampions = computed(() => {
+			return store.state.userPreferences.favoriteChampions;
+		});
 		const toggleSearch = () => {
 			showInput.value = !showInput.value;
 			if (showInput.value) {
@@ -325,7 +342,7 @@ export default {
 		};
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
-			toggleSearch,
+			toggleSearch, favoriteChampions
 		};
 	},
 	// watch: {
@@ -334,8 +351,10 @@ export default {
 	// 	}
 	// },
 	data() {
-
 		return {
+			showFavorites: false,
+			isButtonHovered: false,
+			isPopupHovered: false,
 			baseUrl: '', // Initialize the baseUrl
 			championImageUrls: {},
 			championImageUrl: '',
@@ -378,12 +397,8 @@ export default {
 
 	async mounted() {
 		const store = useStore();
-
-		if (import.meta.env.MODE !== 'development') {
-			this.baseUrl = await window.electron.ipcRenderer.invoke('get-base-url');
-		} else {
-			this.baseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
-		}
+		const urlHelper = getUrlHelper();
+		this.baseUrl = urlHelper.baseUrl;
 
 		let { championA, championB } = store.state.matchups;
 
@@ -413,6 +428,7 @@ export default {
 		await Promise.all(this.filteredChampions.map(async (champion) => {
 			this.championImageUrls[champion.id] = await this.getChampionImageSource('small', champion.id);
 		}));
+		await this.$store.dispatch('userPreferences/getFavoriteChampions');
 	},
 
 
@@ -449,6 +465,45 @@ export default {
 		},
 	},
 	methods: {
+		toggleFavorite(champion) {
+			console.log('Toggling favorite for champion:', champion);
+			const index = this.favoriteChampions?.findIndex(c => c.id === champion.id);
+			if (index > -1) {
+				// Champion is already a favorite, remove them
+				this.favoriteChampions.splice(index, 1);
+			} else {
+				// Add the whole champion object as a favorite
+				this.favoriteChampions.push(champion);
+			}
+			this.$store.dispatch('userPreferences/updateFavoriteChampions', this.favoriteChampions);
+		},
+		isFavorite(champion) {
+			return this.favoriteChampions?.some(c => c.id === champion.id);
+		},
+		handleMouseEnter() {
+			this.isButtonHovered = true;
+			this.showFavorites = true;
+		},
+		handleMouseLeave() {
+			this.isButtonHovered = false;
+			// Delay hiding to allow moving to the popup
+			this.delayHidePopup();
+		},
+		handlePopupMouseEnter() {
+			this.isPopupHovered = true;
+		},
+		handlePopupMouseLeave() {
+			this.isPopupHovered = false;
+			// Delay hiding to provide a smoother experience
+			this.delayHidePopup();
+		},
+		delayHidePopup() {
+			setTimeout(() => {
+				if (!this.isButtonHovered && !this.isPopupHovered) {
+					this.showFavorites = false;
+				}
+			}, 100); // Adjust delay as needed
+		},
 		async selectSpell(selectedSpell, index) {
 			// Update local component state first
 			const updatedSpells = [...this.selectedSpells];
@@ -641,6 +696,56 @@ export default {
 </script>
 
 <style scoped>
+.favorite-icon,
+.favorite-icon .fa {
+	cursor: pointer;
+}
+
+.favorite-icon.is-favorite .fa-star {
+	color: gold;
+}
+
+.fav-button {
+	position: relative;
+	cursor: pointer;
+}
+
+.fav-popup {
+	position: absolute;
+	top: -50%;
+	right: 100%;
+	background-color: var(--navbar-background-elements);
+	padding: 5px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	z-index: 5;
+}
+
+.fav-item {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+}
+
+.fav-item img {
+	display: flex;
+	align-items: center;
+	width: 45px;
+	height: 45px;
+}
+
+.fav-item img:hover {
+	border: 1px solid var(--gold-4);
+}
+
+
+.champion-image {
+	width: 40px;
+	height: 40px;
+	object-fit: cover;
+}
+
 .stat-toggle-container {
 	position: absolute;
 	left: 10px;
@@ -863,9 +968,7 @@ export default {
 
 .stats-container {
 	display: flex;
-	justify-content: flex-end;
 	align-items: center;
-	padding: 0.5rem 0;
 }
 
 .stat-item {

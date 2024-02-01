@@ -5,6 +5,7 @@ import { matchups } from "./modules/matchups.js";
 import { matches } from "./modules/matches.js";
 import { generalNotes } from "./modules/generalNotes.js";
 import { items } from "./modules/items.js";
+import { userPreferences } from "./modules/userPreferences.js"; // Adjust the path as necessary
 
 import { champions } from "./modules/champions.js";
 import { auth } from "./modules/auth.js";
@@ -24,6 +25,7 @@ const vuexLocal = new VuexPersistence({
     "matches",
     "items",
     "generalNotes",
+    "userPreferences",
   ],
   reducer: (state) => ({
     champions: state.champions,
@@ -36,6 +38,7 @@ const vuexLocal = new VuexPersistence({
     matches: state.matches,
     items: state.items,
     generalNotes: state.generalNotes,
+    userPreferences: state.userPreferences,
   }),
 });
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -49,7 +52,8 @@ export const store = createStore({
     init: init,
     matches: matches,
     items: items,
-	generalNotes: generalNotes,
+    generalNotes: generalNotes,
+    userPreferences: userPreferences,
   },
 
   actions: {

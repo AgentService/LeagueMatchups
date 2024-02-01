@@ -38,7 +38,6 @@ const profileIconId = computed(() => store.getters['summoner/profileIconId']);
 const currentSummonerName = computed(() => store.getters['summoner/currentSummonerName']);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
 // Somewhere in your Vue component
-let baseUrl = '';
 
 const getSummonerIcon = (iconId) => {
 	const urlHelper = getUrlHelper();

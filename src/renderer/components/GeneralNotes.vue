@@ -13,7 +13,7 @@
 	<!-- Notes list -->
 	<div class="notes-list card-body">
 		<li v-for="item in limitedNotes" :key="item.date" class="note-item mb-4">
-			<textarea spellcheck="false" v-model="notesByDate[item.date]" class="note-textarea"
+			<textarea spellcheck="false" v-model="noteText[item.date]" class="note-textarea"
 				placeholder="Type your notes here..." rows="6"></textarea>
 			<div class="note-footer d-flex">
 				<div class="note-date">{{ formatDate(item.date) }}</div>
@@ -57,7 +57,7 @@ const limitedNotes = computed(() => {
 
 
 const showMoreNotes = () => {
-	notesDisplayLimit.value += 2; // Adjust as needed
+	notesDisplayLimit.value += 2; 
 	isExpanded.value = true;
 	console.log("Show More clicked. Display limit:", notesDisplayLimit.value, "Is Expanded:", isExpanded.value);
 };
@@ -117,15 +117,16 @@ const saveNote = (date) => {
 };
 
 onMounted(() => {
-	console.log("Total notes:", notesOrdered.value.length);
-	console.log("Display limit:", notesDisplayLimit.value);
-	console.log("notesOrdered on mounted:", notesOrdered.value);
 	const currentDate = new Date().toISOString().split('T')[0];
 	// Ensure there's an entry for the current day
 	if (!noteText.value[currentDate]) {
 		noteText.value[currentDate] = '';
 	}
-	fetchNotes();
+	fetchNotes().then(() => {
+		for (const [date, note] of Object.entries(notesByDate.value)) {
+			noteText.value[date] = note;
+		}
+	});
 });
 </script>
 

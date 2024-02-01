@@ -6,17 +6,37 @@ const Debug = require("debug");
 const debug = Debug("app:main");
 console.log("env:", import.meta.env.DEV);
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-const basePath = isDevelopment 
-  ? path.join(__dirname, '..', 'public', 'img') 
-  : path.join(process.resourcesPath, 'app', 'public', 'img');
+const LEAGUE_CLIENT_PATHS = [
+  "C:\\Riot Games\\League of Legends",
+  "C:\\Program Files\\Riot Games\\League of Legends",
+];
 
-ipcMain.handle('get-base-url', () => `file://${basePath}`);
+const isDevelopment = process.env.NODE_ENV === "development";
+const basePath = isDevelopment
+  ? path.join(__dirname, "..", "public", "img")
+  : path.join(process.resourcesPath, "app", "public", "img");
 
+ipcMain.handle("get-base-url", () => `file://${basePath}`);
 
 let mainWindow; // Store a reference to the main window
 
-const LEAGUE_CLIENT_PATH = process.env.LEAGUE_CLIENT_PATH; // Adjust if necessary
+async function findLeagueClientPath() {
+  debug("Searching for League client...");
+  for (const basePath of LEAGUE_CLIENT_PATHS) {
+    try {
+      const lockfilePath = path.join(basePath, "lockfile");
+      if (await fs.access(lockfilePath, fs.constants.F_OK)) {
+        debug(`League client found at ${basePath}`);
+        return basePath; // Return the path where the lockfile is found
+      }
+    } catch (error) {
+      // If the lockfile doesn't exist in the current path, catch the error and continue the loop
+      debug(`League client not found at ${basePath}`);
+    }
+  }
+  debug("League client not found.");
+  return null; // Return null if the client is not found in any of the paths
+}
 
 ipcMain.on("get-summoner-name", async (event) => {
   debug("IPC message received: get-summoner-name");
@@ -38,7 +58,8 @@ ipcMain.handle("get-api-key", async (event) => {
 
 async function getSummonerName() {
   debug("Retrieving summoner name");
-  if (!fs.existsSync(LEAGUE_CLIENT_PATH)) {
+  const leagueClientPath = await findLeagueClientPath();
+  if (!leagueClientPath) {
     debug("League client not found.");
     return null;
   }
@@ -104,6 +125,8 @@ function createWindow(x = 0, y = 0) {
     y: y,
     minWidth: 1280, // set the minimum width
     minHeight: 720, // set the minimum height
+    width: 1800,
+    height:1200,
     // maxHeight: 800,
     // maxWidth: 1280,
     partition: "nopersist",
