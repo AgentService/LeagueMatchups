@@ -16,7 +16,7 @@ ipcMain.handle('get-base-url', () => `file://${basePath}`);
 
 let mainWindow; // Store a reference to the main window
 
-const LEAGUE_CLIENT_PATH = "C:/Riot Games/League of Legends/lockfile"; // Adjust if necessary
+const LEAGUE_CLIENT_PATH = process.env.LEAGUE_CLIENT_PATH; // Adjust if necessary
 
 ipcMain.on("get-summoner-name", async (event) => {
   debug("IPC message received: get-summoner-name");
