@@ -750,14 +750,13 @@ export default {
 
 .fav-popup {
 	position: absolute;
-	top: -100%;
-	right: 110%;
+	top: -80%;
+	right: 140%;
 	background: var(--grey-4);
 	border: 1px solid var(--grey-3);
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
-	/* Allow items to wrap to the next line */
 	align-items: center;
 	z-index: 5;
 	min-width: 182px;
