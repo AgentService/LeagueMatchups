@@ -63,7 +63,6 @@ export const generalNotes = {
     },
     async fetchNotes({ commit }) {
       try {
-        console.log("Fetching notes");
         const authConfig = getAuthConfig();
         const response = await axios.get(
           `${baseUrl}/api/generalNotes/notes`,

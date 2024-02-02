@@ -2,6 +2,7 @@
 import store from "../store/index"; // Import the store directly
 import Debug from "debug";
 const debug = Debug("app:services:summoner-data");
+
 // Function that invokes the fetching of summoner data
 export async function fetchAndSaveSummonerData(summonerNameValue) {
   try {
@@ -19,16 +20,22 @@ export async function fetchAndSaveSummonerData(summonerNameValue) {
   }
 }
 
-// Function to initialize summoner data fetching
+// Function to initialize summoner data fetching without timestamp validation
 export function initializeSummonerDataFetching() {
   window.api.receive("summoner-name-response", async (newSummonerName) => {
-    const currentSummonerData = JSON.parse(
-      localStorage.getItem("summonerData")
-    ); // Adjust if you're using sessionStorage
-    if (!currentSummonerData || currentSummonerData.name !== newSummonerName) {
+    console.log("Summoner name response:", newSummonerName);
+    const summonersData = JSON.parse(
+      localStorage.getItem("summonerData") || "[]"
+    );
+    let summonerExists = summonersData.some(
+      (summoner) => summoner.name === newSummonerName
+    );
+
+    // If the summoner does not exist in our local data, fetch and save new data
+    if (!summonerExists) {
       await fetchAndSaveSummonerData(newSummonerName);
     } else {
-      debug("Summoner data already up to date");
+      debug("Summoner data already exists. No need to update on app startup.");
     }
   });
 
@@ -36,12 +43,13 @@ export function initializeSummonerDataFetching() {
 }
 
 function checkSummonerName() {
+  console.log("Checking summoner name");
   window.api.send("get-summoner-name");
 }
 
 // Function to start checking for Summoner Name every minute
 export function startSummonerNameCheck() {
-  const intervalId = setInterval(checkSummonerName, 3600000); // 60000 milliseconds = 1 minute 3600000
+  const intervalId = setInterval(checkSummonerName, 1200000); // 60000 milliseconds = 1 minute 3600000
 
   // Optionally, you can store intervalId to clear it later when needed
   localStorage.setItem("summonerNameCheckIntervalId", intervalId.toString());
@@ -55,4 +63,3 @@ export function stopSummonerNameCheck() {
     localStorage.removeItem("summonerNameCheckIntervalId");
   }
 }
-

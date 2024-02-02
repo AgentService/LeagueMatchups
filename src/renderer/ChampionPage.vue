@@ -148,9 +148,6 @@ function getBackgroundStyle(champion) {
 	return '';
 }
 
-onMounted(async () => {
-	console.log('ChampionPage mounted');
-});
 const handleMatchup = () => {
 
 	if (championA.value && championB.value) {

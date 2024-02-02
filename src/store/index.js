@@ -112,7 +112,7 @@ export const store = createStore({
       const { apiEndpoint, vuexMutation, data, authConfig = {} } = options;
 
       try {
-        console.log("Full URL:", `${baseUrl}${apiEndpoint}`);
+        // console.log("Full URL:", `${baseUrl}${apiEndpoint}`);
 
         const response = await axios.post(
           `${baseUrl}` + apiEndpoint,

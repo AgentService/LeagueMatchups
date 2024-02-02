@@ -17,7 +17,7 @@
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
 					<div class="fav-header">
-						<i class="fa-solid fa-star fa-xl"></i>
+						<i class="fa-solid fa-star fa-sm"></i>
 						<span></span>
 					</div>
 					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
@@ -469,7 +469,6 @@ export default {
 	},
 	methods: {
 		toggleFavorite(champion) {
-			console.log('Toggling favorite for champion:', champion);
 			const index = this.favoriteChampions?.findIndex(c => c.id === champion.id);
 			if (index > -1) {
 				// Champion is already a favorite, remove them
@@ -740,7 +739,7 @@ export default {
 
 .fav-header {
 	display: flex;
-	font-size: 1.25rem;
+	font-size: 1.15rem;
 }
 
 .fav-header span {
@@ -750,7 +749,7 @@ export default {
 
 .fav-popup {
 	position: absolute;
-	top: -80%;
+	top: -20px;
 	right: 140%;
 	background: var(--grey-4);
 	border: 1px solid var(--grey-3);

@@ -3,8 +3,8 @@ AWS and GCP
 Elixir, Phoenix, and Absinthe
 Postgres
 
-- Favorite Selection
-- Auto Save / STRG + S for notes
+DONE Favorite Selection
+DONE Auto Save
 - Learning Objectives
 - End of Game RATINGS
 - BIG DATA ANALYZES > D
@@ -12,6 +12,9 @@ Postgres
 - Daily Notes Expandable, Filterable, Tags
 - Add Clips to Notes
 - AUTH Token refresh automatically
+- Show more Button for Match History
+- Move Match History to new tab
+- Use current Match History again in Prepare for intensity rating after match
 
 LCU
 - Champion Select Detection

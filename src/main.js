@@ -4,12 +4,8 @@ import path from "path";
 require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
-console.log("env:", import.meta.env.DEV);
 
-const LEAGUE_CLIENT_PATHS = [
-  "C:\\Riot Games\\League of Legends",
-  "C:\\Program Files\\Riot Games\\League of Legends",
-];
+
 
 const isDevelopment = process.env.NODE_ENV === "development";
 const basePath = isDevelopment
@@ -18,93 +14,77 @@ const basePath = isDevelopment
 
 ipcMain.handle("get-base-url", () => `file://${basePath}`);
 
-let mainWindow; // Store a reference to the main window
+console.log("env:", import.meta.env.DEV);
+console.log("dirname", __dirname);
+console.log("basePath", basePath);
+console.log("NODE_ENV", process.env.NODE_ENV);
 
-async function findLeagueClientPath() {
-  debug("Searching for League client...");
-  for (const basePath of LEAGUE_CLIENT_PATHS) {
-    try {
-      const lockfilePath = path.join(basePath, "lockfile");
-      if (await fs.access(lockfilePath, fs.constants.F_OK)) {
-        debug(`League client found at ${basePath}`);
-        return basePath; // Return the path where the lockfile is found
-      }
-    } catch (error) {
-      // If the lockfile doesn't exist in the current path, catch the error and continue the loop
-      debug(`League client not found at ${basePath}`);
-    }
-  }
-  debug("League client not found.");
-  return null; // Return null if the client is not found in any of the paths
-}
+
+let mainWindow;
+
+const LEAGUE_CLIENT_PATHS = [
+  "C:/Riot Games/League of Legends/lockfile",
+  "/Applications/League of Legends.app/Contents/LoL/lockfile",
+  "C:/Program Files/Riot Games/League of Legends/lockfile"
+];
 
 ipcMain.on("get-summoner-name", async (event) => {
-  debug("IPC message received: get-summoner-name");
-  const summonerName = await getSummonerName(); // This function retrieves the summoner name
+  console.log("IPC message received: get-summoner-name");
+  const summonerName = await getSummonerName();
   if (summonerName) {
     console.log("Summoner Name:", summonerName);
-    // Send the summoner name back to the renderer process
     event.reply("summoner-name-response", summonerName);
   } else {
-    // Send an error message back to the renderer process
     event.reply("summoner-name-response", null);
   }
 });
 
 ipcMain.handle("get-api-key", async (event) => {
   debug("IPC message received: get-api-key");
-  return process.env.RIOT_API_KEY; // Send the API key to the renderer process
+  return process.env.RIOT_API_KEY;
 });
 
 async function getSummonerName() {
-  debug("Retrieving summoner name");
-  const leagueClientPath = await findLeagueClientPath();
-  if (!leagueClientPath) {
-    debug("League client not found.");
-    return null;
-  }
+  for (let path of LEAGUE_CLIENT_PATHS) {
+    if (!fs.existsSync(path)) {
+      console.log(`League client not found at ${path}.`);
+      continue; // Try the next path
+    }
+    console.log("League client found at:", path);
+    let previousValue = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
+    try {
+      console.log("Reading lockfile");
+      const lockfileContent = fs.readFileSync(path, "utf8");
+      const [, , port, token] = lockfileContent.split(":");
+      console.log("Port:", port);
+      console.log("Token:", token);
 
-  let previousValue = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-  try {
-    debug("Reading lockfile");
-    const lockfileContent = fs.readFileSync(LEAGUE_CLIENT_PATH, "utf8");
-    const [, , port, token] = lockfileContent.split(":");
-    debug("Port:", port);
-    debug("Token:", token);
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+      const fetch = (...args) =>
+        import("node-fetch").then(({ default: fetch }) => fetch(...args));
+      const response = await fetch(
+        `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
+        {
+          headers: {
+            Authorization:
+              "Basic " + Buffer.from(`riot:${token}`).toString("base64"),
+          },
+        }
+      );
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    debug("Fetching summoner name from League client");
-    const fetch = (...args) =>
-      import("node-fetch").then(({ default: fetch }) => fetch(...args));
-    const response = await fetch(
-      `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
-      {
-        headers: {
-          Authorization:
-            "Basic " + Buffer.from(`riot:${token}`).toString("base64"),
-        },
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Summoner Name:", data.displayName);
+        return data.displayName;
+      } else {
+        console.error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      debug("Summoner Name:", data.displayName);
-      return data.displayName;
-    } else {
-      console.error(`HTTP error! status: ${response.status}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
+    } catch (error) {
+      console.log(`Error retrieving summoner name from ${path}:`, error);
+    } finally {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousValue;
     }
-  } catch (error) {
-    if (error.code === "ECONNREFUSED") {
-      debug("Connection refused. Is the League client running?");
-      // Inform the user that the client cannot be found or is not running
-      // You can also dispatch an action to update the UI accordingly
-    } else {
-      debug("Error retrieving summoner name:", error);
-    }
-  } finally {
-    // Reset the environment variable in the finally block
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousValue;
   }
   return null;
 }
@@ -117,7 +97,6 @@ if (require("electron-squirrel-startup")) {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-console.log(__dirname);
 function createWindow(x = 0, y = 0) {
   debug("Creating main window");
   mainWindow = new BrowserWindow({
@@ -125,8 +104,6 @@ function createWindow(x = 0, y = 0) {
     y: y,
     minWidth: 1280, // set the minimum width
     minHeight: 720, // set the minimum height
-    width: 1800,
-    height:1200,
     // maxHeight: 800,
     // maxWidth: 1280,
     partition: "nopersist",
