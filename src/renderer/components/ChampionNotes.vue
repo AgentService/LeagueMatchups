@@ -31,7 +31,9 @@ const store = useStore();
 const championA = computed(() => store.getters['matchups/getChampionA']);
 const championId = ref('');
 const editableNotes = ref('');
+const championSwitched = ref(false);
 const userEditing = ref(false);
+
 const autoSaved = ref(false);
 
 const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
@@ -69,12 +71,17 @@ async function fetchAndSetNotes(currentChampionId) {
 watch(championA, async (newChampionA) => {
 	if (newChampionA && newChampionA.id !== championId.value) {
 		championId.value = newChampionA.id;
+		championSwitched.value = true
 		await fetchAndSetNotes(championId.value);
 	}
 }, { immediate: true });
 
 watch(editableNotes, (newValue, oldValue) => {
 	if (!isInitialLoad.value && newValue !== oldValue) {
+		if (championSwitched.value) {
+			championSwitched.value = false;
+			return;
+		}
 		notesState.value = 'editing';
 		debouncedSave();
 	}

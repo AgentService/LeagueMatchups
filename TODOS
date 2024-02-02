@@ -10,11 +10,14 @@ DONE Auto Save
 - BIG DATA ANALYZES > D
 - AI KEK
 - Daily Notes Expandable, Filterable, Tags
+    - probably have to not use textfield, but some sort of input into div creation
 - Add Clips to Notes
 - AUTH Token refresh automatically
 - Show more Button for Match History
 - Move Match History to new tab
 - Use current Match History again in Prepare for intensity rating after match
+- set a default image in case a championImage is not found for e.g. new champ
+    - or / and add fallback to use CDN to get images if not found
 
 LCU
 - Champion Select Detection

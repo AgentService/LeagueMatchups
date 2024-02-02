@@ -33,6 +33,7 @@ const autoSaved = ref(false);
 const localNotes = ref('');
 const isSaved = ref(false)
 const userEditing = ref(false);
+const championSwitched = ref(false);
 
 let saveTimeout = null;
 
@@ -44,12 +45,12 @@ function debouncedSaveNotes() {
 		autoSaved.value = true;
 		userEditing.value = false;
 
-		// Optionally, reset autoSaved flag after a certain time
 		setTimeout(() => autoSaved.value = false, 2000);
-	}, 2000); // Adjust the delay as needed
+	}, 2000);
 }
 
 watch(currentMatchup, (newMatchup) => {
+	championSwitched.value = true
 	localNotes.value = newMatchup?.personalNotes || '';
 }, { immediate: true });
 
@@ -60,6 +61,10 @@ watch(localNotes, () => {
 
 watch(localNotes, (newValue, oldValue) => {
 	if (newValue !== oldValue) {
+		if (championSwitched.value) {
+			championSwitched.value = false;
+			return;
+		}
 		userEditing.value = true;
 		autoSaved.value = false;
 		debouncedSaveNotes();
