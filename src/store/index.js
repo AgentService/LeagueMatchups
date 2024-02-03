@@ -41,6 +41,7 @@ const vuexLocal = new VuexPersistence({
     userPreferences: state.userPreferences,
   }),
 });
+
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export const store = createStore({
@@ -102,6 +103,7 @@ export const store = createStore({
         );
         const data = validateApiResponse(response);
         commit(vuexMutation, data);
+        
         return data;
       } catch (error) {
         return handleApiError(error);

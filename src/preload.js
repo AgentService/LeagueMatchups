@@ -17,7 +17,8 @@ contextBridge.exposeInMainWorld("versions", {
 
 contextBridge.exposeInMainWorld("api", {
   send: (channel, data) => {
-    let validSendChannels = ["get-summoner-name"];
+    const validSendChannels = ["get-summoner-name"];
+    
     if (validSendChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
     }
@@ -34,7 +35,8 @@ contextBridge.exposeInMainWorld("api", {
   },
   // Add the removeReceive method to remove the listener
   removeReceive: (channel, func) => {
-    let validReceiveChannels = ["summoner-name-response"];
+    const validReceiveChannels = ["summoner-name-response"];
+    
     if (validReceiveChannels.includes(channel)) {
       ipcRenderer.removeListener(channel, func);
     }
