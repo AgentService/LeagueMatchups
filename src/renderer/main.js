@@ -12,13 +12,17 @@ import "@fortawesome/fontawesome-free/css/all.css";
 import { setupBaseUrl } from './globalSetup';
 
 import { initializeSummonerDataFetching, startSummonerNameCheck } from "../services/summonerDataService";
-import { retrieveFromLocalStorage } from "../store/plugins/storage.mjs";
 
 import Debug from "debug";
 
 if (import.meta.env.MODE !== "production") {
+  console.log("MODE: ", import.meta.env.MODE)
+  console.log("Running in development mode")
+  console.log("DEBUG?: ",import.meta.env.VITE_DEBUG)
   Debug.enable(import.meta.env.VITE_DEBUG);
 }
+Debug.enable(import.meta.env.VITE_DEBUG);
+
 async function initializeApp() {
   await setupBaseUrl(); 
   await store.dispatch("init/initializeApp");

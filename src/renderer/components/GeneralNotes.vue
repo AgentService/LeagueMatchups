@@ -45,11 +45,10 @@ import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
-const newNoteText = ref('');
 const noteText = ref({});
 const notesDisplayLimit = ref(2);
 const isExpanded = ref(false);
-const notesByDate = computed(() => store.state.generalNotes.notesByDate);
+const notesByDate = computed(() => store.state.notes.generalNotes);
 
 const limitedNotes = computed(() => {
 	return notesOrdered.value.slice(0, notesDisplayLimit.value);
@@ -85,7 +84,7 @@ const formatDate = (date) => {
 
 const fetchNotes = async () => {
 	try {
-		await store.dispatch('generalNotes/fetchNotes');
+		await store.dispatch('notes/fetchGeneralNotes');
 		// The Vuex state is automatically updated, so your UI should react to these changes
 	} catch (error) {
 		console.error('Error while fetching notes:', error);
@@ -95,11 +94,10 @@ const fetchNotes = async () => {
 
 const createNewNote = () => {
 	const currentDate = new Date().toISOString().split('T')[0];
-	if (!store.state.generalNotes.notesByDate[currentDate]) {
+	if (!store.state.notes.generalNotes[currentDate]) {
 		const newNote = ''; // Default content for the new note
 		// Commit the new note to the Vuex state and save it to the backend
-		store.commit('generalNotes/SET_NOTE', { date: currentDate, note: newNote });
-		store.dispatch('generalNotes/saveNote', { date: currentDate, note: newNote });
+		store.dispatch('notes/saveGeneralNote', { date: currentDate, note: newNote });
 	} else {
 		console.log("A note for today already exists.");
 	}
@@ -107,13 +105,13 @@ const createNewNote = () => {
 
 
 const deleteNote = (date) => {
-	store.dispatch('generalNotes/deleteNote', date).then(() => {
+	store.dispatch('notes/deleteGeneralNote', date).then(() => {
 	});
 };
 
 const saveNote = (date) => {
 	const note = noteText.value[date];
-	store.dispatch('generalNotes/saveNote', { date, note });
+	store.dispatch('notes/saveGeneralNote', { date, note });
 };
 
 onMounted(() => {

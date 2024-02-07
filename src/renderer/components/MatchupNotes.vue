@@ -17,8 +17,8 @@
 		</div>
 	</div>
 	<div class="card-body">
-		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="11"></textarea>
+		<textarea spellcheck="false" v-model="localNotes"
+			placeholder="Type your notes here..." class="note-textarea" rows="11"></textarea>
 	</div>
 </template>
 <script setup>
@@ -30,61 +30,60 @@ const debug = Debug('app:component:MatchupNotes');
 const store = useStore();
 const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
 const autoSaved = ref(false);
-const localNotes = ref('');
-const isSaved = ref(false)
+const localNotes = computed({
+	get: () => store.getters['notes/getPersonalNotesByMatchupId'](currentMatchup.value?.id),
+	set: (newValue) => {
+		userEditing.value = true;
+		debouncedSaveNotes(newValue);
+	}
+});
+
+
 const userEditing = ref(false);
 const championSwitched = ref(false);
 
 let saveTimeout = null;
 
-// Debounce function to limit how often we save the notes
-function debouncedSaveNotes() {
+function debouncedSaveNotes(newValue) {
 	if (saveTimeout) clearTimeout(saveTimeout);
-	saveTimeout = setTimeout(async () => {
-		await saveNotes();
-		autoSaved.value = true;
-		userEditing.value = false;
-
-		setTimeout(() => autoSaved.value = false, 2000);
-	}, 2000);
-}
-
-watch(currentMatchup, (newMatchup) => {
-	championSwitched.value = true
-	localNotes.value = newMatchup?.personalNotes || '';
-}, { immediate: true });
-
-watch(localNotes, () => {
-	// Reset save status when notes are edited
-	isSaved.value = false;
-});
-
-watch(localNotes, (newValue, oldValue) => {
-	if (newValue !== oldValue) {
-		if (championSwitched.value) {
-			championSwitched.value = false;
-			return;
+	saveTimeout = setTimeout(() => {
+		if (userEditing.value) { // Ensure we're saving because of user edits
+			saveNotes(newValue);
+			userEditing.value = false; // Reset the editing flag after saving
 		}
-		userEditing.value = true;
-		autoSaved.value = false;
-		debouncedSaveNotes();
+	}, 2000); // Adjust the debounce time as needed
+}
+
+watch(currentMatchup, (newVal, oldVal) => {
+	if (newVal?.id !== oldVal?.id) {
+		championSwitched.value = true;
+		store.dispatch('notes/fetchMatchupNotes', newVal.id);
+		userEditing.value = false; // Reset user editing flag
 	}
-});
+}, { deep: true, immediate: true });
 
-async function saveNotes() {
+
+async function saveNotes(newValue) {
 	if (currentMatchup.value && currentMatchup.value.id) {
-		await store.dispatch('matchups/saveNotes', { matchupId: currentMatchup.value.id, notes: localNotes.value });
+		await store.dispatch('notes/saveOrUpdateMatchupNotes', {
+			matchupId: currentMatchup.value.id,
+			notes: newValue,
+		});
 		debug('Auto-saved notes for matchup', currentMatchup.value.id);
-		isSaved.value = true;
-
+		autoSaved.value = true;
 		// Set a timer to revert isSaved back to false after 2 seconds
-		setTimeout(() => isSaved.value = false, 2000);
+		setTimeout(() => autoSaved.value = false, 2000);
 	}
 }
-onMounted(() => {
-	if (currentMatchup.value) {
-		localNotes.value = currentMatchup.value.personalNotes || '';
+
+async function fetchNotes() {
+	if (currentMatchup.value && currentMatchup.value.id) {
+		await store.dispatch('notes/fetchMatchupNotes', currentMatchup.value.id);
 	}
+}
+
+onMounted(() => {
+	fetchNotes();
 });
 </script>
 

@@ -3,7 +3,7 @@ import { createStore } from "vuex";
 import { summoner } from "./modules/summoner.js";
 import { matchups } from "./modules/matchups.js";
 import { matches } from "./modules/matches.js";
-import { generalNotes } from "./modules/generalNotes.js";
+import { notes } from "./modules/notes.js";
 import { items } from "./modules/items.js";
 import { userPreferences } from "./modules/userPreferences.js"; // Adjust the path as necessary
 
@@ -24,7 +24,7 @@ const vuexLocal = new VuexPersistence({
     "auth",
     "matches",
     "items",
-    "generalNotes",
+    "notes",
     "userPreferences",
   ],
   reducer: (state) => ({
@@ -37,7 +37,7 @@ const vuexLocal = new VuexPersistence({
     },
     matches: state.matches,
     items: state.items,
-    generalNotes: state.generalNotes,
+    notes: state.notes,
     userPreferences: state.userPreferences,
   }),
 });
@@ -53,7 +53,7 @@ export const store = createStore({
     init: init,
     matches: matches,
     items: items,
-    generalNotes: generalNotes,
+    notes: notes,
     userPreferences: userPreferences,
   },
 

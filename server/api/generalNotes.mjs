@@ -1,11 +1,11 @@
 import express from "express";
-import fs from "fs";
-import path from "path";
 import {
   verifyToken,
   extractEmailFromToken,
 } from "../utils/authMiddleware.mjs";
 import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
+import Debug from "debug";
+const debug = Debug("api:generalNotes");
 
 const router = express.Router();
 router.use(verifyToken); // Apply to all routes in this router
@@ -36,16 +36,16 @@ router.use("/save", extractEmailFromToken, (req, res) => {
     // Read existing notes
     let notes = {};
     try {
-      console.log("Reading the existing notes file.");
+      debug("Reading the existing notes file.");
       notes = readJsonFile(filePath);
     } catch (error) {
       // If the file doesn't exist, start with an empty object
-      console.log("Starting with a new notes file.");
+      debug("Starting with a new notes file.");
     }
 
     // Save or update the note
     notes[date] = note;
-    console.log("Saving the note:", note);
+    debug("Saving the note:", note);
     // Write the updated notes back to the file
     writeJsonFile(filePath, notes);
 

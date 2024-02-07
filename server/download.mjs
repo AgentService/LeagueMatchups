@@ -17,7 +17,7 @@ const ddragon = new DDragon(rAPI);
 const baseImageUrl = "https://ddragon.leagueoflegends.com/cdn";
 
 // Function to download and save champion images if they don't already exist
-async function downloadChampionImages(champion, version) {
+export async function downloadChampionImages(champion, version) {
 	const championImagePath = path.join(publicImagePath, 'champions', `${champion.id}.png`);
 	const loadingImagePath = path.join(publicImagePath, 'champion_loading', `${champion.id}_0.jpg`);
 	const splashImagePath = path.join(publicImagePath, 'champion_splash', `${champion.id}_0.jpg`);
@@ -178,7 +178,3 @@ async function main() {
 	}
 }
 
-
-
-// Führe die Hauptfunktion aus
-main();

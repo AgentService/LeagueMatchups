@@ -58,6 +58,7 @@
 		"node-schedule": "^2.1.1",
 		"passport": "^0.7.0",
 		"passport-local": "^1.0.0",
+		"psql": "^0.0.1",
 		"volar-service-vetur": "^0.0.17",
 		"vue": "^3.4.15",
 		"vue-router": "^4.2.5",

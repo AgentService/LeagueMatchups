@@ -5,6 +5,8 @@
 			<div class="container-fluid">
 				<div class="d-flex justify-content-start">
 					<Login></Login>
+					<RegistrationForm></RegistrationForm> <!-- Add the registration form component here -->
+
 				</div>
 				<div class="mx-auto d-flex justify-content-center">
 					<router-link to="/championMatchup" class="nav-link">Prepare</router-link>
@@ -71,6 +73,7 @@
 
 <script setup>
 import Login from "./LoginForm.vue";
+import RegistrationForm from './RegistrationForm.vue'; // Import the registration form component
 
 import { computed, onMounted } from "vue";
 import { useStore } from "vuex";

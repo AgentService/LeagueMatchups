@@ -33,9 +33,7 @@ const championId = ref('');
 const editableNotes = ref('');
 const championSwitched = ref(false);
 const userEditing = ref(false);
-
 const autoSaved = ref(false);
-
 const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
 
 let saveTimeout = null;
@@ -58,8 +56,8 @@ function debouncedSave() {
 
 // Function to fetch and set the notes for the current champion
 async function fetchAndSetNotes(currentChampionId) {
-	await store.dispatch('champions/fetchCustomChampionData', { championId: currentChampionId });
-	editableNotes.value = store.getters['champions/getChampionCustomData'](currentChampionId).personalNotes || '';
+	await store.dispatch('notes/fetchChampionPersonalNotes', currentChampionId);
+	editableNotes.value = store.getters['notes/getChampionPersonalNotes'](currentChampionId);
 
 	// Delay the setting of isInitialLoad to false to avoid immediate auto-save
 	setTimeout(() => {
@@ -96,10 +94,9 @@ onMounted(async () => {
 
 async function saveChampionNotes() {
 	try {
-		await store.dispatch('champions/updateCustomChampionData', {
+		await store.dispatch('notes/updateChampionPersonalNotes', {
 			championId: championId.value,
-			dataToUpdate: editableNotes.value,
-			type: 'notes'
+			personalNotes: editableNotes.value,
 		});
         notesState.value = 'saved'; // Update state to 'saved' after successful save
 		setTimeout(() => {

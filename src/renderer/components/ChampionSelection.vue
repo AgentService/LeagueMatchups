@@ -630,7 +630,6 @@ export default {
 			this.hideGrid();
 			debug('Selected champion:', this.selectedChampion);
 
-			await this.$store.dispatch('champions/fetchCustomChampionData', { championId: champion.id });
 
 			// Assuming 'championCustomData' is part of your component's data and is reactive
 			this.$nextTick(() => {

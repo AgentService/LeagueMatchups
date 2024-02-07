@@ -1,12 +1,11 @@
 // api/auth.mjs
-import Debug from "debug";
 import express from "express";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jsonwebtoken";
 import { verifyToken } from "../utils/authMiddleware.mjs";
-
-const debugApi = Debug("api");
+import Debug from "debug";
+const debug = Debug("api:auth");
 
 // const users = [
 // 	{ email: "user@example.com", password: "password123", name: "jegaj" },
@@ -17,14 +16,14 @@ passport.use(new LocalStrategy({
 	passwordField: "password"
 },
 (email, password, done) => {
-	debugApi(`Received email: ${email}, password: ${password}`);
+	debug(`Received email: ${email}, password: ${password}`);
 
 	// Directly check hardcoded credentials
-	if (email === "user@example.com" && password === "password123") {
-		debugApi("Hardcoded credentials matched");
-		return done(null, { email: "user@example.com", name: "jegaj" });
+	if (email === "markusromaniw@gmx.de" && password === "123") {
+		debug("Hardcoded credentials matched");
+		return done(null, { email: "markusromaniw@gmx.de", name: "jegaj", id: 8 });
 	} else {
-		debugApi("Hardcoded credentials did not match");
+		debug("Hardcoded credentials did not match");
 		return done(null, false, { message: "Incorrect username or password." });
 	}
 }
@@ -35,10 +34,12 @@ const router = express.Router();
 // Mock user data
 
 router.post("/login", passport.authenticate("local", { session: false }), (req, res) => {
+	debug("User login: ", req.user);
 	const user = req.user; // Your authenticated user
 	const email = user.email; // Get the user's email from the authenticated user
-	const token = jwt.sign({ email }, "your JWT secret", { expiresIn: "148h" });
-	debugApi("asd", user,  email, token);
+	const id =  8;
+	const token = jwt.sign({ email, id }, "your JWT secret", { expiresIn: "148h" });
+	debug("User login: ", user,  email);
 
 	// Send both the user and the token in the response
 	res.status(200).json({ user, token });

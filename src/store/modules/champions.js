@@ -1,6 +1,5 @@
 import Debug from "debug";
 const debug = Debug("app:store:champions");
-import { getAuthConfig } from "./utilities.js";
 
 // const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
@@ -22,6 +21,9 @@ export const champions = {
     },
     getChampionCustomData: (state) => (championId) => {
       return state.championCustomData[championId] || {};
+    },
+    getChampionList: (state) => {
+      return state.championList;
     },
   },
   mutations: {
@@ -63,37 +65,8 @@ export const champions = {
     SET_ALL_CUSTOM_CHAMPION_DATA(state, data) {
       state.championCustomData = data;
     },
-    UPDATE_NOTES(state, payload) {
-      // Find the matchup with the given id
-      const matchup = state.championCustomData.find((m) => m.id === payload.id);
-
-      if (matchup) {
-        // Update the notes of the found matchup
-        matchup.personalNotes = payload.personalNotes;
-      }
-    },
   },
   actions: {
-    async saveNotes({ dispatch }, payload) {
-      try {
-        await dispatch(
-          "patchDataAndCache",
-          {
-            module: "matchups",
-            type: "notes",
-            apiEndpoint: `/api/matchups/${payload.matchupId}/notes`,
-            vuexMutation: "matchups/UPDATE_NOTES",
-            data: { personalNotes: payload.notes },
-            authConfig: getAuthConfig(),
-          },
-          { root: true }
-        );
-        // Optionally, provide user feedback for success
-      } catch (error) {
-        // Error handling will be managed by patchDataAndCache
-        // Optionally, provide user feedback for error
-      }
-    },
     setSelectedSpells(state, spells) {
       state.selectedSpells = spells;
     },
@@ -168,56 +141,14 @@ export const champions = {
           vuexMutation: "champions/SET_CHAMPION_TIPS",
           skipCacheValidation: true,
           itemId: championId,
+          skipCacheValidation: true,
         },
         { root: true }
       );
-      debug("Champion tips:", championTips);
-      return championTips;
-    },
-    async fetchCustomChampionData({ dispatch }, { championId }) {
-      const options = {
-        module: "champions",
-        type: "championCustomData",
-        apiEndpoint: `/api/champions/${championId}/custom-data/`,
-        vuexMutation: "champions/SET_CUSTOM_CHAMPION_DATA",
-        itemId: championId,
-        commit: this.commit,
-        skipCacheValidation: true,
-        authConfig: getAuthConfig(),
-      };
-
-      const championCustomdData = await dispatch("fetchDataAndCache", options, {
-        root: true,
-      });
-
-      return championCustomdData;
-    },
-
-    // Action to update champion data
-    async updateCustomChampionData(
-      { dispatch },
-      { championId, dataToUpdate, type }
-    ) {
-      const options = {
-        module: "champions",
-        type: "championCustomData",
-        apiEndpoint: `/api/champions/${championId}/custom-data/${type}`,
-        vuexMutation: "champions/SET_CUSTOM_CHAMPION_DATA",
-        itemId: championId,
-        data: type === "notes" ? { personalNotes: dataToUpdate } : dataToUpdate,
-        commit: this.commit,
-        authConfig: getAuthConfig(),
-      };
-
-      try {
-        const newData = await dispatch("postDataAndCache", options, {
-          root: true,
-        });
-        return newData;
-      } catch (error) {
-        // Handle the error
-        console.error("Failed to post data:", error);
+      if (championTips) {
+        debug("Champion tips:", championTips);
       }
+      return championTips;
     },
   },
 };

@@ -39,6 +39,31 @@ export const auth = {
     },
   },
   actions: {
+    async register({ commit }, userData) {
+      commit("SET_AUTH_LOADING", true); // Optional: indicate that registration is in progress
+      console.log(userData)
+      try {
+        const response = await axios.post(
+          `${baseUrl}/api/user/register`,
+          userData
+        );
+        const data = validateApiResponse(response);
+
+        commit("SET_USER", data.user);
+        commit("SET_TOKEN", data.token);
+
+        saveToLocalStorage("token", data.token);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+
+        debug("Registration successful", data.user);
+        return data; // Optionally return data on successful registration
+      } catch (error) {
+        handleApiError(error); // Process and return any API errors
+        throw error; // Rethrow error to be handled by the caller
+      } finally {
+        commit("SET_AUTH_LOADING", false); // Indicate that registration process is complete
+      }
+    },
     // In your `auth.js` module
     async login({ commit }, credentials) {
       try {
@@ -60,34 +85,34 @@ export const auth = {
       }
     },
 
-	async reauthenticate({ commit }, token) {
-		commit("SET_AUTH_LOADING", true);
-		try {
-			const response = await axios.post(
-				`${baseUrl}/api/auth/verifyToken`,
-				{ token },
-				getAuthConfig()
-			);
-			const data = validateApiResponse(response);
-			commit("SET_USER", data.user);
-			commit("SET_TOKEN", token);
-			axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-		} catch (error) {
-			console.error("Token verification failed:", error);
-			if (error.response && error.response.status === 401) {
-				// Handle token expiration or invalid token
-				commit("SET_USER", null);
-				commit("SET_TOKEN", null);
-				removeFromLocalStorage("token");
-				delete axios.defaults.headers.common["Authorization"];
-				// Redirect to login or show a message as needed
-			}
-			// Handle other errors
-		} finally {
-			commit("SET_AUTH_LOADING", false);
-		}
-	},
-	
+    async reauthenticate({ commit }, token) {
+      commit("SET_AUTH_LOADING", true);
+      try {
+        const response = await axios.post(
+          `${baseUrl}/api/auth/verifyToken`,
+          { token },
+          getAuthConfig()
+        );
+        const data = validateApiResponse(response);
+        commit("SET_USER", data.user);
+        commit("SET_TOKEN", token);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      } catch (error) {
+        console.error("Token verification failed:", error);
+        if (error.response && error.response.status === 401) {
+          // Handle token expiration or invalid token
+          commit("SET_USER", null);
+          commit("SET_TOKEN", null);
+          removeFromLocalStorage("token");
+          delete axios.defaults.headers.common["Authorization"];
+          // Redirect to login or show a message as needed
+        }
+        // Handle other errors
+      } finally {
+        commit("SET_AUTH_LOADING", false);
+      }
+    },
+
     logout({ commit }) {
       commit("SET_USER", null);
       commit("SET_TOKEN", null);

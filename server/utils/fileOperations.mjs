@@ -2,7 +2,6 @@
 import fs from "fs";
 
 const readJsonFile = (filePath) => {
-	console.log("filePath:", filePath);
 	const rawData = fs.readFileSync(filePath);
 	return JSON.parse(rawData);
 };

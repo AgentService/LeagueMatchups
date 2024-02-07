@@ -115,7 +115,7 @@ import MatchHistory from './components/MatchHistory.vue';
 import GeneralNotes from './components/GeneralNotes.vue';
 
 
-const debug = Debug('app:page:ChampionPage');
+const debug = Debug('app:component:ChampionPage');
 
 const championA = ref(null);
 const championB = ref(null);
@@ -123,49 +123,29 @@ const championB = ref(null);
 const store = useStore();
 let bothSelected = false;
 
-const championBackgroundStyleA = computed(() => {
-	if (championA.value) {
-		const imageUrl = getChampionImageSource('splash', championA.value.id);
-		return `background-image: url('${imageUrl}');`;
-	}
-	return '';
-});
-
-const championBackgroundStyleB = computed(() => {
-	if (championB.value) {
-		const imageUrl = getChampionImageSource('splash', championB.value.id);
-		return `background-image: url('${imageUrl}');`;
-	}
-	return '';
-});
-
-function getBackgroundStyle(champion) {
-	if (champion) {
-		const imageUrl = getChampionImageSource('splash', champion.id);
-		// Return a class name or a style object that references the image URL
-		return `background-${champion.id}`; // Example class name
-	}
-	return '';
-}
-
 const handleMatchup = () => {
-
 	if (championA.value && championB.value) {
 		if (!bothSelected) {
 			bothSelected = true;
-			const champAName = championA.value.name;
-			const champBName = championB.value.name;
+			const championA_name = championA.value.name; // Assuming .id is the unique identifier
+			const championB_name = championB.value.name;
 
-			if (champAName === champBName) {
+			if (championA_name === championB_name) {
+				alert("Cannot create a matchup with the same champion.");
 				return;
 			}
-			const matchupKey = `${champAName}-${champBName}`;
 
+			// Construct a unique matchupKey based on champion IDs
+			const matchupKey = `${championA_name}-${championB_name}`;
+
+			// Now the matchup object uses champion IDs
 			const matchup = {
-				id: matchupKey, // using matchupKey as a unique id
-				champions: [championA.value, championB.value] // retaining champions data
+				id: matchupKey, // Still using matchupKey as a unique identifier for ease of reference
+				champions: [championA.value, championB.value], // Retaining champions data for additional context
 			};
-			debug(`handleMatchup: ${JSON.stringify(matchupKey)}`);
+
+			debug(`handleMatchup: ${JSON.stringify(matchupKey)} - ${JSON.stringify(matchup.champions[0].name)} vs ${JSON.stringify(matchup.champions[1].name)}`);
+			// Dispatching with matchup ID and champion details
 			store.dispatch('matchups/handleMatchupCreation', matchup);
 		}
 	} else {
@@ -173,19 +153,19 @@ const handleMatchup = () => {
 	}
 };
 
+
 const setChampionA = (champion) => {
 	championA.value = champion;
 	store.dispatch('matchups/setChampionA', champion);
 	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
-	store.dispatch('champions/fetchCustomChampionData', { championId: champion.id });
+	store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
 
 };
 
 const setChampionB = (champion) => {
 	championB.value = champion;
 	store.dispatch('matchups/setChampionB', champion);
-	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
-	store.dispatch('champions/fetchCustomChampionData', { championId: champion.id });
+	store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {

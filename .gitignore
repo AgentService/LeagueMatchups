@@ -36,8 +36,10 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
-
+keyfile.json
 user_data/
+api-data/convert.py
+api-data/converttips.py
 # TypeScript v1 declaration files
 typings/
 

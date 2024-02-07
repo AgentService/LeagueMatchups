@@ -1,13 +1,13 @@
 // In api/summoner.js
-import { RiotAPI, PlatformId } from "@fightmegg/riot-api";
+import { PlatformId } from "@fightmegg/riot-api";
 import express from "express";
 import axios from "axios";
 import Debug from "debug";
 const debugApi = Debug("api");
+import { getRiotAPI } from './utilities.mjs';
+
 
 const router = express.Router();
-const RIOT_API_KEY = process.env.VITE_RIOT_API_KEY;
-const rAPI = new RiotAPI(process.env.VITE_RIOT_API_KEY);
 
 // Endpoint to get summoner by Riot ID
 router.get("/by-riot-id", async (req, res) => {
@@ -18,7 +18,7 @@ router.get("/by-riot-id", async (req, res) => {
 
 		const accountData = await axios.get(URL, {
 			headers: {
-				"X-Riot-Token": RIOT_API_KEY
+				"X-Riot-Token": process.env.VITE_RIOT_API_KEY
 			}
 		});
 
@@ -26,6 +26,7 @@ router.get("/by-riot-id", async (req, res) => {
 
 		// Then, use the PUUID to get the summoner's data
 		debugApi("Fetching summoner by PUUID");
+		const rAPI = getRiotAPI();
 		const summonerData = await rAPI.summoner.getByPUUID({
 			region: PlatformId.EUW1,
 			puuid: puuid,
