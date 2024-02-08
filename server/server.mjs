@@ -43,6 +43,7 @@ import userManagementRouter from "./api/userManagement.mjs";
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import Debug from "debug";
 const debug = Debug("server");
+import { initializePassportStrategy } from './api/auth.mjs'; // Adjust based on your file structure
 
 Debug.enable(process.env.DEBUG);
 debug("Debug is enabled")
@@ -90,6 +91,8 @@ async function startServer() {
 
   app.use(cors());
   app.use(express.json());
+
+  initializePassportStrategy(dbPool);
   app.use(passport.initialize());
 
   app.use("/api/matchups", verifyToken);

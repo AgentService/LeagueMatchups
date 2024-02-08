@@ -26,8 +26,8 @@ router.post("/register", async (req, res) => {
   try {
     // Insert the new user into the database
     const result = await dbPool.query(
-      "INSERT INTO Users (username, Email, PasswordHash) VALUES ($1, $2, $3) RETURNING userid, username, Email"
-      [username, email, hashedPassword]
+      "INSERT INTO Users (username, Email, PasswordHash) VALUES ($1, $2, $3) RETURNING userid, username, Email",
+      [username, email, hashedPassword] // Note the comma at the end of the SQL query string
     );
     const newUser = result.rows[0];
     // Exclude the password hash when returning the created user

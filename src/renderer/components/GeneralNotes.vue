@@ -12,21 +12,22 @@
 	</div>
 	<!-- Notes list -->
 	<div class="notes-list card-body">
-		<li v-for="item in limitedNotes" :key="item.date" class="note-item mb-4">
-			<textarea spellcheck="false" v-model="noteText[item.date]" class="note-textarea"
+		<li v-for="item in limitedNotes" :key="item.noteid" class="note-item mb-4">
+			<textarea spellcheck="false" v-model="noteText[item.noteid]" class="note-textarea"
 				placeholder="Type your notes here..." rows="6"></textarea>
 			<div class="note-footer d-flex">
-				<div class="note-date">{{ formatDate(item.date) }}</div>
+				<div class="note-date">{{ formatDate(item.created_at) }}</div>
 				<div class="buttons-container d-flex justify-content-end">
-					<button @click="deleteNote(item.date)" class="btn delete-button">
+					<button @click="deleteNote(item.noteid)" class="btn delete-button">
 						<i class="far fa-trash-alt"></i>
 					</button>
-					<button @click="saveNote(item.date)" class="btn save-button">
+					<button @click="saveNote(item.noteid)" class="btn save-button">
 						<i class="far fa-save"></i>
 					</button>
 				</div>
 			</div>
 		</li>
+
 		<div class="show-more-container">
 			<button v-if="!isExpanded.value && notesOrdered.length > notesDisplayLimit" @click="showMoreNotes" class="btn">
 				Show More
@@ -48,15 +49,21 @@ const store = useStore();
 const noteText = ref({});
 const notesDisplayLimit = ref(2);
 const isExpanded = ref(false);
-const notesByDate = computed(() => store.state.notes.generalNotes);
+const notesOrdered = computed(() => {
+	return store.state.notes?.generalNotes
+		.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+});
 
 const limitedNotes = computed(() => {
 	return notesOrdered.value.slice(0, notesDisplayLimit.value);
 });
 
+// Adjust other methods accordingly
+
+
 
 const showMoreNotes = () => {
-	notesDisplayLimit.value += 2; 
+	notesDisplayLimit.value += 2;
 	isExpanded.value = true;
 	console.log("Show More clicked. Display limit:", notesDisplayLimit.value, "Is Expanded:", isExpanded.value);
 };
@@ -66,15 +73,6 @@ const showLessNotes = () => {
 	isExpanded.value = false;
 	console.log("Show Less clicked. Display limit:", notesDisplayLimit.value, "Is Expanded:", isExpanded.value);
 };
-
-
-const notesOrdered = computed(() => {
-	return Object.entries(notesByDate.value)
-		.sort(([dateA], [dateB]) => new Date(dateB) - new Date(dateA))
-		.map(([date, note]) => ({ date, note }));
-});
-
-
 
 const formatDate = (date) => {
 	return new Date(date).toLocaleDateString('en-US', {
@@ -93,36 +91,35 @@ const fetchNotes = async () => {
 };
 
 const createNewNote = () => {
-	const currentDate = new Date().toISOString().split('T')[0];
-	if (!store.state.notes.generalNotes[currentDate]) {
-		const newNote = ''; // Default content for the new note
-		// Commit the new note to the Vuex state and save it to the backend
-		store.dispatch('notes/saveGeneralNote', { date: currentDate, note: newNote });
-	} else {
-		console.log("A note for today already exists.");
-	}
+    const currentDate = new Date().toISOString().split('T')[0];
+    if (!store.state.notes.generalNotes.find(note => note.date === currentDate)) {
+        const newNote = ''; // Default content for the new note
+        // Commit the new note to the Vuex state and save it to the backend
+        store.dispatch('notes/saveGeneralNote', { date: currentDate, note: newNote });
+    } else {
+        console.log("A note for today already exists.");
+    }
 };
 
 
-const deleteNote = (date) => {
-	store.dispatch('notes/deleteGeneralNote', date).then(() => {
+const deleteNote = (noteid) => {
+	store.dispatch('notes/deleteGeneralNote', noteid).then(() => {
+		// Handle post-delete actions
 	});
 };
 
-const saveNote = (date) => {
-	const note = noteText.value[date];
-	store.dispatch('notes/saveGeneralNote', { date, note });
+const saveNote = (noteid) => {
+	const content = noteText.value[noteid];
+	store.dispatch('notes/saveGeneralNote', { noteid, content });
 };
 
 onMounted(() => {
 	const currentDate = new Date().toISOString().split('T')[0];
 	// Ensure there's an entry for the current day
-	if (!noteText.value[currentDate]) {
-		noteText.value[currentDate] = '';
-	}
 	fetchNotes().then(() => {
-		for (const [date, note] of Object.entries(notesByDate.value)) {
-			noteText.value[date] = note;
+		noteText.value = {};
+		for (const note of notesOrdered.value) {
+			noteText.value[note.noteid] = note.content;
 		}
 	});
 });

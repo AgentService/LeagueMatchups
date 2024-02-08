@@ -11,51 +11,98 @@ const debug = Debug("api:auth");
 // 	{ email: "user@example.com", password: "password123", name: "jegaj" },
 // ];
 
-passport.use(new LocalStrategy({
-	usernameField: "email",
-	passwordField: "password"
-},
-(email, password, done) => {
-	debug(`Received email: ${email}, password: ${password}`);
+import bcrypt from "bcrypt";
 
-	// Directly check hardcoded credentials
-	if (email === "markusromaniw@gmx.de" && password === "123") {
-		debug("Hardcoded credentials matched");
-		return done(null, { email: "markusromaniw@gmx.de", name: "jegaj", id: 8 });
-	} else {
-		debug("Hardcoded credentials did not match");
-		return done(null, false, { message: "Incorrect username or password." });
-	}
+// Assuming dbPool is initialized somewhere in your app setup
+export function initializePassportStrategy(dbPool) {
+  passport.use(
+    new LocalStrategy(
+      {
+        usernameField: "email",
+        passwordField: "password",
+      },
+      async (email, password, done) => {
+        try {
+          const result = await dbPool.query(
+            "SELECT * FROM Users WHERE Email = $1",
+            [email]
+          );
+		  debug("Result: ", result);
+          if (result.rows.length > 0) {
+            const user = result.rows[0];
+			debug("User: ", user);
+            const match = await bcrypt.compare(password, user.passwordhash);
+            if (match) {
+              // User authenticated successfully
+			  debug("User authenticated successfully");
+              return done(null, {
+                email: user.email,
+                name: user.username,
+                id: user.userid, // Make sure to include the user's ID
+              });
+            } else {
+              // Password does not match
+			  debug("Password does not match");
+              return done(null, false, {
+                message: "Incorrect username or password.",
+              });
+            }
+          } else {
+            // No user found with the provided email
+            return done(null, false, { message: "User not found." });
+          }
+        } catch (err) {
+          console.error("Error during authentication", err);
+          return done(err);
+        }
+      }
+    )
+  );
 }
-));
 
 const router = express.Router();
 
 // Mock user data
 
-router.post("/login", passport.authenticate("local", { session: false }), (req, res) => {
-	debug("User login: ", req.user);
-	const user = req.user; // Your authenticated user
-	const email = user.email; // Get the user's email from the authenticated user
-	const id =  8;
-	const token = jwt.sign({ email, id }, "your JWT secret", { expiresIn: "148h" });
-	debug("User login: ", user,  email);
+router.post(
+  "/login",
+  passport.authenticate("local", { session: false }),
+  (req, res) => {
+    debug("User login: ", req.user);
+    const user = req.user; // Your authenticated user
+    const email = user.email; // Get the user's email from the authenticated user
+    const id = user.id; // Get the user's ID from the authenticated user
+    const token = jwt.sign({ email, id }, "your JWT secret", {
+      expiresIn: "148h",
+    });
+    debug("User login: ", user, email);
 
-	// Send both the user and the token in the response
-	res.status(200).json({ user, token });
-});
+    // Send both the user and the token in the response
+    res.status(200).json({ user, token });
+  }
+);
 
-// Token Verification Endpoint
-router.post("/verifyToken", verifyToken, (req, res) => {
-	// If the token is valid, the user information will be in req.user
-	const user = req.user;
+router.post("/verifyToken", verifyToken, async (req, res) => {
+  // Extract userId from verified token, assumed to be added by `verifyToken` middleware
+  const { id } = req.user; // This assumes your middleware adds the decoded token to `req.user`
+  const { dbPool } = req.app.locals;
 
-	if (!user) {
-		return res.status(401).send("Invalid Token");
-	}
-
-	// Assuming you want to return some user info (adjust as needed)
-	res.json({ user: { email: user.email, name: user.name } });
+  try {
+    const result = await dbPool.query("SELECT * FROM Users WHERE UserID = $1", [
+      id,
+    ]);
+    if (result.rows.length > 0) {
+      const user = result.rows[0];
+      res.json({
+        user: { email: user.email, name: user.username, id: user.userid },
+      });
+    } else {
+      res.status(404).send("User not found.");
+    }
+  } catch (err) {
+    console.error("Error during user verification", err);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 export default router;

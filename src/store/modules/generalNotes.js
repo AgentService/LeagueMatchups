@@ -7,8 +7,7 @@ export const generalNotes = {
   namespaced: true,
   state: () => ({
     notesByDate: {
-      "2024-01-20": "This is a test note for January 20, 2024.",
-      "2024-01-19": "This is a test note for January 19, 2024.",
+
     },
   }),
   getters: {

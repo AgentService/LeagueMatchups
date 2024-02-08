@@ -95,8 +95,8 @@ onMounted(async () => {
 async function saveChampionNotes() {
 	try {
 		await store.dispatch('notes/updateChampionPersonalNotes', {
-			championId: championId.value,
-			personalNotes: editableNotes.value,
+			championName: championId.value,
+			content: editableNotes.value,
 		});
         notesState.value = 'saved'; // Update state to 'saved' after successful save
 		setTimeout(() => {

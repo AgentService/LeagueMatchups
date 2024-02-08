@@ -9,99 +9,116 @@ export const notes = {
   namespaced: true,
   state: {
     championNotes: {},
-    generalNotes: {
-      "2024-01-20": "This is a test note for January 20, 2024.",
-      "2024-01-19": "This is a test note for January 19, 2024.",
-    },
+    generalNotes: [],
     matchupNotes: {},
   },
   mutations: {
-    // generalNotes
-    SET_GENERAL_NOTE(state, { date, note }) {
-      state.generalNotes[date] = note;
+    SET_GENERAL_NOTE(state, { note }) {
+      // Find the index of the note if it already exists in the state
+      const index = state.generalNotes.findIndex(
+        (existingNote) => existingNote.noteid === note.noteid
+      );
+
+      if (index !== -1) {
+        // If the note exists, update the content of the existing note
+        state.generalNotes[index] = { ...state.generalNotes[index], ...note };
+      } else {
+        // If the note does not exist, add the new note to the state
+        state.generalNotes.push(note);
+      }
     },
+
     SET_GENERAL_NOTES(state, notes) {
       state.generalNotes = notes;
     },
-    DELETE_GENERAL_NOTE(state, date) {
-      delete state.generalNotes[date];
+    DELETE_GENERAL_NOTE(state, noteid) {
+      const index = state.generalNotes.findIndex(
+        (existingNote) => existingNote.noteid === noteid
+      );
+      if (index !== -1) {
+        state.generalNotes.splice(index, 1);
+      }
     },
+
     // championNotes
-    SET_CHAMPION_PERSONAL_NOTES(state, { championId, data }) {
-      if (!state.championNotes[championId]) {
-        state.championNotes[championId] = {};
-      }
-      if (data.personalNotes !== undefined) {
-        state.championNotes[championId].personalNotes = data.personalNotes;
+    SET_CHAMPION_PERSONAL_NOTES(state, { championName, data }) {
+      state.championNotes[championName] = data;
+    },
+
+    UPDATE_CHAMPION_PERSONAL_NOTES_CONTENT(
+      state,
+      { championName, content, updated_at }
+    ) {
+      if (state.championNotes[championName]) {
+        state.championNotes[championName].content = content;
+        state.championNotes[championName].updated_at = updated_at;
       }
     },
-    UPDATE_CHAMPION_PERSONAL_NOTES(state, { championId, personalNotes }) {
-      if (!state.championNotes[championId]) {
-        state.championNotes[championId] = {};
-      }
-      state.championNotes[championId].personalNotes = personalNotes;
-    },
+
     // Matchup Notes Mutations
-    SET_MATCHUP_NOTES(state, { matchupId, notes }) {
-      state.matchupNotes[matchupId] = notes;
+    SET_MATCHUP_NOTES(state, { matchupId, data }) {
+      state.matchupNotes[matchupId] = data;
     },
-    UPDATE_MATCHUP_PERSONAL_NOTES(state, { matchupId, notes }) {
-      if (!state.matchupNotes[matchupId]) {
-        state.matchupNotes[matchupId] = {
-          notes,
-        };
-      } else {
-        state.matchupNotes[matchupId].notes = notes;
+    UPDATE_MATCHUP_PERSONAL_NOTES(state, { matchupId, content, updated_at }) {
+      if (state.matchupNotes[matchupId]) {
+        state.matchupNotes[matchupId].content = content;
+        state.matchupNotes[matchupId].updated_at = updated_at;
       }
     },
   },
   getters: {
-    getGeneralNote: (state) => (date) => {
-      return state.generalNotes[date] || "";
+    getGeneralNote: (state) => (noteId) => {
+      return state.generalNotes[noteId] || "";
     },
     getChampionNotes: (state) => (championId) => {
       return state.championNotes[championId] || {};
     },
     getChampionPersonalNotes: (state) => (championId) => {
-      return state.championNotes[championId]?.personalNotes || "";
+      return state.championNotes[championId]?.content || "";
     },
     // matchup
     getMatchupNotes: (state) => (matchupId) => {
       return state.matchupNotes[matchupId] || {};
     },
     getPersonalNotesByMatchupId: (state) => (matchupId) => {
-      return state.matchupNotes[matchupId]?.notes || "";
+      return state.matchupNotes[matchupId]?.content || "";
     },
   },
   actions: {
     // generalNotes
-    async saveGeneralNote({ commit }, { date, note }) {
+    async saveGeneralNote({ commit }, { noteid, content }) {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.post(
-          `${baseUrl}/api/generalNotes/save`,
-          { date, note },
+          `${baseUrl}/api/notes/general`,
+          { noteid, content },
           authConfig
         );
 
-        // Use the response data to update the state, if needed
-        commit("SET_GENERAL_NOTE", { date, note: response.data.note });
+        // Assuming the response data includes the entire note object
+        const { note } = response.data;
+
+        // Use the response data to update the state
+        commit("SET_GENERAL_NOTE", {
+          note,
+        });
       } catch (error) {
         console.error("Error saving the note:", error);
         // Handle the error appropriately
       }
     },
-    async deleteGeneralNote({ commit }, date) {
+
+    async deleteGeneralNote({ commit }, noteid) {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.delete(
-          `${baseUrl}/api/generalNotes/delete/${date}`,
+          `${baseUrl}/api/notes/general/${noteid}`,
           authConfig
         );
 
         // Assuming the backend sends a success response
         if (response.status === 200) {
-          commit("DELETE_GENERAL_NOTE", date);
+          commit("DELETE_GENERAL_NOTE", noteid);
         }
       } catch (error) {
         console.error("Error deleting the note:", error);
@@ -112,7 +129,7 @@ export const notes = {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.get(
-          `${baseUrl}/api/generalNotes/notes`,
+          `${baseUrl}/api/notes/general`,
           authConfig
         );
 
@@ -125,54 +142,57 @@ export const notes = {
       }
     },
     // championNotes
-    async fetchChampionPersonalNotes({ commit }, championId) {
-      try {
-        const authConfig = getAuthConfig();
-        const response = await axios.get(
-          `${baseUrl}/api/champions/${championId}/custom-data`,
-          authConfig
-        );
-        commit("SET_CHAMPION_PERSONAL_NOTES", {
-          championId,
-          data: response.data.data,
-        });
-      } catch (error) {
-        console.error("Error fetching custom champion data:", error);
-        // Handle error appropriately
+    async fetchChampionPersonalNotes({ commit, state }, championName) {
+      if (!state.championNotes[championName]) {
+        try {
+          const authConfig = getAuthConfig();
+          const response = await axios.get(
+            `${baseUrl}/api/notes/champion/${championName}`,
+            authConfig
+          );
+          // Handle the full SQL row
+          commit("SET_CHAMPION_PERSONAL_NOTES", {
+            championName,
+            data: response.data, // Assuming the response wraps the note in a `note` object
+          });
+        } catch (error) {
+          console.error("Error fetching champion notes:", error);
+          // Handle error appropriately
+        }
       }
     },
-    async updateChampionPersonalNotes(
-      { commit },
-      { championId, personalNotes }
-    ) {
+
+    async updateChampionPersonalNotes({ commit }, { championName, content }) {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.post(
-          `${baseUrl}/api/champions/${championId}/custom-data/notes`,
-          { personalNotes }, // Assuming your backend expects an object with personalNotes
+          `${baseUrl}/api/notes/champion/${championName}`,
+          { content },
           authConfig
         );
-        // Assuming the backend responds with the updated notes structure
-        commit("UPDATE_CHAMPION_PERSONAL_NOTES", {
-          championId,
-          personalNotes: response.data.data.personalNotes,
+        // Only update the content in the state
+        commit("UPDATE_CHAMPION_PERSONAL_NOTES_CONTENT", {
+          championName,
+          content: response.data.content,
+          updated_at: response.data.updated_at,
         });
       } catch (error) {
-        console.error("Error updating custom champion data:", error);
+        console.error("Error updating champion notes:", error);
         // Handle error appropriately
       }
     },
+
     // Matchup Notes Actions
     async fetchMatchupNotes({ state, commit }, id) {
       if (!state.matchupNotes[id]) {
         try {
-          const config = getAuthConfig(); // Ensure this function is defined and correctly sets up authorization headers
+          const authConfig = getAuthConfig(); // Ensure this function is defined and correctly sets up authorization headers
           const response = await axios.get(
             `${baseUrl}/api/notes/matchup/${id}`,
-            config
+            authConfig
           );
 
-          commit("SET_MATCHUP_NOTES", { matchupId: id, notes: response.data });
+          commit("SET_MATCHUP_NOTES", { matchupId: id, data: response.data });
         } catch (error) {
           console.error("Error fetching matchup notes:", error);
         }
@@ -180,7 +200,7 @@ export const notes = {
     },
     async saveOrUpdateMatchupNotes(
       { state, commit, dispatch },
-      { matchupId, notes }
+      { matchupId, content }
     ) {
       if (!state.matchupNotes[matchupId]) {
         await dispatch("fetchMatchupNotes", matchupId);
@@ -190,13 +210,14 @@ export const notes = {
         const authConfig = getAuthConfig();
         const response = await axios.post(
           `${baseUrl}/api/notes/matchup/${matchupId}`,
-          { notes },
+          { content },
           authConfig
         );
 
         commit("UPDATE_MATCHUP_PERSONAL_NOTES", {
           matchupId,
-          notes: response.data.note,
+          content: response.data.content,
+          updated_at: response.data.updated_at,
         });
       } catch (error) {
         console.error("Error updating matchup notes:", error);

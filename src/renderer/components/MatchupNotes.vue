@@ -67,7 +67,7 @@ async function saveNotes(newValue) {
 	if (currentMatchup.value && currentMatchup.value.id) {
 		await store.dispatch('notes/saveOrUpdateMatchupNotes', {
 			matchupId: currentMatchup.value.id,
-			notes: newValue,
+			content: newValue,
 		});
 		debug('Auto-saved notes for matchup', currentMatchup.value.id);
 		autoSaved.value = true;

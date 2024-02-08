@@ -1,0 +1,41 @@
+GPT
+Compact Database Schema Summary
+Tables:
+Users
+
+UserID (PK, int): Unique identifier for each user.
+Email (varchar): User's email, unique.
+Username (varchar): User's chosen username.
+PasswordHash (varchar): Hashed password for security.
+Champions
+
+Name (PK, varchar): Unique name of the champion.
+Matchups
+
+ID (PK, int): Unique identifier for the matchup.
+Champion_A_Name (FK, varchar): References Champions.Name.
+Champion_B_Name (FK, varchar): References Champions.Name.
+GeneralNotes
+
+NoteID (PK, int): Unique identifier for the note.
+UserID (FK, int): References Users.UserID.
+Content (text): The text content of the note.
+Visibility (varchar): Access control, e.g., "private".
+ChampionNotes
+
+NoteID (PK, int): Unique identifier for the note.
+UserID (FK, int): References Users.UserID.
+ChampionName (FK, varchar): References Champions.Name.
+Content (text): The text content of the note.
+Visibility (varchar): Access control, e.g., "private".
+MatchupNotes
+
+NoteID (PK, int): Unique identifier for the note.
+UserID (FK, int): References Users.UserID.
+MatchupID (FK, int): References Matchups.ID.
+Content (text): The text content of the note.
+Visibility (varchar): Access control, e.g., "private".
+Relationships:
+Users can have multiple GeneralNotes, ChampionNotes, and MatchupNotes.
+Champions can be associated with multiple ChampionNotes and are part of Matchups.
+Each Matchup can be associated with multiple MatchupNotes.
