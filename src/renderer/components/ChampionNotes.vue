@@ -9,7 +9,27 @@
 				<div v-if="notesState === 'editing'" key="editing" class="status-message">
 					<i class="fas fa-edit text-warning"></i>
 				</div>
+				<button @click="showNotesModal = true" class="btn btn-secondary btn-sm">
+					Show Other Users' Notes
+				</button>
 			</transition-group>
+		</div>
+		<div v-if="showNotesModal" class="overlay">
+			<div class="popup">
+				<p class="card-header">Shared Champion Notes</p>
+				<div v-for="note in otherUsersNotes" :key="note.id" class="note-details  d-flex flex-column">
+					<figure>
+						<blockquote class="blockquote">
+							<p>{{ note.username }}</p>
+						</blockquote>
+						<figcaption class="blockquote-footer">
+							<h6 class="align-self-start note-updated">updated: {{ formatDate(note.updated_at) }}</h6>
+						</figcaption>
+					</figure>
+					<p class="note-content ">{{ note.content }}</p>
+				</div>
+				<button @click="showNotesModal = false">Close</button>
+			</div>
 		</div>
 	</div>
 	<div class="card-body ">
@@ -36,8 +56,25 @@ const userEditing = ref(false);
 const autoSaved = ref(false);
 const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
 
+const showNotesModal = ref(false); // Controls the visibility of the modal
+const otherUsersNotes = ref([]); // Array to store other users' notes
+
 let saveTimeout = null;
 let isInitialLoad = ref(true); // Flag for initial data load
+
+async function fetchOtherUsersNotes() {
+	// This will fetch notes for the current champion from other users
+	// You need to modify this according to your Vuex store and actions
+	await store.dispatch('notes/fetchOtherUsersChampionNotes', championId.value);
+	otherUsersNotes.value = store.getters['notes/getChampionNotesShared'](championId.value);
+}
+
+// Call fetchOtherUsersNotes when the modal is opened
+watch(showNotesModal, (newVal) => {
+	if (newVal === true) {
+		fetchOtherUsersNotes();
+	}
+});
 
 function debouncedSave() {
 	if (saveTimeout) clearTimeout(saveTimeout);
@@ -92,15 +129,20 @@ onMounted(async () => {
 	}
 });
 
+const formatDate = (date) => {
+	return new Date(date).toLocaleDateString('en-US', {
+		year: 'numeric', month: 'long', day: 'numeric'
+	});
+};
 async function saveChampionNotes() {
 	try {
 		await store.dispatch('notes/updateChampionPersonalNotes', {
 			championName: championId.value,
 			content: editableNotes.value,
 		});
-        notesState.value = 'saved'; // Update state to 'saved' after successful save
+		notesState.value = 'saved'; // Update state to 'saved' after successful save
 		setTimeout(() => {
-            notesState.value = 'neutral'; // Reset to 'neutral' after some time
+			notesState.value = 'neutral'; // Reset to 'neutral' after some time
 		}, 2000);
 	} catch (error) {
 		console.error('Error saving notes:', error);
@@ -112,6 +154,96 @@ async function saveChampionNotes() {
 
 
 <style scoped>
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	/* Slightly darker overlay for better focus on popup */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	/* Ensure overlay is above everything else */
+}
+
+.popup {
+	width: 30%;
+	min-width: 300px;
+	/* Ensure popup is not too narrow on small screens */
+	background-color: black;
+	/* Light background for contrast */
+	padding: 25px;
+	border: 1px solid var(--grey-2);
+	border-radius: 8px;
+	/* More pronounced rounded corners */
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	/* Softer shadow for depth */
+	transition: transform 0.3s ease-out;
+	/* Smooth enter effect */
+	transform: scale(1.05);
+	/* Slightly scale up for attention */
+}
+
+.note-details {
+	background-color: var(--card-background);
+	/* Light grey background for each note for better separation */
+	padding: 15px;
+	text-transform:none;
+	border-radius: 4px;
+	margin-bottom: 15px;
+	margin-left: .75rem;
+	font-size: .875rem;
+	color: var(--grey-1);
+
+	/* Increase spacing for better readability */
+}
+
+.note-updated {
+	color: var(--grey-2);
+	font-size: 0.875rem;
+	/* Light grey for date */
+}
+
+.note-content {
+	white-space: pre-wrap;
+	background-color: rgb(23, 31, 56);
+	padding: 1rem;
+	border-radius: 12px;
+	margin-top: .5rem;
+	color: var(--gold-1);
+	/* Dark grey text for softer contrast */
+	font-size: 0.95rem;
+	/* Slightly smaller font for content */
+}
+
+button {
+	background-color: #4CAF50;
+	/* Green background for action */
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 5px;
+	cursor: pointer;
+	/* Cursor indication for clickable */
+	transition: background-color 0.2s;
+	/* Smooth background color transition for hover */
+}
+
+button:hover {
+	background-color: #45a049;
+	/* Darker green on hover for feedback */
+}
+
+h3 {
+	color: #333;
+	/* Dark grey for titles */
+	margin-bottom: 20px;
+	/* More space below the title */
+}
+
 .notes-saved {
 	font-size: 1rem;
 	text-transform: none;

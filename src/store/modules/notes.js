@@ -9,6 +9,7 @@ export const notes = {
   namespaced: true,
   state: {
     championNotes: {},
+    championNotesShared: {},
     generalNotes: [],
     matchupNotes: {},
   },
@@ -44,7 +45,6 @@ export const notes = {
     SET_CHAMPION_PERSONAL_NOTES(state, { championName, data }) {
       state.championNotes[championName] = data;
     },
-
     UPDATE_CHAMPION_PERSONAL_NOTES_CONTENT(
       state,
       { championName, content, updated_at }
@@ -53,6 +53,9 @@ export const notes = {
         state.championNotes[championName].content = content;
         state.championNotes[championName].updated_at = updated_at;
       }
+    },
+    SET_OTHER_USERS_CHAMPION_NOTES(state, { championName, notes }) {
+      state.championNotesShared[championName] = notes;
     },
 
     // Matchup Notes Mutations
@@ -67,6 +70,9 @@ export const notes = {
     },
   },
   getters: {
+    getChampionNotesShared: (state) => (championId) => {
+      return state.championNotesShared[championId] || {};
+    },
     getGeneralNote: (state) => (noteId) => {
       return state.generalNotes[noteId] || "";
     },
@@ -161,7 +167,22 @@ export const notes = {
         }
       }
     },
-
+    async fetchOtherUsersChampionNotes({ commit }, championName) {
+      try {
+        const authConfig = getAuthConfig();
+        const response = await axios.get(
+          `${baseUrl}/api/notes/other/${championName}`,
+          authConfig
+        );
+        commit("SET_OTHER_USERS_CHAMPION_NOTES", {
+          championName,
+          notes: response.data, // Assuming the response wraps the notes in a data array
+        });
+      } catch (error) {
+        console.error("Error fetching other users' champion notes:", error);
+        // Handle error appropriately
+      }
+    },
     async updateChampionPersonalNotes({ commit }, { championName, content }) {
       try {
         const authConfig = getAuthConfig();
