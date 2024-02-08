@@ -107,8 +107,8 @@ router.post("/matchup/:id", async (req, res) => {
 router.post("/champion/:championName", async (req, res) => {
   const { dbPool } = req.app.locals;
   const championName = req.params.championName;
-  const { content } = req.body; 
-  const userId = req.user.id; 
+  const { content } = req.body;
+  const userId = req.user.id;
 
   try {
     // Verify the Champion exists
@@ -127,7 +127,7 @@ router.post("/champion/:championName", async (req, res) => {
        VALUES ($1, $2, $3, 'private', NOW(), NOW())
        ON CONFLICT (UserID, ChampionName) DO UPDATE
        SET Content = EXCLUDED.Content, Updated_At = NOW()
-       RETURNING *`, 
+       RETURNING *`,
       [userId, championName, content]
     );
 
@@ -137,7 +137,7 @@ router.post("/champion/:championName", async (req, res) => {
       res.status(200).json({
         message: "Note saved successfully.",
         content: savedNote.content,
-        updated_at: savedNote.updated_at, 
+        updated_at: savedNote.updated_at,
       });
     } else {
       res.status(400).json({ message: "Failed to save note." });
@@ -167,6 +167,35 @@ router.get("/champion/:championName", async (req, res) => {
     }
   } catch (error) {
     debug("Error fetching champion notes:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Node.js backend using Express framework
+router.get("/other/:championName", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const { championName } = req.params;
+  const userId = req.user.id; // Assuming req.user is populated and contains the user ID
+
+  try {
+    debug("Fetching other users' notes for:", championName);
+    // Fetch notes about the specified Champion that were not written by the given User
+    const notesResult = await dbPool.query(
+      `SELECT ChampionNotes.*, Users.Username FROM ChampionNotes
+       JOIN Users ON ChampionNotes.UserID = Users.UserID
+       WHERE ChampionNotes.ChampionName = $1 AND ChampionNotes.UserID != $2`,
+      [championName, userId]
+    );
+    debug("Notes result other:", notesResult.rows);
+    if (notesResult.rowCount > 0) {
+      res.json(notesResult.rows);
+    } else {
+      res
+        .status(404)
+        .json({ message: "No other users' notes found for this champion." });
+    }
+  } catch (error) {
+    console.error("Error fetching other users' champion notes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
