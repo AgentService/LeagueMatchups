@@ -25,6 +25,7 @@ const vuexLocal = new VuexPersistence({
     "matches",
     "items",
     "notes",
+    "summoner",
     "userPreferences",
   ],
   reducer: (state) => ({
@@ -38,6 +39,7 @@ const vuexLocal = new VuexPersistence({
     matches: state.matches,
     items: state.items,
     notes: state.notes,
+    summoner: state.summoner,
     userPreferences: state.userPreferences,
   }),
 });
@@ -54,6 +56,7 @@ export const store = createStore({
     matches: matches,
     items: items,
     notes: notes,
+    summoner: summoner,
     userPreferences: userPreferences,
   },
 

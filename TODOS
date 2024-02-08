@@ -18,6 +18,15 @@ DONE Auto Save
 - Use current Match History again in Prepare for intensity rating after match
 - set a default image in case a championImage is not found for e.g. new champ
     - or / and add fallback to use CDN to get images if not found
+=> Find problems in games and find a solution > MACRO CONCEPT
+    - alot of problems are often tied to a common macro concept solution
+    - e.g. jungler died a grubs 
+        > did not push wave before obj  / didnt see support roaming to grubs /
+    - e.g. enemy stole dragon 
+        > didnt stay at dragon / didnt ping off dragon because no smite / 
+
+After Game:
+Champ vs Champ > WINLOSS > My Feelings > Comments > Focus Level > Performance > Matchup Thoughts
 
 LCU
 - Champion Select Detection

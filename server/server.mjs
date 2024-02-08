@@ -36,17 +36,17 @@ import matchupsRouter from "./api/matchups.mjs";
 import authRouter from "./api/auth.mjs";
 import utilitiesRouter from "./api/utilities.mjs";
 import matchesRouter from "./api/matches.mjs";
-import generalNotes from "./api/generalNotes.mjs"; 
-import itemRouter from "./api/items.mjs"; 
+import generalNotes from "./api/generalNotes.mjs";
+import itemRouter from "./api/items.mjs";
 import notes from "./api/notes.mjs";
 import userManagementRouter from "./api/userManagement.mjs";
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import Debug from "debug";
 const debug = Debug("server");
-import { initializePassportStrategy } from './api/auth.mjs'; // Adjust based on your file structure
+import { initializePassportStrategy } from "./api/auth.mjs"; // Adjust based on your file structure
 
 Debug.enable(process.env.DEBUG);
-debug("Debug is enabled")
+debug("Debug is enabled");
 import pg from "pg";
 const { Pool } = pg;
 
@@ -97,7 +97,10 @@ async function startServer() {
 
   app.use("/api/matchups", verifyToken);
   app.use("/api/champions", championsRouter); // Assuming championsRouter handles both GET and update routes
+  // Logger middleware to check req.user
+  app.use("/summoner", verifyToken);
   app.use("/summoner", summonerRouter);
+
   app.use("/api/matchups", matchupsRouter);
 
   app.use("/api/auth", authRouter);

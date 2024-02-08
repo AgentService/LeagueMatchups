@@ -20,28 +20,39 @@ export async function fetchAndSaveSummonerData(summonerNameValue) {
   }
 }
 
-// Function to initialize summoner data fetching without timestamp validation
+/**
+ * The function initializes data fetching for a summoner's name and checks if the summoner data already
+ * exists before fetching and saving new data.
+ */
 export function initializeSummonerDataFetching() {
   window.api.receive("summoner-name-response", async (newSummonerName) => {
-    console.log("Summoner name response:", newSummonerName);
-    const summonersData = JSON.parse(
-      localStorage.getItem("summonerData") || "[]"
-    );
-    let summonerExists = summonersData.some(
-      (summoner) => summoner.name === newSummonerName
-    );
+    console.log("Summoner name response received:", newSummonerName);
+    // Use the getter to check if summoner data exists
+    const summonerData =
+      store.getters["summoner/getSummonerDataByName"](newSummonerName);
 
-    // If the summoner does not exist in our local data, fetch and save new data
-    if (!summonerExists) {
+    if (!summonerData) {
+      console.log(
+        "Summoner data not found. Fetching data for:",
+        newSummonerName
+      );
+      // Fetch and save new summoner data
       await fetchAndSaveSummonerData(newSummonerName);
     } else {
-      debug("Summoner data already exists. No need to update on app startup.");
+      console.log(
+        "Summoner data already exists. Skipping fetch for:",
+        newSummonerName
+      );
+      // Here, you'd handle the data as needed or proceed without action
     }
   });
 
   window.api.send("get-summoner-name");
 }
 
+/*
+  * The function checks for the summoner name every hour and fetches the data if it doesn't exist.
+  */
 function checkSummonerName() {
   console.log("Checking summoner name");
   window.api.send("get-summoner-name");
@@ -49,7 +60,7 @@ function checkSummonerName() {
 
 // Function to start checking for Summoner Name every minute
 export function startSummonerNameCheck() {
-  const intervalId = setInterval(checkSummonerName, 3600000); // 60000 milliseconds = 1 minute 3600000
+  const intervalId = setInterval(checkSummonerName, 600000); // 3600000 milliseconds = 1 minute 3600000
 
   // Optionally, you can store intervalId to clear it later when needed
   localStorage.setItem("summonerNameCheckIntervalId", intervalId.toString());

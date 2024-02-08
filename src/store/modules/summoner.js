@@ -2,21 +2,22 @@
 import axios from "axios";
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 // If summoner.js is at src/store/modules/summoner.js and storage.js is at src/store/storage.js
-import {
-  saveToLocalStorage,
-  retrieveFromLocalStorage,
-} from "../plugins/storage.mjs";
+import { getAuthConfig } from "./utilities.js";
+
 import Debug from "debug";
 const debug = Debug("app:store:summoner");
 
 export const summoner = {
   namespaced: true,
   state: () => ({
-    playerDetails: retrieveFromLocalStorage("playerDetails") || [],
-    currentSummonerName:
-      retrieveFromLocalStorage("currentSummonerName") || "null",
+    playerDetails: [],
+    currentSummonerName: "",
   }),
   getters: {
+    getSummonerDataByName: (state) => (summonerName) => {
+      const summonerDetail = state.playerDetails.find(detail => detail.summonerData.name === summonerName);
+      return summonerDetail ? summonerDetail.summonerData : null;
+    },
     currentSummoner: (state) => {
       return (
         state.playerDetails.find(
@@ -83,11 +84,9 @@ export const summoner = {
         // Add new summoner data
         state.playerDetails.push(data);
       }
-      saveToLocalStorage("playerDetails", state.playerDetails);
     },
     setCurrentSummonerName(state, summonerName) {
       state.currentSummonerName = summonerName;
-      saveToLocalStorage("currentSummonerName", summonerName);
     },
     addOrUpdateSummoner(state, summonerData) {
       const index = state.summoners.findIndex(
@@ -99,13 +98,21 @@ export const summoner = {
       } else {
         state.summoners.push(summonerData);
       }
-      saveToLocalStorage("summoners", state.summoners);
     },
   },
   actions: {
+    async updateSummonerDetailsIfNeeded({ dispatch, state }, { gameName, newSummonerLevel, newProfileIconId }) {
+      const existingDetail = state.playerDetails.find(detail => detail.summonerData.name === gameName);
+    
+      if (existingDetail && (existingDetail.summonerData.summonerLevel !== newSummonerLevel || existingDetail.summonerData.profileIconId !== newProfileIconId)) {
+        // Detected change in summoner level or icon ID, initiate an update
+        debug("Summoner details changed, updating...");
+        await dispatch('updateSummonerDetails', { puuid: existingDetail.accountData.puuid, summonerLevel: newSummonerLevel, profileIconId: newProfileIconId });
+      }
+    },
+    
     async setCurrentSummoner({ commit }, summonerName) {
       commit("setCurrentSummonerName", summonerName);
-      saveToLocalStorage("currentSummonerName", summonerName);
     },
     async fetchSummonerData({ commit, state }, { region, gameName, tagLine }) {
       console.log("fetchSummonerData", gameName);
@@ -119,8 +126,11 @@ export const summoner = {
         // Optionally, you could re-fetch to update the data
       } else {
         try {
+          const authConfig = getAuthConfig();
+
           debug("Fetching summoner data");
           const response = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
+            ...authConfig,
             params: { region, gameName, tagLine },
           });
           if (response.status !== 200) {
