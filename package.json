@@ -6,7 +6,8 @@
 	"main": ".vite/build/main.js",
 	"type": "commonjs",
 	"scripts": {
-		"start": "cross-env NODE_ENV=DEVELOPMENT electron-forge start",
+		"start": "cross-env NODE_ENV=production electron-forge start",
+		"start_dev": "cross-env NODE_ENV=DEVELOPMENT electron-forge start",
 		"package": "cross-env NODE_ENV=production electron-forge package",
 		"make": "cross-env NODE_ENV=production electron-forge make",
 		"publish": "cross-env NODE_ENV=production electron-forge publish",
