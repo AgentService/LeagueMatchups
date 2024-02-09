@@ -9,6 +9,37 @@ import debug from "debug";
 
 const router = express.Router();
 
+router.get('/data', async (req, res) => {
+  const userId = req.user.id;
+  try {
+      // Assuming you have a function to query your database
+      const summonerData = await getSummonerDataByAccountId(userId, req);
+      res.json(summonerData);
+  } catch (error) {
+      console.error("Failed to fetch summoner data:", error);
+      res.status(500).send("Internal Server Error");
+  }
+});
+
+const getSummonerDataByAccountId = async (userId, req) => {
+  const { dbPool } = req.app.locals;
+
+  const queryText = `
+      SELECT Puuid, GameName, TagLine, SummonerID, AccountID, ProfileIconID, RevisionDate, SummonerLevel, Timestamp
+      FROM SummonerDetails
+      WHERE UserID = $1;
+  `;
+  try {
+      const { rows } = await dbPool.query(queryText, [userId]);
+      return rows; // This will return an array of summoner details
+  } catch (err) {
+      console.error("Error querying SummonerDetails:", err);
+      throw err; // Re-throw the error and handle it in the calling function
+  }
+};
+
+
+
 router.get("/by-riot-id", async (req, res) => {
   debugApi("Fetching summoner by Riot ID");
   const { dbPool } = req.app.locals;
