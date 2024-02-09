@@ -12,8 +12,7 @@ const router = express.Router();
 router.get("/by-riot-id", async (req, res) => {
   debugApi("Fetching summoner by Riot ID");
   const { dbPool } = req.app.locals;
-  const query = req.query;
-  const { region, gameName, tagLine } = query;
+  const { region, gameName, tagLine } = req.query;
   const userId = req.user.id;
 
   try {
