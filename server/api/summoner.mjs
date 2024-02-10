@@ -5,19 +5,18 @@ import axios from "axios";
 import Debug from "debug";
 const debugApi = Debug("api:summoner");
 import { getRiotAPI } from "./utilities.mjs";
-import debug from "debug";
 
 const router = express.Router();
 
-router.get('/data', async (req, res) => {
+router.get("/data", async (req, res) => {
   const userId = req.user.id;
   try {
-      // Assuming you have a function to query your database
-      const summonerData = await getSummonerDataByAccountId(userId, req);
-      res.json(summonerData);
+    // Assuming you have a function to query your database
+    const summonerData = await getSummonerDataByAccountId(userId, req);
+    res.json(summonerData);
   } catch (error) {
-      console.error("Failed to fetch summoner data:", error);
-      res.status(500).send("Internal Server Error");
+    console.error("Failed to fetch summoner data:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -30,15 +29,13 @@ const getSummonerDataByAccountId = async (userId, req) => {
       WHERE UserID = $1;
   `;
   try {
-      const { rows } = await dbPool.query(queryText, [userId]);
-      return rows; // This will return an array of summoner details
+    const { rows } = await dbPool.query(queryText, [userId]);
+    return rows; // This will return an array of summoner details
   } catch (err) {
-      console.error("Error querying SummonerDetails:", err);
-      throw err; // Re-throw the error and handle it in the calling function
+    console.error("Error querying SummonerDetails:", err);
+    throw err; // Re-throw the error and handle it in the calling function
   }
 };
-
-
 
 router.get("/by-riot-id", async (req, res) => {
   debugApi("Fetching summoner by Riot ID");
@@ -72,10 +69,16 @@ router.get("/by-riot-id", async (req, res) => {
       "SELECT * FROM SummonerDetails WHERE Puuid = $1",
       [puuid]
     );
-    if (!existingSummoner.rows.length > 0) {
+
+    let rows;
+
+    if (existingSummoner.rows.length > 0) {
+      // If the summoner already exists, use the existing rows
+      rows = existingSummoner.rows;
+    } else {
       // Insert a new record with the fetched data if not found
-      await dbPool.query(
-        "INSERT INTO SummonerDetails (Puuid, UserID, GameName, TagLine, SummonerID, AccountID, ProfileIconID, RevisionDate, SummonerLevel, Timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
+      const insertResult = await dbPool.query(
+        "INSERT INTO SummonerDetails (Puuid, UserID, GameName, TagLine, SummonerID, AccountID, ProfileIconID, RevisionDate, SummonerLevel, Timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
         [
           puuid,
           userId,
@@ -89,14 +92,14 @@ router.get("/by-riot-id", async (req, res) => {
           Date.now(),
         ]
       );
+      // Use the rows from the insertion result
+      rows = insertResult.rows;
     }
+
     // Database integration ends here
 
-    debugApi("Sending back combined data");
-    res.json({
-      accountData: accountData.data,
-      summonerData: summonerData,
-    });
+    debugApi("Sending back combined data ", rows);
+    res.json(rows);
   } catch (error) {
     console.error("Error in /by-riot-id route:", error);
     res.status(500).send("Internal Server Error");

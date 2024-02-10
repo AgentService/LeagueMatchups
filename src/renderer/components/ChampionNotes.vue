@@ -1,7 +1,7 @@
 <template>
 	<div class="card-header d-flex justify-content-between align-items-center">
 		<span>Champion Notes</span>
-		<div class="status-container"> <!-- Parent container with relative positioning -->
+		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
 			<transition-group name="fade" tag="div">
 				<div v-if="notesState === 'saved'" key="saved" class="status-message">
 					<span class="text-success notes-saved">Saved</span>
@@ -10,13 +10,13 @@
 					<i class="fas fa-edit text-warning"></i>
 				</div>
 				<button @click="showNotesModal = true" class="btn btn-secondary btn-sm">
-					Show Other Users' Notes
+					Shared Notes
 				</button>
 			</transition-group>
 		</div>
 		<div v-if="showNotesModal" class="overlay">
 			<div class="popup">
-				<p class="card-header">Shared Champion Notes</p>
+				<p class="card-header">Shared Notes</p>
 				<div v-for="note in otherUsersNotes" :key="note.id" class="note-details  d-flex flex-column">
 					<figure>
 						<blockquote class="blockquote">
@@ -221,15 +221,11 @@ async function saveChampionNotes() {
 
 button {
 	background-color: #4CAF50;
-	/* Green background for action */
 	color: white;
 	border: none;
-	padding: 10px 20px;
 	border-radius: 5px;
 	cursor: pointer;
-	/* Cursor indication for clickable */
 	transition: background-color 0.2s;
-	/* Smooth background color transition for hover */
 }
 
 button:hover {

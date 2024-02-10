@@ -26,10 +26,10 @@
 									<div class="position-relative">
 										<div class="position-relative icon-container">
 											<img :src="summonerIcon" alt="Summoner Icon" class="rounded-circle icon-image">
-											<span class="level-pill">{{ level }}</span>
+											<span class="level-pill">{{ currentSummoner.summonerlevel }}</span>
 										</div>
-										<span class="ps-2 text-light">{{ riotIdParts.gameName }}</span>
-										<span class="text-secondary">#{{ riotIdParts.tagLine }}</span>
+										<span class="ps-2 text-light">{{ currentSummoner.gamename }}</span>
+										<span class="text-secondary">#{{ currentSummoner.tagline }}</span>
 									</div>
 								</button>
 								<!-- Dropdown Menu -->
@@ -82,19 +82,14 @@ import ProgressBar from "./utility/ProgressBar.vue";
 const store = useStore();
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
-// const accountData = computed(() => store.getters["summoner/accountData"]);
-// const summonerData = computed(() => store.getters["summoner/summonerData"]);
-const riotIdParts = computed(() => store.getters["summoner/riotIdParts"]);
-const profileIconId = computed(() => store.getters["summoner/profileIconId"]);
-const level = computed(() => store.getters["summoner/level"]);
-const lpPercentage = computed(() => 79); // Assuming 79 LP for demonstration
+const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
 onMounted(async () => {
 	await store.dispatch("summoner/getSummonerData");
 });
 
 const summonerIcon = computed(() => {
-	const iconId = profileIconId.value;
+	const iconId = currentSummoner.value.profileiconid;
 	if (!iconId) {
 		return undefined;
 	}
@@ -105,7 +100,6 @@ const summonerIcon = computed(() => {
 <style scoped>
 .nav-link {
 	color: #fff;
-	/* Adjust the color to fit your theme */
 	text-decoration: none;
 	padding: 10px 15px;
 	transition: color 0.3s ease;

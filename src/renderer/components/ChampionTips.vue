@@ -45,7 +45,7 @@
 
 
 <script setup>
-import { computed, ref, defineProps, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const props = defineProps({

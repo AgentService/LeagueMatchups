@@ -148,8 +148,8 @@ export default {
 	setup() {
 		const store = useStore();
 
-		const summonerData = computed(() => store.getters['summoner/currentSummonerData']);
-		const summonerId = computed(() => summonerData.value ? summonerData.value.puuid : '');
+		const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
+		const summonerId = computed(() => currentSummoner.value ? currentSummoner.value.puuid : '');
 
 		const championDetails = computed(() => store.state.champions.championDetails);
 		const championB = computed(() => store.getters['matchups/getChampionB']);
@@ -212,7 +212,7 @@ export default {
 
 		onMounted(() => {
 			store.dispatch('items/fetchAllItems');
-			fetchAndShowLastMatch();
+			// fetchAndShowLastMatch();
 		});
 		const hideTooltip = () => {
 			tooltip.itemId = null; // Reset the currently hovered item when mouse leaves
@@ -249,7 +249,7 @@ export default {
 
 		const fetchAndShowLastMatch = async () => {
 			if (summonerId.value) {
-				await store.dispatch('matches/fetchLastMatch', { summonerId: summonerId.value, region: 'euw1' });
+				await store.dispatch('matches/fetchLastMatch', currentSummoner.value);
 			} else {
 				console.error('Summoner ID not found');
 			}

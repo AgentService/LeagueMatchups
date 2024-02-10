@@ -6,7 +6,6 @@ export const matches = {
   namespaced: true,
   state: () => ({
     matchHistory: null,
-    lastThirtyGames: [],
   }),
   getters: {
     getMatchHistory: (state) => state.matchHistory,
@@ -15,15 +14,11 @@ export const matches = {
     SET_MATCH_HISTORY(state, match) {
       state.matchHistory = match;
     },
-    SET_LAST_THIRTY_GAMES(state, games) {
-      state.lastThirtyGames = games;
-    },
   },
-  // In deinem Vuex-Store-Modul (z.B. matches.js)
   actions: {
-    async fetchLastMatch({ commit, state, rootGetters, dispatch }) {
-      const puuid = rootGetters["summoner/currentSummonerData"]?.puuid || "";
-      const count = 8; // Number of matches to fetch
+    async fetchLastMatch({ commit, state, dispatch }, currentSummonerData) {
+      const puuid = currentSummonerData.puuid;
+      const count = 2; // Number of matches to fetch
 
       if (!puuid) {
         console.error("PUUID is missing");
@@ -33,13 +28,13 @@ export const matches = {
       const config = getAuthConfig();
 
       const options = {
-        module: "matches", // Assuming 'match' is the Vuex module where this data will be stored
-        type: "matchHistory", // A specific type identifier for this data
-        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`, // API endpoint to fetch data
-        vuexMutation: "matches/SET_MATCH_HISTORY", // Mutation type to commit the fetched data
-        itemId: puuid, // Unique identifier for caching purposes
-        commit, // Passing the Vuex commit function
-        state, // Passing the Vuex state
+        module: "matches",
+        type: "matchHistory",
+        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`,
+        vuexMutation: "matches/SET_MATCH_HISTORY",
+        itemId: puuid,
+        commit,
+        state,
         auth: config,
       };
 

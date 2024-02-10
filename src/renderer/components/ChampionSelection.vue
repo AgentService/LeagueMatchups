@@ -285,12 +285,11 @@
 <script>
 import { useStore, mapState, mapActions } from 'vuex';
 import { ref, computed, watch } from 'vue';
-import { getUrlHelper } from '../globalSetup'; // Adjust the import path as needed
+import { getUrlHelper } from '../globalSetup';
 
 import gsap from 'gsap';
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionSelection');
-import path from 'path';
 
 export default {
 	props: {

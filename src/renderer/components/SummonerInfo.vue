@@ -31,11 +31,11 @@
         @click="selectSummoner(detail)"
       >
         <img
-          :src="getSummonerIcon(detail.profileIconId)"
+          :src="getSummonerIcon(detail.profileiconid)"
           alt="Summoner Icon"
           class="icon-menu-image"
         >
-        <span class="ms-2">{{ detail.name }}</span>
+        <span class="ms-2">{{ detail.gamename }}</span>
       </div>
     </div>
   </div>
@@ -50,9 +50,7 @@ const store=useStore();
 
 const dropdownContainer=ref(null);
 const dropdownOpen=ref(false);
-
-const profileIconId=computed(() => store.getters['summoner/profileIconId']);
-const currentSelection=ref({});
+const currentSelection = computed(() => store.getters['summoner/getCurrentSummoner']);
 
 const allPlayerDetails=computed(() => store.getters['summoner/getAllPlayerDetails']);
 // Somewhere in your Vue component
@@ -73,21 +71,14 @@ function handleClickOutside(event) {
 }
 function selectSummoner(summonerDetail) {
   currentSelection.value=summonerDetail;
-  dropdownOpen.value=false; // Close the dropdown after selection
+  store.commit('summoner/setCurrentSummoner', summonerDetail); 
+  dropdownOpen.value=false; 
 }
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   if (!allPlayerDetails.value.length) {
-    store.dispatch('summoner/fetchSummonerDataByAccountId').then(() => {
-      // Default to the first entry after data is fetched
-      if (allPlayerDetails.value.length) {
-        currentSelection.value=allPlayerDetails.value[0];
-      }
-    });
-  } else {
-    // If player details are already loaded, default to the first entry
-    currentSelection.value=allPlayerDetails.value[0];
+    store.dispatch('summoner/fetchSummonerDataByAccountId');
   }
 });
 
