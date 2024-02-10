@@ -26,10 +26,10 @@
 									<div class="position-relative">
 										<div class="position-relative icon-container">
 											<img :src="summonerIcon" alt="Summoner Icon" class="rounded-circle icon-image">
-											<span class="level-pill">{{ currentSummoner.summonerlevel }}</span>
+											<span class="level-pill">{{ currentSummoner?.summonerlevel }}</span>
 										</div>
-										<span class="ps-2 text-light">{{ currentSummoner.gamename }}</span>
-										<span class="text-secondary">#{{ currentSummoner.tagline }}</span>
+										<span class="ps-2 text-light">{{ currentSummoner?.gamename }}</span>
+										<span class="text-secondary">#{{ currentSummoner?.tagline }}</span>
 									</div>
 								</button>
 								<!-- Dropdown Menu -->
@@ -89,7 +89,7 @@ onMounted(async () => {
 });
 
 const summonerIcon = computed(() => {
-	const iconId = currentSummoner.value.profileiconid;
+	const iconId = currentSummoner.value?.profileiconid;
 	if (!iconId) {
 		return undefined;
 	}

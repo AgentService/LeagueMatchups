@@ -18,8 +18,8 @@
             class="level-pill"
           >{{ currentSelection ? currentSelection.summonerlevel : 'N/A' }}</span>
         </div>
-        <span class="ps-2 text-light">{{ currentSelection.gamename || 'Select Summoner' }}</span>
-        <span class="text-secondary">#{{ currentSelection.tagline || '' }}</span>
+        <span class="ps-2 text-light">{{ currentSelection?.gamename || 'Select Summoner' }}</span>
+        <span class="text-secondary">#{{ currentSelection?.tagline || '' }}</span>
       </div>
     </button>
     <div class="dropdown-menu" :class="{ 'show': dropdownOpen }">
@@ -52,7 +52,7 @@ const dropdownContainer=ref(null);
 const dropdownOpen=ref(false);
 const currentSelection = computed(() => store.getters['summoner/getCurrentSummoner']);
 
-const allPlayerDetails=computed(() => store.getters['summoner/getAllPlayerDetails']);
+const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
 // Somewhere in your Vue component
 
 const getSummonerIcon=(iconId) => {
@@ -77,9 +77,9 @@ function selectSummoner(summonerDetail) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  if (!allPlayerDetails.value.length) {
-    store.dispatch('summoner/fetchSummonerDataByAccountId');
-  }
+//   if (!allPlayerDetails.value.length) {
+//     store.dispatch('summoner/fetchSummonerDataByAccountId');
+//   }
 });
 
 onBeforeUnmount(() => {

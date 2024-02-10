@@ -1,6 +1,9 @@
 <template>
 	<div class="card-header d-flex justify-content-between align-items-center">
-		<span>Champion Notes</span>
+		<div class="d-flex">
+			<span>Champion Notes</span>
+		</div>
+
 		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
 			<transition-group name="fade" tag="div">
 				<div v-if="notesState === 'saved'" key="saved" class="status-message">
@@ -9,32 +12,23 @@
 				<div v-if="notesState === 'editing'" key="editing" class="status-message">
 					<i class="fas fa-edit text-warning"></i>
 				</div>
-				<button @click="showNotesModal = true" class="btn btn-secondary btn-sm">
-					Shared Notes
-				</button>
+				<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
+				</div>
 			</transition-group>
 		</div>
-		<div v-if="showNotesModal" class="overlay">
-			<div class="popup">
-				<p class="card-header">Shared Notes</p>
-				<div v-for="note in otherUsersNotes" :key="note.id" class="note-details  d-flex flex-column">
-					<figure>
-						<blockquote class="blockquote">
-							<p>{{ note.username }}</p>
-						</blockquote>
-						<figcaption class="blockquote-footer">
-							<h6 class="align-self-start note-updated">updated: {{ formatDate(note.updated_at) }}</h6>
-						</figcaption>
-					</figure>
-					<p class="note-content ">{{ note.content }}</p>
-				</div>
-				<button @click="showNotesModal = false">Close</button>
-			</div>
-		</div>
+		<SharedNotesModal
+		:isVisible="showNotesModal"
+		:notes="otherUsersNotes"
+		notesType="champion"
+		title="Shared Champion Notes"
+		@update:isVisible="showNotesModal = $event"
+		/>
+		
 	</div>
 	<div class="card-body ">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..."
-			class="note-textarea zeee" rows="11"></textarea>
+			class="note-textarea" rows="11"></textarea>
 	</div>
 </template>
 
@@ -43,6 +37,8 @@
 <script setup>
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import SharedNotesModal from './reuse/NotesShareModal.vue';
+
 
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionNotes');
@@ -129,11 +125,6 @@ onMounted(async () => {
 	}
 });
 
-const formatDate = (date) => {
-	return new Date(date).toLocaleDateString('en-US', {
-		year: 'numeric', month: 'long', day: 'numeric'
-	});
-};
 async function saveChampionNotes() {
 	try {
 		await store.dispatch('notes/updateChampionPersonalNotes', {
@@ -154,6 +145,16 @@ async function saveChampionNotes() {
 
 
 <style scoped>
+.share-button {
+	text-transform: none;
+	margin-right: 5rem;
+	color: var(--gold-1);
+}
+
+.share-button:hover {
+	color: var(--gold-2);
+}
+
 .overlay {
 	position: fixed;
 	top: 0;
@@ -191,7 +192,7 @@ async function saveChampionNotes() {
 	background-color: var(--card-background);
 	/* Light grey background for each note for better separation */
 	padding: 15px;
-	text-transform:none;
+	text-transform: none;
 	border-radius: 4px;
 	margin-bottom: 15px;
 	margin-left: .75rem;

@@ -12,6 +12,11 @@ export const notes = {
     championNotesShared: {},
     generalNotes: [],
     matchupNotes: {},
+    matchupNotesShared: {},
+    lastFetchTimestamps: {
+      champions: {},
+      matchups: {},
+    },
   },
   mutations: {
     SET_GENERAL_NOTE(state, { note }) {
@@ -68,13 +73,23 @@ export const notes = {
         state.matchupNotes[matchupId].updated_at = updated_at;
       }
     },
+    SET_OTHER_USERS_MATCHUP_NOTES(state, { matchupId, notes }) {
+      state.matchupNotesShared[matchupId] = notes;
+    },
+    // TIMESTAMP MUTATIONS
+    SET_LAST_FETCH_TIMESTAMP(state, { type, key, timestamp }) {
+      if (!state.lastFetchTimestamps[type]) {
+        state.lastFetchTimestamps[type] = {};
+      }
+      state.lastFetchTimestamps[type][key] = timestamp;
+    }
   },
   getters: {
-    getChampionNotesShared: (state) => (championId) => {
-      return state.championNotesShared[championId] || {};
-    },
     getGeneralNote: (state) => (noteId) => {
       return state.generalNotes[noteId] || "";
+    },
+    getChampionNotesShared: (state) => (championId) => {
+      return state.championNotesShared[championId] || {};
     },
     getChampionNotes: (state) => (championId) => {
       return state.championNotes[championId] || {};
@@ -88,6 +103,9 @@ export const notes = {
     },
     getPersonalNotesByMatchupId: (state) => (matchupId) => {
       return state.matchupNotes[matchupId]?.content || "";
+    },
+    getMatchupNotesShared: (state) => (matchupId) => {
+      return state.matchupNotesShared[matchupId] || {};
     },
   },
   actions: {
@@ -167,17 +185,33 @@ export const notes = {
         }
       }
     },
-    async fetchOtherUsersChampionNotes({ commit }, championName) {
+    async fetchOtherUsersChampionNotes({ commit, state }, championName) {
+      const lastFetchTime =
+        state.lastFetchTimestamps.champions[championName] || 0;
+
+      if (
+        !shouldFetchData(lastFetchTime) &&
+        state.championNotesShared[championName]
+      ) {
+        console.log(
+          "Champion notes for",
+          championName,
+          "are up-to-date. Using stored notes."
+        );
+        return;
+      }
       try {
         const authConfig = getAuthConfig();
         const response = await axios.get(
-          `${baseUrl}/api/notes/other/${championName}`,
+          `${baseUrl}/api/notes/champion/others/${championName}`,
           authConfig
         );
         commit("SET_OTHER_USERS_CHAMPION_NOTES", {
           championName,
           notes: response.data, // Assuming the response wraps the notes in a data array
         });
+        updateLastFetchTimestamp(commit, { type: 'champions', key: championName });
+
       } catch (error) {
         console.error("Error fetching other users' champion notes:", error);
         // Handle error appropriately
@@ -244,7 +278,48 @@ export const notes = {
         console.error("Error updating matchup notes:", error);
       }
     },
+    async fetchOtherUsersMatchupNotes({ commit, state }, combinedId) {
+      const lastFetchTime = state.lastFetchTimestamps.matchups[combinedId] || 0;
+
+      if (
+        !shouldFetchData(lastFetchTime) &&
+        state.matchupNotesShared[combinedId]
+      ) {
+        console.log("Matchup notes are up-to-date. Using stored notes.");
+        return;
+      }
+      try {
+        const authConfig = getAuthConfig();
+        const response = await axios.get(
+          `${baseUrl}/api/notes/matchup/others/${combinedId}`,
+          authConfig
+        );
+
+        commit("SET_OTHER_USERS_MATCHUP_NOTES", {
+          combinedId,
+          notes: response.data,
+        });
+        updateLastFetchTimestamp(commit, { type: 'matchups', key: combinedId });
+      } catch (error) {
+        console.error("Error fetching other users' matchup notes:", error);
+      }
+    },
   },
 };
+
+function shouldFetchData(lastFetchTime) {
+  const currentTime = Date.now();
+  const hoursSinceLastFetch = (currentTime - lastFetchTime) / (1000 * 60 * 60);
+  return hoursSinceLastFetch >= 24;
+}
+// Timestamp update helper
+function updateLastFetchTimestamp(commit, { type, key }) {
+  const currentTime = Date.now();
+  commit("SET_LAST_FETCH_TIMESTAMP", {
+    type,
+    key,
+    timestamp: currentTime,
+  });
+}
 
 export default notes;

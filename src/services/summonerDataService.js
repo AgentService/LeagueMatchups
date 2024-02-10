@@ -60,7 +60,7 @@ function checkSummonerName() {
 
 // Function to start checking for Summoner Name every minute
 export function startSummonerNameCheck() {
-  const intervalId = setInterval(checkSummonerName, 600000); // 3600000 milliseconds = 1 minute 3600000
+  const intervalId = setInterval(checkSummonerName, 3600000); // 3600000 milliseconds = 1 minute 3600000
 
   // Optionally, you can store intervalId to clear it later when needed
   localStorage.setItem("summonerNameCheckIntervalId", intervalId.toString());

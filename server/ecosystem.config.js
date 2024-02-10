@@ -3,6 +3,8 @@ module.exports = {
     {
       name: "api",
       script: "./server.mjs",
+      autorestart: true,
+      watch: false,
       env: {
         NODE_ENV: "production",
         DEBUG:

@@ -102,6 +102,33 @@ router.post("/matchup/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+router.get("/matchup/others/:combinedId", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const combinedId = req.params.combinedId; // "Bard-Azir"
+  const userId = req.user.id;
+
+  try {
+    // Assuming you can directly join Matchups with MatchupNotes using a known relationship
+    const query = `
+      SELECT MatchupNotes.*, Users.Username 
+      FROM MatchupNotes
+      JOIN Users ON MatchupNotes.UserID = Users.UserID
+      JOIN Matchups ON MatchupNotes.MatchupID = Matchups.ID
+      WHERE Matchups.combined_id = $1 AND MatchupNotes.UserID != $2
+    `;
+    const notesResult = await dbPool.query(query, [combinedId, userId]);
+    
+    if (notesResult.rowCount > 0) {
+      res.json(notesResult.rows);
+    } else {
+      res.status(404).json({ message: "No other users' notes found for this matchup." });
+    }
+  } catch (error) {
+    console.error("Error fetching other users' matchup notes:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 // Champion Notes
 router.post("/champion/:championName", async (req, res) => {
@@ -171,8 +198,7 @@ router.get("/champion/:championName", async (req, res) => {
   }
 });
 
-// Node.js backend using Express framework
-router.get("/other/:championName", async (req, res) => {
+router.get("/champion/others/:championName", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { championName } = req.params;
   const userId = req.user.id; // Assuming req.user is populated and contains the user ID
@@ -251,7 +277,6 @@ router.post("/general", async (req, res) => {
     } else {
       debug("Inserting new note");
       // If no noteid is provided, insert a new note
-      const { date } = req.body; // Date is only needed for new notes
       const noteContent = content ? content : "";
       const insertQuery = `
       INSERT INTO generalnotes (UserID, Content, Created_At, Updated_At) 

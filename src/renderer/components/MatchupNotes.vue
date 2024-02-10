@@ -13,17 +13,24 @@
 					<!-- <span class="text-warning notes-saved">Editing</span> -->
 
 				</div>
+				<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
+				</div>
 			</transition-group>
 		</div>
 	</div>
+	<SharedNotesModal :isVisible="showNotesModal" :notes="otherUsersNotes" notesType="matchup" title="Shared Matchup Notes"
+		@update:isVisible="showNotesModal = $event" />
 	<div class="card-body">
-		<textarea spellcheck="false" v-model="localNotes"
-			placeholder="Type your notes here..." class="note-textarea" rows="11"></textarea>
+		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
+			rows="11"></textarea>
 	</div>
 </template>
 <script setup>
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import SharedNotesModal from './reuse/NotesShareModal.vue';
+
 import Debug from 'debug';
 const debug = Debug('app:component:MatchupNotes');
 
@@ -38,9 +45,25 @@ const localNotes = computed({
 	}
 });
 
-
 const userEditing = ref(false);
 const championSwitched = ref(false);
+
+const showNotesModal = ref(false); // Controls the visibility of the modal
+const otherUsersNotes = ref([]); // Array to store other users' notes
+
+async function fetchOtherUsersNotes() {
+	// This will fetch notes for the current champion from other users
+	// You need to modify this according to your Vuex store and actions
+	await store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value?.id);
+	otherUsersNotes.value = store.getters['notes/getMatchupNotesShared'](currentMatchup.value?.id);
+}
+
+// Call fetchOtherUsersNotes when the modal is opened
+watch(showNotesModal, (newVal) => {
+	if (newVal === true) {
+		fetchOtherUsersNotes();
+	}
+});
 
 let saveTimeout = null;
 

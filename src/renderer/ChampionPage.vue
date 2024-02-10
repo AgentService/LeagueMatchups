@@ -103,13 +103,9 @@ import SummonerRankedInfo from './components/SummonerRankedInfo.vue';
 import LearningObjectives from "./components/LearningObjectives.vue";
 
 
-import xxx from './components/xxx.vue';
-
 import ChampionNotes from './components/ChampionNotes.vue';
-import ChampionFundamentals from './components/ChampionFundamentals.vue';
 
 import MatchupNotes from './components/MatchupNotes.vue';
-import MatchupRating from './components/MatchupRating.vue';
 
 import MatchHistory from './components/MatchHistory.vue';
 import GeneralNotes from './components/GeneralNotes.vue';

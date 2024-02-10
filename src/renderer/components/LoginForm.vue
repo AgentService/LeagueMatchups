@@ -76,6 +76,10 @@ const handleSubmit = async () => {
 		errorMessage.value = error.message || 'Failed to login';
 	} finally {
 		isSubmitting.value = false;
+		const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
+		if (!allPlayerDetails.value.length) {
+			store.dispatch('summoner/fetchSummonerDataByAccountId');
+		}
 	}
 };
 

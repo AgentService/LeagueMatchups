@@ -12,12 +12,12 @@ import { onMounted } from 'vue';
 import Navbar from './components/TopNavbar.vue';
 
 
+
 onMounted(() => {
 	// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 	// store.dispatch("champions/retrieveChampionData");
+
 });
 </script>
   
-<style>
-
-</style>
+<style></style>
