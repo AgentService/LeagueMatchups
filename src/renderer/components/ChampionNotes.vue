@@ -53,7 +53,6 @@ let saveTimeout = null;
 let isInitialLoad = ref(true); // Flag for initial data load
 
 async function fetchOtherUsersNotes() {
-	debugger
 	await store.dispatch('notes/fetchOtherUsersChampionNotes', championId.value);
 	// Ensure the child component is mounted and its method is available
 	NotesSharedModalRef.value?.fetchData(championId.value);
