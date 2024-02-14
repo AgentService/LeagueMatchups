@@ -1,7 +1,7 @@
 <template>
 	<div class="card-header d-flex justify-content-between align-items-center">
 		<span>Matchup Notes</span>
-		<div class="status-container"> <!-- Parent container with relative positioning -->
+		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
 			<transition-group name="fade" tag="div">
 				<div v-if="autoSaved" key="saved" class="status-message">
 					<span class="text-success notes-saved">Saved</span>
@@ -18,9 +18,17 @@
 				</div>
 			</transition-group>
 		</div>
+		<SharedNotesModal
+		:isVisible="showNotesModal"
+		:notes="otherUsersNotes"
+		notesType="matchup"
+		title="Shared Matchup Notes"
+		:championA="championA"
+		:championB="championB"
+		@update:isVisible="showNotesModal = $event"
+		/>
 	</div>
-	<SharedNotesModal :isVisible="showNotesModal" :notes="otherUsersNotes" notesType="matchup" title="Shared Matchup Notes"
-		@update:isVisible="showNotesModal = $event" />
+
 	<div class="card-body">
 		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
 			rows="11"></textarea>
@@ -36,9 +44,11 @@ const debug = Debug('app:component:MatchupNotes');
 
 const store = useStore();
 const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
+const championA = computed(() => store.getters['matchups/getChampionA']);
+const championB = computed(() => store.getters['matchups/getChampionB']);
 const autoSaved = ref(false);
 const localNotes = computed({
-	get: () => store.getters['notes/getPersonalNotesByMatchupId'](currentMatchup.value?.id),
+	get: () => store.getters['notes/getPersonalNotesByMatchupId'](currentMatchup.value?.combinedId),
 	set: (newValue) => {
 		userEditing.value = true;
 		debouncedSaveNotes(newValue);
@@ -54,8 +64,8 @@ const otherUsersNotes = ref([]); // Array to store other users' notes
 async function fetchOtherUsersNotes() {
 	// This will fetch notes for the current champion from other users
 	// You need to modify this according to your Vuex store and actions
-	await store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value?.id);
-	otherUsersNotes.value = store.getters['notes/getMatchupNotesShared'](currentMatchup.value?.id);
+	await store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value?.combinedId);
+	otherUsersNotes.value = store.getters['notes/getMatchupNotesShared'](currentMatchup.value?.combinedId);
 }
 
 // Call fetchOtherUsersNotes when the modal is opened
@@ -78,21 +88,21 @@ function debouncedSaveNotes(newValue) {
 }
 
 watch(currentMatchup, (newVal, oldVal) => {
-	if (newVal?.id !== oldVal?.id) {
+	if (newVal?.combinedId !== oldVal?.combinedId) {
 		championSwitched.value = true;
-		store.dispatch('notes/fetchMatchupNotes', newVal.id);
+		store.dispatch('notes/fetchMatchupNotes', newVal.combinedId);
 		userEditing.value = false; // Reset user editing flag
 	}
 }, { deep: true, immediate: true });
 
 
 async function saveNotes(newValue) {
-	if (currentMatchup.value && currentMatchup.value.id) {
+	if (currentMatchup.value && currentMatchup.value.combinedId) {
 		await store.dispatch('notes/saveOrUpdateMatchupNotes', {
-			matchupId: currentMatchup.value.id,
+			matchupId: currentMatchup.value.combinedId,
 			content: newValue,
 		});
-		debug('Auto-saved notes for matchup', currentMatchup.value.id);
+		debug('Auto-saved notes for matchup', currentMatchup.value.combinedId);
 		autoSaved.value = true;
 		// Set a timer to revert isSaved back to false after 2 seconds
 		setTimeout(() => autoSaved.value = false, 2000);
@@ -100,8 +110,8 @@ async function saveNotes(newValue) {
 }
 
 async function fetchNotes() {
-	if (currentMatchup.value && currentMatchup.value.id) {
-		await store.dispatch('notes/fetchMatchupNotes', currentMatchup.value.id);
+	if (currentMatchup.value && currentMatchup.value.combinedId) {
+		await store.dispatch('notes/fetchMatchupNotes', currentMatchup.value.combinedId);
 	}
 }
 

@@ -4,6 +4,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import jwt from "jsonwebtoken";
 import { verifyToken } from "../utils/authMiddleware.mjs";
+import { snakeToCamelCase } from "./utilities.mjs";
 import Debug from "debug";
 const debug = Debug("api:auth");
 
@@ -27,22 +28,22 @@ export function initializePassportStrategy(dbPool) {
             "SELECT * FROM Users WHERE Email = $1",
             [email]
           );
-		  debug("Result: ", result);
+          debug("Result: ", result);
           if (result.rows.length > 0) {
-            const user = result.rows[0];
-			debug("User: ", user);
-            const match = await bcrypt.compare(password, user.passwordhash);
+            const user = snakeToCamelCase(result.rows[0]);
+            debug("User: ", user);
+            const match = await bcrypt.compare(password, user.passwordHash);
             if (match) {
               // User authenticated successfully
-			  debug("User authenticated successfully");
+              debug("User authenticated successfully");
               return done(null, {
                 email: user.email,
                 name: user.username,
-                id: user.userid, // Make sure to include the user's ID
+                id: user.userId, // Make sure to include the user's ID
               });
             } else {
               // Password does not match
-			  debug("Password does not match");
+              debug("Password does not match");
               return done(null, false, {
                 message: "Incorrect username or password.",
               });
@@ -83,19 +84,17 @@ router.post(
 );
 
 router.post("/verifyToken", verifyToken, async (req, res) => {
-  // Extract userId from verified token, assumed to be added by `verifyToken` middleware
-  const { id } = req.user; // This assumes your middleware adds the decoded token to `req.user`
+  const { id } = req.user; // Assumes your middleware adds the decoded token to `req.user`
   const { dbPool } = req.app.locals;
 
   try {
-    const result = await dbPool.query("SELECT * FROM Users WHERE UserID = $1", [
-      id,
-    ]);
+    const result = await dbPool.query(
+      "SELECT * FROM Users WHERE user_id = $1",
+      [id]
+    ); // Adjusted to snake_case
     if (result.rows.length > 0) {
-      const user = result.rows[0];
-      res.json({
-        user: { email: user.email, name: user.username, id: user.userid },
-      });
+      const user = snakeToCamelCase(result.rows[0]); // Convert user object to camelCase
+      res.json({ user });
     } else {
       res.status(404).send("User not found.");
     }

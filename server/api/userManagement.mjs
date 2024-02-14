@@ -3,6 +3,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import Debug from "debug";
 const debug = Debug("api:userManagement");
+import { snakeToCamelCase } from "./utilities.mjs";
 
 const router = express.Router();
 
@@ -26,12 +27,13 @@ router.post("/register", async (req, res) => {
   try {
     // Insert the new user into the database
     const result = await dbPool.query(
-      "INSERT INTO Users (username, Email, PasswordHash) VALUES ($1, $2, $3) RETURNING userid, username, Email",
+      "INSERT INTO Users (username, Email, Password_Hash) VALUES ($1, $2, $3) RETURNING user_id, username, Email",
       [username, email, hashedPassword] // Note the comma at the end of the SQL query string
     );
-    const newUser = result.rows[0];
+    let newUser = result.rows[0];
+    newUser = snakeToCamelCase(newUser); // Convert newUser object to camelCase
+
     // Exclude the password hash when returning the created user
-    delete newUser.passwordhash;
     res.status(201).json({ user: newUser });
   } catch (error) {
     console.error("Error creating user:", error);

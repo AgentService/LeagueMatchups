@@ -45,6 +45,17 @@ export const getLatestVersion = async () => {
   }
 };
 
+
+export const snakeToCamelCase = (obj) => {
+  const convertedObject = {};
+  Object.keys(obj).forEach((key) => {
+      const convertedKey = key.replace(/(_\w)/g, (matches) => matches[1].toUpperCase());
+      convertedObject[convertedKey] = obj[key];
+  });
+  return convertedObject;
+}
+
+
 const router = express.Router();
 
 router.get("/version", async (req, res) => {

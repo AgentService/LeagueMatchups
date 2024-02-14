@@ -12,16 +12,16 @@
 	</div>
 	<!-- Notes list -->
 	<div class="notes-list card-body">
-		<li v-for="item in limitedNotes" :key="item.noteid" class="note-item mb-4">
-			<textarea spellcheck="false" v-model="noteText[item.noteid]" class="note-textarea"
+		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item mb-4">
+			<textarea spellcheck="false" v-model="noteText[item.noteId]" class="note-textarea"
 				placeholder="Type your notes here..." rows="6"></textarea>
 			<div class="note-footer d-flex">
-				<div class="note-date">{{ formatDate(item.created_at) }}</div>
+				<div class="note-date">{{ formatDate(item.createdAt) }}</div>
 				<div class="buttons-container d-flex justify-content-end">
-					<button @click="deleteNote(item.noteid)" class="btn delete-button">
+					<button @click="deleteNote(item.noteId)" class="btn delete-button">
 						<i class="far fa-trash-alt"></i>
 					</button>
-					<button @click="saveNote(item.noteid)" class="btn save-button">
+					<button @click="saveNote(item.noteId)" class="btn save-button">
 						<i class="far fa-save"></i>
 					</button>
 				</div>
@@ -51,7 +51,7 @@ const notesDisplayLimit = ref(2);
 const isExpanded = ref(false);
 const notesOrdered = computed(() => {
 	return store.state.notes?.generalNotes
-		.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 });
 
 const limitedNotes = computed(() => {
@@ -102,15 +102,15 @@ const createNewNote = () => {
 };
 
 
-const deleteNote = (noteid) => {
-	store.dispatch('notes/deleteGeneralNote', noteid).then(() => {
+const deleteNote = (noteId) => {
+	store.dispatch('notes/deleteGeneralNote', noteId).then(() => {
 		// Handle post-delete actions
 	});
 };
 
-const saveNote = (noteid) => {
-	const content = noteText.value[noteid];
-	store.dispatch('notes/saveGeneralNote', { noteid, content });
+const saveNote = (noteId) => {
+	const content = noteText.value[noteId];
+	store.dispatch('notes/saveGeneralNote', { noteId, content });
 };
 
 onMounted(() => {
@@ -119,7 +119,7 @@ onMounted(() => {
 	fetchNotes().then(() => {
 		noteText.value = {};
 		for (const note of notesOrdered.value) {
-			noteText.value[note.noteid] = note.content;
+			noteText.value[note.noteId] = note.content;
 		}
 	});
 });

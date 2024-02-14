@@ -64,7 +64,6 @@ export const auth = {
         commit("SET_AUTH_LOADING", false); // Indicate that registration process is complete
       }
     },
-    // In your `auth.js` module
     async login({ commit }, credentials) {
       try {
         const response = await axios.post(

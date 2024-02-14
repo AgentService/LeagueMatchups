@@ -1,9 +1,38 @@
 // api/notes.mjs
 import express from "express";
 import Debug from "debug";
+import { snakeToCamelCase } from "./utilities.mjs";
 
 const debug = Debug("api:notes");
 const router = express.Router();
+
+// Rating
+router.post("/champion/rating", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const { noteId, rating } = req.body;
+  const userId = req.user.id;
+  debug("Note ID:", noteId);
+  debug("Rating:", rating);
+  try {
+    // Insert or update the rating
+    const { rowCount } = await dbPool.query(
+      `INSERT INTO ChampionNotesRating (Note_ID, User_ID, Rating)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (Note_ID, User_ID) DO UPDATE
+       SET Rating = EXCLUDED.Rating
+       RETURNING *`,
+      [noteId, userId, rating]
+    );
+    if (rowCount > 0) {
+      res.status(200).json({ message: "Rating updated successfully." });
+    } else {
+      res.status(404).json({ message: "Failed to update rating." });
+    }
+  } catch (error) {
+    console.error("Error updating champion note rating:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // Matchup Notes
 router.get("/matchup/:id", async (req, res) => {
@@ -31,25 +60,26 @@ router.get("/matchup/:id", async (req, res) => {
 
     // Step 2: Verify the User exists (based on email)
     const userResult = await dbPool.query(
-      `SELECT userid FROM users WHERE email = $1`,
+      `SELECT user_id FROM users WHERE email = $1`,
       [userEmail]
     );
     if (userResult.rowCount === 0) {
       return res.status(404).json({ message: "User not found." });
     }
-    const userId = userResult.rows[0].userid;
+    const userId = userResult.rows[0].user_id;
     debug("User ID:", userId);
 
     // Step 3: Fetch the Matchup Notes for the verified Matchup and User
     const notesResult = await dbPool.query(
       `SELECT mn.* 
        FROM MatchupNotes mn
-       WHERE mn.MatchupID = $1 AND mn.UserID = $2`,
+       WHERE mn.Matchup_ID = $1 AND mn.User_ID = $2`,
       [matchupId, userId]
     );
     if (notesResult.rowCount > 0) {
-      res.json(notesResult.rows[0]);
-      debug("Notes result:", notesResult.rows[0]);
+      const foundNote = snakeToCamelCase(notesResult.rows[0]); // Convert to camelCase
+      debug("Notes result:", foundNote);
+      res.json(foundNote); // Send the converted object
     } else {
       res.status(404).json({ message: "No notes found for this matchup." });
     }
@@ -78,9 +108,9 @@ router.post("/matchup/:id", async (req, res) => {
     debug("notes:", content);
     // Insert or update note in the Content column
     const { rows, rowCount } = await dbPool.query(
-      `INSERT INTO MatchupNotes (UserID, MatchupID, Content, Visibility, Created_At, Updated_At)
+      `INSERT INTO MatchupNotes (User_ID, Matchup_ID, Content, Visibility, Created_At, Updated_At)
        VALUES ($1, $2, $3, 'private', NOW(), NOW())
-       ON CONFLICT (UserID, MatchupID) DO UPDATE
+       ON CONFLICT (User_ID, Matchup_ID) DO UPDATE
        SET Content = EXCLUDED.Content, Updated_At = NOW()
        RETURNING *`, // Use RETURNING * to return all columns of the affected row
       [req.user.id, matchupId, content] // `notes` from request maps to `Content` column
@@ -88,11 +118,12 @@ router.post("/matchup/:id", async (req, res) => {
 
     if (rowCount > 0) {
       // Assuming we always affect exactly one row, either by inserting or updating
-      const savedNote = rows[0]; // Grab the first (and should be only) row returned by the query
+      const savedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
+
       res.status(200).json({
         message: "Note saved successfully.",
         content: savedNote.content, // Return the saved or updated note data from the Content column
-        updated_at: savedNote.updated_at, // Return the updated_at timestamp from the database
+        updatedAt: savedNote.updatedAt, // Return the updated_at timestamp from the database
       });
     } else {
       res.status(400).json({ message: "Failed to save note." });
@@ -112,23 +143,27 @@ router.get("/matchup/others/:combinedId", async (req, res) => {
     const query = `
       SELECT MatchupNotes.*, Users.Username 
       FROM MatchupNotes
-      JOIN Users ON MatchupNotes.UserID = Users.UserID
-      JOIN Matchups ON MatchupNotes.MatchupID = Matchups.ID
-      WHERE Matchups.combined_id = $1 AND MatchupNotes.UserID != $2
+      JOIN Users ON MatchupNotes.User_ID = Users.User_ID
+      JOIN Matchups ON MatchupNotes.Matchup_ID = Matchups.ID
+      WHERE Matchups.combined_id = $1 AND MatchupNotes.User_ID != $2
     `;
     const notesResult = await dbPool.query(query, [combinedId, userId]);
-    
+
     if (notesResult.rowCount > 0) {
-      res.json(notesResult.rows);
+      const convertedNotes = notesResult.rows.map((row) =>
+        snakeToCamelCase(row)
+      ); // Convert each note to camelCase
+      res.json(convertedNotes);
     } else {
-      res.status(404).json({ message: "No other users' notes found for this matchup." });
+      res
+        .status(404)
+        .json({ message: "No other users' notes found for this matchup." });
     }
   } catch (error) {
     console.error("Error fetching other users' matchup notes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 // Champion Notes
 router.post("/champion/:championName", async (req, res) => {
@@ -150,9 +185,9 @@ router.post("/champion/:championName", async (req, res) => {
 
     // Insert or update the note
     const { rows, rowCount } = await dbPool.query(
-      `INSERT INTO ChampionNotes (UserID, ChampionName, Content, Visibility, Created_At, Updated_At)
+      `INSERT INTO ChampionNotes (User_ID, Champion_Name, Content, Visibility, Created_At, Updated_At)
        VALUES ($1, $2, $3, 'private', NOW(), NOW())
-       ON CONFLICT (UserID, ChampionName) DO UPDATE
+       ON CONFLICT (User_ID, Champion_Name) DO UPDATE
        SET Content = EXCLUDED.Content, Updated_At = NOW()
        RETURNING *`,
       [userId, championName, content]
@@ -160,11 +195,11 @@ router.post("/champion/:championName", async (req, res) => {
 
     if (rowCount > 0) {
       debug("Saved note champion:", rows[0]);
-      const savedNote = rows[0];
+      const savedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
       res.status(200).json({
         message: "Note saved successfully.",
-        content: savedNote.content,
-        updated_at: savedNote.updated_at,
+        content: savedNote.content, // Adjusted to camelCase
+        updatedAt: savedNote.updatedAt, // Adjusted to camelCase
       });
     } else {
       res.status(400).json({ message: "Failed to save note." });
@@ -183,7 +218,7 @@ router.get("/champion/:championName", async (req, res) => {
   try {
     // Fetch the Champion Notes for the specified Champion and User
     const notesResult = await dbPool.query(
-      `SELECT * FROM ChampionNotes WHERE ChampionName = $1 AND UserID = $2`,
+      `SELECT * FROM ChampionNotes WHERE Champion_Name = $1 AND User_ID = $2`,
       [championName, userId]
     );
     debug("Notes result champion:", notesResult.rows[0]);
@@ -201,25 +236,76 @@ router.get("/champion/:championName", async (req, res) => {
 router.get("/champion/others/:championName", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { championName } = req.params;
-  const userId = req.user.id; // Assuming req.user is populated and contains the user ID
+  const userId = req.user.id;
 
   try {
     debug("Fetching other users' notes for:", championName);
-    // Fetch notes about the specified Champion that were not written by the given User
+
+    // Fetch notes
     const notesResult = await dbPool.query(
-      `SELECT ChampionNotes.*, Users.Username FROM ChampionNotes
-       JOIN Users ON ChampionNotes.UserID = Users.UserID
-       WHERE ChampionNotes.ChampionName = $1 AND ChampionNotes.UserID != $2`,
+      `SELECT cn.Note_ID, cn.Content, cn.Visibility, u.Username, cn.Created_At, cn.Updated_At
+       FROM ChampionNotes cn
+       JOIN Users u ON cn.User_ID = u.User_ID
+       WHERE cn.Champion_Name = $1 AND cn.User_ID != $2`,
       [championName, userId]
     );
+
     debug("Notes result other:", notesResult.rows);
-    if (notesResult.rowCount > 0) {
-      res.json(notesResult.rows);
-    } else {
-      res
+
+    if (notesResult.rowCount === 0) {
+      return res
         .status(404)
         .json({ message: "No other users' notes found for this champion." });
     }
+
+    // Extract Note IDs
+    const noteIds = notesResult.rows.map((row) => row.note_id);
+
+    // Fetch personal ratings for these notes
+    const personalRatingResult = await dbPool.query(
+      `SELECT Note_ID, Rating, Is_Favorite
+       FROM ChampionNotesRating
+       WHERE User_ID = $2 AND Note_ID = ANY($1::int[])`,
+      [noteIds, userId]
+    );
+
+    debug("Personal ratings:", personalRatingResult.rows);
+
+    // Calculate average ratings for these notes
+    const averageRatingResult = await dbPool.query(
+      `SELECT Note_ID, AVG(Rating) AS AverageRating
+       FROM ChampionNotesRating
+       WHERE Note_ID = ANY($1::int[])
+       GROUP BY Note_ID`,
+      [noteIds]
+    );
+
+    // Map through each note to enrich it with personal and average ratings
+    const enrichedNotes = notesResult.rows.map((note) => {
+      const personalRating = personalRatingResult.rows.find(
+        (rating) => rating.note_id === note.note_id
+      );
+      const averageRating = averageRatingResult.rows.find(
+        (rating) => rating.note_id === note.note_id
+      );
+
+      console.debug(`Matching for note_id: ${note.note_id}, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`);
+
+      return {
+        ...note,
+        personalRating: personalRating ? personalRating.rating : undefined,
+        isFavorite: personalRating ? personalRating.is_favorite : undefined,
+        averageRating: averageRating ? parseFloat(averageRating.averagerating).toFixed(2) : undefined,
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+      };
+    });
+
+    // Ensure the keys are in camelCase before sending the response
+    const finalResponse = enrichedNotes.map((note) => snakeToCamelCase(note));
+
+    debug("Final enriched notes:", finalResponse);
+    res.json(finalResponse);
   } catch (error) {
     console.error("Error fetching other users' champion notes:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -235,12 +321,13 @@ router.get("/general", async (req, res) => {
 
   try {
     const { rows } = await dbPool.query(
-      `SELECT * FROM generalnotes WHERE UserID = $1`,
+      `SELECT * FROM generalnotes WHERE User_ID = $1`,
       [userId]
     );
-    res
-      .status(200)
-      .json({ message: "Notes retrieved successfully", notes: rows });
+    res.status(200).json({
+      message: "Notes retrieved successfully",
+      notes: rows.map((row) => snakeToCamelCase(row)), // Convert each note to camelCase
+    });
   } catch (error) {
     debug("Error retrieving notes:", error);
     res.status(500).json({ message: "Error retrieving notes" });
@@ -253,48 +340,48 @@ router.post("/general", async (req, res) => {
   const userId = req.user.id; // Directly use user ID
 
   try {
+    let noteResponse;
     if (noteid) {
       debug("Updating note:", noteid);
       // Update an existing note if noteid is provided
       const updateQuery = `
-      UPDATE generalnotes
-      SET Content = $1, Updated_At = NOW()
-      WHERE noteid = $2 AND UserID = $3
-      RETURNING *;
-    `;
+        UPDATE generalnotes
+        SET content = $1, updated_at = NOW()
+        WHERE note_id = $2 AND user_id = $3
+        RETURNING *;
+      `;
 
-      const updatedNote = await dbPool.query(updateQuery, [
+      const { rows } = await dbPool.query(updateQuery, [
         content,
         noteid,
         userId,
       ]);
-
-      debug("Note updated successfully:", updatedNote.rows[0]);
-      res.status(200).json({
-        message: "Note updated successfully",
-        note: updatedNote.rows[0],
-      });
+      debug("Note updated successfully:", rows[0]);
+      noteResponse = rows[0]; // Store the updated note for conversion
     } else {
       debug("Inserting new note");
       // If no noteid is provided, insert a new note
       const noteContent = content ? content : "";
       const insertQuery = `
-      INSERT INTO generalnotes (UserID, Content, Created_At, Updated_At) 
-      VALUES ($1, $2, NOW(), NOW())
-      RETURNING *; 
-    `;
+        INSERT INTO generalnotes (user_id, content, created_at, updated_at) 
+        VALUES ($1, $2, NOW(), NOW())
+        RETURNING *; 
+      `;
 
-      const insertResult = await dbPool.query(insertQuery, [
-        userId,
-        noteContent,
-      ]);
+      const { rows } = await dbPool.query(insertQuery, [userId, noteContent]);
       debug("Note inserted successfully:", noteContent);
-      const newNote = insertResult.rows[0];
-      res.status(200).json({
-        message: "Note created successfully",
-        note: newNote,
-      });
+      noteResponse = rows[0]; // Store the new note for conversion
     }
+
+    // Convert the note object from snake_case to camelCase before sending the response
+    const convertedNote = snakeToCamelCase(noteResponse);
+
+    res.status(200).json({
+      message: noteid
+        ? "Note updated successfully"
+        : "Note created successfully",
+      note: convertedNote, // Send the converted note
+    });
   } catch (error) {
     debug("Error saving the note:", error);
     res.status(500).json({ message: "Error saving the note" });
@@ -309,16 +396,22 @@ router.delete("/general/:noteid", async (req, res) => {
   try {
     const deleteQuery = `
     DELETE FROM generalnotes
-    WHERE noteid = $1 AND UserID = $2
+    WHERE note_id = $1 AND User_ID = $2
     RETURNING *;
   `;
     debug("Deleting note:", noteId);
-    const deletedNote = await dbPool.query(deleteQuery, [noteId, userId]);
-    debug("Note deleted successfully:", deletedNote.rows[0]);
-    res.status(200).json({
-      message: "Note deleted successfully",
-      note: deletedNote.rows[0],
-    });
+    const { rows } = await dbPool.query(deleteQuery, [noteId, userId]);
+    if (rows.length > 0) {
+      const deletedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
+      debug("Note deleted successfully:", deletedNote);
+      res.status(200).json({
+        message: "Note deleted successfully",
+        note: deletedNote, // Send the converted note
+      });
+    } else {
+      // If no rows returned, the note wasn't found or didn't belong to the user
+      res.status(404).json({ message: "Note not found or not owned by user" });
+    }
   } catch (error) {
     debug("Error deleting the note:", error);
     res.status(500).json({ message: "Error deleting the note" });

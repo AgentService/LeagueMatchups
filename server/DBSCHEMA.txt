@@ -1,4 +1,7 @@
 GPT
+
+ALL COLUMN NAMES ARE NOW SNAKE_CASE
+
 Compact Database Schema Summary
 Tables:
 Users
@@ -39,3 +42,34 @@ Relationships:
 Users can have multiple GeneralNotes, ChampionNotes, and MatchupNotes.
 Champions can be associated with multiple ChampionNotes and are part of Matchups.
 Each Matchup can be associated with multiple MatchupNotes.
+
+
+CREATE TABLE SummonerDetails (
+    Puuid VARCHAR(255) PRIMARY KEY,
+    UserID INT NOT NULL REFERENCES Users(UserID),
+    GameName VARCHAR(255),
+    TagLine VARCHAR(100),
+    SummonerID VARCHAR(255) NOT NULL,
+    AccountID VARCHAR(255),
+    ProfileIconID INT,
+    RevisionDate BIGINT,
+    SummonerLevel INT,
+    Timestamp BIGINT
+);
+
+
+CREATE TABLE ChampionNotesRating (
+  Note_ID int REFERENCES ChampionNotes(Note_ID),
+  User_ID int REFERENCES Users(User_ID),
+  Rating int CHECK (Rating >= 1 AND Rating <= 5),
+  Is_Favorite boolean DEFAULT false,
+  PRIMARY KEY (Note_ID, User_ID)
+);
+
+CREATE TABLE MatchupNoteRating (
+  NoteID int REFERENCES MatchupNotes(NoteID),
+  UserID int REFERENCES Users(UserID),
+  Rating int CHECK (Rating >= 1 AND Rating <= 5),
+  IsFavorite boolean DEFAULT false,
+  PRIMARY KEY (NoteID, UserID)
+);

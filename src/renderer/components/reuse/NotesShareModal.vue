@@ -1,116 +1,437 @@
 <template>
-	<div v-if="isVisible" class="modal-overlay">
-		<div class="modal-content">
-			<h2>{{ modalTitle }}</h2>
-			<div v-for="note in notes" :key="note.id" class="note"> <!-- Use passed notes here -->
-				<p>{{ note.username }}: {{ note.content }}</p>
-				<small>Updated: {{ formatDate(note.updated_at) }}</small>
+	<div class="modal d-flex" id="championNotesModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true"
+		v-if="isVisible">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content modal-container">
+				<div class="p-3">
+					<div class="background-image-container" :style="championBackgroundStyle"></div>
+
+					<div class="modal-header flex-row position-relative">
+						<div class="modal-title d-flex justify-content-between align-items-start w-100 flex-column">
+							<span class="" id="modalLabel">{{ modalTitle }}</span>
+							<p v-if="champion">Champion Notes for {{ champion.name }}</p>
+							<p v-else-if="championA && championB">Matchup Notes for {{ championA.name }} vs {{ championB.name }}</p>
+
+						</div>
+						<button @click="$emit('update:isVisible', false)" type="button"
+								class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+
+					<div class="modal-body">
+
+						<!-- <div class="d-flex justify-content-center align-items-center">
+						<div v-for="(note, index) in notes.slice(0, 3)" :key="note.id" class="card m-2">
+							<div class="card-header d-flex justify-content-between align-items-center">
+								<div class="champion-images">
+									<img v-if="champion" :src="getChampionImageSource('small', champion.name)"
+										alt="Champion image" class="card-champion-image me-2">
+									<div v-if="championA && championB" class="d-flex align-items-center">
+										<img :src="getChampionImageSource('small', championA.name)" alt="Champion A image"
+											class="card-champion-image me-1">
+										<span>vs</span>
+										<img :src="getChampionImageSource('small', championB.name)" alt="Champion B image"
+											class="card-champion-image ms-1">
+									</div>
+								</div>
+								<span class="badge"
+									:class="{ 'bg-primary': notesType === 'champion', 'bg-warning text-dark': notesType === 'matchup', 'bg-danger': notesType === 'general' }">{{
+										notesType }} Notes</span>
+							</div>
+							<div class="card-body">
+								<p class="card-text text-light">{{ note.content }}</p>
+							</div>
+							<div class="card-footer text-muted">
+								<div class="user">
+									<div class="user__info">
+										<p>{{ note.username }}</p>
+										<small>{{ formatDate(note.updated_at) }}</small>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div> -->
+
+						<div class="d-flex">
+							<div class="list-group align-items-center p-4">
+								<div class="modal-header-2 d-flex justify-content-between">
+									<div v-if="champion">
+										<img v-if="champion" :src="getChampionImageSource('small', champion.name)"
+											alt="Champion image" class="modal-champion-image">
+									</div>
+									<div v-else-if="championA && championB" class="">
+										<span>For Matchup ></span>
+										<img :src="getChampionImageSource('small', championA.name)" alt="Champion A image"
+											class="modal-champion-image me-2">
+										<span>vs</span>
+										<img :src="getChampionImageSource('small', championB.name)" alt="Champion B image"
+											class="modal-champion-image ms-2">
+									</div>
+									<FilterBar @update:filter="handleFilterUpdate"></FilterBar>
+								</div>
+								<div class="d-flex flex-column w-100 overflow-auto">
+									<a href="#" v-for="(note, index) in filteredNotes" :key="note.noteId"
+										class="list-group-item list-group-item-action d-flex"
+										@click.prevent="selectNote(index)">
+
+										<RatingAverage :averageRating="parseFloat(note.averageRating)" />
+
+										<!-- <img :src="getChampionImageSource('small', champion.name)" alt="Champion image"
+										class="card-champion-image" /> -->
+										<img :src="getSummonerIcon('5555', index)" alt="Champion image"
+											class="card-champion-image ms-3" />
+										<div class="user ps-2">
+											<!-- Placeholder for user image; you can replace this with actual user data if available -->
+											<!-- <img src="https://i.pravatar.cc/40?u={{ note.username }}" alt="user__image" class="user__image"> -->
+											<div class="user__info">
+												<p><span>Notes by </span>{{ note.username }}</p>
+												<small>{{ formatDate(note.updatedAt) }}</small>
+											</div>
+										</div>
+									</a>
+									<div v-if="selectedNoteIndex !== null && filteredNotes.length <= 0"
+										class=" d-flex justify-content-center align-items-center h-100">
+										<p>No notes available.</p>
+									</div>
+								</div>
+							</div>
+
+							<div v-if="selectedNoteIndex !== null && filteredNotes.length > 0"
+								class=" d-flex justify-content-center align-items-center">
+								<div class="modal-card d-flex mt-0">
+									<div class="card-header d-flex justify-content-between align-items-center">
+										<!-- Champion images and notes type tags -->
+										<div class="champion-images">
+											<img v-if="champion" :src="getChampionImageSource('small', champion.name)"
+												alt="Champion image" class="card-champion-image">
+											<div v-else-if="championA && championB" class="d-flex align-items-center">
+												<img :src="getChampionImageSource('small', championA.name)"
+													alt="Champion A image" class="card-champion-image me-1">
+												<span>vs</span>
+												<img :src="getChampionImageSource('small', championB.name)"
+													alt="Champion B image" class="card-champion-image ms-1">
+											</div>
+										</div>
+										<span class="badge"
+											:class="{ 'bg-primary': notesType === 'champion', 'bg-warning text-dark': notesType === 'matchup', 'bg-danger': notesType === 'general' }">{{
+												notesType }} Notes</span>
+									</div>
+									<div class="card-body ">
+										<p class="card-text text-light">{{ filteredNotes[selectedNoteIndex]?.content }}</p>
+									</div>
+									<div class="card-footer justify-content-between pb-0">
+										<div class="user">
+											<!-- Placeholder for user image; you can replace this with actual user data if available -->
+											<!-- <img src="https://i.pravatar.cc/40?u={{ note.username }}" alt="user__image" class="user__image"> -->
+											<div class="user__info">
+												<p>{{ filteredNotes[selectedNoteIndex]?.username }}</p>
+												<small>{{ formatDate(filteredNotes[selectedNoteIndex]?.updatedAt) }}</small>
+											</div>
+										</div>
+										<Rating :initialRating="filteredNotes[selectedNoteIndex]?.personalRating"
+											@update:rating="updateRating(champion.name, filteredNotes[selectedNoteIndex]?.noteId, $event)" />
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+				<!-- <div class="modal-footer">
+					<button @click="$emit('update:isVisible', false)" class="btn btn-danger">Close</button>
+				</div> -->
 			</div>
-			<button @click="$emit('update:isVisible', false)">Close</button>
+
 		</div>
+
 	</div>
 </template>
+  
+  
 
 <script setup>
-import { computed, defineProps } from 'vue';
+import { computed, defineProps, ref, onMounted } from 'vue';
+import { getUrlHelper } from '../../globalSetup';
+import { watchEffect } from 'vue';
+import { useStore } from 'vuex';
+import Rating from './Rating.vue';
+import RatingAverage from './RatingAverage.vue';
+import FilterBar from './FilterBarNotes.vue';
+import debug from 'debug';
 
-const { isVisible, notes, notesType } = defineProps({
+const store = useStore();
+
+const { isVisible, notes, notesType, champion, championA, championB } = defineProps({
 	isVisible: Boolean,
 	notes: Array,
 	notesType: String,
+	champion: Object,
+	championA: Object,
+	championB: Object,
 });
 
-const modalTitle = computed(() => notesType === 'champion' ? 'Champion Notes' : 'Matchup Notes');
+const filteredNotes = ref([]);
+const searchQuery = ref('');
+const showFavorites = ref(false);
+const sortDescending = ref(true); // Start with true for descending order
+const sharedNotes = ref([]);
+const selectedNoteIndex = ref(0);
+
+const handleFilterUpdate = ({ type, value }) => {
+	// Update your filters based on the filter bar events
+	if (type === 'search') {
+		searchQuery.value = value;
+	} else if (type === 'favorites') {
+		showFavorites.value = value;
+	} else if (type === 'rating') {
+		sortDescending.value = !sortDescending.value; // Toggle between true and false
+	}
+};
+
+// Inside your SharedNotesModal component
+function fetchData(championName) {
+	if (notesType === 'champion') {
+		sharedNotes.value = store.getters['notes/getChampionNotesShared'](championName);
+	} else if (notesType === 'matchup') {
+		// Assuming championA and championB are available and properly reactive
+		sharedNotes.value = store.getters['notes/getMatchupNotes'](championA.value.name, championB.value.name);
+	} else if (notesType === 'general') {
+		sharedNotes.value = store.getters['notes/getGeneralNotes']();
+	}
+}
+defineExpose({ fetchData });
+
+watchEffect(() => {
+	// Start with a shallow copy of notes to avoid direct mutation
+	let result = sharedNotes.value?.slice() || [];
+
+	// Apply filters only if there are changes to searchQuery, showFavorites, or sortByRating
+	if (searchQuery.value) {
+		result = result.filter(note => note.title.includes(searchQuery.value) || note.content.includes(searchQuery.value));
+	}
+	if (showFavorites.value) {
+		result = result.filter(note => note.isFavorite);
+	}
+	if (sortDescending.value) {
+		result.sort((a, b) => parseFloat(b.averageRating) - parseFloat(a.averageRating));
+	} else {
+		result.sort((a, b) => parseFloat(a.averageRating) - parseFloat(b.averageRating));
+	}
+	filteredNotes.value = result;
+}, { flush: 'post', deep: true });
+
+const getSummonerIcon = (iconId, index) => {
+	const urlHelper = getUrlHelper();
+	const intValue = parseInt(iconId, 10); // Convert string to integer
+	const string = intValue + index;
+	return urlHelper.getSummonerIconUrl(string);
+};
+
+const selectNote = (index) => {
+	selectedNoteIndex.value = index;
+};
+
+const getChampionImageSource = (type, championName) => {
+	const urlHelper = getUrlHelper();
+	return urlHelper.getChampionImageSource(type, championName);
+};
+
+const championBackgroundStyle = computed(() => {
+	if (champion || championB) {
+		const championName = champion ? champion.name : championB.name;
+		const urlHelper = getUrlHelper();
+		const imageUrl = urlHelper.getChampionImageSource('splash', championName);
+
+		return {
+			backgroundImage: `url('${imageUrl}')`,
+			opacity: 0.05
+		};
+	}
+	return {};
+});
+
+const modalTitle = computed(() => {
+	if (notesType === 'champion') {
+		return 'Community Notes';
+	} else if (notesType === 'matchup') {
+		// return `Community Notes ${championA ? `${championA.name} vs ${championB.name}` : ''}`;
+		return 'Community Notes';
+	}
+});
 
 const formatDate = (date) => {
 	return new Date(date).toLocaleDateString('en-US', {
 		year: 'numeric', month: 'long', day: 'numeric'
 	});
 };
+
+const updateRating = (championName, noteId, rating) => {
+	store.dispatch('notes/updateChampionNoteRating', { championName, noteId, rating });
+};
 </script>
 
-  
+
 
 <style scoped>
-.modal-overlay {
-	position: fixed;
+.modal-container {
+	background: var(--card-background);
+	border: 1px solid rgba(128, 128, 128, 0.1);
+	min-width: 80h;
+	max-width: 80vh;
+	min-height: 50vh;
+	max-height: 50vh;
+}
+
+.modal-body {
+	background-color: #05080f;
+	margin: 1rem ;
+}
+.modal-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	padding: 1rem;
+	width: 500px;
+	height: 500px;
+	z-index: auto;
+	background-color: #05080f;
+}
+
+.modal {
+	background-color: rgba(0, 0, 0, 0.69);
+}
+
+.modal-dialog {
+	min-width: 80vh;
+}
+
+.list-group {
+	color: white;
+	border: none;
+	width: 500px;
+	height: 500px;
+	z-index: 1;
+	padding: 1rem;
+	background-color: #05080f;
+
+}
+
+.list-group-item {
+	border: none;
+	border-radius: 0;
+	background-color: #0a1320;
+	margin-bottom: .5rem;
+}
+
+.list-group-item-action:hover {
+	background-color: var(--grey-4);
+}
+
+.list-group-item-action:focus,
+.list-group-item-action:active {
+	background-color: var(--grey-4);
+	color: #495057;
+	outline: none;
+}
+
+
+
+.background-image-container {
+	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.5);
-	/* Slightly darker overlay */
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 1000;
-	/* High z-index to ensure overlay is above other content */
+	z-index: 0;
+	background-size: cover;
+	background-position: left top;
+	background-repeat: no-repeat;
+	filter: grayscale(90%);
+}
+
+.modal-header {
+	text-transform: uppercase;
+	font-weight: 700;
+	text-align: start;
+	font-size: 1.5rem;
+	border: 0;
+
+}
+
+.modal-title p{
+	font-size: 1rem;
+	color: var(--gold-2);
+	margin-bottom: 0;
+}
+
+.modal-header-2 {
+	text-align: center;
+	font-weight: 500;
+	font-size: 1rem;
+	margin-bottom: 1rem;
+	background-color: #0a1320;
+	width: 100%;
+	padding: .5rem;
 }
 
 .modal-content {
-	width: 30%;
-	min-width: 300px;
-	/* Minimum width for responsiveness */
-	background-color: #fff;
-	/* Change to match your modal's background */
-	padding: 25px;
-	border: 1px solid #ccc;
-	/* Adjust according to your theme */
-	border-radius: 8px;
-	/* Rounded corners for the modal */
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-	/* Soft shadow for depth */
-	transition: transform 0.3s ease-out;
-	/* Smooth scaling transition */
-	transform: scale(1.05);
-	/* Slightly scale up for attention */
+	color: white;
+	text-transform: none;
+	border: 1px solid var(--grey-4);
 }
 
-.note {
-	background-color: #f7f7f7;
-	/* Light grey background for each note */
-	padding: 15px;
-	border-radius: 4px;
-	/* Rounded corners for notes */
-	margin-bottom: 15px;
-	/* Space between notes */
-	color: #333;
-	/* Text color for notes */
+.card-champion-image {
+	width: 55px;
+	margin: .5rem .5rem;
+	border: 1px solid var(--gold-2);
 }
 
-.note small {
-	display: block;
-	/* Ensure date is on its own line */
-	color: #666;
-	/* Lighter text color for date */
-	font-size: 0.875rem;
-	/* Smaller font size for date */
+.modal-champion-image {
+	width: 60px;
+	border: 1px solid var(--gold-2);
 }
 
-button {
-	/* Style your button accordingly */
-	background-color: #007bff;
-	/* Example blue background */
-	color: #fff;
-	/* White text */
-	padding: 10px 20px;
-	border: none;
-	border-radius: 5px;
-	/* Slightly rounded corners for the button */
-	cursor: pointer;
+.card-body {
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	width: 100%;
 }
 
-/* Additional styles for modal title and content */
-h2 {
-	color: #333;
-	/* Title color */
-	margin-bottom: 20px;
-	/* Space below the title */
-}
-
-/* Adjust this to match your modal content's needs */
-.modal-content p {
+.card-body p {
+	font-size: 1rem;
 	white-space: pre-wrap;
-	/* Preserve formatting of the note content */
+	font-weight: 500;
+	margin-bottom: 0;
+}
+
+.card-footer {
+	display: flex;
+	margin-top: auto;
+	align-items: center;
+	border-top: 1px solid var(--gold-7);
+}
+
+.user {
+	display: flex;
+	align-items: center;
+}
+
+.user__info p {
+	font-size: 1rem;
+	margin: 0;
+	color: var(--gold-2);
+	line-height: 0.5rem;
+}
+
+.user__info span {
+	font-size: 1rem;
+	color: var(--gold-1);
+}
+
+.user__info>small {
+	color: #666;
+	font-size: .8rem;
 }
 </style>

@@ -78,7 +78,7 @@
 	--border-laser-gradient-horizontal: linear-gradient(to left, #000406, #FF4C5A, #00FDFF, #000406);
 	--border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF);
 
-	--card-background: linear-gradient(to right, #091014, #0a141c);
+	--card-background: linear-gradient(to right, #091014, #060c11);
 
 }
 
@@ -178,7 +178,6 @@ body {
 /* Button styles */
 .btn {
 	font-size: 1rem;
-	border: none;
 	transition: color 0.3s ease;
 }
 

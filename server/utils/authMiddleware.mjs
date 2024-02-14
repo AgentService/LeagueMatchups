@@ -12,7 +12,6 @@ export function verifyToken(req, res, next) {
 
 	try {
 		const decoded = jwt.verify(token, 'your JWT secret');
-		debug('Decoded token:', decoded);
 		req.user = decoded;
 		next(); // Call next() to continue to the route handler if the token is valid
 	} catch (err) {

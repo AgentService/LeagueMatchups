@@ -280,8 +280,8 @@ function getChampionImageSource(type, championId) {
 	display: flex;
 	flex-direction: column;
 	border: 2px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #091014, #0a141c);
-	box-shadow: 4px 8px 12px rgba(0, 0, 1, 1);
+	background-image: linear-gradient(to right, #091014, #05080f);
+	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;

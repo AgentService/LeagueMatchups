@@ -62,7 +62,7 @@ export const summoner = {
     async fetchSummonerData({ commit, state }, { region, gameName, tagLine }) {
       console.log("fetchSummonerData", gameName);
       const existingDetail = state.playerDetails.find(
-        (detail) => detail.gamename === gameName
+        (detail) => detail.gameName === gameName
       );
 
       if (existingDetail) {

@@ -10,9 +10,17 @@ export const notes = {
   state: {
     championNotes: {},
     championNotesShared: {},
+
     generalNotes: [],
+
     matchupNotes: {},
     matchupNotesShared: {},
+
+    rating: {
+      champion: {},
+      matchup: {},
+    },
+
     lastFetchTimestamps: {
       champions: {},
       matchups: {},
@@ -22,7 +30,7 @@ export const notes = {
     SET_GENERAL_NOTE(state, { note }) {
       // Find the index of the note if it already exists in the state
       const index = state.generalNotes.findIndex(
-        (existingNote) => existingNote.noteid === note.noteid
+        (existingNote) => existingNote.noteId === note.noteId
       );
 
       if (index !== -1) {
@@ -37,9 +45,9 @@ export const notes = {
     SET_GENERAL_NOTES(state, notes) {
       state.generalNotes = notes;
     },
-    DELETE_GENERAL_NOTE(state, noteid) {
+    DELETE_GENERAL_NOTE(state, noteId) {
       const index = state.generalNotes.findIndex(
-        (existingNote) => existingNote.noteid === noteid
+        (existingNote) => existingNote.noteId === noteId
       );
       if (index !== -1) {
         state.generalNotes.splice(index, 1);
@@ -52,11 +60,11 @@ export const notes = {
     },
     UPDATE_CHAMPION_PERSONAL_NOTES_CONTENT(
       state,
-      { championName, content, updated_at }
+      { championName, content, updatedAt }
     ) {
       if (state.championNotes[championName]) {
         state.championNotes[championName].content = content;
-        state.championNotes[championName].updated_at = updated_at;
+        state.championNotes[championName].updatedAt = updatedAt;
       }
     },
     SET_OTHER_USERS_CHAMPION_NOTES(state, { championName, notes }) {
@@ -67,14 +75,14 @@ export const notes = {
     SET_MATCHUP_NOTES(state, { matchupId, data }) {
       state.matchupNotes[matchupId] = data;
     },
-    UPDATE_MATCHUP_PERSONAL_NOTES(state, { matchupId, content, updated_at }) {
+    UPDATE_MATCHUP_PERSONAL_NOTES(state, { matchupId, content, updatedAt }) {
       if (state.matchupNotes[matchupId]) {
         state.matchupNotes[matchupId].content = content;
-        state.matchupNotes[matchupId].updated_at = updated_at;
+        state.matchupNotes[matchupId].updatedAt = updatedAt;
       }
     },
-    SET_OTHER_USERS_MATCHUP_NOTES(state, { matchupId, notes }) {
-      state.matchupNotesShared[matchupId] = notes;
+    SET_OTHER_USERS_MATCHUP_NOTES(state, { combinedId, notes }) {
+      state.matchupNotesShared[combinedId] = notes;
     },
     // TIMESTAMP MUTATIONS
     SET_LAST_FETCH_TIMESTAMP(state, { type, key, timestamp }) {
@@ -82,14 +90,27 @@ export const notes = {
         state.lastFetchTimestamps[type] = {};
       }
       state.lastFetchTimestamps[type][key] = timestamp;
-    }
+    },
+    SET_CHAMPION_NOTES_RATING(state, { championName, noteId, rating }) {
+      // Check if the champion's notes exist in the shared structure
+      if (state.championNotesShared[championName]) {
+        // Find the note by noteId
+        const noteIndex = state.championNotesShared[championName].findIndex(note => note.noteId === noteId);
+    
+        // If found, update the rating and isFavorite status
+        if (noteIndex !== -1) {
+          state.championNotesShared[championName][noteIndex].personalRating = rating;
+        }
+      }
+    },
+    
   },
   getters: {
     getGeneralNote: (state) => (noteId) => {
       return state.generalNotes[noteId] || "";
     },
     getChampionNotesShared: (state) => (championId) => {
-      return state.championNotesShared[championId] || {};
+      return state.championNotesShared[championId] || [];
     },
     getChampionNotes: (state) => (championId) => {
       return state.championNotes[championId] || {};
@@ -110,12 +131,12 @@ export const notes = {
   },
   actions: {
     // generalNotes
-    async saveGeneralNote({ commit }, { noteid, content }) {
+    async saveGeneralNote({ commit }, { noteId, content }) {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.post(
           `${baseUrl}/api/notes/general`,
-          { noteid, content },
+          { noteId, content },
           authConfig
         );
 
@@ -132,17 +153,17 @@ export const notes = {
       }
     },
 
-    async deleteGeneralNote({ commit }, noteid) {
+    async deleteGeneralNote({ commit }, noteId) {
       try {
         const authConfig = getAuthConfig();
         const response = await axios.delete(
-          `${baseUrl}/api/notes/general/${noteid}`,
+          `${baseUrl}/api/notes/general/${noteId}`,
           authConfig
         );
 
         // Assuming the backend sends a success response
         if (response.status === 200) {
-          commit("DELETE_GENERAL_NOTE", noteid);
+          commit("DELETE_GENERAL_NOTE", noteId);
         }
       } catch (error) {
         console.error("Error deleting the note:", error);
@@ -210,8 +231,10 @@ export const notes = {
           championName,
           notes: response.data, // Assuming the response wraps the notes in a data array
         });
-        updateLastFetchTimestamp(commit, { type: 'champions', key: championName });
-
+        updateLastFetchTimestamp(commit, {
+          type: "champions",
+          key: championName,
+        });
       } catch (error) {
         console.error("Error fetching other users' champion notes:", error);
         // Handle error appropriately
@@ -229,7 +252,7 @@ export const notes = {
         commit("UPDATE_CHAMPION_PERSONAL_NOTES_CONTENT", {
           championName,
           content: response.data.content,
-          updated_at: response.data.updated_at,
+          updatedAt: response.data.updatedAt,
         });
       } catch (error) {
         console.error("Error updating champion notes:", error);
@@ -238,16 +261,16 @@ export const notes = {
     },
 
     // Matchup Notes Actions
-    async fetchMatchupNotes({ state, commit }, id) {
-      if (!state.matchupNotes[id]) {
+    async fetchMatchupNotes({ state, commit }, combinedId) {
+      if (!state.matchupNotes[combinedId]) {
         try {
           const authConfig = getAuthConfig(); // Ensure this function is defined and correctly sets up authorization headers
           const response = await axios.get(
-            `${baseUrl}/api/notes/matchup/${id}`,
+            `${baseUrl}/api/notes/matchup/${combinedId}`,
             authConfig
           );
 
-          commit("SET_MATCHUP_NOTES", { matchupId: id, data: response.data });
+          commit("SET_MATCHUP_NOTES", { matchupId: combinedId, data: response.data });
         } catch (error) {
           console.error("Error fetching matchup notes:", error);
         }
@@ -272,7 +295,7 @@ export const notes = {
         commit("UPDATE_MATCHUP_PERSONAL_NOTES", {
           matchupId,
           content: response.data.content,
-          updated_at: response.data.updated_at,
+          updatedAt: response.data.updatedAt,
         });
       } catch (error) {
         console.error("Error updating matchup notes:", error);
@@ -299,11 +322,29 @@ export const notes = {
           combinedId,
           notes: response.data,
         });
-        updateLastFetchTimestamp(commit, { type: 'matchups', key: combinedId });
+        updateLastFetchTimestamp(commit, { type: "matchups", key: combinedId });
       } catch (error) {
         console.error("Error fetching other users' matchup notes:", error);
       }
     },
+
+    // Rating
+    async updateChampionNoteRating({ commit }, { championName, noteId, rating }) {
+      try {
+        const response = await axios.post(`${baseUrl}/api/notes/champion/rating`, { noteId, rating });
+        // Assuming the backend response includes the updated rating or a success message
+        if (response.status === 200) {
+          commit('SET_CHAMPION_NOTES_RATING', { championName, noteId, rating });
+        } else {
+          // Handle non-success response
+          console.error('Failed to update rating');
+        }
+      } catch (error) {
+        // Handle error, possibly revert optimistic update
+        console.error('Error updating rating:', error);
+      }
+    }
+    
   },
 };
 

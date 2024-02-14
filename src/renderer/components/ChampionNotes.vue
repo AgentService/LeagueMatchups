@@ -17,18 +17,13 @@
 				</div>
 			</transition-group>
 		</div>
-		<SharedNotesModal
-		:isVisible="showNotesModal"
-		:notes="otherUsersNotes"
-		notesType="champion"
-		title="Shared Champion Notes"
-		@update:isVisible="showNotesModal = $event"
-		/>
-		
+		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
+			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
+
 	</div>
 	<div class="card-body ">
-		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..."
-			class="note-textarea" rows="11"></textarea>
+		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
+			rows="11"></textarea>
 	</div>
 </template>
 
@@ -38,7 +33,6 @@
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import SharedNotesModal from './reuse/NotesShareModal.vue';
-
 
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionNotes');
@@ -53,23 +47,23 @@ const autoSaved = ref(false);
 const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
 
 const showNotesModal = ref(false); // Controls the visibility of the modal
-const otherUsersNotes = ref([]); // Array to store other users' notes
+const NotesSharedModalRef = ref(null);
 
 let saveTimeout = null;
 let isInitialLoad = ref(true); // Flag for initial data load
 
 async function fetchOtherUsersNotes() {
-	// This will fetch notes for the current champion from other users
-	// You need to modify this according to your Vuex store and actions
+	debugger
 	await store.dispatch('notes/fetchOtherUsersChampionNotes', championId.value);
-	otherUsersNotes.value = store.getters['notes/getChampionNotesShared'](championId.value);
+	// Ensure the child component is mounted and its method is available
+	NotesSharedModalRef.value?.fetchData(championId.value);
 }
 
 // Call fetchOtherUsersNotes when the modal is opened
 watch(showNotesModal, (newVal) => {
-	if (newVal === true) {
-		fetchOtherUsersNotes();
-	}
+  if (newVal === true) {
+	fetchOtherUsersNotes();
+  }
 });
 
 function debouncedSave() {
@@ -153,85 +147,6 @@ async function saveChampionNotes() {
 
 .share-button:hover {
 	color: var(--gold-2);
-}
-
-.overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgba(0, 0, 0, 0.5);
-	/* Slightly darker overlay for better focus on popup */
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 1000;
-	/* Ensure overlay is above everything else */
-}
-
-.popup {
-	width: 30%;
-	min-width: 300px;
-	/* Ensure popup is not too narrow on small screens */
-	background-color: black;
-	/* Light background for contrast */
-	padding: 25px;
-	border: 1px solid var(--grey-2);
-	border-radius: 8px;
-	/* More pronounced rounded corners */
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-	/* Softer shadow for depth */
-	transition: transform 0.3s ease-out;
-	/* Smooth enter effect */
-	transform: scale(1.05);
-	/* Slightly scale up for attention */
-}
-
-.note-details {
-	background-color: var(--card-background);
-	/* Light grey background for each note for better separation */
-	padding: 15px;
-	text-transform: none;
-	border-radius: 4px;
-	margin-bottom: 15px;
-	margin-left: .75rem;
-	font-size: .875rem;
-	color: var(--grey-1);
-
-	/* Increase spacing for better readability */
-}
-
-.note-updated {
-	color: var(--grey-2);
-	font-size: 0.875rem;
-	/* Light grey for date */
-}
-
-.note-content {
-	white-space: pre-wrap;
-	background-color: rgb(23, 31, 56);
-	padding: 1rem;
-	border-radius: 12px;
-	margin-top: .5rem;
-	color: var(--gold-1);
-	/* Dark grey text for softer contrast */
-	font-size: 0.95rem;
-	/* Slightly smaller font for content */
-}
-
-button {
-	background-color: #4CAF50;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-	transition: background-color 0.2s;
-}
-
-button:hover {
-	background-color: #45a049;
-	/* Darker green on hover for feedback */
 }
 
 h3 {

@@ -5,15 +5,16 @@ import axios from "axios";
 import Debug from "debug";
 const debugApi = Debug("api:summoner");
 import { getRiotAPI } from "./utilities.mjs";
+import { snakeToCamelCase } from "./utilities.mjs";
 
 const router = express.Router();
 
 router.get("/data", async (req, res) => {
   const userId = req.user.id;
   try {
-    // Assuming you have a function to query your database
     const summonerData = await getSummonerDataByAccountId(userId, req);
-    res.json(summonerData);
+    const convertedData = summonerData.map((row) => snakeToCamelCase(row)); // Convert each row
+    res.json(convertedData);
   } catch (error) {
     console.error("Failed to fetch summoner data:", error);
     res.status(500).send("Internal Server Error");
@@ -24,9 +25,9 @@ const getSummonerDataByAccountId = async (userId, req) => {
   const { dbPool } = req.app.locals;
 
   const queryText = `
-      SELECT Puuid, GameName, TagLine, SummonerID, AccountID, ProfileIconID, RevisionDate, SummonerLevel, Timestamp
+      SELECT Puuid, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp
       FROM SummonerDetails
-      WHERE UserID = $1;
+      WHERE User_ID = $1;
   `;
   try {
     const { rows } = await dbPool.query(queryText, [userId]);
@@ -74,11 +75,11 @@ router.get("/by-riot-id", async (req, res) => {
 
     if (existingSummoner.rows.length > 0) {
       // If the summoner already exists, use the existing rows
-      rows = existingSummoner.rows;
+      rows = existingSummoner.rows.map((row) => snakeToCamelCase(row)); // Convert each existing row
     } else {
       // Insert a new record with the fetched data if not found
       const insertResult = await dbPool.query(
-        "INSERT INTO SummonerDetails (Puuid, UserID, GameName, TagLine, SummonerID, AccountID, ProfileIconID, RevisionDate, SummonerLevel, Timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
+        "INSERT INTO SummonerDetails (Puuid, User_ID, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
         [
           puuid,
           userId,
@@ -93,7 +94,7 @@ router.get("/by-riot-id", async (req, res) => {
         ]
       );
       // Use the rows from the insertion result
-      rows = insertResult.rows;
+      rows = insertResult.rows.map((row) => snakeToCamelCase(row)); // Convert each inserted row
     }
 
     // Database integration ends here
@@ -111,15 +112,18 @@ router.post("/update-summoner-details", async (req, res) => {
 
   try {
     // Perform the update operation here
-    await dbPool.query(
+    const updatedDetails = await dbPool.query(
       `
           UPDATE SummonerDetails 
-          SET SummonerLevel = $2, ProfileIconID = $3
+          SET SummonerLevel = $2, Profile_Icon_ID = $3
           WHERE Puuid = $1`,
       [puuid, summonerLevel, profileIconId]
     );
+    const convertedDetails = updatedDetails.rows.map((row) =>
+      snakeToCamelCase(row)
+    ); // Convert each updated row
 
-    res.status(200).json({ message: "Summoner details updated successfully." });
+    res.status(200).json({ message: "Summoner details updated successfully.", details: convertedDetails[0] });
   } catch (error) {
     console.error("Error updating summoner details:", error);
     res.status(500).send("Internal Server Error");

@@ -283,7 +283,7 @@
 </template>
 
 <script>
-import { useStore, mapState, mapActions } from 'vuex';
+import { useStore, mapActions } from 'vuex';
 import { ref, computed, watch } from 'vue';
 import { getUrlHelper } from '../globalSetup';
 

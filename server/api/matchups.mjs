@@ -1,30 +1,31 @@
 // api/matchups.mjs
 import express from "express";
-import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
-import { getLatestVersion } from "./utilities.mjs";
+// import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
+// import { getLatestVersion } from "./utilities.mjs";
 import Debug from "debug";
+import { snakeToCamelCase } from "./utilities.mjs";
 
 const debug = Debug("api:matchups");
 const router = express.Router();
 
-// Function to read matchups from JSON file
-function readMatchups(userMatchupsFilePath) {
-  return readJsonFile(userMatchupsFilePath);
-}
+// // Function to read matchups from JSON file
+// function readMatchups(userMatchupsFilePath) {
+//   return readJsonFile(userMatchupsFilePath);
+// }
 
-// Function to write matchups to JSON file
-function writeMatchups(userMatchupsFilePath, matchups) {
-  writeJsonFile(userMatchupsFilePath, matchups);
-}
+// // Function to write matchups to JSON file
+// function writeMatchups(userMatchupsFilePath, matchups) {
+//   writeJsonFile(userMatchupsFilePath, matchups);
+// }
 
-// Get all matchups
-router.get("/", (req, res) => {
-  debudebuggApi("Fetching all matchups");
-  const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
+// // Get all matchups
+// router.get("/DELETE", (req, res) => {
+//   debudebuggApi("Fetching all matchups");
+//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
 
-  const matchups = readMatchups(userMatchupsFilePath);
-  res.json(matchups);
-});
+//   const matchups = readMatchups(userMatchupsFilePath);
+//   res.json(matchups);
+// });
 
 // router.get("/:id", async (req, res) => {
 //   debug("Fetching or creating specific matchups id: ", req.params.id);
@@ -80,24 +81,14 @@ router.get("/:id", async (req, res) => {
          VALUES ($1, $2, $3) RETURNING *;`,
         [championAName, championBName, combinedId]
       );
-        debug("matchup inserted:", matchup.rows[0]);
-      // Assuming the insert was successful, format and send the response
-      const createdMatchup = matchup.rows[0];
-      res.status(201).json({
-        id: createdMatchup.combined_id, // Use the combined_id as the id in the response
-        champion_a_name: createdMatchup.champion_a_name,
-        champion_b_name: createdMatchup.champion_b_name,
-      });
+      debug("matchup inserted:", matchup.rows[0]);
+      const createdMatchup = snakeToCamelCase(matchup.rows[0]);
+      res.status(201).json(createdMatchup); // Send the converted object
     } else {
       // Matchup found, format and send the response
-
-      const foundMatchup = matchup.rows[0];
-      debug("foundMatchup:", foundMatchup.combined_id);
-      res.json({
-        id: foundMatchup.combined_id, // Use the combined_id as the id in the response
-        champion_a_name: foundMatchup.champion_a_name,
-        champion_b_name: foundMatchup.champion_b_name,
-      });
+      const foundMatchup = snakeToCamelCase(matchup.rows[0]);
+      debug("foundMatchup:", foundMatchup.combinedId);
+      res.json(foundMatchup); // Send the converted object
     }
   } catch (error) {
     debug("Error accessing database:", error);
@@ -105,51 +96,51 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// Create a new matchup
-router.post("/", (req, res) => {
-  debug("Create a new matchup");
-  debug("user:", req.user.email);
-  // Create the user-specific matchups file path
-  const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
-  const matchups = readMatchups(userMatchupsFilePath);
-  const newMatchup = req.body;
-  matchups.push(newMatchup);
-  writeMatchups(userMatchupsFilePath, matchups);
-  res.status(201).json(newMatchup);
-});
+// // Create a new matchup
+// router.post("/", (req, res) => {
+//   debug("Create a new matchup");
+//   debug("user:", req.user.email);
+//   // Create the user-specific matchups file path
+//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
+//   const matchups = readMatchups(userMatchupsFilePath);
+//   const newMatchup = req.body;
+//   matchups.push(newMatchup);
+//   writeMatchups(userMatchupsFilePath, matchups);
+//   res.status(201).json(newMatchup);
+// });
 
-// Delete all matchups
-router.delete("/delete", (req, res) => {
-  debug("Delete all matchups");
-  writeMatchups([]);
-  res.status(204).send();
-});
+// // Delete all matchups
+// router.delete("/delete", (req, res) => {
+//   debug("Delete all matchups");
+//   writeMatchups([]);
+//   res.status(204).send();
+// });
 
-// Update a matchup's notes by id
-router.patch("/:id/notes", (req, res) => {
-  const { id } = req.params;
-  const { personalNotes } = req.body;
-  // Create the user-specific matchups file path
-  const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
+// // Update a matchup's notes by id
+// router.patch("/:id/notes", (req, res) => {
+//   const { id } = req.params;
+//   const { personalNotes } = req.body;
+//   // Create the user-specific matchups file path
+//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
 
-  //const savedNote = saveNoteForUser(userEmail, noteContent);
+//   //const savedNote = saveNoteForUser(userEmail, noteContent);
 
-  // Read matchups from the user's specific file
-  const matchups = readJsonFile(userMatchupsFilePath);
+//   // Read matchups from the user's specific file
+//   const matchups = readJsonFile(userMatchupsFilePath);
 
-  // Find the index of the matchup to update
-  const matchupIndex = matchups.findIndex((m) => m.id === id);
-  if (matchupIndex !== -1) {
-    // Update the matchup's notes
-    matchups[matchupIndex].personalNotes = personalNotes;
-    debug("matchups note update:", matchups[matchupIndex]);
-    // Write the updated matchups back to the user's specific file
-    writeJsonFile(userMatchupsFilePath, matchups);
+//   // Find the index of the matchup to update
+//   const matchupIndex = matchups.findIndex((m) => m.id === id);
+//   if (matchupIndex !== -1) {
+//     // Update the matchup's notes
+//     matchups[matchupIndex].personalNotes = personalNotes;
+//     debug("matchups note update:", matchups[matchupIndex]);
+//     // Write the updated matchups back to the user's specific file
+//     writeJsonFile(userMatchupsFilePath, matchups);
 
-    res.json(matchups[matchupIndex]);
-  } else {
-    res.status(404).json({ error: "Matchup not found" });
-  }
-});
+//     res.json(matchups[matchupIndex]);
+//   } else {
+//     res.status(404).json({ error: "Matchup not found" });
+//   }
+// });
 
 export default router;

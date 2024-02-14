@@ -13,7 +13,7 @@
 					<router-link to="/userJourney" class="nav-link">Journey</router-link>
 				</div>
 				<div class="d-flex justify-content-end">
-					<div class="container-fluid justify-content-start justify-content-right" style="max-width: 1480px;">
+					<div class="container-fluid justify-content-start justify-content-right" style="max-width: 1280px;">
 						<div class="d-flex position-relative">
 							<!-- Loading spinner or dropdown based on summonerIcon's state -->
 							<div v-if="!summonerIcon" class="spinner-grow text-light" role="status">
@@ -26,10 +26,10 @@
 									<div class="position-relative">
 										<div class="position-relative icon-container">
 											<img :src="summonerIcon" alt="Summoner Icon" class="rounded-circle icon-image">
-											<span class="level-pill">{{ currentSummoner?.summonerlevel }}</span>
+											<span class="level-pill">{{ currentSummoner?.summonerLevel }}</span>
 										</div>
-										<span class="ps-2 text-light">{{ currentSummoner?.gamename }}</span>
-										<span class="text-secondary">#{{ currentSummoner?.tagline }}</span>
+										<span class="ps-2 text-light">{{ currentSummoner?.gameName }}</span>
+										<span class="text-secondary">#{{ currentSummoner?.tagLine }}</span>
 									</div>
 								</button>
 								<!-- Dropdown Menu -->
@@ -85,11 +85,11 @@ const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
 onMounted(async () => {
-	await store.dispatch("summoner/getSummonerData");
+	// await store.dispatch("summoner/getSummonerData");
 });
 
 const summonerIcon = computed(() => {
-	const iconId = currentSummoner.value?.profileiconid;
+	const iconId = currentSummoner.value?.profileIconId;
 	if (!iconId) {
 		return undefined;
 	}
@@ -148,7 +148,7 @@ const summonerIcon = computed(() => {
 .navbar {
 	font-size: 0.85rem;
 	background: var(--navbar-background-gradient);
-	max-height: 50px;
+	max-height: 70px;
 }
 
 .navbar-brand {
