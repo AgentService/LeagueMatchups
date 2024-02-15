@@ -140,8 +140,8 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" />
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]" alt="Champion Image"
+								@click="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -1175,7 +1175,7 @@ export default {
 
 .champion-card {
 	display: flex;
-	height: 300px;
+	height: 350px;
 	flex-direction: column;
 	padding: 1.5rem;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -1232,6 +1232,7 @@ export default {
 	flex-wrap: wrap;
 	gap: 0;
 	padding-top: 1rem;
+
 }
 
 .champion-grid.is-scrollable {

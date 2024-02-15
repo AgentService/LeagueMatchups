@@ -110,8 +110,8 @@ function createWindow(x = 0, y = 0) {
   mainWindow = new BrowserWindow({
     x: x,
     y: y,
-    minWidth: 1280, // set the minimum width
-    minHeight: 720, // set the minimum height
+    minWidth: 1600, // set the minimum width
+    minHeight: 800, // set the minimum height
     // maxHeight: 800,
     // maxWidth: 1280,
     partition: "nopersist",

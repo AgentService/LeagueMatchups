@@ -95,15 +95,32 @@ export const notes = {
       // Check if the champion's notes exist in the shared structure
       if (state.championNotesShared[championName]) {
         // Find the note by noteId
-        const noteIndex = state.championNotesShared[championName].findIndex(note => note.noteId === noteId);
-    
+        const noteIndex = state.championNotesShared[championName].findIndex(
+          (note) => note.noteId === noteId
+        );
+
         // If found, update the rating and isFavorite status
         if (noteIndex !== -1) {
-          state.championNotesShared[championName][noteIndex].personalRating = rating;
+          state.championNotesShared[championName][noteIndex].personalRating =
+            rating;
         }
       }
     },
-    
+    SET_MATCHUP_NOTES_RATING(state, { matchupId, noteId, rating }) {
+      // Check if the champion's notes exist in the shared structure
+      if (state.matchupNotesShared[matchupId]) {
+        // Find the note by noteId
+        const noteIndex = state.matchupNotesShared[matchupId].findIndex(
+          (note) => note.noteId === noteId
+        );
+
+        // If found, update the rating and isFavorite status
+        if (noteIndex !== -1) {
+          state.matchupNotesShared[matchupId][noteIndex].personalRating =
+            rating;
+        }
+      }
+    },
   },
   getters: {
     getGeneralNote: (state) => (noteId) => {
@@ -126,7 +143,7 @@ export const notes = {
       return state.matchupNotes[matchupId]?.content || "";
     },
     getMatchupNotesShared: (state) => (matchupId) => {
-      return state.matchupNotesShared[matchupId] || {};
+      return state.matchupNotesShared[matchupId] || [];
     },
   },
   actions: {
@@ -270,7 +287,10 @@ export const notes = {
             authConfig
           );
 
-          commit("SET_MATCHUP_NOTES", { matchupId: combinedId, data: response.data });
+          commit("SET_MATCHUP_NOTES", {
+            matchupId: combinedId,
+            data: response.data,
+          });
         } catch (error) {
           console.error("Error fetching matchup notes:", error);
         }
@@ -329,22 +349,43 @@ export const notes = {
     },
 
     // Rating
-    async updateChampionNoteRating({ commit }, { championName, noteId, rating }) {
+    async updateChampionNoteRating(
+      { commit },
+      { championName, noteId, rating }
+    ) {
       try {
-        const response = await axios.post(`${baseUrl}/api/notes/champion/rating`, { noteId, rating });
+        const response = await axios.post(
+          `${baseUrl}/api/notes/champion/rating`,
+          { noteId, rating }
+        );
         // Assuming the backend response includes the updated rating or a success message
         if (response.status === 200) {
-          commit('SET_CHAMPION_NOTES_RATING', { championName, noteId, rating });
+          commit("SET_CHAMPION_NOTES_RATING", { championName, noteId, rating });
         } else {
           // Handle non-success response
-          console.error('Failed to update rating');
+          console.error("Failed to update rating");
         }
       } catch (error) {
         // Handle error, possibly revert optimistic update
-        console.error('Error updating rating:', error);
+        console.error("Error updating rating:", error);
       }
-    }
-    
+    },
+    // New action for matchup notes
+    async updateMatchupNoteRating({ commit }, { matchupId, noteId, rating }) {
+      try {
+        const response = await axios.post(
+          `${baseUrl}/api/notes/matchup/rating`,
+          { noteId, rating }
+        );
+        if (response.status === 200) {
+          commit("SET_MATCHUP_NOTES_RATING", { matchupId, noteId, rating });
+        } else {
+          console.error("Failed to update matchup note rating");
+        }
+      } catch (error) {
+        console.error("Error updating matchup note rating:", error);
+      }
+    },
   },
 };
 

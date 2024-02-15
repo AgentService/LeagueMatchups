@@ -19,8 +19,8 @@
 			</transition-group>
 		</div>
 		<SharedNotesModal
+		ref="NotesSharedModalRef"
 		:isVisible="showNotesModal"
-		:notes="otherUsersNotes"
 		notesType="matchup"
 		title="Shared Matchup Notes"
 		:championA="championA"
@@ -61,11 +61,13 @@ const championSwitched = ref(false);
 const showNotesModal = ref(false); // Controls the visibility of the modal
 const otherUsersNotes = ref([]); // Array to store other users' notes
 
+const NotesSharedModalRef = ref(null);
+
 async function fetchOtherUsersNotes() {
 	// This will fetch notes for the current champion from other users
 	// You need to modify this according to your Vuex store and actions
 	await store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value?.combinedId);
-	otherUsersNotes.value = store.getters['notes/getMatchupNotesShared'](currentMatchup.value?.combinedId);
+	NotesSharedModalRef.value?.fetchData(currentMatchup.value?.combinedId);
 }
 
 // Call fetchOtherUsersNotes when the modal is opened

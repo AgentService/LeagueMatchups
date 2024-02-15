@@ -60,9 +60,9 @@ async function fetchOtherUsersNotes() {
 
 // Call fetchOtherUsersNotes when the modal is opened
 watch(showNotesModal, (newVal) => {
-  if (newVal === true) {
-	fetchOtherUsersNotes();
-  }
+	if (newVal === true) {
+		fetchOtherUsersNotes();
+	}
 });
 
 function debouncedSave() {

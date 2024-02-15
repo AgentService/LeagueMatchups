@@ -62,9 +62,11 @@ function selectSummoner(summonerDetail) {
 
 onMounted(() => {
 	document.addEventListener('click', handleClickOutside);
-	  if (!allPlayerDetails.value.length) {
-	    store.dispatch('summoner/fetchSummonerDataByAccountId');
-	  }
+
+	
+	if (!allPlayerDetails.value.length) {
+		store.dispatch('summoner/fetchSummonerDataByAccountId');
+	}
 });
 
 onBeforeUnmount(() => {

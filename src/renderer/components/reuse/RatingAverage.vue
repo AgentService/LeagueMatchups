@@ -1,7 +1,8 @@
 <template>
     <div class="d-flex flex-column align-items-center justify-content-center pe-3 star-rating-container">
-        <div class="average-rating-number">{{ averageRating.toFixed(1) }}</div>
-
+        <div v-if="averageRating > 0">
+            <div class="average-rating-number">{{ averageRating.toFixed(1) }}</div>
+        </div>
         <div class="star-rating d-flex flex-row">
             <!-- Display stars based on the average rating -->
 
@@ -20,7 +21,7 @@
 import { computed } from 'vue';
 import Debug from 'debug';
 
-const debug = Debug('app:component:ChampionNotes');
+const debug = Debug('app:component:RatingAverage');
 
 const props = defineProps({
     averageRating: {

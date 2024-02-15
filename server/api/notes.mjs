@@ -34,6 +34,33 @@ router.post("/champion/rating", async (req, res) => {
   }
 });
 
+router.post("/matchup/rating", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const { noteId, rating } = req.body;
+  const userId = req.user.id;
+  debug("Note ID:", noteId);
+  debug("Rating:", rating);
+  try {
+    // Insert or update the rating
+    const { rowCount } = await dbPool.query(
+      `INSERT INTO MatchupNotesRating (Note_ID, User_ID, Rating)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (Note_ID, User_ID) DO UPDATE
+       SET Rating = EXCLUDED.Rating
+       RETURNING *`,
+      [noteId, userId, rating]
+    );
+    if (rowCount > 0) {
+      res.status(200).json({ message: "Rating updated successfully." });
+    } else {
+      res.status(404).json({ message: "Failed to update rating." });
+    }
+  } catch (error) {
+    console.error("Error updating champion note rating:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Matchup Notes
 router.get("/matchup/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
@@ -135,30 +162,67 @@ router.post("/matchup/:id", async (req, res) => {
 });
 router.get("/matchup/others/:combinedId", async (req, res) => {
   const { dbPool } = req.app.locals;
-  const combinedId = req.params.combinedId; // "Bard-Azir"
+  const combinedId = req.params.combinedId.split("-"); // combinedId is "ChampionA-ChampionB"
   const userId = req.user.id;
 
   try {
-    // Assuming you can directly join Matchups with MatchupNotes using a known relationship
     const query = `
-      SELECT MatchupNotes.*, Users.Username 
-      FROM MatchupNotes
-      JOIN Users ON MatchupNotes.User_ID = Users.User_ID
-      JOIN Matchups ON MatchupNotes.Matchup_ID = Matchups.ID
-      WHERE Matchups.combined_id = $1 AND MatchupNotes.User_ID != $2
+      SELECT mn.Note_ID, mn.Content, mn.Visibility, u.Username, mn.Created_At, mn.Updated_At
+      FROM MatchupNotes mn
+      JOIN Users u ON mn.User_ID = u.User_ID
+      JOIN Matchups m ON mn.Matchup_ID = m.ID
+      WHERE (m.Champion_A_Name = $1 AND m.Champion_B_Name = $2 OR m.Champion_A_Name = $2 AND m.Champion_B_Name = $1) AND mn.User_ID != $3
     `;
-    const notesResult = await dbPool.query(query, [combinedId, userId]);
+    const notesResult = await dbPool.query(query, [...combinedId, userId]);
 
-    if (notesResult.rowCount > 0) {
-      const convertedNotes = notesResult.rows.map((row) =>
-        snakeToCamelCase(row)
-      ); // Convert each note to camelCase
-      res.json(convertedNotes);
-    } else {
-      res
+    if (notesResult.rowCount === 0) {
+      return res
         .status(404)
         .json({ message: "No other users' notes found for this matchup." });
     }
+
+    const noteIds = notesResult.rows.map((row) => row.note_id);
+
+    const personalRatingResult = await dbPool.query(
+      `
+      SELECT Note_ID, Rating, Is_Favorite
+      FROM MatchupNotesRating
+      WHERE User_ID = $2 AND Note_ID = ANY($1::int[])`,
+      [noteIds, userId]
+    );
+
+    const averageRatingResult = await dbPool.query(
+      `
+      SELECT Note_ID, AVG(Rating) AS AverageRating
+      FROM MatchupNotesRating
+      WHERE Note_ID = ANY($1::int[])
+      GROUP BY Note_ID`,
+      [noteIds]
+    );
+
+    const enrichedNotes = notesResult.rows.map((note) => {
+      const personalRating = personalRatingResult.rows.find(
+        (rating) => rating.note_id === note.note_id
+      );
+      const averageRating = averageRatingResult.rows.find(
+        (rating) => rating.note_id === note.note_id
+      );
+
+      return {
+        ...note,
+        personalRating: personalRating ? personalRating.rating : undefined,
+        isFavorite: personalRating ? personalRating.is_favorite : undefined,
+        averageRating: averageRating
+          ? parseFloat(averageRating.averagerating).toFixed(2)
+          : undefined,
+        createdAt: note.created_at,
+        updatedAt: note.updated_at,
+      };
+    });
+
+    const finalResponse = enrichedNotes.map((note) => snakeToCamelCase(note));
+
+    res.json(finalResponse);
   } catch (error) {
     console.error("Error fetching other users' matchup notes:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -289,13 +353,19 @@ router.get("/champion/others/:championName", async (req, res) => {
         (rating) => rating.note_id === note.note_id
       );
 
-      console.debug(`Matching for note_id: ${note.note_id}, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`);
+      console.debug(
+        `Matching for note_id: ${
+          note.note_id
+        }, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`
+      );
 
       return {
         ...note,
         personalRating: personalRating ? personalRating.rating : undefined,
         isFavorite: personalRating ? personalRating.is_favorite : undefined,
-        averageRating: averageRating ? parseFloat(averageRating.averagerating).toFixed(2) : undefined,
+        averageRating: averageRating
+          ? parseFloat(averageRating.averagerating).toFixed(2)
+          : undefined,
         createdAt: note.created_at,
         updatedAt: note.updated_at,
       };

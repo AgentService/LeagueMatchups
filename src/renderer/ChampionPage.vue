@@ -18,10 +18,12 @@
 					<div class="row justify-content-evenly">
 						<div class="col-xxl-3 col-xl-3">
 							<div class="card">
-								<SummonerRankedInfo />
+								<!-- <SummonerRankedInfo /> -->
+								<ChampionTips :champion="championA" />
 							</div>
 							<div class="card">
-								<LearningObjectives></LearningObjectives>
+								<!-- <LearningObjectives></LearningObjectives> -->
+								<MatchHistory />
 							</div>
 							<div class="card">
 								<GeneralNotes />
@@ -34,11 +36,19 @@
 								</div> -->
 								<div class="row position-relative">
 									<!-- Champion Search for User's Champion -->
-									<div class="col-xxl-7">
-										<div class="card card-top mb-0 ">
+									<!-- <div class="col-xxl-2 col-xl-2">
+										<div class="card">
+											<SummonerRankedInfo />
+										</div>
+										<div class="card">
+											<LearningObjectives></LearningObjectives>
+										</div>
+									</div> -->
+									<div class="col-xxl-5 m-auto">
+										<div class="card card-top mb-0">
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 										</div>
-										<div class="card card-bottom mb-0">
+										<div class="card card-bottom ">
 											<ChampionNotes />
 										</div>
 									</div>
@@ -47,20 +57,29 @@
 										<span>vs</span>
 									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-5">
-										<div class="card card-top mb-0">
+									<div class="col-xxl-5 m-auto">
+										<div class="card card-top  mb-0">
 											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 										</div>
-										<div class="card card-bottom mb-0">
+										<div class="card card-bottom">
 											<MatchupNotes />
 										</div>
 									</div>
+									<!-- <div class="col-xxl-2 col-xl-2">
+										<div class="card">
+											<SummonerRankedInfo />
+										</div>
+										<div class="card">
+											<LearningObjectives></LearningObjectives>
+										</div>
+									</div> -->
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-xxl-4">
 									<div class="card">
-										<ChampionTips :champion="championA" />
+										<!-- <GeneralNotes /> -->
+
 									</div>
 								</div>
 								<div class="col-xxl-8">
@@ -72,10 +91,12 @@
 							<div class="row">
 								<div class="col-xxl-4">
 									<div class="card">
+
 									</div>
 								</div>
 								<div class="col-xxl-8">
 									<div class="card">
+
 									</div>
 								</div>
 							</div>
@@ -221,7 +242,7 @@ function getChampionImageSource(type, championId) {
 	z-index: 100;
 	font-size: 3rem;
 	top: 20%;
-	right: 40%;
+	right: 458;
 	width: 40px;
 	height: 40px;
 	padding: 1rem;
@@ -358,8 +379,8 @@ function getChampionImageSource(type, championId) {
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
-	width: 95%;
-	max-width: 1900px;
+	width: 100%;
+	max-width: 1920px;
 	min-height: 100%;
 
 }

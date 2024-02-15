@@ -10,14 +10,15 @@
 						<div class="modal-title d-flex justify-content-between align-items-start w-100 flex-column">
 							<span class="" id="modalLabel">{{ modalTitle }}</span>
 							<p v-if="champion">Champion Notes for {{ champion.name }}</p>
-							<p v-else-if="championA && championB">Matchup Notes for {{ championA.name }} vs {{ championB.name }}</p>
+							<p v-else-if="championA && championB">Matchup Notes for {{ championA.name }} vs {{
+								championB.name }}</p>
 
 						</div>
-						<button @click="$emit('update:isVisible', false)" type="button"
-								class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+						<button @click="$emit('update:isVisible', false)" type="button" class="btn-close btn-close-white"
+							data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 
-					<div class="modal-body">
+					<div class="modal-body ">
 
 						<!-- <div class="d-flex justify-content-center align-items-center">
 						<div v-for="(note, index) in notes.slice(0, 3)" :key="note.id" class="card m-2">
@@ -51,7 +52,7 @@
 						</div>
 					</div> -->
 
-						<div class="d-flex">
+						<div class="d-flex justify-content-between">
 							<div class="list-group align-items-center p-4">
 								<div class="modal-header-2 d-flex justify-content-between">
 									<div v-if="champion">
@@ -59,7 +60,6 @@
 											alt="Champion image" class="modal-champion-image">
 									</div>
 									<div v-else-if="championA && championB" class="">
-										<span>For Matchup ></span>
 										<img :src="getChampionImageSource('small', championA.name)" alt="Champion A image"
 											class="modal-champion-image me-2">
 										<span>vs</span>
@@ -100,15 +100,15 @@
 								<div class="modal-card d-flex mt-0">
 									<div class="card-header d-flex justify-content-between align-items-center">
 										<!-- Champion images and notes type tags -->
-										<div class="champion-images">
+										<div class="champion-images-container">
 											<img v-if="champion" :src="getChampionImageSource('small', champion.name)"
 												alt="Champion image" class="card-champion-image">
 											<div v-else-if="championA && championB" class="d-flex align-items-center">
 												<img :src="getChampionImageSource('small', championA.name)"
-													alt="Champion A image" class="card-champion-image me-1">
+													alt="Champion A image" class="card-champion-image me-2">
 												<span>vs</span>
 												<img :src="getChampionImageSource('small', championB.name)"
-													alt="Champion B image" class="card-champion-image ms-1">
+													alt="Champion B image" class="card-champion-image ms-2">
 											</div>
 										</div>
 										<span class="badge"
@@ -128,7 +128,7 @@
 											</div>
 										</div>
 										<Rating :initialRating="filteredNotes[selectedNoteIndex]?.personalRating"
-											@update:rating="updateRating(champion.name, filteredNotes[selectedNoteIndex]?.noteId, $event)" />
+											@update:rating="updateRating(notesType, filteredNotes[selectedNoteIndex]?.noteId, $event)" />
 									</div>
 								</div>
 							</div>
@@ -150,7 +150,7 @@
   
 
 <script setup>
-import { computed, defineProps, ref, onMounted } from 'vue';
+import { computed, defineProps, ref, toRefs } from 'vue';
 import { getUrlHelper } from '../../globalSetup';
 import { watchEffect } from 'vue';
 import { useStore } from 'vuex';
@@ -161,9 +161,8 @@ import debug from 'debug';
 
 const store = useStore();
 
-const { isVisible, notes, notesType, champion, championA, championB } = defineProps({
+const props = defineProps({
 	isVisible: Boolean,
-	notes: Array,
 	notesType: String,
 	champion: Object,
 	championA: Object,
@@ -174,8 +173,16 @@ const filteredNotes = ref([]);
 const searchQuery = ref('');
 const showFavorites = ref(false);
 const sortDescending = ref(true); // Start with true for descending order
-const sharedNotes = ref([]);
 const selectedNoteIndex = ref(0);
+
+const isVisible	= computed(() => props.isVisible);
+const sharedNotes = ref([]);
+const champion = computed(() => props.champion);
+const championA = computed(() => props.championA);
+const championB = computed(() => props.championB);
+const notesType = computed(() => props.notesType);
+
+console.log(champion.value, championA.value, championB.value);
 
 const handleFilterUpdate = ({ type, value }) => {
 	// Update your filters based on the filter bar events
@@ -189,14 +196,14 @@ const handleFilterUpdate = ({ type, value }) => {
 };
 
 // Inside your SharedNotesModal component
-function fetchData(championName) {
-	if (notesType === 'champion') {
-		sharedNotes.value = store.getters['notes/getChampionNotesShared'](championName);
-	} else if (notesType === 'matchup') {
+function fetchData(championNameOrMatchupId) {
+	if (notesType.value === 'champion') {
+		sharedNotes.value = store.getters['notes/getChampionNotesShared'](championNameOrMatchupId);
+	} else if (notesType.value === 'matchup') {
 		// Assuming championA and championB are available and properly reactive
-		sharedNotes.value = store.getters['notes/getMatchupNotes'](championA.value.name, championB.value.name);
-	} else if (notesType === 'general') {
-		sharedNotes.value = store.getters['notes/getGeneralNotes']();
+		sharedNotes.value = store.getters['notes/getMatchupNotesShared'](championNameOrMatchupId);
+	} else if (notesType.value === 'general') {
+		sharedNotes.value = store.getters['notes/getGeneralNotesShared']();
 	}
 }
 defineExpose({ fetchData });
@@ -218,7 +225,7 @@ watchEffect(() => {
 		result.sort((a, b) => parseFloat(a.averageRating) - parseFloat(b.averageRating));
 	}
 	filteredNotes.value = result;
-}, { flush: 'post', deep: true });
+}, { flush: 'post' });
 
 const getSummonerIcon = (iconId, index) => {
 	const urlHelper = getUrlHelper();
@@ -251,9 +258,9 @@ const championBackgroundStyle = computed(() => {
 });
 
 const modalTitle = computed(() => {
-	if (notesType === 'champion') {
+	if (notesType.value === 'champion') {
 		return 'Community Notes';
-	} else if (notesType === 'matchup') {
+	} else if (notesType.value === 'matchup') {
 		// return `Community Notes ${championA ? `${championA.name} vs ${championB.name}` : ''}`;
 		return 'Community Notes';
 	}
@@ -265,9 +272,16 @@ const formatDate = (date) => {
 	});
 };
 
-const updateRating = (championName, noteId, rating) => {
-	store.dispatch('notes/updateChampionNoteRating', { championName, noteId, rating });
+// This method now accepts a 'notesType' parameter to differentiate between champion and matchup notes.
+const updateRating = (notesType, noteId, rating) => {
+	const identifier = notesType === 'champion' ? champion.name : store.getters['matchups/getCurrentMatchup'].combinedId;
+	if (notesType === 'champion') {
+		store.dispatch('notes/updateChampionNoteRating', { championName: identifier, noteId, rating });
+	} else if (notesType === 'matchup') {
+		store.dispatch('notes/updateMatchupNoteRating', { matchupId: identifier, noteId, rating });
+	}
 };
+
 </script>
 
 
@@ -276,16 +290,17 @@ const updateRating = (championName, noteId, rating) => {
 .modal-container {
 	background: var(--card-background);
 	border: 1px solid rgba(128, 128, 128, 0.1);
-	min-width: 80h;
-	max-width: 80vh;
-	min-height: 50vh;
-	max-height: 50vh;
+	min-width: 1100px;
+	max-width: 1100px;
+	min-height: 700px;
+	max-height: 700px;
 }
 
 .modal-body {
 	background-color: #05080f;
-	margin: 1rem ;
+	margin: 1rem;
 }
+
 .modal-card {
 	position: relative;
 	display: flex;
@@ -308,8 +323,8 @@ const updateRating = (championName, noteId, rating) => {
 .list-group {
 	color: white;
 	border: none;
-	width: 500px;
-	height: 500px;
+	width: 600px;
+	height: 450px;
 	z-index: 1;
 	padding: 1rem;
 	background-color: #05080f;
@@ -358,7 +373,7 @@ const updateRating = (championName, noteId, rating) => {
 
 }
 
-.modal-title p{
+.modal-title p {
 	font-size: 1rem;
 	color: var(--gold-2);
 	margin-bottom: 0;
@@ -378,6 +393,12 @@ const updateRating = (championName, noteId, rating) => {
 	color: white;
 	text-transform: none;
 	border: 1px solid var(--grey-4);
+}
+
+.champion-images-container {
+	font-weight: 500;
+	text-transform: none;
+	font-size: 1rem;
 }
 
 .card-champion-image {
