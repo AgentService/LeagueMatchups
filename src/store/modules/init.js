@@ -56,17 +56,17 @@ export const init = {
           },
           { root: true }
         );
-        await dispatch(
-          "fetchDataAndCache",
-          {
-            module: "champions",
-            type: "championDetails",
-            apiEndpoint: "/api/champions/details",
-            vuexMutation: "champions/SET_ALL_CHAMPION_DETAILS",
-            skipCacheValidation: false,
-          },
-          { root: true }
-        );
+        // await dispatch(
+        //   "fetchDataAndCache",
+        //   {
+        //     module: "champions",
+        //     type: "championDetails",
+        //     apiEndpoint: "/api/champions/details",
+        //     vuexMutation: "champions/SET_ALL_CHAMPION_DETAILS",
+        //     skipCacheValidation: false,
+        //   },
+        //   { root: true }
+        // );
         try {
           // Fetch the current game version from the server
           const response = await axios.get(`${baseUrl}/api/utilities/version`);
@@ -82,18 +82,6 @@ export const init = {
           console.error("Error checking and updating game version:", error);
         }
         commit("SET_DATA_INITIALIZED", true);
-		await dispatch(
-			"fetchDataAndCache",
-			{
-			  module: "champions",
-			  type: "championCustomData",
-			  apiEndpoint: "/api/champions/custom-data",
-			  vuexMutation: "champions/SET_ALL_CUSTOM_CHAMPION_DATA",
-			  skipCacheValidation: true,
-			  authConfig: getAuthConfig(),
-			},
-			{ root: true }
-		  );
       }
     },
   },

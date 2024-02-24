@@ -59,7 +59,6 @@ const userEditing = ref(false);
 const championSwitched = ref(false);
 
 const showNotesModal = ref(false); // Controls the visibility of the modal
-const otherUsersNotes = ref([]); // Array to store other users' notes
 
 const NotesSharedModalRef = ref(null);
 
