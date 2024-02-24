@@ -93,9 +93,8 @@ const fetchNotes = async () => {
 const createNewNote = () => {
     const currentDate = new Date().toISOString().split('T')[0];
     if (!store.state.notes.generalNotes.find(note => note.date === currentDate)) {
-        const newNote = ''; // Default content for the new note
         // Commit the new note to the Vuex state and save it to the backend
-        store.dispatch('notes/saveGeneralNote', { date: currentDate, note: newNote });
+        store.dispatch('notes/createNewNote');
     } else {
         console.log("A note for today already exists.");
     }
@@ -114,8 +113,6 @@ const saveNote = (noteId) => {
 };
 
 onMounted(() => {
-	const currentDate = new Date().toISOString().split('T')[0];
-	// Ensure there's an entry for the current day
 	fetchNotes().then(() => {
 		noteText.value = {};
 		for (const note of notesOrdered.value) {

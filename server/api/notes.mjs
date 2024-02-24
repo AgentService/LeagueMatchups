@@ -406,13 +406,13 @@ router.get("/general", async (req, res) => {
 
 router.post("/general", async (req, res) => {
   const { dbPool } = req.app.locals;
-  const { noteid, content } = req.body; // Use noteid if provided for updates
+  const { noteId, content } = req.body; // Use noteId if provided for updates
   const userId = req.user.id; // Directly use user ID
 
   try {
     let noteResponse;
-    if (noteid) {
-      debug("Updating note:", noteid);
+    if (noteId) {
+      debug("Updating note:", noteId);
       // Update an existing note if noteid is provided
       const updateQuery = `
         UPDATE generalnotes
@@ -423,14 +423,14 @@ router.post("/general", async (req, res) => {
 
       const { rows } = await dbPool.query(updateQuery, [
         content,
-        noteid,
+        noteId,
         userId,
       ]);
       debug("Note updated successfully:", rows[0]);
       noteResponse = rows[0]; // Store the updated note for conversion
     } else {
       debug("Inserting new note");
-      // If no noteid is provided, insert a new note
+      // If no noteId is provided, insert a new note
       const noteContent = content ? content : "";
       const insertQuery = `
         INSERT INTO generalnotes (user_id, content, created_at, updated_at) 
@@ -447,7 +447,7 @@ router.post("/general", async (req, res) => {
     const convertedNote = snakeToCamelCase(noteResponse);
 
     res.status(200).json({
-      message: noteid
+      message: noteId
         ? "Note updated successfully"
         : "Note created successfully",
       note: convertedNote, // Send the converted note

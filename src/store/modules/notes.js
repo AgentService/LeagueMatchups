@@ -27,18 +27,16 @@ export const notes = {
     },
   },
   mutations: {
-    SET_GENERAL_NOTE(state, { note }) {
-      // Find the index of the note if it already exists in the state
+    ADD_GENERAL_NOTE(state, note) {
+      state.generalNotes.push(note);
+    },
+    UPDATE_GENERAL_NOTE: (state, note) => {
       const index = state.generalNotes.findIndex(
         (existingNote) => existingNote.noteId === note.noteId
       );
-
       if (index !== -1) {
         // If the note exists, update the content of the existing note
         state.generalNotes[index] = { ...state.generalNotes[index], ...note };
-      } else {
-        // If the note does not exist, add the new note to the state
-        state.generalNotes.push(note);
       }
     },
 
@@ -148,6 +146,22 @@ export const notes = {
   },
   actions: {
     // generalNotes
+    async createNewNote({ commit }) {
+      try {
+        const content = ""; // Default content for the new note
+        const authConfig = getAuthConfig();
+        const response = await axios.post(
+          `${baseUrl}/api/notes/general`,
+          { content }, // Note: No noteId is sent for a new note
+          authConfig
+        );
+        const { note } = response.data;
+        commit("ADD_GENERAL_NOTE", note); // Assuming you have a mutation to add a note to the state
+      } catch (error) {
+        console.error("Error creating the note:", error);
+        // Handle the error appropriately
+      }
+    },
     async saveGeneralNote({ commit }, { noteId, content }) {
       try {
         const authConfig = getAuthConfig();
@@ -156,14 +170,8 @@ export const notes = {
           { noteId, content },
           authConfig
         );
-
-        // Assuming the response data includes the entire note object
         const { note } = response.data;
-
-        // Use the response data to update the state
-        commit("SET_GENERAL_NOTE", {
-          note,
-        });
+        commit("UPDATE_GENERAL_NOTE", note); // Assuming you have a mutation to update a note in the state
       } catch (error) {
         console.error("Error saving the note:", error);
         // Handle the error appropriately

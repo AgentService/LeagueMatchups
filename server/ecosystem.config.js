@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "api",
-      script: "./server.mjs",
+      script: "/home/azateqq/server/server.mjs",
       autorestart: true,
       watch: false,
       env: {
