@@ -1,78 +1,63 @@
 <template>
-  <div class="app-container">
-    <h1 class="page-title">User Journey</h1>
-    <!-- Content specific to User Journey -->
-  </div>
   <div class="app-wrapper">
     <div class="app-container">
-      <div class="background-container gradient-top-border ">
+      <div class="background-container">
+        <!-- Background or thematic imagery can go here -->
       </div>
       <div class="grid-container">
-        <div class="row slim-row">
-          <div class="col-md-3 h-100 ">
-            
-          </div>
-          <div class="col-md-9">
-            <div class="row ">
-              <div class="col-md-6 d-flex flex-column h-100   gradient-border ">
-              </div>
-              <div class="col-md-3 d-flex flex-column h-100  gradient-border ">
+        <div class="container-fluid">
+          <!-- Header Row for Page Title or User Info -->
+          <div class="row">
+            <div class="col-12">
+              <div class="page-header">
+                <h1>Journey</h1>
+                <!-- Optional: SummonerInfo Component if relevant -->
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 h-100 ">
-          </div>
-          <div class="col-md-9">
-            <div class="row ">
-              <div class="col-md-6 d-flex flex-column h-100   gradient-border ">
+          <!-- Main Content Row -->
+          <div class="row justify-content-evenly">
+            <!-- Sidebar for Filters and Progress Tracking -->
+            <div class="col-xxl-3 col-xl-3">
+              <div class="card">
+                <LearningObjectives />
               </div>
-              <div class="col-md-3 d-flex flex-column h-100  gradient-border ">
+              <div class="card">
+                <h2 class="card-header-custom">Progress</h2>
+                <!-- LearningObjectives with ProgressBar Component -->
               </div>
-            </div>
-          </div>
-        </div>
-        <!-- Second Row -->
-        <div class="row">
-          <div class="col-md-3 d-flex align-items-stretch gradient-top-border">
-            <LearningObjectives></LearningObjectives>
-          </div>
-          <div class="col-md-6 d-flex flex-column align-items-stretch ">
-            <div class="row">
-              <div class="col-md-6 gradient-border h-100">
-              </div>
-              <div class="col-md-6 gradient-border h-100">
+              <div class="card">
+                <h2 class="card-header-custom">Reflections</h2>
+                <!-- List of past reflections or quick links -->
               </div>
             </div>
-          </div>
-          <div class="col-md-3 d-flex align-items-stretch gradient-border ">
-          </div>
-        </div>
-        <div class="row ">
-          <div class="col-md-3 gradient-border ">
-          </div>
-          <div class="col-md-6">
-            <div class="row">
-              <div class="col-md-2 gradient-border ">
+            <!-- Main Content Area for Notes and Reflections -->
+            <div class="col-xxl-9 col-xl-9">
+              <div class="card">
+								<GeneralNotes />
+                <!-- Consider adding an "Add Note" button here that opens a modal for note entry -->
               </div>
-              <div class="col-md-8  gradient-top-border ">
+              <div class="card">
+                <h2 class="card-header-custom">Weekly Reflection</h2>
+                <!-- A space for writing and viewing weekly reflections -->
               </div>
-              <div class="col-md-2  gradient-border ">
+              <div class="card">
+                <MatchHistory />
+                <!-- A space for writing and viewing weekly reflections -->
               </div>
             </div>
-          </div>
-          <div class="col-md-3">
           </div>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
 import LearningObjectives from "./components/LearningObjectives.vue";
+import GeneralNotes from './components/GeneralNotes.vue';
+import MatchHistory from './components/MatchHistory.vue';
+
 </script>
 
 <style scoped>

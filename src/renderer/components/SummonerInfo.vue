@@ -1,14 +1,14 @@
 <template>
-	<div class="dropdown summoner-display" ref="dropdownContainer">
-		<button class="btn btn-dark dropdown-toggle position-relative btn-fixed-width" type="button"
+	<div class="summoner-display" ref="dropdownContainer">
+		<button class="btn dropdown-toggler d-flex align-items-center justify-content-center text-secondary"
 			@click="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen.toString()">
-			<div class="d-flex align-items-center">
+			<div class="d-flex">
 				<div class="icon-container">
 					<img :src="currentSelection ? getSummonerIcon(currentSelection.profileIconId) : defaultIcon"
 						alt="Summoner Icon" class="rounded-circle icon-image">
 				</div>
 				<div class="text-container d-flex justify-content-center">
-					<span class="text-light truncate-text">{{ currentSelection?.gameName || 'SelectSummowwwwwner' }}</span>
+					<span class="text-light truncate-text">{{ currentSelection?.gameName || 'Select Summoner' }}</span>
 					<span class="text-secondary ms-1 text-uppercase">#{{ currentSelection?.tagLine || ''
 					}}</span>
 				</div>
@@ -35,20 +35,18 @@ const store = useStore();
 
 const dropdownContainer = ref(null);
 const dropdownOpen = ref(false);
-const currentSelection = computed(() => store.getters['summoner/getCurrentSummoner']);
-
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
-// Somewhere in your Vue component
+
+const currentSelection = computed(() => {
+	// Get the current summoner; if not found, use the first entry from allPlayerDetails
+	const current = store.getters['summoner/getCurrentSummoner'];
+	return current ?? allPlayerDetails.value[0]; // Make sure allPlayerDetails is not empty before accessing
+});
 
 const getSummonerIcon = (iconId) => {
 	const urlHelper = getUrlHelper();
 	return urlHelper.getSummonerIconUrl(iconId);
 };
-
-function toggleDropdown() {
-	dropdownOpen.value = !dropdownOpen.value;
-}
-
 function handleClickOutside(event) {
 	if (dropdownContainer.value && !dropdownContainer.value.contains(event.target)) {
 		dropdownOpen.value = false;
@@ -63,7 +61,7 @@ function selectSummoner(summonerDetail) {
 onMounted(() => {
 	document.addEventListener('click', handleClickOutside);
 
-	
+
 	if (!allPlayerDetails.value.length) {
 		store.dispatch('summoner/fetchSummonerDataByAccountId');
 	}
@@ -76,22 +74,25 @@ onBeforeUnmount(() => {
   
 <style scoped>
 .summoner-display {
-	border: none;
-	margin: 1rem 0;
-	align-items: center;
 	cursor: pointer;
 	display: inline-block;
 	position: relative;
+	max-height: 35px;
 }
 
+.summoner-display .btn {
+	height: 100%;
+	width: 100%;
+	border-radius: 6px;
+}
 
 .dropdown-menu.show {
 	display: block;
 }
 
 .icon-image {
-	width: 35px;
-	height: 35px;
+	width: 25px;
+	height: 25px;
 	border: 2px solid #c0c0c0;
 }
 
@@ -114,23 +115,14 @@ onBeforeUnmount(() => {
 	font-weight: bold;
 }
 
-.dropdown-toggle {
-	background: var(--navbar-background-elements);
-	border: none;
-	width: 200px;
-	border-radius: 6px 6px 0 0;
-}
-
 .icon-container {
 	flex-shrink: 0;
 	margin-right: 8px;
-	/* Add some space between the icon and the text */
 }
 
 .text-container {
 	flex-grow: 1;
 	overflow: hidden;
-	/* Hide overflow inside this container */
 }
 
 .truncate-text {
@@ -150,7 +142,6 @@ onBeforeUnmount(() => {
 	box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
 }
 
-/* Dropdown item styling */
 .dropdown-item {
 	background: none;
 	cursor: pointer;
@@ -179,4 +170,3 @@ onBeforeUnmount(() => {
 	color: inherit;
 }
 </style>
-  

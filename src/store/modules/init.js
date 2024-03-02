@@ -56,17 +56,17 @@ export const init = {
           },
           { root: true }
         );
-        // await dispatch(
-        //   "fetchDataAndCache",
-        //   {
-        //     module: "champions",
-        //     type: "championDetails",
-        //     apiEndpoint: "/api/champions/details",
-        //     vuexMutation: "champions/SET_ALL_CHAMPION_DETAILS",
-        //     skipCacheValidation: false,
-        //   },
-        //   { root: true }
-        // );
+        await dispatch(
+          "fetchDataAndCache",
+          {
+            module: "champions",
+            type: "championDetails",
+            apiEndpoint: "/api/champions/details",
+            vuexMutation: "champions/SET_ALL_CHAMPION_DETAILS",
+            skipCacheValidation: false,
+          },
+          { root: true }
+        );
         try {
           // Fetch the current game version from the server
           const response = await axios.get(`${baseUrl}/api/utilities/version`);

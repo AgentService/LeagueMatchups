@@ -29,7 +29,7 @@ export const matchups = {
     CLEAR_MATCHUPS(state) {
       state.matchupList = [];
     },
-    SET_CURRENT_MATCHUP(state, matchup, rootState) {
+    SET_CURRENT_MATCHUP(state, matchup) {
       state.currentMatchup = matchup;
     },
 

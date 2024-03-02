@@ -1,6 +1,8 @@
 <template>
-	<div class="card-header d-flex justify-content-between align-items-center">
-		<span>Review Notes</span>
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
+		<div class="d-flex">
+			<span>Review Notes</span>
+		</div>
 		<transition name="fade">
 			<i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
 		</transition>
@@ -11,10 +13,10 @@
 		</div>
 	</div>
 	<!-- Notes list -->
-	<div class="notes-list card-body">
-		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item mb-4">
+	<div class="notes-list notes-body">
+		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item mb-3">
 			<textarea spellcheck="false" v-model="noteText[item.noteId]" class="note-textarea"
-				placeholder="Type your notes here..." rows="6"></textarea>
+				placeholder="Type your notes here..." rows="5"></textarea>
 			<div class="note-footer d-flex">
 				<div class="note-date">{{ formatDate(item.createdAt) }}</div>
 				<div class="buttons-container d-flex justify-content-end">
@@ -47,7 +49,7 @@ import { useStore } from 'vuex';
 
 const store = useStore();
 const noteText = ref({});
-const notesDisplayLimit = ref(2);
+const notesDisplayLimit = ref(3);
 const isExpanded = ref(false);
 const notesOrdered = computed(() => {
 	return store.state.notes?.generalNotes
@@ -63,13 +65,13 @@ const limitedNotes = computed(() => {
 
 
 const showMoreNotes = () => {
-	notesDisplayLimit.value += 2;
+	notesDisplayLimit.value += 3;
 	isExpanded.value = true;
 	console.log("Show More clicked. Display limit:", notesDisplayLimit.value, "Is Expanded:", isExpanded.value);
 };
 
 const showLessNotes = () => {
-	notesDisplayLimit.value = 2; // Reset to initial limit
+	notesDisplayLimit.value = 3; // Reset to initial limit
 	isExpanded.value = false;
 	console.log("Show Less clicked. Display limit:", notesDisplayLimit.value, "Is Expanded:", isExpanded.value);
 };
@@ -134,12 +136,12 @@ onMounted(() => {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin-top: 10px;
+	margin-top: .5rem;
 	/* Optional spacing from the preceding content */
 }
 
 .show-more-button {
-	margin-top: 10px;
+	margin-top: .5rem;
 	color: var(--gold-2);
 	border: 1px solid var(--gold-6);
 }

@@ -1,5 +1,5 @@
 <template>
-		<div class="card-header justify-content-between">
+		<div class="card-header-custom justify-content-between">
 			<span>Learning Objectives</span>
 			<div class="button-container">
 				<div class="btn" @click="toggleLOs" href="path/to/settings" aria-label="Settings">

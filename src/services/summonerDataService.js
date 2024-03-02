@@ -27,23 +27,27 @@ export async function fetchAndSaveSummonerData(summonerNameValue) {
 export function initializeSummonerDataFetching() {
   window.api.receive("summoner-name-response", async (newSummonerName) => {
     console.log("Summoner name response received:", newSummonerName);
-    // Use the getter to check if summoner data exists
-    const summonerData =
-      store.getters["summoner/getSummonerDataByName"](newSummonerName);
 
-    if (!summonerData) {
+    if (!newSummonerName) {
       console.log(
-        "Summoner data not found. Fetching data for:",
-        newSummonerName
+        "Summoner name not found. Requesting user to specify path manually."
       );
-      // Fetch and save new summoner data
-      await fetchAndSaveSummonerData(newSummonerName);
     } else {
-      console.log(
-        "Summoner data already exists. Skipping fetch for:",
-        newSummonerName
-      );
-      // Here, you'd handle the data as needed or proceed without action
+      const summonerData =
+        store.getters["summoner/getSummonerDataByName"](newSummonerName);
+
+      if (!summonerData) {
+        console.log(
+          "Summoner data not found. Fetching data for:",
+          newSummonerName
+        );
+        await fetchAndSaveSummonerData(newSummonerName);
+      } else {
+        console.log(
+          "Summoner data already exists. Skipping fetch for:",
+          newSummonerName
+        );
+      }
     }
   });
 
@@ -51,8 +55,8 @@ export function initializeSummonerDataFetching() {
 }
 
 /*
-  * The function checks for the summoner name every hour and fetches the data if it doesn't exist.
-  */
+ * The function checks for the summoner name every hour and fetches the data if it doesn't exist.
+ */
 function checkSummonerName() {
   console.log("Checking summoner name");
   window.api.send("get-summoner-name");

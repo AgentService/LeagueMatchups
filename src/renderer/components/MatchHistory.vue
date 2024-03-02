@@ -5,80 +5,60 @@
 			<p class="item-description">{{ tooltip.content.description }}</p>
 		</div>
 	</div>
-	<div class="card-header d-flex justify-content-between align-items-center">
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span class="d-flex align-items-center">Match History
 			<button class="btn " v-if="!selectedMatch" @click="fetchAndShowLastMatch">
 				<i class="fas fa-refresh"></i>
 			</button>
 		</span>
-		<div class="filter-container">
-			<div class="filter-header">
-				<i class="text-secondary fa-solid fa-filter"></i>
-			</div>
-			<div class="buttons-container d-flex align-items-center justify-content-between">
-				<button class="btn" @click="clearFilter">
-					<i class="fa-solid fa-ban fa-lg"></i>
-				</button>
-				<button class="btn" @click="filterMatchesByChampion">
-					<img :src="getChampionImageSource('small', championB?.id)" alt="Champion" class="champion-icon-filter">
-				</button>
-			</div>
 
+	</div>
+	<div class="filter-container d-flex justify-content-between">
+		<div class="filter-header d-flex">
+			<i class="text-secondary fa-solid fa-filter"></i>
 		</div>
+		<div class="buttons-container d-flex align-items-center justify-content-between">
+			<button class="btn" @click="clearFilter">
+				<i class="fa-solid fa-ban fa-lg"></i>
+			</button>
+			<button class="btn" @click="filterMatchesByChampion">
+				<img :src="getChampionImageSource('small', championB?.id)" alt="Champion" class="champion-icon-filter">
+			</button>
+		</div>
+
 	</div>
 	<!-- List of matches -->
-	<div v-if="!selectedMatch" class="matches-list ">
-
+	<div v-if="!selectedMatch" class="matches-list">
 		<div v-for="(match, index) in rankedLastMatches" :key="index" class="match-card" @click="selectMatch(match)">
-			<div class="timestamp">
-				{{ calculateTimeSinceMatch(match.info.gameCreation) }} hours ago
-			</div>
+			<div class="match-info">
+				<div class="champion-icon-container d-flex flex-column justify-content-end align-items-center">
+					<img :src="getChampionImageSource('small', getChampionNameById(getPlayerChampion(match)?.championId))"
+						alt="Your Champion" class="champion-icon">
+					<div class="timestamp mt-1 align-items-center">{{ calculateTimeSinceMatch(match.info.gameCreation) }}
+						hours ago</div>
 
-			<div class="match-card-body">
-
-				<img :src="getChampionImageSource('small', getChampionNameById(getPlayerChampion(match)?.championId))"
-					alt="Your Champion" class="champion-icon">
-				<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">
-					{{ isWin(match) ? 'Win' : 'Loss' }}
 				</div>
-				<!-- Item Images -->
-				<!-- Other match details -->
-				<div class="item-images">
-					<div v-for="(itemId, index) in getPlayerChampionAndItems(match).items" :key="index" class="item-slot">
-						<img v-if="itemId" :src="getItemImageSource(itemId)" :alt="`Item ${index + 1}`" class="item-icon"
-							@mouseover="logItemDescription(itemId)" @mouseout="hideTooltip" />
-						<!-- Tooltip Div -->
-
+				<div class="details-container">
+					<div class="stats-row">
+						<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">{{ isWin(match) ?
+							'Win' : 'Loss' }}</div>
+						<div>{{ getPlayerChampion(match).kills }} / <span class="deaths">{{ getPlayerChampion(match).deaths
+						}}</span> / {{ getPlayerChampion(match).assists }}</div>
+						<div>{{ calculateCsPerMinute(getPlayerChampion(match)) }} CS/Min.</div>
+						<div>{{ calculateVisionScorePerMinute(getPlayerChampion(match)) }} Vis/Min.</div>
 					</div>
-				</div>
-
-				<!-- KDA -->
-				<div class="stat-column">
-					<div class="stat-header">KDA</div>
-					<div class="stat-value">
-						<span>{{ getPlayerChampion(match).kills }}</span> /
-						<span class="deaths">{{ getPlayerChampion(match).deaths }}</span> /
-						<span>{{ getPlayerChampion(match).assists }}</span>
-					</div>
-				</div>
-				<!-- CS -->
-				<div class="stat-column">
-					<div class="stat-header">
-						CS</div>
-					<div class="stat-value">
-						{{ calculateCsPerMinute(getPlayerChampion(match)) }} / Min.
-					</div>
-				</div>
-				<!-- Vision -->
-				<div class="stat-column">
-					<div class="stat-header">Vision</div>
-					<div class="stat-value">
-						{{ calculateVisionScorePerMinute(getPlayerChampion(match)) }} / Min.
+					<div class="items-row">
+						<div v-for="(itemId, index) in getPlayerChampionAndItems(match).items" :key="index"
+							class="item-slot">
+							<img v-if="itemId" :src="getItemImageSource(itemId)" :alt="`Item ${index + 1}`"
+								class="item-icon" @mouseover="logItemDescription(itemId)" @mouseout="hideTooltip" />
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+
 	<div v-if="selectedMatch" class="match-details-container">
 		<button @click="goBackToList" class="back-button">Go Back to Matches</button>
 		<div class="match-details">
@@ -148,8 +128,19 @@ export default {
 	setup() {
 		const store = useStore();
 
+		const playerDetails = computed(() => store.state.summoner.playerDetails);
+
 		const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
-		const summonerId = computed(() => currentSummoner.value ? currentSummoner.value.puuid : '');
+		// Use the first entry from playerDetails if no currentSummoner is selected
+		const summonerId = computed(() => {
+			if (currentSummoner.value) {
+				return currentSummoner.value.puuid;
+			} else if (playerDetails.value.length > 0) {
+				return playerDetails.value[0].puuid; // Assuming the first entry has a puuid
+			} else {
+				return ''; // No summonerId found
+			}
+		});
 
 		const championDetails = computed(() => store.state.champions.championDetails);
 		const championB = computed(() => store.getters['matchups/getChampionB']);
@@ -212,7 +203,7 @@ export default {
 
 		onMounted(() => {
 			store.dispatch('items/fetchAllItems');
-			// fetchAndShowLastMatch();
+			fetchAndShowLastMatch();
 		});
 		const hideTooltip = () => {
 			tooltip.itemId = null; // Reset the currently hovered item when mouse leaves
@@ -249,7 +240,7 @@ export default {
 
 		const fetchAndShowLastMatch = async () => {
 			if (summonerId.value) {
-				await store.dispatch('matches/fetchLastMatch', currentSummoner.value);
+				await store.dispatch('matches/fetchLastMatch', summonerId.value);
 			} else {
 				console.error('Summoner ID not found');
 			}
@@ -449,6 +440,7 @@ export default {
 	padding: 12px;
 	max-width: 400px;
 	font-size: 0.85em;
+	z-index: 1050;
 }
 
 .item-name {
@@ -458,26 +450,10 @@ export default {
 }
 
 .item-slot {
-	width: 30px;
-	height: 30px;
-	border-radius: 0%;
-	border: 1px solid #333;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	position: relative;
-}
-
-.item-icon {
-	width: 100%;
-	height: 100%;
-	border-radius: 0%;
-}
-
-.item-images {
-	display: grid;
-	grid-template-columns: repeat(8, 1fr);
-	gap: 0px;
+	margin-right: 5px;
 }
 
 .item-icon {
@@ -486,7 +462,6 @@ export default {
 	border-radius: 0%;
 	border: 2px solid #333;
 }
-
 
 .back-button {
 	position: absolute;
@@ -505,21 +480,32 @@ export default {
 	margin: 0 auto;
 }
 
-.container {
+.stats-row,
+.items-row {
+	font-weight: normal;
+	font-size: .875rem;
 	display: flex;
-	flex-direction: column;
-	border: none;
-	height: 100%;
-	border-radius: 15px;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-	color: #e7e7e7;
-	transition: box-shadow 0.3s ease;
+	align-items: center;
 }
 
-.matches-list,
+.stats-row {
+	justify-content: space-between;
+	padding: 0.5rem 0;
+}
+
+.items-row {
+	padding: 0.5rem 0;
+}
+
+.details-container {
+	flex-basis: 80%;
+	display: flex;
+	flex-direction: column;
+
+}
+
 .match-details-container {
 	overflow-y: auto;
-	padding: 20px;
 	border-radius: 8px;
 }
 
@@ -533,13 +519,6 @@ export default {
 	margin: 5px;
 	padding: 5px;
 	border-radius: 4px;
-}
-
-.match-card-body {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: 100%;
 }
 
 .champion-column {
@@ -559,37 +538,51 @@ export default {
 	text-align: center;
 }
 
-.summoner-name {
-	grid-column: 2 / 3;
+.top-row,
+.bottom-row {
+	display: flex;
+	justify-content: space-between;
 }
 
-.kda {
-	grid-column: 3 / 4;
+.matches-list {
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	/* Allows scrolling the entire list of matches */
+	max-height: calc(100vh - 100px);
+	/* Example: Adjust based on your layout */
 }
 
-.cs {
-	grid-column: 4 / 5;
+.matches-list .match-card {
+	display: flex;
+	flex-direction: column;
 }
 
-.vision-score {
-	grid-column: 5 / 6;
+.match-info {
+	display: flex;
+	width: 100%;
+	border-bottom: 1px solid rgba(51, 51, 51, 0.486);
+	padding: 1rem;
 }
 
+.champion-icon-container {
+	flex-basis: 20%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
-
+.right-side-details {
+	flex: 2;
+	display: flex;
+	flex-direction: column;
+}
 
 .summoner-name {
 	flex-grow: 1;
 	margin-left: 10px;
 	color: #fff;
 	font-weight: bold;
-}
-
-.kda,
-.cs,
-.vision-score {
-	text-align: center;
-	color: #ccc;
 }
 
 .kda .deaths {
@@ -609,19 +602,9 @@ export default {
 
 .match-card {
 	display: flex;
-	flex-direction: column;
-	border-radius: 4px;
-	overflow: hidden;
-	margin-bottom: 10px;
-	cursor: pointer;
-	padding: 6px 0 12px 0px;
-	border-bottom: 1px solid #33333341;
-}
-
-.match-result {
-	padding: 5px 10px;
-	color: #fff;
-	font-weight: bold;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 1rem;
 }
 
 .win {
@@ -668,8 +651,6 @@ export default {
 
 .timestamp {
 	position: relative;
-	align-self: flex-end;
-	font-size: 0.6em;
+	font-size: 0.7em;
 	color: #777;
-}
-</style>
+}</style>

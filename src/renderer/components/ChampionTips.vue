@@ -1,10 +1,10 @@
 <template>
-		<div class="card-header">
+		<div class="card-header-custom">
 			General Tips <!-- Header title -->
 		</div>
 		<transition name="fade" mode="out-in">
 			<div class="overflow-auto d-flex  flex-grow-1" v-if="championTips && Object.keys(championTips).length > 0">
-				<div class="card-body tips-card" :key="selectedTip">
+				<div class="  tips-card" :key="selectedTip">
 					<div v-if="!selectedTip" class="flex-container d-flex ">
 						<!-- Iterate over each key in championTips -->
 						<div v-for="(value, key) in championTips" :key="key" class="flex-item">
@@ -33,7 +33,7 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="card-body tips-card">
+			<div v-else class="  tips-card">
 				<div class="content-container d-flex align-items-center justify-content-center">
 					<div class="no-tips-message text-center">
 						<p>No tips available for this champion.</p>

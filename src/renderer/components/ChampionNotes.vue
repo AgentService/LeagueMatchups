@@ -1,5 +1,5 @@
 <template>
-	<div class="card-header d-flex justify-content-between align-items-center">
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<div class="d-flex">
 			<span>Champion Notes</span>
 		</div>
@@ -21,9 +21,9 @@
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
 
 	</div>
-	<div class="card-body ">
+	<div class="notes-body">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="11"></textarea>
+			rows="10"></textarea>
 	</div>
 </template>
 

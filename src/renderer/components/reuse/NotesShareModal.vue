@@ -51,7 +51,6 @@
 							</div>
 						</div>
 					</div> -->
-
 						<div class="d-flex justify-content-between">
 							<div class="list-group align-items-center p-4">
 								<div class="modal-header-2 d-flex justify-content-between">

@@ -1,9 +1,12 @@
 import fs from "fs";
-import { ipcMain, app, BrowserWindow, screen } from "electron";
+import { ipcMain, app, BrowserWindow, screen, dialog } from "electron";
 import path from "path";
 require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
+
+const Store = require("electron-store");
+const store = new Store();
 
 const isDevelopment = process.env.NODE_ENV === "development";
 const basePath = isDevelopment
@@ -20,14 +23,81 @@ console.log("NODE_ENV", process.env.NODE_ENV);
 let mainWindow;
 
 const LEAGUE_CLIENT_PATHS = [
-  "C:/Riot Games/League of Legends/lockfile",
+  "C:/Riot Games/League of LegendsX/lockfile",
   "/Applications/League of Legends.app/Contents/LoL/lockfile",
-  "C:/Program Files/Riot Games/League of Legends/lockfile"
+  "C:/Program Files/Riot Games/League of Legends/lockfile",
 ];
 
-ipcMain.on("get-summoner-name", async (event) => {
+function saveLockfilePath(lockfilePath) {
+  store.set("lockfilePath", lockfilePath);
+}
+
+function loadLockfilePath() {
+  return store.get("lockfilePath", null); // Returns null if not found
+}
+
+// Function to open the directory picker
+async function openDirectoryPicker(event) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+    // mainWindow is used here
+    properties: ["openDirectory"],
+    parent: mainWindow, // Make the dialog modal to the main window
+    modal: true, // This is optional depending on your needs
+  });
+
+  if (!canceled && filePaths.length > 0) {
+    const directoryPath = filePaths[0];
+    const lockfilePath = path.join(directoryPath, "lockfile"); // Assuming 'lockfile' is the filename
+
+    if (fs.existsSync(lockfilePath)) {
+      console.log("Lockfile found:", lockfilePath);
+      saveLockfilePath(lockfilePath); // Save the direct lockfile path
+      mainWindow.webContents.send("directory-path-selected", {
+        lockfilePath,
+        directoryPath,
+      });
+    } else {
+      console.log("Lockfile not found in the selected directory.");
+      mainWindow.webContents.send("directory-path-selected", {
+        directoryPath: null,
+        lockfilePath: null,
+      });
+    }
+  } else {
+    // Handle cancellation or no selection
+    event.reply("directory-path-selected", null);
+  }
+}
+
+async function findLockfilePath() {
+  for (const path of LEAGUE_CLIENT_PATHS) {
+    if (fs.existsSync(path)) {
+      console.log(`Lockfile found at: ${path}`);
+      const savedPath = store.get("lockfilePath", null);
+      if (path !== savedPath) {
+        console.log("New lockfile path found, updating Electron Store...");
+        store.set("lockfilePath", path);
+      }
+      return path;
+    }
+  }
+  console.log("Lockfile not found in standard locations.");
+  return null;
+}
+
+// Assuming 'open-path-dialog' is triggered after the Vue component popup interaction
+ipcMain.on("open-path-dialog", (event) => {
+  openDirectoryPicker(event);
+});
+
+ipcMain.handle("check-lockfile-exists", async () => {
+  const savedLockfilePath = loadLockfilePath();
+  return savedLockfilePath && fs.existsSync(savedLockfilePath);
+});
+
+ipcMain.on("get-summoner-name", async (event, selectedPath = null) => {
   console.log("IPC message received: get-summoner-name");
-  const summonerName = await getSummonerName();
+  const summonerName = await getSummonerName(selectedPath); // Pass the selectedPath if provided
 
   if (summonerName) {
     console.log("Summoner Name:", summonerName);
@@ -43,30 +113,46 @@ ipcMain.handle("get-api-key", async (event) => {
   return process.env.RIOT_API_KEY;
 });
 
-async function getSummonerName() {
-  for (let path of LEAGUE_CLIENT_PATHS) {
-    if (!fs.existsSync(path)) {
-      console.log(`League client not found at ${path}.`);
+async function getSummonerName(selectedPath = null) {
+  // First, try to get the lockfile path from Electron Store
+  let lockfilePath = selectedPath || store.get("lockfilePath", null);
 
-      continue; // Try the next path
+  console.log("Attempting to use lockfile path:", lockfilePath);
+
+  // Check if the stored path is valid (exists and contains the lockfile)
+  if (lockfilePath && fs.existsSync(lockfilePath)) {
+    console.log("Using lockfile path from Electron Store:", lockfilePath);
+  } else {
+    console.log("Stored lockfile path not valid. Searching standard paths...");
+    lockfilePath = await findLockfilePath();
+
+    if (!lockfilePath) {
+      console.log("No lockfile path available.");
+      return null; // Exit if lockfile not found in standard paths either
+    }
+  }
+
+  // Function to attempt fetching summoner name from a given path
+  async function attemptFetchSummonerNameFromPath(lockfilePath) {
+    if (!fs.existsSync(lockfilePath)) {
+      console.log(`League client not found at ${lockfilePath}.`);
+      return null; // Indicate that the path did not contain the lockfile
     }
 
-    console.log("League client found at:", path);
-
+    console.log("League client found at:", lockfilePath);
     let previousValue = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
 
     try {
       console.log("Reading lockfile");
-
-      const lockfileContent = fs.readFileSync(path, "utf8");
+      const lockfileContent = fs.readFileSync(lockfilePath, "utf8");
       const [, , port, token] = lockfileContent.split(":");
-
       console.log("Port:", port);
       console.log("Token:", token);
 
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-      const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
+      const fetch = (...args) =>
+        import("node-fetch").then(({ default: fetch }) => fetch(...args));
       const response = await fetch(
         `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
         {
@@ -80,21 +166,23 @@ async function getSummonerName() {
       if (response.ok) {
         const data = await response.json();
         console.log("Summoner Name:", data.displayName);
-
         return data.displayName;
-      } 
-      
+      }
+
       console.error(`HTTP error! status: ${response.status}`);
-      throw new Error(`HTTP error! status: ${response.status}`);
-      
+      return null; // HTTP error occurred
     } catch (error) {
-      console.log(`Error retrieving summoner name from ${path}:`, error);
+      console.log(
+        `Error retrieving summoner name from ${lockfilePath}:`,
+        error
+      );
+      return null; // Error occurred
     } finally {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = previousValue;
     }
   }
 
-  return null;
+  return await attemptFetchSummonerNameFromPath(lockfilePath);
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -138,10 +226,12 @@ function createWindow(x = 0, y = 0) {
   }
 }
 
-app.on("ready", () => {
+app.on("ready", async () => {
   const primaryDisplay = screen.getPrimaryDisplay();
   const allDisplays = screen.getAllDisplays();
-  const externalDisplay = allDisplays.find(display => display.bounds.x > primaryDisplay.bounds.x);
+  const externalDisplay = allDisplays.find(
+    (display) => display.bounds.x > primaryDisplay.bounds.x
+  );
 
   if (externalDisplay) {
     createWindow(externalDisplay.bounds.x + 50, externalDisplay.bounds.y + 50); // +50 for a slight offset from the corner

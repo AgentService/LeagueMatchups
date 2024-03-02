@@ -2,13 +2,13 @@ Waiit this is to complicated, lets ceck if there is another issue.
 
 <template>
   <div class="card gradient-border">
-    <div class="card-header d-flex justify-content-center align-items-center">
+    <div class="card-header-custom d-flex justify-content-center align-items-center">
       <h5 class="mb-0">Rating</h5>
       <transition name="fade">
         <i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
       </transition>
     </div>
-    <div class="card-body">
+    <div class=" ">
       <textarea v-model="notes" placeholder="Rate your matchup" class="note-textarea " rows="4"></textarea>
     </div>
   </div>
@@ -90,7 +90,7 @@ export default {
 .note-textarea:hover {
   background-color: rgba(255, 255, 255, 1); /* Slightly more visible on hover */
 }
-.card-header {
+.card-header-custom {
   padding: 0.75rem 1.25rem;
 }
 

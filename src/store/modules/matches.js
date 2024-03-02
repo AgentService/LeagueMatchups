@@ -16,9 +16,9 @@ export const matches = {
     },
   },
   actions: {
-    async fetchLastMatch({ commit, state, dispatch }, currentSummonerData) {
-      const puuid = currentSummonerData.puuid;
-      const count = 2; // Number of matches to fetch
+    async fetchLastMatch({ commit, state, dispatch }, summonerId) {
+      const puuid = summonerId;
+      const count = 4; // Number of matches to fetch
 
       if (!puuid) {
         console.error("PUUID is missing");

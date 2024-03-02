@@ -488,5 +488,72 @@ router.delete("/general/:noteid", async (req, res) => {
   }
 });
 
+// General Tags
+router.get("/tags", async (req, res) => {
+  const { dbPool } = req.app.locals;
+
+  try {
+    const { rows } = await dbPool.query(`SELECT * FROM Tags`);
+    res.status(200).json({
+      message: "Tags retrieved successfully",
+      tags: rows,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving tags" });
+  }
+});
+
+router.post("/general/:noteId/tags", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const noteId = req.params.noteId;
+  const { tagIds } = req.body; // Expect an array of tagIds to associate with the note
+
+  try {
+    // Begin a transaction
+    await dbPool.query("BEGIN");
+
+    // Insert tag associations
+    const promises = tagIds.map((tagId) =>
+      dbPool.query(
+        `INSERT INTO GeneralNotesTags (NoteID, TagID) VALUES ($1, $2)`,
+        [noteId, tagId]
+      )
+    );
+
+    // Wait for all insertions to complete
+    await Promise.all(promises);
+
+    // Commit the transaction
+    await dbPool.query("COMMIT");
+
+    res.status(200).json({ message: "Tags associated successfully" });
+  } catch (error) {
+    // Rollback the transaction in case of error
+    await dbPool.query("ROLLBACK");
+    res.status(500).json({ message: "Error associating tags with the note" });
+  }
+});
+
+router.delete("/general/:noteId/tags/:tagId", async (req, res) => {
+  const { dbPool } = req.app.locals;
+  const noteId = req.params.noteId;
+  const tagId = req.params.tagId;
+
+  try {
+    const { rowCount } = await dbPool.query(
+      `DELETE FROM GeneralNotesTags WHERE NoteID = $1 AND TagID = $2`,
+      [noteId, tagId]
+    );
+
+    if (rowCount > 0) {
+      res.status(200).json({ message: "Tag disassociated successfully" });
+    } else {
+      res.status(404).json({ message: "Tag association not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error removing tag association" });
+  }
+});
+
 export default router;
 // server/api/notes.mjs

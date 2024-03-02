@@ -142,7 +142,7 @@ body {
 
 /* Text area styles */
 .textarea {
-	background-color: rgba(255, 255, 255, 0.1);
+	background-color: rgba(255, 0, 0, 1.1);
 	/* Semi-transparent white background */
 	color: #E6E6E6;
 	border: none;
@@ -192,9 +192,8 @@ body {
 	overflow: hidden;
 }
 
-.btn-primary:hover {
-	background-color: rgba(0, 128, 255, 0.1);
-	/* Adjust color for glow */
+.btn:hover {
+	background: #1b2735;
 }
 
 .btn-primary::after {

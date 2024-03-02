@@ -1,6 +1,8 @@
 <template>
 	<div>
+		
 		<div class="note-card champion-card">
+
 			<div class="background-image-container" :style="championBackgroundStyle"></div>
 			<div class="d-flex justify-content-between align-items-center">
 				<div class="search-container">
@@ -41,8 +43,11 @@
 					</div>
 				</div>
 			</div>
+			<div v-if="loading" class="loading-indicator">
+				Loading...
+			</div>
 
-			<div class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
+			<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
@@ -354,6 +359,7 @@ export default {
 	// },
 	data() {
 		return {
+			loading: true, // Initial loading state
 			showFavorites: false,
 			isButtonHovered: false,
 			isPopupHovered: false,
@@ -399,18 +405,23 @@ export default {
 
 	async mounted() {
 		const store = useStore();
+		this.loading = true; // Start with loading state
+		console.log('ChampionSelection mounted');
 		const urlHelper = getUrlHelper();
 		this.baseUrl = urlHelper.baseUrl;
 
 		let { championA, championB } = store.state.matchups;
 
-		if (!championA && !championB) {
+		if (!championA) {
 			// If no champions are selected initially
 			championA = {
-				id: "Bard"
+				id: "Hwei"
 			}
+		}
+		if (!championB) {
+			// If no champions are selected initially
 			championB = {
-				id: "Pyke"
+				id: "Azir"
 			}
 		}
 		// Retrieve champion details
@@ -419,7 +430,6 @@ export default {
 
 		// Determine the champion ID to preselect based on the component's instance
 		const preselectedChampionId = this.instanceId === 1 ? championA?.id : championB?.id;
-
 		// Find the corresponding champion in the details array using the ID
 		const preselectedChampion = this.champions.find(champion => champion.id === preselectedChampionId);
 
@@ -431,6 +441,9 @@ export default {
 			this.championImageUrls[champion.id] = await this.getChampionImageSource('small', champion.id);
 		}));
 		await this.$store.dispatch('userPreferences/getFavoriteChampions');
+
+		this.loading = false; // Start with loading state
+
 	},
 
 
@@ -696,6 +709,17 @@ export default {
 </script>
 
 <style scoped>
+.loading-indicator {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	z-index: 1000;
+	color: red;
+	/* Full viewport height */
+	font-size: 20px;
+}
+
 .favorite-icon {
 	cursor: pointer;
 	margin: 5px;
@@ -725,6 +749,7 @@ export default {
 }
 
 .fav-button {
+	z-index: 112;
 	position: relative;
 	cursor: pointer;
 	border-radius: 6px;
@@ -1175,11 +1200,10 @@ export default {
 
 .champion-card {
 	display: flex;
-	height: 350px;
+	height: 250px;
 	flex-direction: column;
 	padding: 1.5rem;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
 }
 
 
@@ -1256,6 +1280,7 @@ export default {
 	color: var(--gold-1);
 	background: var(--grey-cool);
 	border: 0;
+	z-index: 100;
 }
 
 .search-bar input.form-control::placeholder {
@@ -1472,4 +1497,5 @@ export default {
 		0 0 25px rgba(223, 58, 58, 0.35),
 		0 0 35px rgba(223, 58, 58, 0.35),
 		0 0 45px rgba(223, 58, 58, 0.35);
-}</style>
+}
+</style>

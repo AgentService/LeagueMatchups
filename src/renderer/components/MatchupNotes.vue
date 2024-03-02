@@ -1,5 +1,5 @@
 <template>
-	<div class="card-header d-flex justify-content-between align-items-center">
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span>Matchup Notes</span>
 		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
 			<transition-group name="fade" tag="div">
@@ -29,9 +29,9 @@
 		/>
 	</div>
 
-	<div class="card-body">
+	<div class="notes-body">
 		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="11"></textarea>
+			rows="10"></textarea>
 	</div>
 </template>
 <script setup>

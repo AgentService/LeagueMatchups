@@ -20,13 +20,13 @@ MidGame & LUL States
 -->
 <template>
 	<div class="card ">
-		<div class="card-header d-flex justify-content-center align-items-center">
+		<div class="card-header-custom d-flex justify-content-center align-items-center">
 			<h5 class="mb-0">Matchup Notes</h5>
 			<transition name="fade">
 				<i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
 			</transition>
 		</div>
-		<div class="card-body">
+		<div class=" ">
 			<textarea v-model="localNotes" placeholder="Type your notes here..." class="note-textarea" rows="4"></textarea>
 			<button @click="saveNotes" :class="{ 'btn-success': isSaved, 'save-button': true }" class="btn btn-primary">
 				{{ isSaved ? 'Notes Saved' : 'Save Notes' }}
@@ -113,10 +113,6 @@ function saveNotes() {
 .note-textarea:hover {
 	background-color: rgba(255, 255, 255, 1);
 	/* Slightly more visible on hover */
-}
-
-.card-header {
-	padding: 0.75rem 1.25rem;
 }
 
 /* Transition styles for fade effect */

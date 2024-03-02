@@ -1,6 +1,7 @@
 <template>
 	<div class="app-wrapper">
-		<div class="app-container">
+		<div v-if="isLoading" class="loading-indicator">Loading...</div>
+		<div v-else class="app-container">
 			<div class="background-container ">
 				<!--
         <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
@@ -11,30 +12,26 @@
 				<div class="container-fluid">
 					<!-- Summoner Info Row -->
 					<div class="row">
-						<div class="col-12">
-							<SummonerInfo />
+						<div class="col-9">
+							<!-- <SummonerInfo /> -->
 						</div>
 					</div>
 					<div class="row justify-content-evenly">
-						<div class="col-xxl-3 col-xl-3">
+						<!-- <div class="col-xxl-3 col-xl-3">
 							<div class="card">
-								<!-- <SummonerRankedInfo /> -->
 								<ChampionTips :champion="championA" />
 							</div>
 							<div class="card">
-								<!-- <LearningObjectives></LearningObjectives> -->
-								<MatchHistory />
 							</div>
 							<div class="card">
-								<GeneralNotes />
 							</div>
-						</div>
-						<div class="col-xxl-9 col-xl-9">
+						</div> -->
+						<div class="col-xxl-9 col-xl-9 mt-4">
 							<div class="card-container">
 								<!-- <div class="card-container-header">
 									<span>Champion Selection</span>
 								</div> -->
-								<div class="row position-relative">
+								<div class="row ">
 									<!-- Champion Search for User's Champion -->
 									<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
@@ -45,7 +42,7 @@
 										</div>
 									</div> -->
 									<div class="col-xxl-5 m-auto">
-										<div class="card card-top mb-0">
+										<div class="card-small card-top mb-0">
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 										</div>
 										<div class="card card-bottom ">
@@ -53,12 +50,12 @@
 										</div>
 									</div>
 									<!-- VS Divider -->
-									<div class="vs-container position-absolute">
+									<div class="vs-container">
 										<span>vs</span>
 									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
 									<div class="col-xxl-5 m-auto">
-										<div class="card card-top  mb-0">
+										<div class="card-small card-top  mb-0">
 											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 										</div>
 										<div class="card card-bottom">
@@ -75,31 +72,18 @@
 									</div> -->
 								</div>
 							</div>
-							<div class="row">
-								<div class="col-xxl-4">
-									<div class="card">
-										<!-- <GeneralNotes /> -->
-
+								<div class="row">
+									<div class="col-xxl-6">
+										<div class="card-large card-top card-bottom">
+											<GeneralNotes />
+										</div>
+									</div>
+									<div class="col-xxl-6">
+										<div class="card-large card-top card-bottom">
+											<MatchHistory />
+										</div>
 									</div>
 								</div>
-								<div class="col-xxl-8">
-									<div class="card">
-										<MatchHistory />
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-xxl-4">
-									<div class="card">
-
-									</div>
-								</div>
-								<div class="col-xxl-8">
-									<div class="card">
-
-									</div>
-								</div>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -111,7 +95,7 @@
 
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 // Debug
@@ -123,7 +107,6 @@ import SummonerInfo from './components/SummonerInfo.vue';
 import SummonerRankedInfo from './components/SummonerRankedInfo.vue';
 import LearningObjectives from "./components/LearningObjectives.vue";
 
-
 import ChampionNotes from './components/ChampionNotes.vue';
 
 import MatchupNotes from './components/MatchupNotes.vue';
@@ -133,6 +116,17 @@ import GeneralNotes from './components/GeneralNotes.vue';
 
 
 const debug = Debug('app:component:ChampionPage');
+
+const isLoading = ref(true);
+
+async function fetchData() {
+	// Simulate fetching data
+	isLoading.value = false;
+}
+
+onMounted(() => {
+	fetchData();
+});
 
 const championA = ref(null);
 const championB = ref(null);
@@ -189,29 +183,22 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	bothSelected = false;
 	handleMatchup();
 });
-// Function to get the image source URL
-function getChampionImageSource(type, championId) {
-	let baseUrl;
-	baseUrl = window.electronAPI.getAssetBaseUrl();
-	// In production, use a dynamic path
-	baseUrl = `file://${process.resourcesPath}/app/.vite/renderer/main_window`;
-	switch (type) {
-		case 'small':
-			return `${baseUrl}/img/champions/${championId}.png`;
-		case 'loading':
-			return `${baseUrl}/img/champion_loading/${championId}.png`;
-		case 'splash':
-			return `${baseUrl}/img/champion_splash/${championId}.png`;
-		case 'tiles':
-			return `${baseUrl}/img/tiles/${championId}_0.jpg`;
-		default:
-			return ''; // or some default path
-	}
-}
 
 </script>
 
 <style>
+
+
+
+.loading-indicator {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	/* Full viewport height */
+	font-size: 20px;
+}
+
 /* Save and delete buttons */
 .save-button,
 .add-button,
@@ -239,11 +226,12 @@ function getChampionImageSource(type, championId) {
 	display: flex;
 	justify-content: center;
 	align-items: start;
-	z-index: 100;
+	position: absolute;
+	z-index: 0;
 	font-size: 3rem;
 	top: 20%;
 	right: 458;
-	width: 40px;
+	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
 	color: #fff;
@@ -259,16 +247,7 @@ function getChampionImageSource(type, championId) {
 	transform: scale(1.1);
 }
 
-.card-header {
-	text-transform: uppercase;
-	font-weight: 700;
-	text-align: start;
-	font-size: 1.2rem;
-	padding: .5rem 1rem;
-	display: flex;
-	color: #e7e7e7;
-	background-color: rgba(0, 0, 0, 0.0);
-}
+
 
 .card-container-header {
 	text-transform: uppercase;
@@ -278,12 +257,6 @@ function getChampionImageSource(type, championId) {
 	padding-top: 0rem;
 	display: flex;
 	color: #e7e7e7;
-
-}
-
-.card-body {
-	padding: 0rem .5rem;
-	margin-bottom: 0rem;
 }
 
 .card-container {
@@ -306,11 +279,40 @@ function getChampionImageSource(type, championId) {
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 370px;
-	min-height: 370px;
+	max-height: 330px;
+	min-height: 330px;
 	z-index: auto;
 }
 
+.card-small {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 2px solid rgba(128, 128, 128, 0.1);
+	background-image: linear-gradient(to right, #091014, #05080f);
+	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
+	color: #e7e7e7;
+	padding: .5rem;
+	margin-bottom: 1rem;
+	max-height: 310px;
+	min-height: 310px;
+	z-index: auto;
+}
+
+.card-large {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 2px solid rgba(128, 128, 128, 0.1);
+	background-image: linear-gradient(to right, #091014, #05080f);
+	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
+	color: #e7e7e7;
+	padding: 1rem 2rem;
+	margin-bottom: 1rem;
+	max-height: 500px;
+	min-height: 500px;
+	z-index: auto;
+}
 
 .card-top {
 	border-radius: 6px 6px 0 0;
@@ -320,9 +322,16 @@ function getChampionImageSource(type, championId) {
 	border-radius: 0 0 6px 6px;
 }
 
-.card-header h5 {
+.card-header-custom h5 {
 	margin: 0;
 	/* Adjust as needed */
+}
+
+.notes-body  {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	padding: .25rem .5rem;
 }
 
 /* Textarea for the note content */
@@ -336,7 +345,7 @@ function getChampionImageSource(type, championId) {
 	background: var(--background-1-gradient);
 	color: var(--gold-1);
 	line-height: 1.5;
-	padding: 0.5rem;
+	padding: .5rem 1rem;
 	transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 
@@ -494,5 +503,16 @@ function getChampionImageSource(type, championId) {
 .gradient-border:not(:first-child)::before {
 	display: none;
 	/* This hides the left border for all but the first child */
+}
+
+.card-header-custom {
+	background-color: transparent;
+	text-transform: uppercase;
+	font-weight: 600;
+	text-align: start;
+	font-size: 1.1rem;
+	padding: .5rem 1rem;
+	display: flex;
+	color: var(--gold-2);
 }
 </style>
