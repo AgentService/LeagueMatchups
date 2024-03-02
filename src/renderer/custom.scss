@@ -1,12 +1,10 @@
 // custom.scss
 @import "bootstrap/scss/bootstrap.scss";
-@import 'node_modules/bootstrap/scss/bootstrap';
-@import 'node_modules/bootstrap/scss/bootstrap.scss';
-@import './index.scss';
-
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/bootstrap/scss/bootstrap.scss";
+@import "./index.scss";
 
 // Importing Bootstrap source SASS for customization
-
 
 $primary-color: #a1628c; // Change the primary color
 $secondary-color: #0f813f; // Change the secondary color
@@ -15,3 +13,80 @@ $secondary-color: #0f813f; // Change the secondary color
 // Override Bootstrap variables
 $btn-primary-bg: $primary-color;
 $btn-secondary-bg: $secondary-color;
+
+.dropdown {
+    position: relative;
+}
+
+/* Dropdown Trigger/Button */
+.dropdown-toggler {
+    border: none;
+    background: none;
+    color: #fff;
+    font-size: 1.2rem;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+    position: absolute;
+    right: 0;
+    left: auto;
+}
+
+/* General Dropdown Menu */
+.dropdown-menu {
+    border-radius: 6px;
+    border: 1px solid var(--grey-3);
+    background: var(--card-background);
+    color: white;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.dropdown-item,
+.dropdown-header {
+    font-size: 0.875rem;
+    color: inherit;
+    text-align: start;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: rgba(45, 57, 65, 0.395); /* Background color on hover/focus */
+    color: inherit; /* Keeps the text color consistent */
+    border-radius: 0.5rem; /* Ensures rounded corners */
+}
+
+/* Dropdown Items */
+.dropdown-item {
+    cursor: pointer;
+    margin: 0.25rem 0; /* Adds some space between items */
+    width: auto; /* Ensures the item doesn't stretch to the full width */
+    text-align: start; /* Centers the text, remove if not needed */
+    border-radius: 0.5rem; /* Rounded corners for the dropdown items */
+    transition: background-color 0.2s ease-in-out; /* Smooth transition for background color change */
+}
+
+/* Alignments and Extra Styles */
+.dropdown-divider {
+    border-top: 1px solid #34495e85;
+    /* Lighter border color for dividers */
+}
+
+.auth-buttons button,
+.dropdown .btn {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    padding: 5px 10px;
+}
+
+.auth-buttons button:not(:last-child) {
+    margin-right: 10px;
+}
+
+
+

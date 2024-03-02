@@ -197,7 +197,7 @@
 									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
-											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
+											<!-- <div class="cooldown">{{ spellData.spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
@@ -1075,13 +1075,13 @@ export default {
 }
 
 .ability-label {
-	font-size: 0.8rem;
+	font-size: 1rem;
+	font-weight: 700;
 	color: #fff;
 	position: absolute;
 	bottom: 0;
 	right: 0;
 	padding: 2px 4px;
-	background-color: rgba(0, 0, 0, 0.7);
 	border-radius: 2px;
 	text-shadow: none;
 }
@@ -1097,7 +1097,7 @@ export default {
 
 .tooltip {
 	position: absolute;
-	top: 100%;
+	border: 1px solid var(--grey-3);
 	/* Aligns the tooltip above the ability icon */
 	left: 50%;
 	transform: translateX(-50%);
@@ -1109,6 +1109,7 @@ export default {
 	border-radius: 0.25rem;
 	z-index: 999;
 	min-width: 300px;
+	margin-top: .5rem;
 	/* Other styles */
 }
 

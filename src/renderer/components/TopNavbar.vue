@@ -1,7 +1,7 @@
 <template>
 	<div class="main-container">
 
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark me-4 ms-4">
 			<div class="container-fluid w-75">
 				<div class="d-flex justify-content-start">
 					<SummonerInfo></SummonerInfo>
@@ -10,46 +10,49 @@
 					<router-link to="/championMatchup" class="nav-link">Prepare</router-link>
 					<router-link to="/userJourney" class="nav-link">Journey</router-link>
 				</div>
-				<div class="d-flex justify-content-center align-items-center">
-					<div class="button-container d-flex align-items-center">
-						<!-- Tooltip Container -->
-						<div class="tooltip-container me-3">
-							<a class="btn" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
-								aria-expanded="false" @mouseover="showTooltip = true" @mouseleave="showTooltip = false">
-								<span>Game events</span>
+				<div class="d-flex justify-content-center align-items-center ">
+					<div class="button-container">
+						<div class="dropdown" @mouseover="showTooltip = true" @mouseleave="showTooltip = false"
+							style="position: relative;">
+							<a class="btn dropdown-toggler" href="#" role="button">
+								<span>Client</span>
 								<div class="ms-2 lockfile-indicator" :class="{ 'active': lockfileConnected }"></div>
 							</a>
-							<div class="custom-tooltip" v-if="showTooltip">
-								<div class="dropdown-item d-flex align-items-center">
-									<div class="me-2 lockfile-indicator" :class="{ 'active': lockfileConnected }"></div>
-
-									{{ lockfileConnected ? 'Client connected' : 'Client not connected' }}
-								</div>
-							</div>
+							<ul class="custom-tooltip dropdown-menu" v-if="showTooltip"
+								:style="{ 'background': lockfileConnected ? '#28a745' : '#dc3545' }">
+								<li class="dropdown-tooltip ">
+									<a class="dropdown-item" href="#">
+										<i class="fa-solid fa-circle-info me-1"></i>
+										{{ lockfileConnected ? 'Client connected' : 'Client not connected' }}
+									</a>
+								</li>
+							</ul>
 						</div>
 
-						<!-- Vertical Separator -->
-
+						<div class="button-divider"></div>
 						<!-- Profile Dropdown -->
-						<div class="dropdown">
-							<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
-								data-bs-toggle="dropdown" aria-expanded="false">
-								<i class="fas fa-user-circle"></i> <!-- Font Awesome User Icon -->
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-								<li><a class="dropdown-item" href="#">User Email</a></li>
-								<li><a class="dropdown-item" href="#">User Settings</a></li>
-								<li>
-									<hr class="dropdown-divider">
-								</li>
-								<li>
-									<Login></Login>
-								</li>
-								<li>
-									<RegistrationForm></RegistrationForm>
-								</li>
-								<li><a class="dropdown-item" href="#">Logout</a></li>
-							</ul>
+						<div>
+							<div class="dropdown" v-if="isLoggedIn">
+								<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
+									data-bs-toggle="dropdown" aria-expanded="false">
+									<!-- Show user icon if logged in, otherwise show login and registration options -->
+									<i class="fas fa-user-circle"></i>
+								</a>
+								<ul v-show="dropdownOpen" class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
+									<li class="dropdown-header">{{ user.username }}</li>
+									<li>
+										<hr class="dropdown-divider">
+									</li>
+									<div class="text-secondary">
+										<li><a class="dropdown-item" href="#">Send Feedback</a></li>
+										<li><a class="dropdown-item" href="#" @click="logout">Log Out</a></li>
+									</div>
+								</ul>
+							</div>
+							<span v-else class="auth-buttons">
+								<Login />
+								<RegistrationForm />
+							</span>
 						</div>
 					</div>
 				</div>
@@ -119,6 +122,11 @@ const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
+const user = computed(() => store.state.auth.user);
+const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
+
+const dropdownOpen = ref(true);
+
 async function checkLockfileConnection() {
 	try {
 		const isConnected = await window.api.checkLockfileExists();
@@ -151,31 +159,37 @@ const summonerIcon = computed(() => {
 </script>
 
 <style scoped>
-.dropdown-toggler {
-	border: none;
-	background: none;
-	color: #fff;
-	font-size: 1.2rem;
+.custom-tooltip .dropdown-item {
+	cursor: default;
 }
 
-.dropdown {
+.button-container {
 	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
 }
 
-.dropdown .dropdown-toggle {
-	border: none;
+.button-divider {
+	width: 1px;
+	height: 20px;
+	background-color: var(--grey-3);
+	margin: auto 20px;
+	align-self: stretch;
+	flex: 0 0 1px;
 }
 
-.tooltip-container {
-	position: relative;
-	display: inline-block;
+.custom-tooltip {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	transform: translate(25%, 11px);
+	z-index: 1050;
+	width: auto;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	border: 1px solid var(--grey-2);
 }
 
-.tooltip-container .btn {
-	border: none;
-	background: none;
-	font-size: .8rem;
-}
 
 .lockfile-indicator {
 	width: 10px;
@@ -188,58 +202,6 @@ const summonerIcon = computed(() => {
 	background-color: rgb(50, 255, 50);
 	border-radius: 50%;
 	display: inline-block;
-}
-
-/*
-	Tooltip styling
-*/
-
-.custom-tooltip {
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	transform: translateX(-50%);
-	background-color: #000;
-	color: #fff;
-	text-align: center;
-	border-radius: 5px;
-	padding: 5px;
-	border: 1px solid  var(--grey-2);
-	z-index: 1000;
-	margin-top: 10px;
-}
-
-.custom-tooltip::before {
-	content: '';
-	position: absolute;
-	bottom: 120%;
-	left: 50%;
-	border-width: 10px;
-	border-style: solid;
-	border-color: transparent transparent #000 transparent;
-	transform: translateX(-50%) translateY(1px);
-	/* Adjust for border */
-	z-index: -1;
-}
-
-.custom-tooltip::after {
-	content: '';
-	position: absolute;
-	bottom: 120%;
-	left: 50%;
-	transform: translateX(-50%) translateY(2px);
-	/* Adjust for border */
-	border-width: 9px;
-	border-style: solid;
-	border-color: transparent transparent var(--grey-2) transparent;
-	/* White arrow to match border */
-	margin-bottom: -9px;
-	/* Adjusts the position of the arrow to overlap the tooltip */
-}
-
-.dropdown-menu.show {
-	display: block;
-	/* Override Bootstrap's default hiding */
 }
 
 .nav-link {
@@ -284,7 +246,7 @@ const summonerIcon = computed(() => {
 .navbar {
 	font-size: 0.85rem;
 	background: var(--navbar-background-gradient);
-	max-height: -50%0px;
+	max-height: 50px;
 	margin: 0 auto;
 }
 
@@ -369,41 +331,6 @@ const summonerIcon = computed(() => {
 	animation: fadeIn 0.5s ease forwards;
 }
 
-.dropdown-menu {
-	background: var(--navbar-background-elements);
-	color: #f8f9fa;
-	border: none;
-	padding: .5rem;
-	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-	margin-top: 0.25rem;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, .5);
-}
-
-/* Dropdown item styling */
-.dropdown-item {
-	padding: 0.75rem;
-	background: none;
-}
-
-.dropdown-item .flex-grow-1 {
-	display: flex;
-	flex-direction: column;
-}
-
-.dropdown-item,
-.dropdown-header {
-	font-size: .875rem;
-	color: inherit;
-	text-align: center;
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-	background-color: transparent;
-	color: inherit;
-}
-
-
 /* Custom progress bar to match the theme */
 .progress {
 	height: .5rem;
@@ -419,4 +346,5 @@ const summonerIcon = computed(() => {
 	color: #a9a9a9;
 	align-self: flex-start;
 	font-size: 0.9rem;
-}</style>
+}
+</style>
