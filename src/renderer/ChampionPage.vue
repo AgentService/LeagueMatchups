@@ -243,8 +243,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 .vs-container:hover {
-	cursor: pointer;
-	transform: scale(1.1);
+	cursor:default;
 }
 
 

@@ -197,7 +197,8 @@
 									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
-											<!-- <div class="cooldown">{{ spellData.spell.cooldownBurn.split('/')[0] }}</div> -->
+											<div class="cooldown position-absolute">{{ spellData.spell.cooldownBurn.split('/')[0] }}</div>
+
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
@@ -222,6 +223,7 @@
 												</div>
 											</div>
 										</div>
+
 									</div>
 								</div>
 							</div>
@@ -972,12 +974,14 @@ export default {
 	flex-direction: column;
 	align-items: center;
 	margin-right: 0.25rem;
+	margin-bottom: .5rem;
 }
 
 .cooldown {
 	font-size: 0.75rem;
+	font-weight: 500;
 	color: white;
-	margin-top: 4px;
+	bottom: -18px;
 }
 
 .cooldown-display {
