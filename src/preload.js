@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld("versions", {
 
 contextBridge.exposeInMainWorld("api", {
   checkLockfileExists: () => ipcRenderer.invoke("check-lockfile-exists"),
+  checkLeagueClientPathExists: () => ipcRenderer.invoke("check-league-client-path-exists"),
   send: (channel, data) => {
     const validChannels = ['open-path-dialog', 'get-summoner-name']; // Add more valid channels as needed
     if (validChannels.includes(channel)) {

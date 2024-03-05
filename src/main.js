@@ -21,22 +21,45 @@ console.log("basePath", basePath);
 console.log("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
+store.set("leagueClientPath", null); // Returns null if not found
 
-const LEAGUE_CLIENT_PATHS = [
-  "C:/Riot Games/League of LegendsX/lockfile",
-  "/Applications/League of Legends.app/Contents/LoL/lockfile",
-  "C:/Program Files/Riot Games/League of Legends/lockfile",
-];
+// Function to recursively search for a file in a directory
+function searchForFile(directory, targetFile, maxDepth = 5, currentDepth = 0) {
+  if (currentDepth > maxDepth) return null;
 
-function saveLockfilePath(lockfilePath) {
-  store.set("lockfilePath", lockfilePath);
+  const files = fs.readdirSync(directory, { withFileTypes: true });
+  for (const file of files) {
+    const fullPath = path.join(directory, file.name);
+    if (file.isDirectory()) {
+      const result = searchForFile(
+        fullPath,
+        targetFile,
+        maxDepth,
+        currentDepth + 1
+      );
+      if (result) return result;
+    } else if (file.name === targetFile) {
+      return fullPath;
+    }
+  }
+  return null;
 }
 
-function loadLockfilePath() {
-  return store.get("lockfilePath", null); // Returns null if not found
+function saveLeagueClientPath(leagueClientPath) {
+  store.set("leagueClientPath", leagueClientPath);
 }
 
-// Function to open the directory picker
+function loadLeagueClientPath() {
+  return store.get("leagueClientPath", null); // Returns null if not found
+}
+
+// Enhanced League client path discovery
+ipcMain.handle("find-league-client-path", async (event) => {
+  const leagueClientPath = await findLeagueClientPath();
+  event.reply("league-client-path-found", leagueClientPath);
+});
+
+// Adjust the openDirectoryPicker function
 async function openDirectoryPicker(event) {
   const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
     // mainWindow is used here
@@ -44,44 +67,56 @@ async function openDirectoryPicker(event) {
     parent: mainWindow, // Make the dialog modal to the main window
     modal: true, // This is optional depending on your needs
   });
-
   if (!canceled && filePaths.length > 0) {
     const directoryPath = filePaths[0];
-    const lockfilePath = path.join(directoryPath, "lockfile"); // Assuming 'lockfile' is the filename
+    const leagueClientPath = path.join(directoryPath, "LeagueClient.exe"); // Look for LeagueClient.exe
 
-    if (fs.existsSync(lockfilePath)) {
-      console.log("Lockfile found:", lockfilePath);
-      saveLockfilePath(lockfilePath); // Save the direct lockfile path
+    if (fs.existsSync(leagueClientPath)) {
+      console.log("League client found:", leagueClientPath);
+      // Save the path up to the directory containing the executable
+      saveLeagueClientPath(path.dirname(leagueClientPath));
       mainWindow.webContents.send("directory-path-selected", {
-        lockfilePath,
+        leagueClientPath: path.dirname(leagueClientPath), // Correctly set to the directory
         directoryPath,
       });
     } else {
-      console.log("Lockfile not found in the selected directory.");
+      console.log("League client not found in the selected directory.");
       mainWindow.webContents.send("directory-path-selected", {
+        leagueClientPath: null,
         directoryPath: null,
-        lockfilePath: null,
       });
     }
-  } else {
-    // Handle cancellation or no selection
-    event.reply("directory-path-selected", null);
   }
+  event.reply("directory-path-selected", null);
 }
 
-async function findLockfilePath() {
-  for (const path of LEAGUE_CLIENT_PATHS) {
-    if (fs.existsSync(path)) {
-      console.log(`Lockfile found at: ${path}`);
-      const savedPath = store.get("lockfilePath", null);
-      if (path !== savedPath) {
-        console.log("New lockfile path found, updating Electron Store...");
-        store.set("lockfilePath", path);
-      }
-      return path;
+// Enhanced function to find the League client path
+async function findLeagueClientPath() {
+  // First, check the predefined paths
+  for (const predefinedPath of LEAGUE_CLIENT_PATHS) {
+    if (fs.existsSync(predefinedPath)) {
+      console.log(`Lockfile found at: ${predefinedPath}`);
+      return predefinedPath;
     }
   }
-  console.log("Lockfile not found in standard locations.");
+
+  // If not found, scan common directories
+  const commonPaths = [
+    "C:/Program Files/",
+    "C:/Program Files (x86)/",
+    "/Applications/",
+    // Add other common paths as needed
+  ];
+  for (const commonPath of commonPaths) {
+    if (fs.existsSync(commonPath)) {
+      const leaguePath = searchForFile(commonPath, "LeagueClient.exe"); // Example for Windows
+      if (leaguePath) {
+        console.log(`League client found at: ${leaguePath}`);
+        return leaguePath.replace(/LeagueClient\.exe$/, ""); // Adjust accordingly for macOS or other files
+      }
+    }
+  }
+  console.log("League client not found.");
   return null;
 }
 
@@ -90,9 +125,32 @@ ipcMain.on("open-path-dialog", (event) => {
   openDirectoryPicker(event);
 });
 
+ipcMain.handle("check-league-client-path-exists", async () => {
+  const leagueClientPath = loadLeagueClientPath(); // This function should retrieve the saved path
+  if (typeof leagueClientPath !== "string") {
+    console.error(
+      "League client path is not set or invalid:",
+      leagueClientPath
+    );
+    return false; // Indicate failure or absence of the path
+  }
+
+  const leagueClientExePath = path.join(leagueClientPath, "LeagueClient.exe");
+  return fs.existsSync(leagueClientExePath);
+});
+
 ipcMain.handle("check-lockfile-exists", async () => {
-  const savedLockfilePath = loadLockfilePath();
-  return savedLockfilePath && fs.existsSync(savedLockfilePath);
+  const leagueClientPath = loadLeagueClientPath(); // Assume this now loads the general client path
+  if (typeof leagueClientPath !== "string") {
+    console.error(
+      "League client path is not set or invalid:",
+      leagueClientPath
+    );
+    return false; // Similarly handle the case for the lockfile check
+  }
+
+  const lockfilePath = path.join(leagueClientPath, "lockfile");
+  return fs.existsSync(lockfilePath);
 });
 
 ipcMain.on("get-summoner-name", async (event, selectedPath = null) => {
@@ -115,21 +173,19 @@ ipcMain.handle("get-api-key", async (event) => {
 
 async function getSummonerName(selectedPath = null) {
   // First, try to get the lockfile path from Electron Store
-  let lockfilePath = selectedPath || store.get("lockfilePath", null);
+  let leagueClientPath = selectedPath || loadLeagueClientPath(); // Update to use the correct function name
 
-  console.log("Attempting to use lockfile path:", lockfilePath);
+  console.log("Attempting to use League client path:", leagueClientPath);
+  let lockfilePath = leagueClientPath
+    ? path.join(leagueClientPath, "lockfile")
+    : null;
 
-  // Check if the stored path is valid (exists and contains the lockfile)
+  // Check if the lockfile exists at the constructed path
   if (lockfilePath && fs.existsSync(lockfilePath)) {
-    console.log("Using lockfile path from Electron Store:", lockfilePath);
+    console.log("Lockfile found at:", lockfilePath);
   } else {
-    console.log("Stored lockfile path not valid. Searching standard paths...");
-    lockfilePath = await findLockfilePath();
-
-    if (!lockfilePath) {
-      console.log("No lockfile path available.");
-      return null; // Exit if lockfile not found in standard paths either
-    }
+    console.log("Lockfile not found. Ensure the League client is running.");
+    return null; // Exit if the lockfile is not found
   }
 
   // Function to attempt fetching summoner name from a given path

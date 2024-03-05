@@ -4,29 +4,21 @@
 
 		<div v-if="showModal" class="test-modal">
 			<button @click="toggleModal" class="close-button">&times;</button>
-			<form @submit.prevent="handleSubmit" class="registration-form">
-				<div class="form-group">
-					<label for="reg-email">Email:</label>
-					<input type="email" id="reg-email" v-model="form.email" required>
-				</div>
-				<div class="form-group">
-					<label for="reg-username">Username:</label>
-					<input type="text" id="reg-username" v-model="form.username" required>
-				</div>
-				<div class="form-group">
-					<label for="reg-password">Password:</label>
-					<input type="password" id="reg-password" v-model="form.password" required>
-				</div>
-				<div class="form-group">
-					<label for="reg-confirm-password">Confirm Password:</label>
-					<input type="password" id="reg-confirm-password" v-model="form.confirmPassword" required>
-				</div>
-				<button type="submit" :disabled="isSubmitting" class="submit-button">Register</button>
-				<p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+			<form @submit.prevent="handleSubmit" class="auth-form">
+				<input type="email" v-model="form.email" placeholder="Email" required>
+				<input type="password" v-model="form.password" placeholder="Password" required>
+				<input type="text" v-if="authMode === 'register'" v-model="form.username" placeholder="Username"
+					required>
+				<input type="password" v-if="authMode === 'register'" v-model="form.confirmPassword"
+					placeholder="Confirm Password" required>
+				<button type="submit" :disabled="isSubmitting">
+					{{ authMode === 'login' ? 'Log In' : 'Create Account' }}
+				</button>
 			</form>
 		</div>
 	</div>
 </template>
+
 <script setup>
 import { ref } from 'vue';
 import { useStore } from 'vuex';
@@ -61,7 +53,8 @@ const handleSubmit = async () => {
 			username: form.value.username, // Ensure this is sent correctly
 			password: form.value.password,
 		});
-		toggleModal(); // Close the registration modal upon successful registration
+		toggleModal();
+		router.push('/championMatchup');
 		form.value = { email: '', username: '', password: '', confirmPassword: '' };
 		errorMessage.value = '';
 	} catch (error) {
@@ -73,7 +66,7 @@ const handleSubmit = async () => {
 
 </script>
 
-  
+
 <style scoped>
 /* Add your modal and form styling here */
 .test-modal {
@@ -99,4 +92,3 @@ const handleSubmit = async () => {
 	/* Error message styles */
 }
 </style>
-  

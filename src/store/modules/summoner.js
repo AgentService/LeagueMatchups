@@ -43,7 +43,6 @@ export const summoner = {
       const existingDetail = state.playerDetails.find(
         (detail) => detail.summonerData.name === gameName
       );
-
       if (
         existingDetail &&
         (existingDetail.summonerData.summonerLevel !== newSummonerLevel ||
@@ -64,7 +63,6 @@ export const summoner = {
       const existingDetail = state.playerDetails.find(
         (detail) => detail.gameName === gameName
       );
-
       if (existingDetail) {
         debug("Summoner data loaded from cache:", existingDetail);
         // Optionally, you could re-fetch to update the data

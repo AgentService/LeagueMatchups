@@ -7,6 +7,8 @@ PRE RELEASE TODOS:
 DONE ENTER LOLPATH ON INITIAL LOAD 
 - FIGURE OUT UPDATE SYSTEM
 - POLISH USER ACCOUNTS
+    - Prompt User for login on initial login
+    - Then load app / or reload page / Review notes dont get updated after login in, erst nach reload
 - FIX TOKEN REFRESH
 - 
 

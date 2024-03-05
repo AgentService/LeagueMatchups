@@ -18,11 +18,11 @@ const proceedToSelectDirectory = () => {
 };
 
 window.api.receive("directory-path-selected", (data) => {
-  const { directoryPath, lockfilePath } = data;
-  if (lockfilePath) {
-    // If lockfile path is provided, use it for fetching summoner name
-    console.log("Valid directory selected:", lockfilePath);
-    window.api.send('get-summoner-name', lockfilePath);
+  const { leagueClientPath, directoryPath } = data;
+  if (leagueClientPath) {
+    // If leagueClientPath path is provided, use it for fetching summoner name
+    window.api.send('get-summoner-name');
+    router.push('/championMatchup');
   } else if (directoryPath) {
     // Use directoryPath for operations that don't need the lockfile
     // Example operation that needs just the directory path

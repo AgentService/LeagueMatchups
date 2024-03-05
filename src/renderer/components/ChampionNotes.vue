@@ -12,10 +12,10 @@
 				<div v-if="notesState === 'editing'" key="editing" class="status-message">
 					<i class="fas fa-edit text-warning"></i>
 				</div>
-				<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
-					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-				</div>
 			</transition-group>
+			<div key="share-button" class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
+			</div>
 		</div>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />

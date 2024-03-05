@@ -38,7 +38,7 @@ export function initializePassportStrategy(dbPool) {
               debug("User authenticated successfully");
               return done(null, {
                 email: user.email,
-                name: user.username,
+                username: user.username,
                 id: user.userId, // Make sure to include the user's ID
               });
             } else {

@@ -39,7 +39,7 @@
 									<i class="fas fa-user-circle"></i>
 								</a>
 								<ul v-show="dropdownOpen" class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-									<li class="dropdown-header">{{ user.username }}</li>
+									<li class="dropdown-header">{{ user.username  }}</li>
 									<li>
 										<hr class="dropdown-divider">
 									</li>
@@ -121,7 +121,6 @@ const store = useStore();
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
-
 const user = computed(() => store.state.auth.user);
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 
@@ -156,6 +155,12 @@ const summonerIcon = computed(() => {
 	}
 	return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
 });
+
+const logout = () => {
+	store.dispatch('auth/logout');
+	router.push('/login'); // Redirect to the login page after logout
+};
+
 </script>
 
 <style scoped>

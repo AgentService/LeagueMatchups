@@ -13,20 +13,15 @@
 					<!-- <span class="text-warning notes-saved">Editing</span> -->
 
 				</div>
-				<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
-					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-				</div>
+
 			</transition-group>
+			<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
+			</div>
 		</div>
-		<SharedNotesModal
-		ref="NotesSharedModalRef"
-		:isVisible="showNotesModal"
-		notesType="matchup"
-		title="Shared Matchup Notes"
-		:championA="championA"
-		:championB="championB"
-		@update:isVisible="showNotesModal = $event"
-		/>
+		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="matchup"
+			title="Shared Matchup Notes" :championA="championA" :championB="championB"
+			@update:isVisible="showNotesModal = $event" />
 	</div>
 
 	<div class="notes-body">
@@ -34,6 +29,7 @@
 			rows="10"></textarea>
 	</div>
 </template>
+
 <script setup>
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
