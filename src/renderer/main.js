@@ -9,6 +9,13 @@ import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./custom.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+library.add(fas); // Add all solid icons to the library
+
 import { setupBaseUrl } from './globalSetup';
 
 import { initializeSummonerDataFetching, startSummonerNameCheck } from "../services/summonerDataService";
@@ -37,6 +44,7 @@ initializeApp().then(() => {
 
   vueApp.use(router);
   vueApp.use(store); // Use the Vuex store
+  vueApp.component('font-awesome-icon', FontAwesomeIcon);
 
   vueApp.mount("#app");
 });

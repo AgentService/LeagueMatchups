@@ -1,9 +1,12 @@
 <template>
-	<Navbar v-if="route.path !== '/login'">
-		<!-- Navigation links -->
-	</Navbar>
+	<transition name="fade">
+		<Navbar @before-leave="handleBeforeLeave">
+		</Navbar>
+	</transition>
 	<div class="app-wrapper">
-		<router-view></router-view>
+		<transition name="fade">
+			<router-view></router-view>
+		</transition>
 		<div>
 			<!-- Conditionally render the custom popup -->
 			<!-- <CustomPopup v-if="showPopup" @close="showPopup = false" /> -->
@@ -16,10 +19,18 @@ import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import Navbar from './components/TopNavbar.vue';
 
-import CustomPopup from './components/utility/LockfilePopup.vue';
+// import CustomPopup from './components/utility/LockfilePopup.vue';
 const route = useRoute();
+const showNavbar = ref(route.path !== '/login');
 
 const showPopup = ref(false);
+
+function handleBeforeLeave() {
+	showNavbar.value = false; // Hide Navbar, show placeholder
+	setTimeout(() => {
+		showNavbar.value = true; // Revert after transition duration
+	}, 1100); // Match your fade transition duration
+}
 
 // Example function that checks for the lockfile
 async function checkLeagueClientDirectory() {
@@ -35,6 +46,19 @@ onMounted(() => {
 	// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 	checkLeagueClientDirectory();
 });
+
 </script>
 
-<style></style>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.5s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+	opacity: 0;
+	transition-delay: 0.5s;
+	/* Delay the disappearance to allow for a smooth transition */
+}
+</style>

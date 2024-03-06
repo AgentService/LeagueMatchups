@@ -4,6 +4,7 @@ import path from "path";
 require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
+import findProcess from "find-process";
 
 const Store = require("electron-store");
 const store = new Store();
@@ -21,7 +22,9 @@ console.log("basePath", basePath);
 console.log("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
-store.set("leagueClientPath", null); // Returns null if not found
+
+store.set("leagueClientPath", null);
+store.set("detectionMethod", store.get("detectionMethod", "process")); // Default to 'lockfile'
 
 // Function to recursively search for a file in a directory
 function searchForFile(directory, targetFile, maxDepth = 5, currentDepth = 0) {
@@ -139,6 +142,95 @@ ipcMain.handle("check-league-client-path-exists", async () => {
   return fs.existsSync(leagueClientExePath);
 });
 
+ipcMain.handle("check-client-status", async () => {
+  const detectionMethod = store.get("detectionMethod", "process"); // Fallback to 'lockfile' if not set
+  console.log("Detection method:", detectionMethod);
+  switch (detectionMethod) {
+    case "lockfile":
+      return await checkLockfileExists(); // Your existing lockfile check logic
+    case "process":
+      return await checkLeagueClientProcess(); // New method to implement
+    default:
+      console.error("Invalid detection method.");
+      return false;
+  }
+});
+
+async function checkLeagueClientProcess() {
+  try {
+    const processes = await findProcess("name", "LeagueClientUx.exe");
+    if (processes.length > 0) {
+      const riotCredentials = await getLeagueClientCredentials(); // Call the function to get the credentials
+      console.log("Riot credentials:", riotCredentials);
+      return riotCredentials; // Process found
+    }
+    return false; // Process not found
+  } catch (error) {
+    console.error("Error checking League client process:", error);
+    return false;
+  }
+}
+
+async function getLeagueClientCredentials() {
+  const processes = await findProcess("name", "LeagueClientUx.exe");
+  for (const proc of processes) {
+    const cmd = proc.cmd || ""; // Command line string
+    const portMatch = cmd.match(/--app-port=(\d+)/);
+    const tokenMatch = cmd.match(/--remoting-auth-token=([\w-]+)/);
+
+    if (portMatch && tokenMatch) {
+      return { port: portMatch[1], token: tokenMatch[1] };
+    }
+  }
+  return null;
+}
+
+async function getLeagueClientPathFromProcess() {
+  const processes = await findProcess("name", "LeagueClientUx.exe");
+  for (const proc of processes) {
+    const installDir = extractInstallDirectory(proc.cmd);
+    console.log("command:", proc.cmd);
+    if (installDir) {
+      console.log("Extracted Install Directory:", installDir); // Should accurately reflect the full path
+      const lockfilePath = path.join(installDir, "lockfile");
+      console.log("Constructed Lockfile Path:", lockfilePath);
+      if (fs.existsSync(lockfilePath)) {
+        console.log("Lockfile found.");
+        return lockfilePath;
+      } else {
+        console.log("Lockfile not found at the constructed path.");
+      }
+    }
+  }
+  return null;
+}
+
+function extractInstallDirectory(cmd) {
+  // Specifically match the --install-directory parameter and capture the full path, accounting for possible spaces within quotes
+  const regex = /--install-directory=([^"]+?)"/;
+  console.log(regex, regex);
+  const match = cmd.match(regex);
+  console.log("Match:", match);
+  if (match && match[1]) {
+    let directoryPath = match[1];
+    // Remove leading and trailing quotes if present
+    directoryPath = directoryPath.replace(/^"|"$/g, "");
+    return directoryPath;
+  }
+  return null;
+}
+
+async function getCredentialsFromLockfile(lockfilePath) {
+  const lockfileContent = fs.readFileSync(lockfilePath, "utf8");
+  const parts = lockfileContent.split(":");
+  if (parts.length >= 4) {
+    const port = parts[2];
+    const token = parts[3];
+    return { port, token };
+  }
+  return null;
+}
+
 ipcMain.handle("check-lockfile-exists", async () => {
   const leagueClientPath = loadLeagueClientPath(); // Assume this now loads the general client path
   if (typeof leagueClientPath !== "string") {
@@ -155,8 +247,29 @@ ipcMain.handle("check-lockfile-exists", async () => {
 
 ipcMain.on("get-summoner-name", async (event, selectedPath = null) => {
   console.log("IPC message received: get-summoner-name");
-  const summonerName = await getSummonerName(selectedPath); // Pass the selectedPath if provided
+  let summonerName = null;
+  // const summonerName = await getSummonerName(selectedPath);
+  try {
+    const lockfilePath = await getLeagueClientPathFromProcess();
+    if (!lockfilePath) {
+      throw new Error("League client lockfile not found.");
+    }
 
+    const credentials = await getCredentialsFromLockfile(lockfilePath);
+    if (!credentials) {
+      throw new Error("Failed to extract credentials from lockfile.");
+    }
+
+    summonerName = await fetchSummonerName(credentials.port, credentials.token);
+    if (summonerName) {
+      console.log("Fetched Summoner Name:", summonerName);
+      console.log("credentials", credentials);
+    } else {
+      console.log("Summoner name could not be fetched.");
+    }
+  } catch (error) {
+    console.error("An error occurred:", error);
+  }
   if (summonerName) {
     console.log("Summoner Name:", summonerName);
     event.reply("summoner-name-response", summonerName);
@@ -170,6 +283,42 @@ ipcMain.handle("get-api-key", async (event) => {
 
   return process.env.RIOT_API_KEY;
 });
+
+async function fetchSummonerName(port, token) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Important: Ensure this is acceptable for your app's security requirements
+
+  try {
+    const fetch = (...args) =>
+      import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+    const response = await fetch(
+      `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${token}`).toString(
+            "base64"
+          )}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Summoner Name:", data.displayName);
+      return data.displayName;
+    } else {
+      console.error(`HTTP error! status: ${response.status}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching summoner name:", error);
+    return null;
+  } finally {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Reset for safety
+  }
+}
 
 async function getSummonerName(selectedPath = null) {
   // First, try to get the lockfile path from Electron Store

@@ -26,7 +26,7 @@ MidGame & LUL States
 				<i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
 			</transition>
 		</div>
-		<div class=" ">
+		<div class="card-body">
 			<textarea v-model="localNotes" placeholder="Type your notes here..." class="note-textarea" rows="4"></textarea>
 			<button @click="saveNotes" :class="{ 'btn-success': isSaved, 'save-button': true }" class="btn btn-primary">
 				{{ isSaved ? 'Notes Saved' : 'Save Notes' }}

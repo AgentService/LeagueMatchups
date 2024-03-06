@@ -7,8 +7,10 @@
 					<SummonerInfo></SummonerInfo>
 				</div>
 				<div class="mx-auto d-flex justify-content-center">
-					<router-link to="/championMatchup" class="nav-link">Prepare</router-link>
-					<router-link to="/userJourney" class="nav-link">Journey</router-link>
+					<router-link to="/championMatchup"
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Prepare</router-link>
+					<router-link to="/userJourney"
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Journey</router-link>
 				</div>
 				<div class="d-flex justify-content-center align-items-center ">
 					<div class="button-container">
@@ -32,14 +34,15 @@
 						<div class="button-divider"></div>
 						<!-- Profile Dropdown -->
 						<div>
-							<div class="dropdown" v-if="isLoggedIn">
+							<div class="dropdown">
 								<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
 									data-bs-toggle="dropdown" aria-expanded="false">
 									<!-- Show user icon if logged in, otherwise show login and registration options -->
-									<i class="fas fa-user-circle"></i>
-								</a>
-								<ul v-show="dropdownOpen" class="dropdown-menu" aria-labelledby="dropdownMenuLink2">
-									<li class="dropdown-header">{{ user.username  }}</li>
+									<font-awesome-icon :icon="['fas', 'user-circle']"
+										:class="{ 'logged-out': !isLoggedIn }" /> </a>
+								<ul v-show="dropdownOpen" v-if="isLoggedIn" class="dropdown-menu"
+									aria-labelledby="dropdownMenuLink2">
+									<li class="dropdown-header">{{ user.username }}</li>
 									<li>
 										<hr class="dropdown-divider">
 									</li>
@@ -49,10 +52,10 @@
 									</div>
 								</ul>
 							</div>
-							<span v-else class="auth-buttons">
+							<!-- <span v-else class="auth-buttons">
 								<Login />
 								<RegistrationForm />
-							</span>
+							</span> -->
 						</div>
 					</div>
 				</div>
@@ -110,7 +113,7 @@ import Login from "./LoginForm.vue";
 import RegistrationForm from "./RegistrationForm.vue";
 import SummonerInfo from './SummonerInfo.vue';
 
-import { computed, onMounted } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 
 const showTooltip = ref(false); // Controls the visibility of the tooltip
@@ -122,13 +125,18 @@ const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 const user = computed(() => store.state.auth.user);
-const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
+const isLoggedIn = computed(() => {
+	console.log('Checking isLoggedIn state:', store.state.auth.isLoggedIn);
+	return store.state.auth.isLoggedIn;
+});
 
 const dropdownOpen = ref(true);
 
 async function checkLockfileConnection() {
 	try {
 		const isConnected = await window.api.checkLockfileExists();
+		const clientStatus = await window.api.checkClientStatus();
+
 		lockfileConnected.value = isConnected;
 	} catch (error) {
 		console.error("Error checking lockfile connection:", error);
@@ -144,16 +152,19 @@ window.api.receive("directory-path-selected", async (data) => {
 });
 
 onMounted(async () => {
-	checkLockfileConnection();
-	// await store.dispatch("summoner/getSummonerData");
-});
+	const intervalId = setInterval(checkLockfileConnection, 5000); // Check every 5 seconds
 
-const summonerIcon = computed(() => {
-	const iconId = currentSummoner.value?.profileIconId;
-	if (!iconId) {
-		return undefined;
-	}
-	return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
+	onUnmounted(() => {
+		clearInterval(intervalId); // Clear the interval when the component is unmounted
+	});
+
+	const summonerIcon = computed(() => {
+		const iconId = currentSummoner.value?.profileIconId;
+		if (!iconId) {
+			return undefined;
+		}
+		return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
+	});
 });
 
 const logout = () => {
@@ -164,6 +175,13 @@ const logout = () => {
 </script>
 
 <style scoped>
+.dropdown-toggler {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	flex-direction: row;
+}
+
 .custom-tooltip .dropdown-item {
 	cursor: default;
 }
@@ -214,6 +232,10 @@ const logout = () => {
 	text-decoration: none;
 	padding: 10px 15px;
 	transition: color 0.3s ease;
+}
+
+.logged-out {
+	color: var(--grey-3);
 }
 
 .nav-link:hover {

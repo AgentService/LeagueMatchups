@@ -2,9 +2,9 @@
 	<div class="dropdown summoner-display" @click="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen.toString()">
 		<a class="btn dropdown-toggler" href="#" role="button" aria-expanded="false">
 			<div class="d-flex align-items-center">
-				<img :src="currentSelection ? getSummonerIcon(currentSelection.profileIconId) : defaultIcon"
+				<img :src="currentSelection ? getSummonerIcon(currentSelection.profileIconId) : getSummonerIcon(5541)"
 					alt="Summoner Icon" class="rounded-circle icon-image me-2">
-				<span class="text-light">{{ currentSelection?.gameName || 'Select Summoner' }}</span>
+				<span class="text-light">{{ currentSelection?.gameName || 'Summoner' }}</span>
 				<span class="text-secondary ms-1 tag">#{{ currentSelection?.tagLine || '' }}</span>
 			</div>
 		</a>
@@ -32,6 +32,7 @@ const store = useStore();
 const dropdownContainer = ref(null);
 const dropdownOpen = ref(false);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
+const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 
 const currentSelection = computed(() => {
 	const current = store.getters['summoner/getCurrentSummoner'];
@@ -55,7 +56,7 @@ function selectSummoner(summonerDetail) {
 
 onMounted(() => {
 	document.addEventListener('click', handleClickOutside);
-	if (!allPlayerDetails.value.length) {
+	if (!allPlayerDetails.value.length && isLoggedIn.value) {
 		store.dispatch('summoner/fetchSummonerDataByAccountId');
 	}
 });

@@ -16,16 +16,20 @@
 				{{ userEmail }}!
 				<button @click="logout" class="logout-button">Logout</button>
 			</div>
-			<form @submit.prevent="handleSubmit" class="auth-form">
-				<input type="email" v-model="form.email" placeholder="Email" required>
-				<input type="password" v-model="form.password" placeholder="Password" required>
-				<input type="text" v-if="authMode === 'register'" v-model="form.username" placeholder="Username"
-					required>
-				<input type="password" v-if="authMode === 'register'" v-model="form.confirmPassword"
-					placeholder="Confirm Password" required>
-				<button type="submit" :disabled="isSubmitting">
-					{{ authMode === 'login' ? 'Log In' : 'Create Account' }}
-				</button>
+			<form v-else @submit.prevent="handleSubmit" class="login-form">
+				<!-- Login form fields -->
+				<div class="form-group">
+					user@example.com
+					password123
+					<label for="email">Email:</label>
+					<input type="email" id="email" v-model="form.email" required>
+				</div>
+				<div class="form-group">
+					<label for="password">Password:</label>
+					<input type="password" id="password" v-model="form.password" required>
+				</div>
+				<button type="submit" :disabled="isSubmitting" class="submit-button">Login</button>
+				<p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
 			</form>
 		</div>
 	</div>
@@ -35,6 +39,7 @@
 import { ref, computed, reactive } from 'vue';
 import { useStore } from 'vuex';
 import router from '../router';
+import { getUrlHelper } from '../globalSetup';
 
 const store = useStore();
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);

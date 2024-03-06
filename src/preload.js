@@ -16,6 +16,7 @@ contextBridge.exposeInMainWorld("versions", {
 });
 
 contextBridge.exposeInMainWorld("api", {
+  checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
   checkLockfileExists: () => ipcRenderer.invoke("check-lockfile-exists"),
   checkLeagueClientPathExists: () => ipcRenderer.invoke("check-league-client-path-exists"),
   send: (channel, data) => {

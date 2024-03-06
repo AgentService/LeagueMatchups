@@ -8,7 +8,7 @@ Waiit this is to complicated, lets ceck if there is another issue.
         <i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
       </transition>
     </div>
-    <div class=" ">
+    <div class="card-body">
       <textarea v-model="notes" placeholder="Rate your matchup" class="note-textarea " rows="4"></textarea>
     </div>
   </div>

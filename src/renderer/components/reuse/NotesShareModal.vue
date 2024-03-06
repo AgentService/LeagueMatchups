@@ -149,7 +149,7 @@
   
 
 <script setup>
-import { computed, defineProps, ref, toRefs } from 'vue';
+import { computed, ref } from 'vue';
 import { getUrlHelper } from '../../globalSetup';
 import { watchEffect } from 'vue';
 import { useStore } from 'vuex';
