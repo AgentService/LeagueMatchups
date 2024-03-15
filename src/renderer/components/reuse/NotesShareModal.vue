@@ -360,7 +360,7 @@ const updateRating = (notesType, noteId, rating) => {
 	background-size: cover;
 	background-position: left top;
 	background-repeat: no-repeat;
-	filter: grayscale(90%);
+	filter: grayscale(0%);
 }
 
 .modal-header {

@@ -1,6 +1,9 @@
 module.exports = {
   packagerConfig: {
     asar: false, // or an object containing your asar options
+    ignore: [
+      /^\/public$/ // This regex will ignore the 'public' folder at the root of your project
+    ],
   },
   rebuildConfig: {},
   makers: [

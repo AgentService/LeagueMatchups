@@ -1,10 +1,11 @@
 <template>
 	<div>
-		
+
 		<div class="note-card champion-card">
 
-			<div class="background-image-container" :style="championBackgroundStyle"></div>
 			<div class="d-flex justify-content-between align-items-center">
+				<div class="background-image" :style="championBackgroundStyle"></div>
+
 				<div class="search-container">
 					<div class="search-bar position-relative">
 						<div class="input-group">
@@ -52,8 +53,8 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]" alt="Champion Image"
-								@click="showGrid" />
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
+								alt="Champion Image" @click="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -83,7 +84,8 @@
 									<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
 										<div class="ability-content">
 											<div class="ability-icon-wrapper">
-												<img :src="selectedChampionPassiveUrl" :alt="selectedChampion?.passive.full"
+												<img :src="selectedChampionPassiveUrl"
+													:alt="selectedChampion?.passive.full"
 													class="ability-icon-passive" />
 											</div>
 										</div>
@@ -97,13 +99,15 @@
 														<span class="ability-label">P</span>
 													</div>
 													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
-													<p class="spell-description">{{ selectedChampion?.passive.description }}
+													<p class="spell-description">{{
+					selectedChampion?.passive.description }}
 													</p>
 												</div>
 											</div>
 										</div>
 									</div>
-									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
+									<div v-for="(spellData, index) in selectedChampionSpell" :key="index"
+										class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
@@ -114,19 +118,21 @@
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{ getAbilityLabelByIndex(index)
-															}}</span>
+																}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
-															<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-																spellData.spell.cooldownBurn
-															}}</span></p>
+															<p class="spell-cooldown">Cooldown: <span
+																	class="value-text">{{
+					spellData.spell.cooldownBurn
+				}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																spellData.spell.costBurn
-															}}</span>
+						spellData.spell.costBurn
+					}}</span>
 															</p>
 														</div>
-														<p class="spell-description">{{ spellData.spell.description }}</p>
+														<p class="spell-description">{{ spellData.spell.description }}
+														</p>
 													</div>
 												</div>
 											</div>
@@ -145,8 +151,8 @@
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]" alt="Champion Image"
-								@click="showGrid" />
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
+								alt="Champion Image" @click="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -175,7 +181,8 @@
 										<div class="ability-content">
 											<div class="ability-icon-wrapper">
 												<img :src="getPassiveImageUrl(selectedChampion?.passive)"
-													:alt="selectedChampion?.passive.full" class="ability-icon-passive" />
+													:alt="selectedChampion?.passive.full"
+													class="ability-icon-passive" />
 											</div>
 										</div>
 										<div class="tooltip-container">
@@ -188,16 +195,19 @@
 														<span class="ability-label">P</span>
 													</div>
 													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
-													<p class="spell-description">{{ selectedChampion?.passive.description }}
+													<p class="spell-description">{{
+					selectedChampion?.passive.description }}
 													</p>
 												</div>
 											</div>
 										</div>
 									</div>
-									<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
+									<div v-for="(spellData, index) in selectedChampionSpell" :key="index"
+										class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
-											<div class="cooldown position-absolute">{{ spellData.spell.cooldownBurn.split('/')[0] }}</div>
+											<div class="cooldown position-absolute">{{
+					spellData.spell.cooldownBurn.split('/')[0] }}</div>
 
 											<div class="tooltip-container">
 												<div class="tooltip">
@@ -206,19 +216,21 @@
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{ getAbilityLabelByIndex(index)
-															}}</span>
+																}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
-															<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-																spellData.spell.cooldownBurn
-															}}</span></p>
+															<p class="spell-cooldown">Cooldown: <span
+																	class="value-text">{{
+					spellData.spell.cooldownBurn
+				}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																spellData.spell.costBurn
-															}}</span>
+						spellData.spell.costBurn
+					}}</span>
 															</p>
 														</div>
-														<p class="spell-description">{{ spellData.spell.description }}</p>
+														<p class="spell-description">{{ spellData.spell.description }}
+														</p>
 													</div>
 												</div>
 											</div>
@@ -553,13 +565,15 @@ export default {
 			this.isStatsCollapsed = !this.isStatsCollapsed;
 		},
 		getPassiveImageUrl(passive) {
-			// Construct the URL for the passive image
-			const imagePath = `./passive/${passive?.image.full}`;
-			return this.baseUrl && imagePath ? `${this.baseUrl}/${imagePath}` : '';
+			debugger
+			const urlHelper = getUrlHelper();
+			return urlHelper.getPassiveImageUrl(passive);
 		},
 		getSpellImageUrl(spell) {
-			const imagePath = `./spell/${spell.image.full}`;
-			return this.baseUrl && imagePath ? `${this.baseUrl}/${imagePath}` : '';
+			debugger
+			const urlHelper = getUrlHelper();
+			
+			return urlHelper.getSpellImageUrl(spell);
 
 		},
 		getSummonerSpellImageUrl(spell) {
@@ -820,7 +834,7 @@ export default {
 	top: 25px;
 }
 
-.background-image-container {
+.background-image {
 	position: absolute;
 	top: 0;
 	left: 0;
