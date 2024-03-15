@@ -230,10 +230,6 @@ function createWindow(x = 0, y = 0) {
   if (process.env.NODE_ENV === "DEVELOPMENT") {
     mainWindow.webContents.openDevTools();
   }
-  // Check for updates after the window is ready
-  mainWindow.once("ready-to-show", () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
 
   debug("Loading main window");
   // and load the index.html of the app.
@@ -244,6 +240,10 @@ function createWindow(x = 0, y = 0) {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
+  // Check for updates after the window is ready
+  mainWindow.once("ready-to-show", () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
 }
 app.on("ready", async () => {
   const primaryDisplay = screen.getPrimaryDisplay();
