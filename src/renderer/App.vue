@@ -1,9 +1,4 @@
 <template>
-	<!-- <div v-if="isUpdateAvailable" class="popup"> -->
-	<div class="popup">
-		asdasdsdAn update is available!1.w0.4 <button @click="checkForUpdates">Download</button>
-		<button @click="closeUpdateAvailablePopup">Close</button>
-	</div>
 	<Navbar @before-leave="handleBeforeLeave">
 	</Navbar>
 	<div class="app-wrapper">
@@ -12,15 +7,15 @@
 		</transition>
 	</div>
 	<div v-if="isUpdateAvailable" class="popup">
-		An update is avaasdilable!555 <button @click="checkForUpdates">Downsdload</button>
+		An update is available!555 <button @click="checkForUpdates">Download</button>
 	</div>
 
 	<div v-if="updateDownloaded" class="popup">
-		Update downlasdoaded. <button @click="restartAppToUpdate">Restart to isdnstall</button>
+		Update downloaded. <button @click="restartAppToUpdate">Restart to install</button>
 	</div>
 
 	<div v-if="downloadProgress > 0" class="popup">
-		Downloadasding update: {{ downloadProgress }}%
+		Downloading update: {{ downloadProgress }}%
 	</div>
 
 	<div v-if="updateError" class="popup">

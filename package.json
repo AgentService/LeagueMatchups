@@ -1,20 +1,24 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Mini template for electron-forge combine with vite and vue3.",
-  "main": ".vite/build/main.js",
+  "main": "dist/main.js",
   "type": "commonjs",
   "scripts": {
+    "build:main": "vite build",
+    "build:renderer": "vite build --config vite.renderer.config.mjs",
+    "build": "npm run build:main && npm run build:renderer && electron-builder",
     "start": "electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
+    "pack": "electron-builder --dir",
     "release": "electron-builder build --publish=always",
     "lint": "echo \"No linting configured\"",
     "server": "node server.js",
-    "build": "babel src --out-dir dist",
+    "build2": "babel src --out-dir dist",
     "test:unit": "jest"
   },
   "keywords": [],
@@ -24,13 +28,35 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "AgentService",
-        "repo": "LeagueMatchups"
-      }
-    ]
+    "appId": "com.agentservice.leaguematchups",
+    "productName": "League Matchups",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist/main.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "license": "MIT",
   "devDependencies": {
@@ -45,7 +71,7 @@
     "@electron-forge/plugin-vite": "^7.2.0",
     "@electron-forge/publisher-github": "^7.2.0",
     "@types/debug": "^4.1.11",
-    "@vitejs/plugin-vue": "^4.2.1",
+    "@vitejs/plugin-vue": "^4.6.2",
     "@vue/test-utils": "^2.4.2",
     "cross-env": "^7.0.3",
     "electron": "^24.8.8",
