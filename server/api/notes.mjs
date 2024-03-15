@@ -164,6 +164,8 @@ router.get("/matchup/others/:combinedId", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.combinedId.split("-"); // combinedId is "ChampionA-ChampionB"
   const userId = req.user.id;
+  debug("Fetching other users' notes for:", combinedId);
+  debug("User ID:", userId);
 
   try {
     const query = `

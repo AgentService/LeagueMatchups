@@ -15,13 +15,21 @@ import { validateApiResponse, handleApiError } from "./modules/utilities.js";
 import VuexPersistence from "vuex-persist";
 import axios from "axios";
 
+
+// VuexPersistence for auth module
+const vuexLocalAuth = new VuexPersistence({
+  key: 'authState', // Unique key for localStorage
+  storage: window.localStorage,
+  modules: ['auth'] // Specify the module name here
+});
+
 const vuexLocal = new VuexPersistence({
   storage: window.localStorage, // or window.sessionStorage
   modules: [
     "champions",
     "matchups",
     "init",
-    "auth",
+    // "auth",
     "matches",
     "items",
     "notes",
@@ -32,10 +40,6 @@ const vuexLocal = new VuexPersistence({
     champions: state.champions,
     matchups: state.matchups,
     init: state.init,
-    auth: {
-      ...state.auth,
-      token: undefined, // Exclude the token
-    },
     matches: state.matches,
     items: state.items,
     notes: state.notes,
@@ -56,7 +60,6 @@ export const store = createStore({
     matches: matches,
     items: items,
     notes: notes,
-    summoner: summoner,
     userPreferences: userPreferences,
   },
 
@@ -165,7 +168,7 @@ export const store = createStore({
       }
     },
   },
-  plugins: [vuexLocal.plugin],
+  plugins: [vuexLocal.plugin, vuexLocalAuth.plugin],
 });
 function isEmpty(obj) {
   return obj && Object.keys(obj).length === 0 && obj.constructor === Object;

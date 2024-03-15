@@ -1,7 +1,7 @@
+// authMiddleware.mjs
 /* eslint-disable quotes */
 import jwt from 'jsonwebtoken';
 import Debug from "debug";
-const debug = Debug("utils:authMiddleware");
 
 export function verifyToken(req, res, next) {
 	const token = req.headers['authorization']?.split(' ')[1]; // Assuming token is sent as a Bearer token
@@ -11,7 +11,7 @@ export function verifyToken(req, res, next) {
 	}
 
 	try {
-		const decoded = jwt.verify(token, 'your JWT secret');
+		const decoded = jwt.verify(token, process.env.JWT_SECRET);
 		req.user = decoded;
 		next(); // Call next() to continue to the route handler if the token is valid
 	} catch (err) {
@@ -26,7 +26,7 @@ export function extractEmailFromToken(req, res, next) {
 		const token = authHeader.substring(7, authHeader.length); // Remove 'Bearer ' from the start
 
 		try {
-			const decoded = jwt.verify(token, 'your JWT secret');
+			const decoded = jwt.verify(token, process.env.JWT_SECRET);
 			req.userEmail = decoded.email; // Attach the email to the request object
 			req.id = decoded.id;
 		} catch (error) {

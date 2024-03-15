@@ -1,7 +1,8 @@
 // utilities.js
-import Debug from 'debug';
-import { retrieveData } from '../plugins/storage';
-const debug = Debug('app:store:utilities');
+import Debug from "debug";
+import store from "../../store"; // Adjust the path according to your project structure
+
+const debug = Debug("app:store:utilities");
 
 /**
  * Validates the API response.
@@ -11,15 +12,15 @@ const debug = Debug('app:store:utilities');
  * @exampleUsage in store/modules/utilities.js
  */
 export function validateApiResponse(response) {
-	const validStatusCodes = [200, 201, 204];
+  const validStatusCodes = [200, 201, 204];
 
-	if (!validStatusCodes.includes(response.status)) {
-		throw new Error(`Unexpected response status: ${response.status}`);
-	}
+  if (!validStatusCodes.includes(response.status)) {
+    throw new Error(`Unexpected response status: ${response.status}`);
+  }
 
-	// Additional validation can be added here
+  // Additional validation can be added here
 
-	return response.data;
+  return response.data;
 }
 
 /**
@@ -29,11 +30,11 @@ export function validateApiResponse(response) {
  * @throws {Error} - If the error needs to be rethrown.
  */
 export function handleApiError(error) {
-	debug('API Request error:', error);
-	// Additional error handling logic can be added here
-	
-	// Return a default value or rethrow the error as needed
-	return null;
+  debug("API Request error:", error);
+  // Additional error handling logic can be added here
+
+  // Return a default value or rethrow the error as needed
+  return null;
 }
 
 /**
@@ -43,10 +44,16 @@ export function handleApiError(error) {
  * @exampleUsage in store/modules/matchups.js
  */
 export function getAuthConfig() {
-	const token = retrieveData('local', 'token');
-	return {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		}
-	};
+  // Retrieve the token from Vuex state
+  const token = store.state.auth.token; // Assuming your auth token is stored in the auth module's state
+
+  if (!token) {
+    throw new Error("Token not available");
+  }
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
 }

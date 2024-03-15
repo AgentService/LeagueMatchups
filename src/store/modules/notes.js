@@ -294,7 +294,6 @@ export const notes = {
             `${baseUrl}/api/notes/matchup/${combinedId}`,
             authConfig
           );
-
           commit("SET_MATCHUP_NOTES", {
             matchupId: combinedId,
             data: response.data,

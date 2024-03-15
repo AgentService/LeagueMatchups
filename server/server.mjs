@@ -76,6 +76,8 @@ async function fetchAndSetSecrets() {
     "DB_USER",
     "DB_PASSWORD",
     "DB_PORT",
+    "JWT_SECRET",
+    "JWT_REFRESH_SECRET"
   ];
 
   for (const secretName of secrets) {
@@ -83,6 +85,7 @@ async function fetchAndSetSecrets() {
     const [version] = await client.accessSecretVersion({ name: secretPath });
     process.env[secretName] = version.payload.data.toString("utf8");
   }
+  debug("Secrets fetched and set successfully", process.env);
 }
 
 async function startServer() {

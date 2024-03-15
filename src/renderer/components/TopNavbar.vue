@@ -18,14 +18,14 @@
 							style="position: relative;">
 							<a class="btn dropdown-toggler" href="#" role="button">
 								<span>Client</span>
-								<div class="ms-2 lockfile-indicator" :class="{ 'active': lockfileConnected }"></div>
+								<div class="ms-2 lockfile-indicator" :class="{ 'active': clientConnected }"></div>
 							</a>
 							<ul class="custom-tooltip dropdown-menu" v-if="showTooltip"
-								:style="{ 'background': lockfileConnected ? '#28a745' : '#dc3545' }">
+								:style="{ 'background': clientConnected ? '#28a745' : '#dc3545' }">
 								<li class="dropdown-tooltip ">
 									<a class="dropdown-item" href="#">
 										<i class="fa-solid fa-circle-info me-1"></i>
-										{{ lockfileConnected ? 'Client connected' : 'Client not connected' }}
+										{{ clientConnected ? 'Client connected' : 'Client not connected' }}
 									</a>
 								</li>
 							</ul>
@@ -109,8 +109,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import Login from "./LoginForm.vue";
-import RegistrationForm from "./RegistrationForm.vue";
 import SummonerInfo from './SummonerInfo.vue';
 
 import { computed, onMounted, onUnmounted } from "vue";
@@ -118,13 +116,15 @@ import { useStore } from "vuex";
 
 const showTooltip = ref(false); // Controls the visibility of the tooltip
 
-const lockfileConnected = ref(false);
+const clientConnected = ref(false);
 
 const store = useStore();
 const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+let intervalId;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 const user = computed(() => store.state.auth.user);
+
 const isLoggedIn = computed(() => {
 	console.log('Checking isLoggedIn state:', store.state.auth.isLoggedIn);
 	return store.state.auth.isLoggedIn;
@@ -132,44 +132,47 @@ const isLoggedIn = computed(() => {
 
 const dropdownOpen = ref(true);
 
-async function checkLockfileConnection() {
+async function checkClientStatusConnection() {
 	try {
-		const isConnected = await window.api.checkLockfileExists();
-		const clientStatus = await window.api.checkClientStatus();
+		const isClientConnected = await window.api.checkClientStatus();
 
-		lockfileConnected.value = isConnected;
+		clientConnected.value = isClientConnected;
+		// Adjust checking interval based on the connection state
+		clearInterval(intervalId);
+		if (isClientConnected) {
+			intervalId = setInterval(checkClientStatusConnection, 60000);
+		} else {
+			intervalId = setInterval(checkClientStatusConnection, 5000);
+		}
 	} catch (error) {
-		console.error("Error checking lockfile connection:", error);
-		lockfileConnected.value = false;
+		console.error("Error checking client status:", error);
+		clientConnected.value = false;
+		// Ensure to check more frequently if an error occurred
+		clearInterval(intervalId);
+		intervalId = setInterval(checkClientStatusConnection, 5000);
 	}
 }
 
-window.api.receive("directory-path-selected", async (data) => {
-	const { directoryPath, lockfilePath } = data;
-	if (lockfilePath) {
-		await checkLockfileConnection(); // Update the lockfile connection indicator
-	}
-});
+
 
 onMounted(async () => {
-	const intervalId = setInterval(checkLockfileConnection, 5000); // Check every 5 seconds
+	checkClientStatusConnection(); // Initial check to set the interval based on the current state
 
-	onUnmounted(() => {
-		clearInterval(intervalId); // Clear the interval when the component is unmounted
-	});
+	// const summonerIcon = computed(() => {
+	// 	const iconId = currentSummoner.value?.profileIconId;
+	// 	if (!iconId) {
+	// 		return undefined;
+	// 	}
+	// 	return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
+	// });
+});
 
-	const summonerIcon = computed(() => {
-		const iconId = currentSummoner.value?.profileIconId;
-		if (!iconId) {
-			return undefined;
-		}
-		return `${assetBaseUrl}/dragontail/13.21.1/img/profileicon/${iconId}.png`;
-	});
+onUnmounted(() => {
+	clearInterval(intervalId); // Clear the interval when the component is unmounted
 });
 
 const logout = () => {
 	store.dispatch('auth/logout');
-	router.push('/login'); // Redirect to the login page after logout
 };
 
 </script>

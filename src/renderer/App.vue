@@ -1,16 +1,10 @@
 <template>
-	<transition name="fade">
-		<Navbar @before-leave="handleBeforeLeave">
-		</Navbar>
-	</transition>
+	<Navbar @before-leave="handleBeforeLeave">
+	</Navbar>
 	<div class="app-wrapper">
 		<transition name="fade">
 			<router-view></router-view>
 		</transition>
-		<div>
-			<!-- Conditionally render the custom popup -->
-			<!-- <CustomPopup v-if="showPopup" @close="showPopup = false" /> -->
-		</div>
 	</div>
 </template>
 
@@ -23,8 +17,6 @@ import Navbar from './components/TopNavbar.vue';
 const route = useRoute();
 const showNavbar = ref(route.path !== '/login');
 
-const showPopup = ref(false);
-
 function handleBeforeLeave() {
 	showNavbar.value = false; // Hide Navbar, show placeholder
 	setTimeout(() => {
@@ -32,19 +24,27 @@ function handleBeforeLeave() {
 	}, 1100); // Match your fade transition duration
 }
 
-// Example function that checks for the lockfile
-async function checkLeagueClientDirectory() {
-	// Simulate checking for the lockfile, e.g., by sending an IPC message to Electron's main process
-	const leagueClientPath = await window.api.checkLeagueClientPathExists();
-
-	if (!leagueClientPath) {
-		showPopup.value = true; // Show the popup if the LeagueClient.exe path is not found
-	}
+function checkForUpdates() {
+	window.api.checkForUpdates();
 }
 
+function restartApp() {
+	window.api.restartApp();
+}
+
+
 onMounted(() => {
+	debugger
+	window.api.onUpdateAvailable(() => {
+		console.log('Update available. It will be downloaded automatically.');
+		// Update UI accordingly
+	});
+
+	window.api.onUpdateDownloaded(() => {
+		console.log('Update downloaded. Restart to apply the update.');
+		// Prompt user to restart the app
+	});
 	// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
-	checkLeagueClientDirectory();
 });
 
 </script>

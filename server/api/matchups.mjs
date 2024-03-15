@@ -61,7 +61,7 @@ const router = express.Router();
 router.get("/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
   debug("Fetching or creating specific matchups id: ", req.params.id);
-  debug("user:", req.user.email);
+  debug("userX:", req.user);
 
   const combinedId = req.params.id; // This is the "a-b" format ID used on the client
 

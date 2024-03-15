@@ -60,10 +60,6 @@ const limitedNotes = computed(() => {
 	return notesOrdered.value.slice(0, notesDisplayLimit.value);
 });
 
-// Adjust other methods accordingly
-
-
-
 const showMoreNotes = () => {
 	notesDisplayLimit.value += 3;
 	isExpanded.value = true;

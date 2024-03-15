@@ -16,9 +16,13 @@ contextBridge.exposeInMainWorld("versions", {
 });
 
 contextBridge.exposeInMainWorld("api", {
+  onUpdateAvailable: (callback) => {
+    ipcRenderer.on('update-available', callback);
+  },
+  onUpdateDownloaded: (callback) => {
+    ipcRenderer.on('update-downloaded', callback);
+  },
   checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
-  checkLockfileExists: () => ipcRenderer.invoke("check-lockfile-exists"),
-  checkLeagueClientPathExists: () => ipcRenderer.invoke("check-league-client-path-exists"),
   send: (channel, data) => {
     const validChannels = ['open-path-dialog', 'get-summoner-name']; // Add more valid channels as needed
     if (validChannels.includes(channel)) {
@@ -40,8 +44,5 @@ contextBridge.exposeInMainWorld("api", {
     if (validReceiveChannels.includes(channel)) {
       ipcRenderer.removeListener(channel, func);
     }
-  },
-  openPathDialog: () => {
-    ipcRenderer.send("open-path-dialog");
   },
 });

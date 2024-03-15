@@ -28,19 +28,6 @@
                         {{ authMode === 'login' ? 'Need an account? Register' : 'Already A Member? Log In' }}
                     </button>
                 </div>
-
-                <div class="directory-picker" v-if="showDirectoryPicker">
-                    <div class="dir-header">
-                        <h5>Setup Required: <br> Locate Your Game Directory</h5>
-                    </div>
-                    <p class="instruction-text">To continue, we need to find where League of Legends is installed on
-                        your
-                        computer.<br><br>Example:<br>"C:\Riot Games\League of Legends"</p>
-                    <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-                    <button @click="proceedToSelectDirectory" class="locate-directory-btn">Select League of Legends
-                        Directory</button>
-                    <!-- <p class="helper-text">Not sure how? <a href="#" @click="showHelp">Click here for help.</a></p> -->
-                </div>
             </div>
         </transition>
 
@@ -49,9 +36,9 @@
 
 
 <script setup>
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { getUrlHelper } from '../globalSetup';
 
 const router = useRouter();
@@ -68,39 +55,6 @@ const errorMessage = ref('');
 const showDirectoryPicker = ref(false);
 
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
-
-onMounted(async () => {
-    if (isLoggedIn.value) {
-        const pathExists = await window.api.checkLeagueClientPathExists();
-        showDirectoryPicker.value = !pathExists;
-    }
-});
-
-const checkLeagueClientPath = async () => {
-    const pathExists = await window.api.checkLeagueClientPathExists();
-    if (!pathExists) {
-        showDirectoryPicker.value = true;
-    } else {
-        // Proceed if the path already exists
-        router.push('/championMatchup');
-    }
-};
-
-// Handle directory selection
-const proceedToSelectDirectory = () => {
-    window.api.openPathDialog();
-};
-
-window.api.receive("directory-path-selected", (data) => {
-    const { leagueClientPath } = data;
-    if (leagueClientPath) {
-        console.log("Valid directory selected:", leagueClientPath);
-        router.replace('/championMatchup');
-    } else {
-        console.error("No valid directory found.");
-        // Handle error or retry logic
-    }
-});
 
 const championBackgroundStyle = computed(() => {
     const urlHelper = getUrlHelper();
@@ -127,7 +81,7 @@ const handleSubmit = async () => {
         if (authMode.value === 'login' || (authMode.value === 'register' && form.password === form.confirmPassword)) {
             // Attempt login or registration
             await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', form);
-            await checkLeagueClientPath(); // Check for the League client path after successful auth
+            router.replace('/championMatchup');
         } else {
             throw new Error('Passwords do not match');
         }
