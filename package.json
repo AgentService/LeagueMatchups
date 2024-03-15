@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
