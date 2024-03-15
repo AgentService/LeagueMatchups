@@ -1,24 +1,21 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.1.6",
+  "version": "1.0.0",
   "description": "Mini template for electron-forge combine with vite and vue3.",
-  "main": "dist/main.js",
+  "main": ".vite/build/main.js",
   "type": "commonjs",
   "scripts": {
-    "build:main": "vite build",
-    "build:renderer": "vite build --config vite.renderer.config.mjs",
-    "build": "npm run build:main && npm run build:renderer && electron-builder",
-    "start": "electron-forge start",
+    "start": "cross-env NODE_ENV=DEVELOPMENT electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "cross-env NODE_ENV=production electron-forge publish",
+    "package": "cross-env NODE_ENV=production electron-forge package",
     "pack": "electron-builder --dir",
+    "make": "cross-env NODE_ENV=production electron-forge make",
+    "publish": "cross-env NODE_ENV=production electron-forge publish",
     "release": "electron-builder build --publish=always",
     "lint": "echo \"No linting configured\"",
     "server": "node server.js",
-    "build2": "babel src --out-dir dist",
+    "build": "babel src --out-dir dist",
     "test:unit": "jest"
   },
   "keywords": [],
@@ -26,36 +23,23 @@
     "name": "Azateq",
     "email": "not@mail.com"
   },
-  "repository": "https://github.com/AgentService/LeagueMatchups.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AgentService/LeagueMatchups.git"
+  },
   "build": {
-    "appId": "com.agentservice.leaguematchups",
-    "productName": "League Matchups",
-    "directories": {
-      "output": "dist"
-    },
     "files": [
       "dist/**/*",
-      "dist/main.js",
       "node_modules/**/*",
       "package.json"
     ],
-    "win": {
-      "target": "nsis"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowElevation": true,
-      "allowToChangeInstallationDirectory": true
-    }
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "AgentService",
+        "repo": "LeagueMatchups"
+      }
+    ]
   },
   "license": "MIT",
   "devDependencies": {
@@ -68,13 +52,12 @@
     "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "@electron-forge/plugin-electronegativity": "^7.2.0",
     "@electron-forge/plugin-vite": "^7.2.0",
-    "@electron-forge/publisher-github": "^7.2.0",
+    "@electron-forge/publisher-github": "^6.1.1",
     "@types/debug": "^4.1.11",
-    "@vitejs/plugin-vue": "^4.6.2",
+    "@vitejs/plugin-vue": "^4.2.1",
     "@vue/test-utils": "^2.4.2",
     "cross-env": "^7.0.3",
     "electron": "^24.8.8",
-    "electron-builder": "^24.13.3",
     "jest": "^26.6.3",
     "sass": "^1.70.0",
     "vite": "^5.0.12",
