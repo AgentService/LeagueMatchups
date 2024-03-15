@@ -58,7 +58,6 @@ export const matchups = {
           return existingMatchup;
         }
       }
-
       const config = getAuthConfig();
       // Assuming `id` is a concatenation of champion IDs, and `key` is the champion name pair
       // Fetch the matchup data using the champion IDs

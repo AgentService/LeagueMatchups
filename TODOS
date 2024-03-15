@@ -10,7 +10,8 @@ DONE POLISH USER ACCOUNTS
     - Prompt User for login on initial login
     - Then load app / or reload page / Review notes dont get updated after login in, erst nach reload
 DONE FIX TOKEN REFRESH
-- 
+- BASE Tags
+- FIX Favorites
 
 *** General Notes DONT UPDATE WHEN YOU EDIT SAVE THEM ***
 *** Weekly Recap in combination with Weekly reflection? ***
@@ -39,6 +40,7 @@ LOGOUT: make sure to clean up token / remove it / so after loggout user cannot d
 
 After Game:
 Champ vs Champ > WINLOSS > My Feelings > Comments > Focus Level > Performance > Matchup Thoughts
+After Game Screen to distract from b ad thoughts
 
 LCU
 - Champion Select Detection

@@ -72,18 +72,18 @@
 									</div> -->
 								</div>
 							</div>
-								<div class="row">
-									<div class="col-xxl-6">
-										<div class="card-large card-top card-bottom">
-											<GeneralNotes />
-										</div>
-									</div>
-									<div class="col-xxl-6">
-										<div class="card-large card-top card-bottom">
-											<MatchHistory />
-										</div>
+							<div class="row">
+								<div class="col-xxl-6">
+									<div class="card-large card-top card-bottom">
+										<GeneralNotes />
 									</div>
 								</div>
+								<div class="col-xxl-6">
+									<div class="card-large card-top card-bottom">
+										<MatchHistory />
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -187,9 +187,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 </script>
 
 <style>
-
-
-
 .loading-indicator {
 	display: flex;
 	justify-content: center;
@@ -243,7 +240,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 .vs-container:hover {
-	cursor:default;
+	cursor: default;
 }
 
 
@@ -326,7 +323,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	/* Adjust as needed */
 }
 
-.notes-body  {
+.notes-body {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;

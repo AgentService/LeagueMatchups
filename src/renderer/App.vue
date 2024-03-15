@@ -1,4 +1,9 @@
 <template>
+	<!-- <div v-if="isUpdateAvailable" class="popup"> -->
+	<div class="popup">
+		An update is available!1.0.4 <button @click="checkForUpdates">Download</button>
+		<button @click="closeUpdateAvailablePopup">Close</button>
+	</div>
 	<Navbar @before-leave="handleBeforeLeave">
 	</Navbar>
 	<div class="app-wrapper">
@@ -6,12 +11,32 @@
 			<router-view></router-view>
 		</transition>
 	</div>
+	<div v-if="isUpdateAvailable" class="popup">
+		An update is available! <button @click="checkForUpdates">Download</button>
+	</div>
+
+	<div v-if="updateDownloaded" class="popup">
+		Update downloaded. <button @click="restartAppToUpdate">Restart to install</button>
+	</div>
+
+	<div v-if="downloadProgress > 0" class="popup">
+		Downloading update: {{ downloadProgress }}%
+	</div>
+
+	<div v-if="updateError" class="popup">
+		Error updating: {{ updateError }}
+	</div>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import Navbar from './components/TopNavbar.vue';
+
+const isUpdateAvailable = ref(false);
+const updateDownloaded = ref(false);
+const downloadProgress = ref(0);
+const updateError = ref(null);
 
 // import CustomPopup from './components/utility/LockfilePopup.vue';
 const route = useRoute();
@@ -24,32 +49,55 @@ function handleBeforeLeave() {
 	}, 1100); // Match your fade transition duration
 }
 
+function closeUpdateAvailablePopup() {
+	isUpdateAvailable.value = false;
+}
+
 function checkForUpdates() {
 	window.api.checkForUpdates();
 }
 
-function restartApp() {
-	window.api.restartApp();
+function restartAppToUpdate() {
+	window.api.restartAppToUpdate();
 }
 
-
 onMounted(() => {
-	debugger
 	window.api.onUpdateAvailable(() => {
-		console.log('Update available. It will be downloaded automatically.');
-		// Update UI accordingly
+		console.log('update available');
+		isUpdateAvailable.value = true;
 	});
 
 	window.api.onUpdateDownloaded(() => {
-		console.log('Update downloaded. Restart to apply the update.');
-		// Prompt user to restart the app
+		console.log('update downloaded');
+		updateDownloaded.value = true;
 	});
-	// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
+
+	window.api.onDownloadProgress((progress) => {
+		console.log('download progress', progress);
+		downloadProgress.value = progress;
+	});
+
+	window.api.onUpdateError((error) => {
+		console.log('update error', error);
+		updateError.value = error;
+	});
 });
+// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
+
 
 </script>
 
 <style>
+.popup {
+	position: fixed;
+	bottom: 20px;
+	z-index: 100;
+	right: 20px;
+	background: white;
+	padding: 20px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 .fade-enter-active,
 .fade-leave-active {
 	transition: opacity 0.5s ease;

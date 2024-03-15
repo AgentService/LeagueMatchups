@@ -2,7 +2,8 @@ module.exports = {
   packagerConfig: {
     asar: false, // or an object containing your asar options
     ignore: [
-      /^\/public$/ // This regex will ignore the 'public' folder at the root of your project
+      /^\/public$/, // This regex will ignore the 'public' folder at the root of your project
+      /^\/server$/ // This regex will ignore the 'server' folder at the root of your project
     ],
   },
   rebuildConfig: {},
@@ -62,7 +63,8 @@ module.exports = {
           owner: "AgentService",
           name: "LeagueMatchups",
         },
-        prerelease: true,
+        authToken: process.env.GITHUB_TOKEN,
+        prerelease: false,
       },
     },
   ],

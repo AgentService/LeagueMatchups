@@ -565,14 +565,11 @@ export default {
 			this.isStatsCollapsed = !this.isStatsCollapsed;
 		},
 		getPassiveImageUrl(passive) {
-			debugger
 			const urlHelper = getUrlHelper();
 			return urlHelper.getPassiveImageUrl(passive);
 		},
 		getSpellImageUrl(spell) {
-			debugger
 			const urlHelper = getUrlHelper();
-			
 			return urlHelper.getSpellImageUrl(spell);
 
 		},

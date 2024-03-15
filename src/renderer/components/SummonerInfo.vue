@@ -56,7 +56,7 @@ function selectSummoner(summonerDetail) {
 
 onMounted(() => {
 	document.addEventListener('click', handleClickOutside);
-	if (!allPlayerDetails.value.length && isLoggedIn.value) {
+	if (!allPlayerDetails.value.length) {
 		store.dispatch('summoner/fetchSummonerDataByAccountId');
 	}
 });

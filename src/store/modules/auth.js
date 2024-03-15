@@ -119,7 +119,6 @@ export const auth = {
         // Attempt to verify the access token
         let config = getAuthConfig(token); // Ensure getAuthConfig uses the provided token
         await axios.post(`${baseUrl}/api/auth/verifyToken`, {}, config);
-debugger
         // If verification is successful, only renew the session with the current token if it has changed
         if (state.token !== token) {
           commit("SET_TOKEN", token);
@@ -129,7 +128,6 @@ debugger
         // Check if the error is a 401 Unauthorized
         if (error.response && error.response.status === 401) {
           // If the token is expired or invalid, attempt to refresh it
-          debugger
           try {
             const refreshResponse = await axios.post(
               `${baseUrl}/api/auth/token`,
@@ -178,7 +176,15 @@ debugger
         router.push("/login"); // Make sure this is the last action
       } catch (error) {
         console.error("Logout failed:", error);
-        // Handle error, possibly retry logout or alert the user
+        // Proceed with client-side logout
+        commit("SET_USER", null);
+        commit("SET_TOKEN", null);
+        commit("SET_REFRESH_TOKEN", null);
+
+        delete axios.defaults.headers.common["Authorization"];
+
+        debug("Logout successful");
+        router.push("/login"); // Make sure this is the last action
       }
     },
   },

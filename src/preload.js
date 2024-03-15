@@ -4,7 +4,6 @@ import { contextBridge, ipcRenderer } from "electron";
 contextBridge.exposeInMainWorld("electron", {
   ipcRenderer: {
     invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
-    // Add other ipcRenderer methods if needed
   },
 });
 
@@ -16,21 +15,28 @@ contextBridge.exposeInMainWorld("versions", {
 });
 
 contextBridge.exposeInMainWorld("api", {
-  onUpdateAvailable: (callback) => {
-    ipcRenderer.on('update-available', callback);
-  },
-  onUpdateDownloaded: (callback) => {
-    ipcRenderer.on('update-downloaded', callback);
-  },
+  checkForUpdates: () => ipcRenderer.send("check-for-updates"),
+  restartAppToUpdate: () => ipcRenderer.send("restart-app-to-update"),
+  onUpdateAvailable: (callback) => ipcRenderer.on("update-available", callback),
+  onUpdateNotAvailable: (callback) =>
+    ipcRenderer.on("update-not-available", callback),
+  onDownloadProgress: (callback) =>
+    ipcRenderer.on("download-progress", callback),
+  onUpdateDownloaded: (callback) =>
+    ipcRenderer.on("update-downloaded", callback),
+    onUpdateError: (callback) =>
+    ipcRenderer.on("update-error", callback),
   checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
   send: (channel, data) => {
-    const validChannels = ['open-path-dialog', 'get-summoner-name']; // Add more valid channels as needed
+    const validChannels = ["open-path-dialog", "get-summoner-name"]; // Add more valid channels as needed
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
     }
   },
   receive: (channel, func) => {
-    let validReceiveChannels = ["directory-path-selected", "summoner-name-response"];
+    let validReceiveChannels = [
+      "summoner-name-response",
+    ];
     if (validReceiveChannels.includes(channel)) {
       const subscription = (event, ...args) => func(...args);
       ipcRenderer.on(channel, subscription);

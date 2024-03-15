@@ -65,38 +65,30 @@ router.post("/matchup/rating", async (req, res) => {
 router.get("/matchup/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.id; // "a-b" format ID from the URL
-  const userEmail = req.user?.email; // Ensure req.user is populated and contains email
-
-  if (!userEmail) {
+  const userId = req.user?.id; // Extracted UserID from JWT
+  if (!userId) {
+    debug("Unauthorized: UserID not available.");
     return res
       .status(401)
-      .json({ message: "Unauthorized: User email not available." });
+      .json({ message: "Unauthorized: UserID not available." });
   }
 
   try {
-    // Step 1: Verify the Matchup exists
+    // Verify the Matchup exists and the user has access
     const matchupResult = await dbPool.query(
-      `SELECT id FROM matchups WHERE combined_id = $1`,
-      [combinedId]
+      `SELECT m.id FROM matchups m
+       INNER JOIN matchupnotes mn ON m.id = mn.matchup_id
+       WHERE m.combined_id = $1 AND mn.user_id = $2`,
+      [combinedId, userId]
     );
     if (matchupResult.rowCount === 0) {
-      return res.status(404).json({ message: "Matchup not found." });
+      return res
+        .status(404)
+        .json({ message: "Matchup not found or user does not have access." });
     }
     const matchupId = matchupResult.rows[0].id;
-    debug("Matchup ID:", matchupId);
 
-    // Step 2: Verify the User exists (based on email)
-    const userResult = await dbPool.query(
-      `SELECT user_id FROM users WHERE email = $1`,
-      [userEmail]
-    );
-    if (userResult.rowCount === 0) {
-      return res.status(404).json({ message: "User not found." });
-    }
-    const userId = userResult.rows[0].user_id;
-    debug("User ID:", userId);
-
-    // Step 3: Fetch the Matchup Notes for the verified Matchup and User
+    // Fetch the Matchup Notes for the verified Matchup and User
     const notesResult = await dbPool.query(
       `SELECT mn.* 
        FROM MatchupNotes mn
@@ -104,7 +96,7 @@ router.get("/matchup/:id", async (req, res) => {
       [matchupId, userId]
     );
     if (notesResult.rowCount > 0) {
-      const foundNote = snakeToCamelCase(notesResult.rows[0]); // Convert to camelCase
+      const foundNote = snakeToCamelCase(notesResult.rows[0]); // Assume this function converts database snake_case to camelCase for the response
       debug("Notes result:", foundNote);
       res.json(foundNote); // Send the converted object
     } else {
@@ -115,6 +107,7 @@ router.get("/matchup/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.post("/matchup/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.id;

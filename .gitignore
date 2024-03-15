@@ -42,6 +42,7 @@ api-data/convert.py
 api-data/converttips.py
 # TypeScript v1 declaration files
 typings/
+dist/
 
 # TypeScript cache
 *.tsbuildinfo
