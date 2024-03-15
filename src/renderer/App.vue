@@ -1,7 +1,7 @@
 <template>
 	<!-- <div v-if="isUpdateAvailable" class="popup"> -->
 	<div class="popup">
-		asdasdsdAn update is available!1.0.4 <button @click="checkForUpdates">Download</button>
+		asdasdsdAn update is available!1.w0.4 <button @click="checkForUpdates">Download</button>
 		<button @click="closeUpdateAvailablePopup">Close</button>
 	</div>
 	<Navbar @before-leave="handleBeforeLeave">
