@@ -31,8 +31,7 @@
     "appId": "com.agentservice.leaguematchups",
     "productName": "League Matchups",
     "directories": {
-      "output": "dist",
-      "buildResources": "build"
+      "output": "dist"
     },
     "files": [
       "dist/**/*",
