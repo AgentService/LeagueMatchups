@@ -1,4 +1,5 @@
 {
+	
   "name": "league_matchups",
   "productName": "league_matchups",
   "version": "2.0.1",
@@ -6,17 +7,17 @@
   "main": ".vite/build/main.js",
   "type": "commonjs",
   "scripts": {
+	"vite": "vite",
     "start": "electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-	"builder-dist": "electron-builder -p always",
-	"builer": "electron-builder",
+    "builder-dist": "electron-builder -p always",
+    "builder": "electron-builder",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
-    "build:main": "vite build --config vite.main.config.mjs",
+    "build:main": "vite build",
     "build:preload": "vite build --config vite.preload.config.mjs",
     "build:renderer": "vite build --config vite.renderer.config.mjs",
-    "postbuild": "cp .vite/dist/main.js dist/main.js && cp .vite/dist/preload.js dist/preload.js",
     "build": "npm run build:main && npm run build:preload && npm run build:renderer && npm run postbuild",
     "pack": "electron-builder --dir",
     "release": "electron-builder",
@@ -32,21 +33,18 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
-    "appId": "your.app.id",
-    "win": {
-      "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "AgentService",
-        "repo": "LeagueMatchups"
-      }
-    ]
+	"appId": "com.yourcompany.yourapp",
+	"productName": "YourApp",
+	"win": {
+	  "target": "nsis"
+	},
+	"nsis": {
+	  "oneClick": false,
+	  "allowToChangeInstallationDirectory": false
+	},
+	"publish": {
+	  "provider": "github"
+	}
   },
   "license": "MIT",
   "devDependencies": {
@@ -104,4 +102,5 @@
     "vuex": "^4.0.2",
     "vuex-persist": "^3.1.3"
   }
+ 
 }
