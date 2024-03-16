@@ -1,7 +1,5 @@
 import fs from "fs";
 const { dialog } = require('electron');
-import fetch from "node-fetch";
-
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");
 const { autoUpdater } = require("electron-updater");
@@ -172,6 +170,9 @@ async function fetchSummonerName(port, token) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Important: Ensure this is acceptable for your app's security requirements
 
   try {
+    const fetch = (...args) =>
+    import("node-fetch").then(({ default: fetch }) => fetch(...args));
+    
     const response = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
       {
