@@ -1,10 +1,7 @@
 import fs from "fs";
 const { dialog } = require('electron');
-let fetch;
+const fetch = require('cross-fetch');
 
-(async () => {
-  fetch = (await import('node-fetch')).default;
-})();
 
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");

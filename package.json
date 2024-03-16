@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -15,7 +15,7 @@
     "server": "node server.js",
     "test:unit": "jest",
     "postbuild": "cp .vite/build/main.js dist/main.js && cp .vite/build/preload.js dist/preload.js",
-	"build": "vite build && electron-builder build",
+    "build": "vite build && electron-builder build",
     "release": "npm run build && electron-builder build --publish=always",
     "pack": "npm run build && electron-builder --dir"
   },
@@ -76,6 +76,7 @@
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "cors": "^2.8.5",
+    "cross-fetch": "^4.0.0",
     "debug": "^4.3.4",
     "dotenv": "^16.4.1",
     "electron-log": "^5.1.2",
