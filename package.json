@@ -1,8 +1,7 @@
 {
-	
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -11,8 +10,9 @@
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-	"pack": "electron-builder --dir",
-	"dist": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -p always",
+    "postinstall": "electron-builder install-app-deps",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
     "build:main": "vite build",
     "build:preload": "vite build --config vite.preload.config.mjs",
@@ -31,18 +31,25 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
-	"appId": "com.yourcompany.yourapp",
-	"productName": "YourApp",
-	"win": {
-	  "target": "nsis"
-	},
-	"nsis": {
-	  "oneClick": false,
-	  "allowToChangeInstallationDirectory": false
-	},
-	"publish": {
-	  "provider": "github"
-	}
+    "appId": "com.yourcompany.yourapp",
+    "productName": "YourApp",
+    "win": {
+      "publish": [
+        {
+          "provider": "github",
+          "owner": "AgentService",
+          "repo": "LeagueMatchups"
+        }
+      ],
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": false
+    },
+    "publish": {
+      "provider": "github"
+    }
   },
   "license": "MIT",
   "devDependencies": {
@@ -100,5 +107,4 @@
     "vuex": "^4.0.2",
     "vuex-persist": "^3.1.3"
   }
- 
 }

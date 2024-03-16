@@ -1,6 +1,6 @@
-const fs = require('fs');
+const fs = require("fs");
 const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
-const { autoUpdater } = require('electron-updater');
+const { autoUpdater } = require("electron-updater");
 
 const log = require("electron-log");
 const path = require("path");
@@ -227,18 +227,10 @@ function createWindow(x = 0, y = 0) {
 
 autoUpdater.on("error", (err) => {
   log.error("Error in auto-updater.", err);
-  dialog.showErrorBox('Update Error', 'An error occurred while updating the application. ' + err);
-});
-
-ipcMain.on('checking-for-update"', () => {
-  autoUpdater.checkForUpdatesAndNotify().then(() => {
-    dialog.showMessageBox({
-      title: 'Check for Updates',
-      message: 'Update check completed. If an update is available, it will be downloaded automatically.'
-    });
-  }).catch(err => {
-    dialog.showErrorBox('Update Check Failed', 'Failed to check for updates: ' + err);
-  });
+  dialog.showErrorBox(
+    "Update Error",
+    "An error occurred while updating the application. " + err
+  );
 });
 
 // Notify the renderer about the update progress
@@ -247,13 +239,12 @@ autoUpdater.on("download-progress", (progressObj) => {
   log_message += " - Downloaded " + progressObj.percent + "%";
   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
   log.info(log_message);
-  mainWindow.webContents.send("download-progress", progprogressObjress);
+  mainWindow.webContents.send("download-progress", progressObj);
 });
 
-// Inform the renderer that an update is available
-autoUpdater.on("update-available", () => {
+autoUpdater.on("update-available", (info) => {
   log.info("Update available.", info);
-  mainWindow.webContents.send("update-available");
+  mainWindow.webContents.send("update-available", info);
 });
 
 autoUpdater.on("update-not-available", (info) => {
@@ -270,7 +261,7 @@ autoUpdater.on("update-error", (error) => {
 
 // Notify the renderer when an update is downloaded and ready to be installed
 autoUpdater.on("update-downloaded", (info) => {
-  log.info('Update downloaded; will install in 5 seconds', info);
+  log.info("Update downloaded; will install in 5 seconds", info);
   mainWindow.webContents.send("update-downloaded");
 });
 
