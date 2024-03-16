@@ -225,6 +225,9 @@ function createWindow(x = 0, y = 0) {
   }
 }
 
+autoUpdater.logger = require("electron-log");
+autoUpdater.logger.transports.file.level = "info";
+
 autoUpdater.on("error", (err) => {
   log.error("Error in auto-updater.", err);
   dialog.showErrorBox(

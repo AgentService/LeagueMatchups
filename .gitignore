@@ -43,7 +43,7 @@ api-data/converttips.py
 # TypeScript v1 declaration files
 typings/
 dist/
-
+release/
 # TypeScript cache
 *.tsbuildinfo
 
@@ -58,7 +58,7 @@ dist/
 
 # Output of 'npm pack'
 *.tgz
-
+builder/
 # Yarn Integrity file
 .yarn-integrity
 

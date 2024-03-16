@@ -7,6 +7,11 @@ export default defineConfig({
   server: {
     port: 3002,
   },
+  build: {
+    rollupOptions: {
+      // Your rollup options here
+    }
+  },
   plugins: [
     vue(),
     ViteImagemin({
