@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -31,6 +31,9 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
+	"files": [
+		"!**/out/**/*"
+	],
     "appId": "com.yourcompany.yourapp",
     "productName": "YourApp",
     "win": {
@@ -57,7 +60,6 @@
     "@electron-forge/cli": "^7.2.0",
     "@electron-forge/maker-deb": "^7.2.0",
     "@electron-forge/maker-rpm": "^7.2.0",
-    "@electron-forge/maker-squirrel": "^7.2.0",
     "@electron-forge/maker-zip": "^6.1.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
     "@electron-forge/plugin-electronegativity": "^7.2.0",
