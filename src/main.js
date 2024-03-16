@@ -1,7 +1,5 @@
 import fs from "fs";
-import { dialog } from "electron";
-
-import { ipcMain, app, BrowserWindow, screen } from "electron";
+import { ipcMain, app, BrowserWindow, screen, dialog } from "electron";
 const log = require("electron-log");
 const { autoUpdater } = require("electron-updater");
 

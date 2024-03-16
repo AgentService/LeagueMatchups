@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -10,6 +10,8 @@
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+	"builder-dist": "electron-builder -p always",
+	"builer": "electron-builder",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
     "build:main": "vite build --config vite.main.config.mjs",
     "build:preload": "vite build --config vite.preload.config.mjs",
@@ -30,6 +32,14 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
+    "appId": "your.app.id",
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
     "publish": [
       {
         "provider": "github",
