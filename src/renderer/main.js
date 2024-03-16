@@ -5,7 +5,6 @@ import router from "./router";
 
 import VueLazyload from "vue3-lazy";
 import { store } from "../store/index.js"; // Import your Vuex store
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";

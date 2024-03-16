@@ -119,7 +119,6 @@ const showTooltip = ref(false); // Controls the visibility of the tooltip
 const clientConnected = ref(false);
 
 const store = useStore();
-const assetBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 let intervalId;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);

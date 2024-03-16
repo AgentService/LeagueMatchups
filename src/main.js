@@ -1,7 +1,9 @@
 import fs from "fs";
+import { dialog } from "electron";
+
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");
-const updateElectronApp = require('update-electron-app');
+const { autoUpdater } = require("electron-updater");
 
 import path from "path";
 require("dotenv").config();
@@ -12,28 +14,16 @@ import findProcess from "find-process";
 const Store = require("electron-store");
 const store = new Store();
 
-const isDevelopment = process.env.NODE_ENV === "development";
-const basePath = isDevelopment
-  ? path.join(__dirname, "..", "public", "img")
-  : path.join(process.resourcesPath, "app", "public", "img");
-
-ipcMain.handle("get-base-url", () => `file://${basePath}`);
-
 // Redirect console output to a file
 console.error = log.error;
 log.transports.file.level = "info";
 log.info("App starting...");
 
-console.log("env:", import.meta.env.DEV);
-console.log("dirname", __dirname);
-console.log("basePath", basePath);
-console.log("NODE_ENV", process.env.NODE_ENV);
+log.info("env:", import.meta.env.DEV);
+log.info("dirname", __dirname);
+log.info("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
-
-
-
-
 // autoUpdater.checkForUpdatesAndNotify();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -173,8 +163,8 @@ async function fetchSummonerName(port, token) {
 
   try {
     const fetch = (...args) =>
-    import("node-fetch").then(({ default: fetch }) => fetch(...args));
-    
+      import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
     const response = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
       {
@@ -233,8 +223,6 @@ function createWindow(x = 0, y = 0) {
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    updateElectronApp();
-
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
@@ -290,20 +278,35 @@ function createWindow(x = 0, y = 0) {
 //   mainWindow.webContents.send("update-downloaded");
 // });
 
-// ipcMain.on("restart-app-to-update", () => {
-//   autoUpdater.quitAndInstall();
-// });
+ipcMain.on("restart-app-to-update", () => {
+  autoUpdater.quitAndInstall();
+});
 
-// ipcMain.on("check-for-updates", () => {
-//   autoUpdater.checkForUpdatesAndNotify();
-// });
+ipcMain.on("check-for-updates", () => {
+  // autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdatesAndNotify();
+});
 
-// // Renderer sends this after user confirmation
-// ipcMain.on("confirm-update-installation", () => {
-//   autoUpdater.quitAndInstall();
-// });
+// Renderer sends this after user confirmation
+ipcMain.on("confirm-update-installation", () => {
+  autoUpdater.quitAndInstall();
+});
 
 app.on("ready", async () => {
+  autoUpdater.on("update-downloaded", (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+      type: "info",
+      buttons: ["Restart", "Later"],
+      title: "Application Update",
+      message: process.platform === "win32" ? releaseNotes : releaseName,
+      detail:
+        "A new version has been downloaded. Restart the application to apply the updates.",
+    };
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const allDisplays = screen.getAllDisplays();
@@ -323,6 +326,7 @@ app.on("ready", async () => {
   //   setInterval(() => {
   //     mainWindow.webContents.send("update-downloaded");
   //   }, 10000); // Emit 'update-downloaded' every 10 seconds, starting 10 second
+  // autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
