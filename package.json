@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -9,14 +9,15 @@
     "start": "cross-env NODE_ENV=DEVELOPMENT electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "cross-env NODE_ENV=production electron-forge package",
-    "pack": "electron-builder --dir",
     "make": "cross-env NODE_ENV=production electron-forge make",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
-    "release": "electron-builder build --publish=always",
     "lint": "echo \"No linting configured\"",
     "server": "node server.js",
-    "build": "babel src --out-dir dist",
-    "test:unit": "jest"
+    "test:unit": "jest",
+    "postbuild": "cp .vite/build/main.js dist/main.js && cp .vite/build/preload.js dist/preload.js",
+	"build": "vite build && electron-builder build",
+    "release": "npm run build && electron-builder build --publish=always",
+    "pack": "npm run build && electron-builder --dir"
   },
   "keywords": [],
   "author": {
@@ -28,9 +29,11 @@
     "url": "https://github.com/AgentService/LeagueMatchups.git"
   },
   "build": {
+    "directories": {
+      "output": "dist"
+    },
     "files": [
-      "dist/**/*",
-      "node_modules/**/*",
+      ".vite/build/**/*",
       "package.json"
     ],
     "publish": [
@@ -58,6 +61,7 @@
     "@vue/test-utils": "^2.4.2",
     "cross-env": "^7.0.3",
     "electron": "^24.8.8",
+    "electron-builder": "^24.13.3",
     "jest": "^26.6.3",
     "sass": "^1.70.0",
     "vite": "^5.0.12",

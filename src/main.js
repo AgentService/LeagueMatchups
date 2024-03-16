@@ -1,6 +1,6 @@
 import fs from "fs";
 const { dialog } = require('electron');
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");
