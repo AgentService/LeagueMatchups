@@ -1,5 +1,7 @@
 const fs = require('fs');
-const { ipcMain, app, BrowserWindow, screen, dialog, autoUpdater } = require("electron");
+const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
+const { autoUpdater } = require('electron-updater');
+
 const log = require("electron-log");
 const path = require("path");
 require("dotenv").config();
@@ -19,9 +21,6 @@ log.info("dirname", __dirname);
 log.info("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
-// autoUpdater.checkForUpdatesAndNotify();
-
-
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -280,8 +279,8 @@ ipcMain.on("restart-app-to-update", () => {
 });
 
 ipcMain.on("check-for-updates", () => {
-  autoUpdater.checkForUpdates();
-  // autoUpdater.checkForUpdatesAndNotify();
+  // autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Renderer sends this after user confirmation
@@ -289,30 +288,7 @@ ipcMain.on("confirm-update-installation", () => {
   autoUpdater.quitAndInstall();
 });
 
-const server = 'https://github.com/AgentService/LeagueMatchups/';
-const feed = `${server}/releases/latest/`;
-const url = `${feed}`;
-
-
 app.on("ready", async () => {
-
-  autoUpdater.setFeedURL({ url });
-
-  autoUpdater.on("update-downloaded", (event, releaseNotes, releaseName) => {
-    const dialogOpts = {
-      type: "info",
-      buttons: ["Restart", "Later"],
-      title: "Application Update",
-      message: process.platform === "win32" ? releaseNotes : releaseName,
-      detail:
-        "A new version has been downloaded. Restart the application to apply the updates.",
-    };
-
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall();
-    });
-  });
-
   const primaryDisplay = screen.getPrimaryDisplay();
   const allDisplays = screen.getAllDisplays();
   const externalDisplay = allDisplays.find(
