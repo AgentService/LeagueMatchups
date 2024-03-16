@@ -31,9 +31,9 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
-	"files": [
-		"!**/out/**/*"
-	],
+    "files": [
+      "!**/out/**/*"
+    ],
     "appId": "com.yourcompany.yourapp",
     "productName": "YourApp",
     "win": {
@@ -44,7 +44,10 @@
           "repo": "LeagueMatchups"
         }
       ],
-      "target": "nsis"
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
     "nsis": {
       "oneClick": false,
