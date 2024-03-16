@@ -53,14 +53,11 @@ initializeApp()
     vueApp.component("font-awesome-icon", FontAwesomeIcon);
     vueApp.mount("#app");
 
-    const tokenJsonString = localStorage.getItem("token");
-    const refreshTokenString = localStorage.getItem("refreshToken");
+    const tokenJsonString = store.state.auth.token;
+    const refreshTokenString = store.state.auth.refreshToken;
     console.log("Token from local storage:", tokenJsonString);
     if (tokenJsonString && refreshTokenString) {
       console.log("Token and refresh token found in local storage");
-      const token = JSON.parse(tokenJsonString).data;
-      const refreshToken = JSON.parse(refreshTokenString).data;
-
       if (token && refreshToken) {
         console.log("Reauthenticating with token and refresh token");
         // Dispatch an action that handles reauthentication and potentially refreshes the token
