@@ -11,10 +11,11 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "cross-env NODE_ENV=production electron-forge publish",
-    "release": "electron-builder build --publish=always",
+	"build": "cross-env NODE_ENV=production vite build --mode production && electron-builder build",
+    "release": "cross-env NODE_ENV=production npm run build && electron-builder build --publish=always",
     "lint": "echo \"No linting configured\"",
     "server": "node server.js",
-    "build": "babel src --out-dir dist",
+    "buildx": "babel src --out-dir dist",
     "test:unit": "jest"
   },
   "keywords": [],
