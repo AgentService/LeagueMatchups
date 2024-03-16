@@ -5,7 +5,6 @@ import router from "./router";
 
 import VueLazyload from "vue3-lazy";
 import { store } from "../store/index.js"; // Import your Vuex store
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/js/all.js";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -53,14 +52,11 @@ initializeApp()
     vueApp.component("font-awesome-icon", FontAwesomeIcon);
     vueApp.mount("#app");
 
-    const tokenJsonString = localStorage.getItem("token");
-    const refreshTokenString = localStorage.getItem("refreshToken");
+    const tokenJsonString = state.auth.token;
+    const refreshTokenString = state.auth.refreshToken;
     console.log("Token from local storage:", tokenJsonString);
     if (tokenJsonString && refreshTokenString) {
       console.log("Token and refresh token found in local storage");
-      const token = JSON.parse(tokenJsonString).data;
-      const refreshToken = JSON.parse(refreshTokenString).data;
-
       if (token && refreshToken) {
         console.log("Reauthenticating with token and refresh token");
         // Dispatch an action that handles reauthentication and potentially refreshes the token

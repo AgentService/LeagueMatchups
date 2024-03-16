@@ -1,10 +1,12 @@
 import fs from "fs";
-const { dialog } = require('electron');
+const { dialog } = require("electron");
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");
 const { autoUpdater } = require("electron-updater");
 
 import path from "path";
+const url = require("url");
+
 require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
@@ -13,10 +15,7 @@ import findProcess from "find-process";
 const Store = require("electron-store");
 const store = new Store();
 
-const isDevelopment = process.env.NODE_ENV === "development";
-const basePath = isDevelopment
-  ? path.join(__dirname, "..", "public", "img")
-  : path.join(process.resourcesPath, "app", "public", "img");
+const isDev = process.env.NODE_ENV !== "production";
 
 // ipcMain.handle("get-base-url", () => `file://${basePath}`);
 
@@ -27,7 +26,6 @@ log.info("App starting...");
 
 console.log("env:", import.meta.env.DEV);
 console.log("dirname", __dirname);
-console.log("basePath", basePath);
 console.log("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
@@ -169,7 +167,7 @@ async function fetchSummonerName(port, token) {
 
   try {
     const fetch = (...args) =>
-    import("node-fetch").then(({ default: fetch }) => fetch(...args));
+      import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
     const response = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
@@ -225,30 +223,44 @@ function createWindow(x = 0, y = 0) {
   }
 
   debug("Loading main window");
-  // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  if (isDev) {
+    mainWindow.loadURL("http://localhost:5173"); // Development URL
   } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+    // Production: Load the local file
+    mainWindow.loadURL(
+      url.format({
+        pathname: path.join(__dirname, "../dist/index.html"), // Adjust path as necessary
+        protocol: "file:",
+        slashes: true,
+      })
     );
   }
 }
 
 autoUpdater.on("error", (err) => {
   log.error("Error in auto-updater.", err);
-  dialog.showErrorBox('Update Error', 'An error occurred while updating the application. ' + err);
+  dialog.showErrorBox(
+    "Update Error",
+    "An error occurred while updating the application. " + err
+  );
 });
 
 ipcMain.on('checking-for-update"', () => {
-  autoUpdater.checkForUpdatesAndNotify().then(() => {
-    dialog.showMessageBox({
-      title: 'Check for Updates',
-      message: 'Update check completed. If an update is available, it will be downloaded automatically.'
+  autoUpdater
+    .checkForUpdatesAndNotify()
+    .then(() => {
+      dialog.showMessageBox({
+        title: "Check for Updates",
+        message:
+          "Update check completed. If an update is available, it will be downloaded automatically.",
+      });
+    })
+    .catch((err) => {
+      dialog.showErrorBox(
+        "Update Check Failed",
+        "Failed to check for updates: " + err
+      );
     });
-  }).catch(err => {
-    dialog.showErrorBox('Update Check Failed', 'Failed to check for updates: ' + err);
-  });
 });
 
 // Notify the renderer about the update progress
@@ -276,7 +288,7 @@ autoUpdater.on("update-error", (error) => {
 
 // Notify the renderer when an update is downloaded and ready to be installed
 autoUpdater.on("update-downloaded", (info) => {
-  log.info('Update downloaded; will install in 5 seconds', info);
+  log.info("Update downloaded; will install in 5 seconds", info);
   mainWindow.webContents.send("update-downloaded");
 });
 

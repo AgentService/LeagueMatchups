@@ -1,12 +1,12 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
   "scripts": {
-    "start": "cross-env NODE_ENV=production electron-forge start",
+    "start": "cross-env NODE_ENV=development electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "package": "cross-env NODE_ENV=production electron-forge package",
     "make": "cross-env NODE_ENV=production electron-forge make",
