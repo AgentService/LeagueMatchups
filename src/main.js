@@ -18,7 +18,7 @@ const basePath = isDevelopment
   ? path.join(__dirname, "..", "public", "img")
   : path.join(process.resourcesPath, "app", "public", "img");
 
-ipcMain.handle("get-base-url", () => `file://${basePath}`);
+// ipcMain.handle("get-base-url", () => `file://${basePath}`);
 
 // Redirect console output to a file
 console.error = log.error;
@@ -31,8 +31,6 @@ console.log("basePath", basePath);
 console.log("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
-
-autoUpdater.checkForUpdatesAndNotify();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -172,7 +170,7 @@ async function fetchSummonerName(port, token) {
   try {
     const fetch = (...args) =>
     import("node-fetch").then(({ default: fetch }) => fetch(...args));
-    
+
     const response = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
       {
@@ -274,10 +272,6 @@ autoUpdater.on("update-not-available", (info) => {
 
 autoUpdater.on("update-error", (error) => {
   mainWindow.webContents.send("update-error", error);
-  dialog.showErrorBox(
-    "Error: ",
-    error == null ? "unknown" : (error.stack || error).toString()
-  );
 });
 
 // Notify the renderer when an update is downloaded and ready to be installed
