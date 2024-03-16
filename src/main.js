@@ -1,8 +1,7 @@
 import fs from "fs";
-const { dialog } = require('electron');
 import { ipcMain, app, BrowserWindow, screen } from "electron";
 const log = require("electron-log");
-const { autoUpdater } = require("electron-updater");
+const updateElectronApp = require('update-electron-app');
 
 import path from "path";
 require("dotenv").config();
@@ -32,7 +31,10 @@ console.log("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow;
 
-autoUpdater.checkForUpdatesAndNotify();
+
+
+
+// autoUpdater.checkForUpdatesAndNotify();
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -231,75 +233,78 @@ function createWindow(x = 0, y = 0) {
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
+    updateElectronApp();
+
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
 }
 
-autoUpdater.on("error", (err) => {
-  log.error("Error in auto-updater.", err);
-  dialog.showErrorBox('Update Error', 'An error occurred while updating the application. ' + err);
-});
+// autoUpdater.on("error", (err) => {
+//   log.error("Error in auto-updater.", err);
+//   dialog.showErrorBox('Update Error', 'An error occurred while updating the application. ' + err);
+// });
 
-ipcMain.on('checking-for-update"', () => {
-  autoUpdater.checkForUpdatesAndNotify().then(() => {
-    dialog.showMessageBox({
-      title: 'Check for Updates',
-      message: 'Update check completed. If an update is available, it will be downloaded automatically.'
-    });
-  }).catch(err => {
-    dialog.showErrorBox('Update Check Failed', 'Failed to check for updates: ' + err);
-  });
-});
+// ipcMain.on('checking-for-update"', () => {
+//   autoUpdater.checkForUpdatesAndNotify().then(() => {
+//     dialog.showMessageBox({
+//       title: 'Check for Updates',
+//       message: 'Update check completed. If an update is available, it will be downloaded automatically.'
+//     });
+//   }).catch(err => {
+//     dialog.showErrorBox('Update Check Failed', 'Failed to check for updates: ' + err);
+//   });
+// });
 
-// Notify the renderer about the update progress
-autoUpdater.on("download-progress", (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message += " - Downloaded " + progressObj.percent + "%";
-  log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
-  log.info(log_message);
-  mainWindow.webContents.send("download-progress", progprogressObjress);
-});
+// // Notify the renderer about the update progress
+// autoUpdater.on("download-progress", (progressObj) => {
+//   let log_message = "Download speed: " + progressObj.bytesPerSecond;
+//   log_message += " - Downloaded " + progressObj.percent + "%";
+//   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
+//   log.info(log_message);
+//   mainWindow.webContents.send("download-progress", progprogressObjress);
+// });
 
-// Inform the renderer that an update is available
-autoUpdater.on("update-available", () => {
-  log.info("Update available.", info);
-  mainWindow.webContents.send("update-available");
-});
+// // Inform the renderer that an update is available
+// autoUpdater.on("update-available", () => {
+//   log.info("Update available.", info);
+//   mainWindow.webContents.send("update-available");
+// });
 
-autoUpdater.on("update-not-available", (info) => {
-  log.info("Update not available.", info);
-});
+// autoUpdater.on("update-not-available", (info) => {
+//   log.info("Update not available.", info);
+// });
 
-autoUpdater.on("update-error", (error) => {
-  mainWindow.webContents.send("update-error", error);
-  dialog.showErrorBox(
-    "Error: ",
-    error == null ? "unknown" : (error.stack || error).toString()
-  );
-});
+// autoUpdater.on("update-error", (error) => {
+//   mainWindow.webContents.send("update-error", error);
+//   dialog.showErrorBox(
+//     "Error: ",
+//     error == null ? "unknown" : (error.stack || error).toString()
+//   );
+// });
 
-// Notify the renderer when an update is downloaded and ready to be installed
-autoUpdater.on("update-downloaded", (info) => {
-  log.info('Update downloaded; will install in 5 seconds', info);
-  mainWindow.webContents.send("update-downloaded");
-});
+// // Notify the renderer when an update is downloaded and ready to be installed
+// autoUpdater.on("update-downloaded", (info) => {
+//   log.info('Update downloaded; will install in 5 seconds', info);
+//   mainWindow.webContents.send("update-downloaded");
+// });
 
-ipcMain.on("restart-app-to-update", () => {
-  autoUpdater.quitAndInstall();
-});
+// ipcMain.on("restart-app-to-update", () => {
+//   autoUpdater.quitAndInstall();
+// });
 
-ipcMain.on("check-for-updates", () => {
-  autoUpdater.checkForUpdatesAndNotify();
-});
+// ipcMain.on("check-for-updates", () => {
+//   autoUpdater.checkForUpdatesAndNotify();
+// });
 
-// Renderer sends this after user confirmation
-ipcMain.on("confirm-update-installation", () => {
-  autoUpdater.quitAndInstall();
-});
+// // Renderer sends this after user confirmation
+// ipcMain.on("confirm-update-installation", () => {
+//   autoUpdater.quitAndInstall();
+// });
 
 app.on("ready", async () => {
+
   const primaryDisplay = screen.getPrimaryDisplay();
   const allDisplays = screen.getAllDisplays();
   const externalDisplay = allDisplays.find(
