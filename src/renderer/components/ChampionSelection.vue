@@ -225,8 +225,8 @@
 					spellData.spell.cooldownBurn
 				}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-						spellData.spell.costBurn
-					}}</span>
+																	spellData.spell.costBurn
+																	}}</span>
 															</p>
 														</div>
 														<p class="spell-description">{{ spellData.spell.description }}
@@ -422,7 +422,6 @@ export default {
 		this.loading = true; // Start with loading state
 		console.log('ChampionSelection mounted');
 		const urlHelper = getUrlHelper();
-		this.baseUrl = urlHelper.baseUrl;
 
 		let { championA, championB } = store.state.matchups;
 
@@ -722,6 +721,17 @@ export default {
 </script>
 
 <style scoped>
+button {
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: #0056b3;
+    /* Adjust to match design */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 .loading-indicator {
 	display: flex;
 	justify-content: center;

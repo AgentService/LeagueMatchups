@@ -20,7 +20,7 @@
                         <input type="password" v-model="form.password" placeholder="Password" required>
                         <input type="password" v-if="authMode === 'register'" v-model="form.confirmPassword"
                             placeholder="Confirm Password" required>
-                        <button type="submit" :disabled="isSubmitting">
+                        <button class="button-login" type="submit" :disabled="isSubmitting">
                             {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
                         </button>
                     </form>
@@ -151,10 +151,6 @@ const handleSubmit = async () => {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-button:disabled {
-    background-image: var(--border-grey-gradient-horizontal);
-}
-
 input {
     border: 1px solid var(--border-grey-gradient-horizontal);
     background-color: #091014;
@@ -274,16 +270,7 @@ input {
     font-size: 16px;
 }
 
-button {
-    padding: 15px;
-    border-radius: 5px;
-    border: none;
-    background-color: #0056b3;
-    /* Adjust to match design */
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+
 
 button:disabled {
     background-color: #cccccc;

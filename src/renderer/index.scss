@@ -1,11 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Railway:wght@400;600;700&display=swap');
-
-
-
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Railway:wght@400;600;700&display=swap");
 
 :root {
 	--primary-color: #1a202c;
@@ -15,70 +12,69 @@
 	--accent-color: #f56565;
 	--navbar-color: #333;
 	--text-color: #ffffff;
-	--font-family: 'Roboto', sans-serif;
+	--font-family: "Roboto", sans-serif;
 	--transition-duration: 0.3s;
 	--navbar-height: 50px;
 	--banner-height: 500px;
 	/* Blue colors */
-	--blue-1: #CDFAFA;
-	--blue-2: #0AC8B9;
-	--blue-3: #0397AB;
-	--blue-4: #005A82;
+	--blue-1: #cdfafa;
+	--blue-2: #0ac8b9;
+	--blue-3: #0397ab;
+	--blue-4: #005a82;
 	--blue-5: rgb(10, 50, 60);
 	--blue-6: #091428;
-	--blue-7: #0A1428;
+	--blue-7: #0a1428;
 
-	--red-1: #FACDCD;
-	--red-2: #B90A0A;
-	--red-3: #AB0303;
+	--red-1: #facdcd;
+	--red-2: #b90a0a;
+	--red-3: #ab0303;
 	--red-4: #820000;
 	--red-5: rgb(60, 10, 10);
 	--red-6: #280909;
-	--red-7: #140A0A;
+	--red-7: #140a0a;
 
 	/* Gold colors */
-	--gold-1: #F0E6D2;
-	--gold-2: #C8AA6E;
-	--gold-3: #C8AA6E;
-	--gold-4: #C89B3C;
-	--gold-5: #785A28;
+	--gold-1: #f0e6d2;
+	--gold-2: #c8aa6e;
+	--gold-3: #c8aa6e;
+	--gold-4: #c89b3c;
+	--gold-5: #785a28;
 	--gold-6: #463714;
-	--gold-7: #32281E;
+	--gold-7: #32281e;
 
 	/* Grey colors */
-	--grey-1: #A09B8C;
-	--grey-1-5: #5B5A56;
-	--grey-2: #3C3C41;
-	--grey-3: #1E2328;
-	--grey-cool: #1E282D;
-	--hextech-black: #010A13;
+	--grey-1: #a09b8c;
+	--grey-1-5: #5b5a56;
+	--grey-2: #3c3c41;
+	--grey-3: #1e2328;
+	--grey-cool: #1e282d;
+	--hextech-black: #010a13;
 
-	--grey-4: #0D2029;
+	--grey-4: #0d2029;
 
-	--blue-laser-1: #00FDFF;
-	--blue-laser-2: #10FEFF;
-	--red-laser-1: #FF5D6B;
-	--red-laser-2: #FF4C5A;
+	--blue-laser-1: #00fdff;
+	--blue-laser-2: #10feff;
+	--red-laser-1: #ff5d6b;
+	--red-laser-2: #ff4c5a;
 
 	--tabs-background: #000406;
-	--tabs-active: #0D2029;
-	--tabs-hover: #0D2029;
-	--tabs-border: #0D2029;
-	--tabs-text: #A09B8C;
-	--tabs-text-active: #F0E6D2;
-
+	--tabs-active: #0d2029;
+	--tabs-hover: #0d2029;
+	--tabs-border: #0d2029;
+	--tabs-text: #a09b8c;
+	--tabs-text-active: #f0e6d2;
 
 	--navbar-background-elements: #13151b;
 	--navbar-background-gradient: linear-gradient(135deg, #000507, #13151b, #000507);
 	--background-1-gradient: linear-gradient(135deg, #000406, #000507);
-	--red-laser-gradient: linear-gradient(135deg, #FF4C5A, #FF5D6B);
-	--blue-laser-gradient: linear-gradient(135deg, #00FDFF, #10FEFF);
+	--red-laser-gradient: linear-gradient(135deg, #ff4c5a, #ff5d6b);
+	--blue-laser-gradient: linear-gradient(135deg, #00fdff, #10feff);
 	--border-grey-gradient: linear-gradient(to top, #000406, #c8aa6e34, #000406);
 	--border-grey-gradient-horizontal: linear-gradient(to left, #000406, #c8aa6e34, #000406);
-	--border-laser-gradient-horizontal: linear-gradient(to left, #000406, #FF4C5A, #00FDFF, #000406);
-	--border-red-blue-gradient: linear-gradient(to top, #FF4C5A, #0D2029, #00FDFF);
+	--border-laser-gradient-horizontal: linear-gradient(to left, #000406, #ff4c5a, #00fdff, #000406);
+	--border-red-blue-gradient: linear-gradient(to top, #ff4c5a, #0d2029, #00fdff);
 	--card-background: linear-gradient(to right, #091014, #060c11);
-
+	--dialog-background: linear-gradient(to right, #00ffcc, #00d3a9);
 }
 
 /* Scrollbar für Webkit-Browser (Chrome, Safari) */
@@ -111,24 +107,66 @@ body {
 	width: 100%;
 	height: 100%;
 	background: #000406;
-	margin:0;
+	margin: 0;
 	padding: 0;
-	font-family: 'Poppins', sans-serif;
+	font-family: "Poppins", sans-serif;
 	font-weight: 600;
+}
+
+button {
+	padding: 10px 20px;
+	font-size: 1rem;
+	font-weight: 700;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	text-align: center;
+	text-transform: uppercase;
+	transition:
+		background-color 0.3s,
+		box-shadow 0.3s;
+}
+
+/* Login button styles */
+.button-login {
+	background-color: #4caf50;
+	/* Green */
+	color: white;
+}
+
+.button-login:hover {
+	background-color: #45a049;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Primary button colors */
+.button-primary {
+	background: var(--blue-5);
+	color: var(--gold-1);
+}
+
+/* Secondary button - use for less prominent actions like 'cancel' or 'later' */
+.button-secondary {
+	background: var(--blue-6);
+	color: var(--gold-1);
+}
+
+/* Hover state for primary and secondary buttons */
+.button-primary:hover,
+.button-secondary:hover {
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .selector-for-some-widget {
 	box-sizing: content-box;
 }
 
-
-
 /* #app is the root Vue element and should fill the entire height of the viewport */
 #app {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
-
 }
 
 .custom-container {
@@ -143,7 +181,7 @@ body {
 .textarea {
 	background-color: rgba(255, 0, 0, 1.1);
 	/* Semi-transparent white background */
-	color: #E6E6E6;
+	color: #e6e6e6;
 	border: none;
 	border-radius: 5px;
 	padding: 0.5rem;
@@ -151,12 +189,15 @@ body {
 	resize: vertical;
 	z-index: -1;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-	transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
+	transition:
+		background-color 0.3s,
+		box-shadow 0.3s,
+		border-color 0.3s;
 }
 
 .textarea:focus {
 	outline: none;
-	border-color: #FFFFFF;
+	border-color: #ffffff;
 	background-color: rgba(255, 255, 255, 0.2);
 	/* More opaque on focus */
 	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
@@ -164,7 +205,7 @@ body {
 }
 
 .textarea::placeholder {
-	color: #A9A9A9;
+	color: #a9a9a9;
 	/* Placeholder text color */
 	font-style: italic;
 }
@@ -174,61 +215,6 @@ body {
 	/* More visible on hover */
 }
 
-/* Button styles */
-.btn {
-	font-size: 1rem;
-	transition: color 0.3s ease;
-}
-
-/* Button Styles */
-.btn-primary {
-	border: none;
-	border-radius: 10px;
-	transition: background-color 0.3s ease;
-	/* Smooth transition for hover effect */
-	position: relative;
-	z-index: 1;
-	overflow: hidden;
-}
-
-.btn:hover {
-	background: #1b2735;
-}
-
-.btn-primary::after {
-	content: '';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 130%;
-	height: 130%;
-	background-color: rgba(0, 128, 255, 0.2);
-	/* Adjust color for glow */
-	filter: blur(5px);
-	z-index: -1;
-	transition: opacity 0.3s;
-	border-radius: inherit;
-	/* Match the button's border-radius */
-}
-
-.btn-secondary {
-	/* Back button should not grow and should remain visible */
-	flex-shrink: 0;
-	align-self: flex-start;
-	/* Align the back button to the start of the flex container */
-}
-
-/* Back Button Styles */
-.btn-secondary {
-	background: #16213e;
-	/* Darker background for the back button */
-	color: #fff;
-	/* White text */
-	border-radius: 10px;
-	/* Rounded corners */
-}
-
 a {
 	font-weight: 500;
 	color: #646cff;
@@ -248,14 +234,11 @@ a {
 a:hover {
 	color: #535bf2;
 }
-
 
 h1 {
 	font-size: 3.2em;
 	line-height: 1.1;
 }
-
-
 
 @media (prefers-color-scheme: dark) {
 	:root {

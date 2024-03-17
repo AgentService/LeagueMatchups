@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld("versions", {
 });
 
 contextBridge.exposeInMainWorld("api", {
+  startDownload: () => ipcRenderer.send("start-download"),
   checkForUpdates: () => ipcRenderer.send("check-for-updates"),
   restartAppToUpdate: () => ipcRenderer.send("restart-app-to-update"),
   onUpdateAvailable: (callback) => ipcRenderer.on("update-available", callback),
@@ -24,8 +25,7 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.on("download-progress", callback),
   onUpdateDownloaded: (callback) =>
     ipcRenderer.on("update-downloaded", callback),
-    onUpdateError: (callback) =>
-    ipcRenderer.on("update-error", callback),
+  onUpdateError: (callback) => ipcRenderer.on("update-error", callback),
   checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
   send: (channel, data) => {
     const validChannels = ["open-path-dialog", "get-summoner-name"]; // Add more valid channels as needed
@@ -36,17 +36,29 @@ contextBridge.exposeInMainWorld("api", {
   receive: (channel, func) => {
     let validReceiveChannels = [
       "summoner-name-response",
+      "update-available",
+      "update-downloaded",
+      "download-progress",
+      "update-error",
     ];
     if (validReceiveChannels.includes(channel)) {
       const subscription = (event, ...args) => func(...args);
       ipcRenderer.on(channel, subscription);
+
+      // Return a cleanup function
       return () => {
         ipcRenderer.removeListener(channel, subscription);
       };
     }
   },
   removeReceive: (channel, func) => {
-    const validReceiveChannels = ["summoner-name-response"];
+    const validReceiveChannels = [
+      "summoner-name-response",
+      "download-progress",
+      "update-available",
+      "update-downloaded",
+      "update-error",
+    ];
     if (validReceiveChannels.includes(channel)) {
       ipcRenderer.removeListener(channel, func);
     }

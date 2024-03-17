@@ -1,6 +1,88 @@
-const fs = require("fs");
 const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
+const fs = require("fs");
+
 const { autoUpdater } = require("electron-updater");
+const EventEmitter = require("events");
+
+autoUpdater.channel = "alpha";
+
+class MockAutoUpdater extends EventEmitter {
+  constructor() {
+    super();
+    // Define the mock update info outside the method
+    this.mockUpdateInfo = {
+      version: "2.0.0",
+      releaseDate: "2024-03-17",
+      releaseName: "New Exciting Features",
+      releaseNotes: "A lot of improvements and bug fixes.",
+    };
+    this.autoDownload = false; // Simulate autoDownload setting
+  }
+  checkForUpdates() {
+    console.log("Checking for updates...");
+    setTimeout(() => {
+      this.emit("update-available", this.mockUpdateInfo);
+    }, 0);
+  }
+
+  downloadUpdate() {
+    console.log("Downloading update...");
+    setTimeout(() => {
+      this.emit("download-progress", { percent: 25 });
+    }, 0);
+    setTimeout(() => {
+      this.emit("download-progress", { percent: 50 });
+    }, 500);
+    setTimeout(() => {
+      this.emit("download-progress", { percent: 75 });
+    }, 1000);
+    setTimeout(() => {
+      this.emit("download-progress", { percent: 100 });
+    }, 1500);
+    setTimeout(() => {
+      this.emit("update-downloaded", this.mockUpdateInfo);
+    }, 2000);
+  }
+
+  quitAndInstall() {
+    console.log("Quitting and installing update...");
+    this.emit("confirm-update-installation");
+  }
+
+  checkForUpdatesAndNotify() {
+    console.log("MockAutoUpdater: Checking for updates and notify");
+    // Immediately emit 'update-available' for simplicity, but could be delayed as in checkForUpdates
+    this.emit("update-available", this.mockUpdateInfo);
+
+    // Simulate a delay as if checking and then downloading updates
+    setTimeout(() => {
+      if (this.autoDownload) {
+        this.downloadUpdate();
+      }
+    }, 1000);
+
+    // Return a mock promise that resolves to an object similar to UpdateCheckResult
+    return Promise.resolve({
+      updateInfo: this.mockUpdateInfo,
+      downloadPromise: this.autoDownload
+        ? Promise.resolve(["path/to/download"])
+        : undefined,
+      // cancellationToken not needed per your requirement
+      versionInfo: this.mockUpdateInfo, // Assuming for backward compatibility
+    });
+  }
+
+  simulateError(errorMessage) {
+    const error = new Error(errorMessage);
+    console.log(`MockAutoUpdater: Simulating error - ${errorMessage}`);
+    this.emit("error", error);
+  }
+}
+
+const mockAutoUpdater = new MockAutoUpdater();
+
+let updater =
+  process.env.NODE_ENV === "DEVELOPMENT" ? mockAutoUpdater : autoUpdater;
 
 const log = require("electron-log");
 const path = require("path");
@@ -225,10 +307,14 @@ function createWindow(x = 0, y = 0) {
   }
 }
 
-autoUpdater.logger = require("electron-log");
-autoUpdater.logger.transports.file.level = "info";
+updater.logger = require("electron-log");
+updater.logger.transports.file.level = "info";
 
-autoUpdater.on("error", (err) => {
+ipcMain.on("start-download", (event) => {
+  mockAutoUpdater.downloadUpdate();
+});
+
+updater.on("error", (err) => {
   log.error("Error in auto-updater.", err);
   dialog.showErrorBox(
     "Update Error",
@@ -237,7 +323,7 @@ autoUpdater.on("error", (err) => {
 });
 
 // Notify the renderer about the update progress
-autoUpdater.on("download-progress", (progressObj) => {
+updater.on("download-progress", (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message += " - Downloaded " + progressObj.percent + "%";
   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
@@ -245,16 +331,16 @@ autoUpdater.on("download-progress", (progressObj) => {
   mainWindow.webContents.send("download-progress", progressObj);
 });
 
-autoUpdater.on("update-available", (info) => {
+updater.on("update-available", (info) => {
   log.info("Update available.", info);
   mainWindow.webContents.send("update-available", info);
 });
 
-autoUpdater.on("update-not-available", (info) => {
+updater.on("update-not-available", (info) => {
   log.info("Update not available.", info);
 });
 
-autoUpdater.on("update-error", (error) => {
+updater.on("update-error", (error) => {
   mainWindow.webContents.send("update-error", error);
   dialog.showErrorBox(
     "Error: ",
@@ -263,26 +349,30 @@ autoUpdater.on("update-error", (error) => {
 });
 
 // Notify the renderer when an update is downloaded and ready to be installed
-autoUpdater.on("update-downloaded", (info) => {
-  log.info("Update downloaded; will install in 5 seconds", info);
+updater.on("update-downloaded", (info) => {
+  log.info("Update downloaded.", info);
   mainWindow.webContents.send("update-downloaded");
 });
 
 ipcMain.on("restart-app-to-update", () => {
-  autoUpdater.quitAndInstall();
+  updater.quitAndInstall();
 });
 
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
-  autoUpdater.checkForUpdatesAndNotify();
+  // updater.checkForUpdates();
+  updater.checkForUpdatesAndNotify();
 });
 
 // Renderer sends this after user confirmation
 ipcMain.on("confirm-update-installation", () => {
-  autoUpdater.quitAndInstall();
+  updater.quitAndInstall();
 });
 
 app.on("ready", async () => {
+  debug("checking for updates");
+  autoUpdater.checkForUpdatesAndNotify();
+  debug("App is ready");
   const primaryDisplay = screen.getPrimaryDisplay();
   const allDisplays = screen.getAllDisplays();
   const externalDisplay = allDisplays.find(
