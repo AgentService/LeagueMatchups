@@ -1,8 +1,8 @@
 {
-  "name": "league_matchups",
-  "productName": "league_matchups",
+  "name": "SoloQ",
+  "productName": "SoloQ - League of Legends",
   "version": "2.1.2",
-  "description": "Mini template for electron-forge combine with vite and vue3.",
+  "description": "SoloQ is a desktop application that helps you in your journey to become a better League of Legends player. You can make notes about your games, track your progress, and get insights about your performance.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
   "scripts": {
@@ -28,8 +28,8 @@
   },
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
-    "appId": "com.example.yourapp",
-    "productName": "SoloQ",
+    "appId": "com.azateq.soloq",
+    "productName": "SoloQ - League of Legends",
     "directories": {
       "output": "builder",
       "buildResources": "buildResources",
