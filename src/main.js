@@ -301,6 +301,7 @@ function createWindow(x = 0, y = 0) {
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
+    log.info("Loading main window from file", path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
