@@ -47,4 +47,14 @@ router.beforeEach(async (to, from, next) => {
   }
 });
 
+router.afterEach((to, from) => {
+  // Call checkForUpdates() after every route change
+  checkForUpdates();
+});
+
+// Function to check for updates
+function checkForUpdates() {
+  window.api.checkForUpdates();
+}F
+
 export default router;

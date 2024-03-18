@@ -29,10 +29,10 @@
 					key="progress">
 					<div class="update-progress-bar" :style="{ width: `${updateState.progress}%` }"></div>
 				</div>
-				<button class="button" v-if="updateState.message === 'An update is available!' && !updateState.progress"
+				<!-- <button class="button" v-if="updateState.message === 'An update is available!' && !updateState.progress"
 					@click="startDownload" key="download">
 					Download
-				</button>
+				</button> -->
 
 			</div>
 
@@ -44,11 +44,6 @@
 				</button>
 				<button class="button-secondary" v-if="updateState.show" @click="postponeUpdate" key="postpone">
 					Later
-				</button>
-				<button class="button-secondary"
-					v-if="updateState.message === 'An update is available!' && !updateState.progress"
-					@click="startDownload" key="download">
-					Download
 				</button>
 			</div>
 		</div>
@@ -95,11 +90,11 @@ function postponeUpdate() {
 }
 
 
-function startDownload() {
-	updateState.progress = 0;
-	updateState.show = true;
-	window.api.startDownload(); // Triggers the download in the main process
-}
+// function startDownload() {
+// 	updateState.progress = 0;
+// 	updateState.show = true;
+// 	window.api.startDownload(); // Triggers the download in the main process
+// }
 
 function checkForUpdates() {
 	window.api.checkForUpdates();
@@ -109,7 +104,7 @@ const handleUpdateAvailable = (update) => {
 	updateState.message = 'An update is available!';
 	console.log('Update available:', update);
 	updateState.show = true;
-	startDownload(); // Automatically start download or wait for user action
+	// startDownload(); // Automatically start download or wait for user action
 };
 
 const handleUpdateDownloaded = () => {
@@ -121,11 +116,13 @@ const handleUpdateDownloaded = () => {
 };
 
 const handleDownloadProgress = (progress) => {
-	console.log("Download progress:", progress.percent); // Debugging
-	updateState.progress = progress.percent;
-	updateState.message = `Downloading update: ${progress.percent}%`;
+	const roundedProgress = Math.round(progress.percent); // Round to nearest whole number
+	console.log("Download progress:", roundedProgress); // Debugging
+	updateState.progress = roundedProgress;
+	updateState.message = `Downloading update: ${roundedProgress}%`;
 	updateState.show = true;
 };
+
 
 const handleUpdateError = (error) => {
 	console.log('Update error:', error);
@@ -208,7 +205,4 @@ onUnmounted(() => {
 .error-message {
 	color: #d9534f;
 }
-
-
-
 </style>

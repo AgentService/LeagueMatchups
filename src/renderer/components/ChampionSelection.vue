@@ -721,16 +721,7 @@ export default {
 </script>
 
 <style scoped>
-button {
-    padding: 15px;
-    border-radius: 5px;
-    border: none;
-    background-color: #0056b3;
-    /* Adjust to match design */
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+
 
 .loading-indicator {
 	display: flex;

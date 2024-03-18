@@ -16,7 +16,7 @@ class MockAutoUpdater extends EventEmitter {
       releaseName: "New Exciting Features",
       releaseNotes: "A lot of improvements and bug fixes.",
     };
-    this.autoDownload = false; // Simulate autoDownload setting
+    this.autoDownload = true; // Simulate autoDownload setting
   }
   checkForUpdates() {
     console.log("Checking for updates...");
