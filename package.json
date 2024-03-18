@@ -1,6 +1,6 @@
 {
-  "name": "SoloQ",
-  "productName": "SoloQ - League of Legends",
+  "name": "SoloQ - League of Legends",
+  "productName": "SoloQ",
   "version": "2.1.2",
   "description": "SoloQ is a desktop application that helps you in your journey to become a better League of Legends player. You can make notes about your games, track your progress, and get insights about your performance.",
   "main": ".vite/build/main.js",
@@ -29,7 +29,7 @@
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
     "appId": "com.azateq.soloq",
-    "productName": "SoloQ - League of Legends",
+    "productName": "SoloQ",
     "directories": {
       "output": "builder",
       "buildResources": "buildResources",

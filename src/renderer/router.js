@@ -55,6 +55,6 @@ router.afterEach((to, from) => {
 // Function to check for updates
 function checkForUpdates() {
   window.api.checkForUpdates();
-}F
+}
 
 export default router;
