@@ -55,6 +55,7 @@
 import { useRoute } from 'vue-router';
 import { onMounted, onUnmounted, ref, reactive } from 'vue';
 import Navbar from './components/TopNavbar.vue';
+import { store } from '../store';
 
 const updateDownloaded = ref(false);
 const updateError = ref(null);
@@ -146,7 +147,7 @@ onMounted(() => {
 			unsubscribeUpdateError();
 		});
 	}
-	store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
+	store.dispatch('init/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 });
 
 onUnmounted(() => {

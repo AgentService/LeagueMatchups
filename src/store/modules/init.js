@@ -35,6 +35,7 @@ export const init = {
 
         // Additional logic if the version has changed
         if (state.currentGameVersion !== currentVersion) {
+          console.log("Game version has changed");
           // Dispatch other actions if needed based on version change
           // For example, dispatch('updateGameData') to fetch updated game data
         }
