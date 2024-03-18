@@ -1,7 +1,7 @@
 {
   "name": "league_matchups",
   "productName": "league_matchups",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "description": "Mini template for electron-forge combine with vite and vue3.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -29,7 +29,7 @@
   "repository": "https://github.com/AgentService/LeagueMatchups.git",
   "build": {
     "appId": "com.example.yourapp",
-    "productName": "YourAppName",
+    "productName": "SoloQ",
     "directories": {
       "output": "builder",
       "buildResources": "buildResources",
