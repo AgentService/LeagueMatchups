@@ -149,6 +149,7 @@ onMounted(() => {
 			unsubscribeUpdateError();
 		});
 	}
+	store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 });
 
 onUnmounted(() => {
@@ -157,7 +158,6 @@ onUnmounted(() => {
 	window.api.removeReceive('download-progress', handleDownloadProgress);
 	window.api.removeReceive('update-error', handleUpdateError);
 });
-// store.dispatch('utilities/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
 </script>
 
 <style scoped>

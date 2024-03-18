@@ -14,9 +14,9 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import '../axiosSetup';
+import "../axiosSetup";
 
-library.add(fas); 
+library.add(fas);
 
 import { setupBaseUrl } from "./globalSetup";
 
@@ -52,16 +52,15 @@ initializeApp()
     vueApp.component("font-awesome-icon", FontAwesomeIcon);
     vueApp.mount("#app");
 
-    const tokenJsonString = store.state.auth.token;
-    const refreshTokenString = store.state.auth.refreshToken;
-    console.log("Token from local storage:", tokenJsonString);
-    if (tokenJsonString && refreshTokenString) {
+    const token = store.state.auth.token;
+    const refreshToken = store.state.auth.refreshToken;
+    console.log("Token from local storage:", token);
+    console.log("Refresh token from local storage:", refreshToken);
+    if (token && refreshToken) {
       console.log("Token and refresh token found in local storage");
-      if (token && refreshToken) {
-        console.log("Reauthenticating with token and refresh token");
-        // Dispatch an action that handles reauthentication and potentially refreshes the token
-        store.dispatch("auth/reauthenticate", { token, refreshToken });
-      }
+      console.log("Reauthenticating with token and refresh token");
+      // Dispatch an action that handles reauthentication and potentially refreshes the token
+      store.dispatch("auth/reauthenticate", { token, refreshToken });
     }
   })
   .catch((error) => {
