@@ -2,7 +2,6 @@ import store from "../../store";
 
 class ImageUrlHelper {
   constructor() {
-    debugger
     this.version = store.state.init.currentGameVersion; // Example version, this should be updated as needed
     this.baseVersionedUrl =
       "https://ddragon.leagueoflegends.com/cdn/" + this.version;
