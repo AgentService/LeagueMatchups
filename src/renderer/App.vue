@@ -82,17 +82,16 @@ function handleBeforeLeave() {
 }
 
 function restartAppToUpdate() {
-	checkForUpdates();
-	updateState.showRestartButton = false;
-	updateState.progress = 0;
-	updateState.show = true;
-	updateDownloaded.value = false;
+	// checkForUpdates();
+	// updateState.showRestartButton = false;
+	// updateState.progress = 0;
+	// updateState.show = true;
+	// updateDownloaded.value = false;
 	window.api.restartAppToUpdate(); // Triggers the app restart and update installation in the main process
 }
 
 function postponeUpdate() {
 	updateState.show = false;
-	restartAppToUpdate();
 }
 
 
