@@ -18,6 +18,7 @@ export const init = {
   mutations: {
     // ... other mutations
     SET_GAME_VERSION(state, version) {
+      debug("Setting game version:", version);
       state.currentGameVersion = version;
     },
     SET_DATA_INITIALIZED(state, value) {
@@ -32,7 +33,7 @@ export const init = {
         const currentVersion = response.data.version;
 
         commit("SET_GAME_VERSION", currentVersion);
-
+        debug("Current game version:", currentVersion);
         // Additional logic if the version has changed
         if (state.currentGameVersion !== currentVersion) {
           console.log("Game version has changed");
@@ -74,8 +75,9 @@ export const init = {
           const currentVersion = response.data.version;
 
           commit("SET_GAME_VERSION", currentVersion);
-
+          debug("Current game version:", currentVersion);
           if (state.currentGameVersion !== currentVersion) {
+            console.log("Game version has changed");
             // Dispatch other actions if needed based on version change
             // For example, dispatch('updateGameData') to fetch updated game data
           }
