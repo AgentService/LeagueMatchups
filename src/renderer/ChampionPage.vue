@@ -27,7 +27,7 @@
 							</div>
 						</div> -->
 						<div class="col-xxl-10 col-xl-10 mt-4">
-							
+
 							<div class="card-container">
 
 								<div class="row ">
@@ -49,9 +49,9 @@
 										</div>
 									</div>
 									<!-- VS Divider -->
-									<!-- <div class="vs-container">
-									<span>vs</span>
-								</div> -->
+									<div class="vs-container">
+										<span>vs</span>
+									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
 									<div class="col-xxl-5 m-auto">
 										<div class="card-small card-top mb-0">
@@ -223,10 +223,10 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	justify-content: center;
 	align-items: start;
 	position: absolute;
-	z-index: 0;
+	z-index: 2;
 	font-size: 3rem;
-	top: 20%;
-	right: 458;
+	top: 12%;
+	right: 42.65%;
 	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
@@ -234,7 +234,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	text-shadow: 0 0 5px #00ffeacd,
 		0 0 10px #00ffeac2,
 		0 0 20px #00ffeac3;
-	transform: scale(1);
+	transform: scale(.775);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
