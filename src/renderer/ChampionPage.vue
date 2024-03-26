@@ -27,12 +27,12 @@
 							</div>
 						</div> -->
 						<div class="col-xxl-10 col-xl-10 mt-4">
-							<!-- <div class="card-container-header">
-									<span>Champion Selection</span>
-								</div> -->
-							<div class="row ">
-								<!-- Champion Search for User's Champion -->
-								<!-- <div class="col-xxl-2 col-xl-2">
+							
+							<div class="card-container">
+
+								<div class="row ">
+									<!-- Champion Search for User's Champion -->
+									<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
 											<SummonerRankedInfo />
 										</div>
@@ -40,28 +40,28 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
-								<div class="col-xxl-7 m-auto">
-									<div class="card-small card-top mb-0">
-										<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+									<div class="col-xxl-7 m-auto">
+										<div class="card-small card-top mb-0">
+											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+										</div>
+										<div class="card card-bottom ">
+											<ChampionNotes />
+										</div>
 									</div>
-									<div class="card card-bottom ">
-										<ChampionNotes />
-									</div>
-								</div>
-								<!-- VS Divider -->
-								<!-- <div class="vs-container">
+									<!-- VS Divider -->
+									<!-- <div class="vs-container">
 									<span>vs</span>
 								</div> -->
-								<!-- Matchup Notes and Search for Enemy Champion -->
-								<div class="col-xxl-5 m-auto">
-									<div class="card-small card-top  mb-0">
-										<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+									<!-- Matchup Notes and Search for Enemy Champion -->
+									<div class="col-xxl-5 m-auto">
+										<div class="card-small card-top mb-0">
+											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+										</div>
+										<div class="card card-bottom">
+											<MatchupNotes />
+										</div>
 									</div>
-									<div class="card card-bottom">
-										<MatchupNotes />
-									</div>
-								</div>
-								<!-- <div class="col-xxl-2 col-xl-2">
+									<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
 											<SummonerRankedInfo />
 										</div>
@@ -69,6 +69,7 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-xxl-6">
@@ -247,17 +248,17 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	text-transform: uppercase;
 	font-weight: 700;
 	text-align: start;
-	padding: 1rem .5rem;
+	padding: .5rem;
 	padding-top: 0rem;
 	display: flex;
-	color: #e7e7e7;
+	color: var(--gold-1);
 }
 
 .card-container {
 	display: flex;
 	flex-direction: column;
 	background: var(--card-background);
-	padding: 2rem;
+	padding: 1.5rem;
 	margin-bottom: 1rem;
 	border-radius: 6px;
 	border: 1px solid rgba(128, 128, 128, 0.1);
@@ -272,7 +273,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
 	padding: .5rem;
-	margin-bottom: 1rem;
 	max-height: 390px;
 	min-height: 390px;
 	z-index: auto;
@@ -288,8 +288,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 250px;
-	min-height: 250px;
+	max-height: 260px;
+	min-height: 260px;
 	z-index: auto;
 }
 
@@ -301,7 +301,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-image: linear-gradient(to right, #091014, #05080f);
 	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
-	padding: 1rem 2rem;
+	padding: 2rem 2rem;
 	margin-bottom: 1rem;
 	max-height: 570px;
 	min-height: 570px;
@@ -359,7 +359,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-color: rgba(255, 255, 255, 1);
 }
 
-
 * {
 	box-sizing: border-box;
 }
@@ -398,16 +397,12 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	border-top: 2px solid var(--blue-laser-gradient);
 }
 
-
-
-/* .grid-container holds the main grid and should fill the available space in .app-container */
 .grid-container {
 	flex-grow: 1;
 	display: flex;
 	flex-direction: column;
 }
 
-/* Each .row should take up an equal amount ofca space within .grid-container */
 .row {
 	display: flex;
 	justify-content: center;
@@ -417,8 +412,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	justify-content: center;
 }
-
-
 
 .background-container {
 	position: static;
@@ -441,7 +434,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 }
 
-/* Gradient Top Border Class */
 .gradient-top-border::after {
 	content: "";
 	position: absolute;
@@ -453,7 +445,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	z-index: 2;
 }
 
-/* Gradient Border Class for left border */
 .gradient-border1::before {
 	content: "";
 	position: absolute;

@@ -2,10 +2,9 @@
 	<div>
 
 		<div class="note-card champion-card">
-
+			
 			<div class="d-flex justify-content-between align-items-center">
 				<div class="background-image" :style="championBackgroundStyle"></div>
-
 				<div class="search-container">
 					<div class="search-bar position-relative">
 						<div class="input-group">
@@ -13,10 +12,14 @@
 								<i class="fa-solid fa-search fa-xs"></i>
 							</span>
 							<input type="text" @click="showGrid" v-model="searchTerm" @input="filterChampions"
-								placeholder="Search Champion" class="form-control" />
+								placeholder="Your Champion" class="form-control" v-if="instanceId === 1"/>
+								
+								<input type="text" @click="showGrid" v-model="searchTerm" @input="filterChampions"
+								placeholder="Enemy Champion" class="form-control" v-if="instanceId === 2"/>
 						</div>
 					</div>
 				</div>
+				
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
 					<div class="fav-header">
@@ -1179,7 +1182,7 @@ export default {
 	display: flex;
 	height: 250px;
 	flex-direction: column;
-	padding: 1.5rem;
+	padding: 1rem;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -1190,7 +1193,7 @@ export default {
 }
 
 .champion-portrait img {
-	width: 90px;
+	width: 120px;
 	height: auto;
 	border-radius: 5px;
 	border: 2px solid var(--gold-4);
