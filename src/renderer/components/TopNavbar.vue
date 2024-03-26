@@ -16,10 +16,8 @@
 					<div class="button-container">
 						<div class="dropdown" @mouseover="showTooltip = true" @mouseleave="showTooltip = false"
 							style="position: relative;">
-							<a class="btn dropdown-toggler" href="#" role="button">
-								<span>Client</span>
-								<div class="ms-2 lockfile-indicator" :class="{ 'active': clientConnected }"></div>
-							</a>
+							<span class="text-light">Client</span>
+							<div class="ms-2 lockfile-indicator" :class="{ 'active': clientConnected }"></div>
 							<ul class="custom-tooltip dropdown-menu" v-if="showTooltip"
 								:style="{ 'background': clientConnected ? '#28a745' : '#dc3545' }">
 								<li class="dropdown-tooltip ">
@@ -33,8 +31,11 @@
 
 						<div class="button-divider"></div>
 						<!-- Profile Dropdown -->
-						<div>
-							<div class="dropdown">
+						<div class="d-flex align-items-center">
+							<span class="text-light"> {{ user.username }}
+							</span>
+							<div class="dropdown align-items-center">
+
 								<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
 									data-bs-toggle="dropdown" aria-expanded="false">
 									<!-- Show user icon if logged in, otherwise show login and registration options -->
@@ -49,6 +50,12 @@
 									<div class="text-secondary">
 										<li><a class="dropdown-item" href="#">Send Feedback</a></li>
 										<li><a class="dropdown-item" href="#" @click="logout">Log Out</a></li>
+										<li>
+											<hr class="dropdown-divider">
+										</li>
+										<li><a class="dropdown-item" href='#' @click="toggleVersionInfoModal">Version:
+												{{
+							appVersionInfo.currentVersion }} </a></li>
 									</div>
 								</ul>
 							</div>
@@ -59,6 +66,12 @@
 						</div>
 					</div>
 				</div>
+			</div>
+			<div v-if="showVersionInfoModal" class="version-info-modal" @click.self="showVersionInfoModal = false">
+				<div>Current Version: {{ appVersionInfo.currentVersion }}</div>
+				<div>Release Date: {{ appVersionInfo.releaseDate }}</div>
+				<div>Release Name: {{ appVersionInfo.releaseName }}</div>
+				<div>Release Notes: {{ appVersionInfo.releaseNotes }}</div>
 			</div>
 			<!-- <div class="container-fluid justify-content-start justify-content-right" style="max-width: 1280px;">
 				<div class="d-flex position-relative">
@@ -108,12 +121,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import SummonerInfo from './SummonerInfo.vue';
 
 import { computed, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
-
+import Debug from "debug";
+const debug = Debug("app:components:TopNavbar");
 const showTooltip = ref(false); // Controls the visibility of the tooltip
 
 const clientConnected = ref(false);
@@ -123,6 +137,33 @@ let intervalId;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 const user = computed(() => store.state.auth.user);
+const showVersionInfoModal = ref(false);
+const toggleVersionInfoModal = () => {
+	showVersionInfoModal.value = !showVersionInfoModal.value;
+};
+const appVersionInfo = reactive({
+	currentVersion: '',
+	available: '',
+	releaseDate: '',
+	releaseName: '',
+	releaseNotes: '',
+});
+
+window.api.receive('current-release', (release) => {
+	debug('Current release:', release);
+	appVersionInfo.currentVersion = release.version;
+	appVersionInfo.releaseDate = release.releaseDate;
+	appVersionInfo.releaseName = release.releaseName;
+	appVersionInfo.releaseNotes = release.releaseNotes;
+});
+
+window.api.receive('update-available', (update) => {
+	debug('Current release:', update);
+	appVersionInfo.currentVersion = update.version;
+	appVersionInfo.releaseDate = update.releaseDate;
+	appVersionInfo.releaseName = update.releaseName;
+	appVersionInfo.releaseNotes = update.releaseNotes;
+});
 
 const isLoggedIn = computed(() => {
 	console.log('Checking isLoggedIn state:', store.state.auth.isLoggedIn);
@@ -177,6 +218,18 @@ const logout = () => {
 </script>
 
 <style scoped>
+.version-info-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: black;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
 .dropdown-toggler {
 	display: flex;
 	align-items: center;
@@ -242,7 +295,6 @@ const logout = () => {
 
 .nav-link:hover {
 	color: #04D9FF;
-	/* Highlight color on hover */
 	text-decoration: underline;
 }
 
@@ -250,7 +302,6 @@ const logout = () => {
 	border-bottom: 2px solid #04D9FF;
 }
 
-/* Main container style */
 .main-container {
 	color: #f8f9fa;
 	border-radius: 0.5rem;
@@ -293,11 +344,8 @@ const logout = () => {
 }
 
 .win-loss-text {
-	/* ... other styles ... */
 	font-size: 0.75rem;
-	/* Smaller font for win/loss record */
 	align-self: flex-end;
-	/* Aligns win/loss to the right */
 }
 
 .rank-image {
@@ -311,7 +359,6 @@ const logout = () => {
 	animation: slideIn 0.3s ease-out;
 }
 
-/* Container for the image and the level pill */
 .icon-container {
 	position: relative;
 	display: inline-block;
@@ -324,7 +371,6 @@ const logout = () => {
 }
 
 .lp-text {
-
 	position: relative;
 	color: #fff;
 	background: transparent;
@@ -345,7 +391,6 @@ const logout = () => {
 }
 
 
-/* Dropdown styling */
 @keyframes fadeIn {
 	from {
 		opacity: 0;

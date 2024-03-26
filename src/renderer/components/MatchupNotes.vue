@@ -1,23 +1,8 @@
 <template>
 	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span>Matchup Notes</span>
-		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
-			<transition-group name="fade" tag="div">
-				<div v-if="autoSaved" key="saved" class="status-message">
-					<span class="text-success notes-saved">Saved</span>
-					<!-- <i class="fas fa-save text-success"></i> -->
-
-				</div>
-				<div v-if="userEditing" key="editing" class="status-message">
-					<i class="fas fa-edit text-warning"></i>
-					<!-- <span class="text-warning notes-saved">Editing</span> -->
-
-				</div>
-
-			</transition-group>
-			<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
-				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-			</div>
+		<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 		</div>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="matchup"
 			title="Shared Matchup Notes" :championA="championA" :championB="championB"
@@ -25,8 +10,22 @@
 	</div>
 
 	<div class="notes-body">
-		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="10"></textarea>
+		<!-- Loading indicator -->
+		<div v-if="loadingNotes" class="loading-indicator">
+			Loading notes...
+		</div>
+		<!-- Textarea for notes, shown only when not loading -->
+		<textarea v-else spellcheck="false" v-model="localNotes" placeholder="Type your notes here..."
+			class="note-textarea" rows="12"></textarea>
+	</div>
+
+	<div class="status-container">
+		<div v-if="autoSaved" key="saved" class="status-message">
+			<i class="fas fa-check text-success"></i>
+		</div>
+		<div v-if="userEditing" key="editing" class="status-message">
+			<i class="fas fa-edit text-warning"></i>
+		</div>
 	</div>
 </template>
 
@@ -34,94 +33,97 @@
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import SharedNotesModal from './reuse/NotesShareModal.vue';
-
 import Debug from 'debug';
-const debug = Debug('app:component:MatchupNotes');
 
+const debug = Debug('app:component:MatchupNotes');
 const store = useStore();
+
 const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
 const championA = computed(() => store.getters['matchups/getChampionA']);
 const championB = computed(() => store.getters['matchups/getChampionB']);
-const autoSaved = ref(false);
-const localNotes = computed({
-	get: () => store.getters['notes/getPersonalNotesByMatchupId'](currentMatchup.value?.combinedId),
-	set: (newValue) => {
-		userEditing.value = true;
-		debouncedSaveNotes(newValue);
-	}
-});
-
-const userEditing = ref(false);
-const championSwitched = ref(false);
-
-const showNotesModal = ref(false); // Controls the visibility of the modal
-
+const showNotesModal = ref(false);
 const NotesSharedModalRef = ref(null);
+const autoSaved = ref(false);
+const userEditing = ref(false);
+const localNotesValue = ref('');
+let saveTimeout = null;
+const loadingNotes = ref(false); // New reactive property to indicate loading state
 
-async function fetchOtherUsersNotes() {
-	// This will fetch notes for the current champion from other users
-	// You need to modify this according to your Vuex store and actions
-	await store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value?.combinedId);
-	NotesSharedModalRef.value?.fetchData(currentMatchup.value?.combinedId);
-}
+const isInitialLoad = ref(true);
+const matchupSwitched = ref(false);
 
-// Call fetchOtherUsersNotes when the modal is opened
-watch(showNotesModal, (newVal) => {
-	if (newVal === true) {
-		fetchOtherUsersNotes();
+const localNotes = computed({
+	get: () => localNotesValue.value,
+	set: (newValue) => {
+		if (!isInitialLoad.value && !matchupSwitched.value) {
+			userEditing.value = true;
+			localNotesValue.value = newValue;
+			debouncedSaveNotes(newValue);
+		} else {
+			localNotesValue.value = newValue; // Directly update the value without triggering save
+		}
 	}
 });
-
-let saveTimeout = null;
 
 function debouncedSaveNotes(newValue) {
 	if (saveTimeout) clearTimeout(saveTimeout);
-	saveTimeout = setTimeout(() => {
-		if (userEditing.value) { // Ensure we're saving because of user edits
-			saveNotes(newValue);
-			userEditing.value = false; // Reset the editing flag after saving
-		}
-	}, 2000); // Adjust the debounce time as needed
-}
-
-watch(currentMatchup, (newVal, oldVal) => {
-	if (newVal?.combinedId !== oldVal?.combinedId) {
-		championSwitched.value = true;
-		store.dispatch('notes/fetchMatchupNotes', newVal.combinedId);
-		userEditing.value = false; // Reset user editing flag
-	}
-}, { deep: true, immediate: true });
-
-
-async function saveNotes(newValue) {
-	if (currentMatchup.value && currentMatchup.value.combinedId) {
-		await store.dispatch('notes/saveOrUpdateMatchupNotes', {
-			matchupId: currentMatchup.value.combinedId,
-			content: newValue,
-		});
-		debug('Auto-saved notes for matchup', currentMatchup.value.combinedId);
+	saveTimeout = setTimeout(async () => {
+		await saveNotes(newValue);
 		autoSaved.value = true;
-		// Set a timer to revert isSaved back to false after 2 seconds
-		setTimeout(() => autoSaved.value = false, 2000);
-	}
-}
-
-async function fetchNotes() {
-	if (currentMatchup.value && currentMatchup.value.combinedId) {
-		await store.dispatch('notes/fetchMatchupNotes', currentMatchup.value.combinedId);
-	}
+		setTimeout(() => {
+			autoSaved.value = false;
+		}, 2000);
+	}, 2000);
 }
 
 onMounted(() => {
 	fetchNotes();
 });
+
+watch(currentMatchup, async (newVal, oldVal) => {
+	if (newVal?.combinedId !== oldVal?.combinedId) {
+		matchupSwitched.value = true; // Indicate a matchup switch has occurred
+		await fetchNotes();
+		// Reset the flags after fetching
+		setTimeout(() => {
+			isInitialLoad.value = false;
+			matchupSwitched.value = false;
+		}, 1000); // Give some time for the user to start editing
+	}
+}, { deep: true, immediate: true });
+
+async function fetchNotes() {
+	if (currentMatchup.value?.combinedId) {
+		loadingNotes.value = true; // Start loading
+		await store.dispatch('notes/fetchMatchupNotes', currentMatchup.value.combinedId);
+		const fetchedNotes = store.getters['notes/getPersonalNotesByMatchupId'](currentMatchup.value.combinedId);
+		localNotesValue.value = fetchedNotes || '';
+		loadingNotes.value = false; // End loading
+	}
+}
+
+
+async function saveNotes(newValue) {
+	if (currentMatchup.value?.combinedId) {
+		await store.dispatch('notes/saveOrUpdateMatchupNotes', {
+			matchupId: currentMatchup.value.combinedId,
+			content: newValue,
+		});
+		userEditing.value = false;
+	}
+}
 </script>
 
 
+
 <style scoped>
-.status-container {
-	position: relative;
-	height: 25px;
+.share-button {
+	text-transform: none;
+	color: var(--gold-1);
+}
+
+.share-button:hover {
+	color: var(--gold-2);
 }
 
 .notes-saved {
@@ -140,9 +142,10 @@ onMounted(() => {
 	opacity: 0;
 }
 
-.status-message {
+.status-container {
 	position: absolute;
-	top: 0;
-	right: 0;
+	height: 25px;
+	bottom: 1rem;
+	right: 2rem;
 }
 </style>

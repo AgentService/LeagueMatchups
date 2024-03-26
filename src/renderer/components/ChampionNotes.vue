@@ -1,29 +1,28 @@
 <template>
 	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<div class="d-flex">
-			<span>Champion Notes</span>
-		</div>
-
-		<div class="status-container d-flex align-items-center"> <!-- Parent container with relative positioning -->
-			<transition-group name="fade" tag="div">
-				<div v-if="notesState === 'saved'" key="saved" class="status-message">
-					<span class="text-success notes-saved">Saved</span>
-				</div>
-				<div v-if="notesState === 'editing'" key="editing" class="status-message">
-					<i class="fas fa-edit text-warning"></i>
-				</div>
-			</transition-group>
+		<span>Champion Notes</span>
+		<div class=" d-flex align-items-center justify-content-evenly">
 			<div key="share-button" class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
 				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 			</div>
 		</div>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
-
 	</div>
 	<div class="notes-body">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="10"></textarea>
+			rows="12"></textarea>
+	</div>
+	<div class="status-container">
+		<!-- <div v-if="notesState === 'neutral'" key="neutral" class="status-message">
+			<i class="fa fa-save text-success"></i>
+		</div> -->
+		<div v-if="notesState === 'editing'" key="editing" class="status-message">
+			<i class="fas fa-edit text-warning"></i>
+		</div>
+		<div v-if="notesState === 'saved'" key="saved" class="status-message">
+			<i class="fas fa-check text-success"></i>
+		</div>
 	</div>
 </template>
 
@@ -42,7 +41,6 @@ const championA = computed(() => store.getters['matchups/getChampionA']);
 const championId = ref('');
 const editableNotes = ref('');
 const championSwitched = ref(false);
-const userEditing = ref(false);
 const autoSaved = ref(false);
 const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
 
@@ -70,7 +68,6 @@ function debouncedSave() {
 	saveTimeout = setTimeout(async () => {
 		await saveChampionNotes();
 		autoSaved.value = true;
-		userEditing.value = false; // Reset userEditing flag on save
 
 		// Set a timeout to hide the "saved" message after 2 seconds
 		setTimeout(() => {
@@ -138,9 +135,25 @@ async function saveChampionNotes() {
 
 
 <style scoped>
+.filter-container {
+	border: 1px solid var(--grey-3);
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 1rem;
+}
+
+.filter-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-right: 1px solid var(--grey-3);
+	margin-right: 1rem;
+}
+
 .share-button {
 	text-transform: none;
-	margin-right: 5rem;
 	color: var(--gold-1);
 }
 
@@ -150,9 +163,7 @@ async function saveChampionNotes() {
 
 h3 {
 	color: #333;
-	/* Dark grey for titles */
 	margin-bottom: 20px;
-	/* More space below the title */
 }
 
 .notes-saved {
@@ -172,13 +183,9 @@ h3 {
 }
 
 .status-container {
-	position: relative;
-	height: 25px;
-}
-
-.status-message {
 	position: absolute;
-	top: 0;
-	right: 0;
+	height: 25px;
+	bottom: 1rem;
+	right: 2rem;
 }
 </style>

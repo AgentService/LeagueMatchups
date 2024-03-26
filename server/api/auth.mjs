@@ -74,7 +74,7 @@ router.post(
 
     // Generate JWT
     const token = jwt.sign({ email, id }, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "24h",
     });
 
     debug("mail", email);
@@ -175,7 +175,7 @@ router.post("/token", async (req, res) => {
 
     // Assuming the refresh token is valid, issue a new JWT
     const newToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "24h",
     });
     debug("New token issued:", newToken);
     // Respond with the new access token (and optionally, the new refresh token)

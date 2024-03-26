@@ -26,14 +26,13 @@
 							<div class="card">
 							</div>
 						</div> -->
-						<div class="col-xxl-9 col-xl-9 mt-4">
-							<div class="card-container">
-								<!-- <div class="card-container-header">
+						<div class="col-xxl-10 col-xl-10 mt-4">
+							<!-- <div class="card-container-header">
 									<span>Champion Selection</span>
 								</div> -->
-								<div class="row ">
-									<!-- Champion Search for User's Champion -->
-									<!-- <div class="col-xxl-2 col-xl-2">
+							<div class="row ">
+								<!-- Champion Search for User's Champion -->
+								<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
 											<SummonerRankedInfo />
 										</div>
@@ -41,36 +40,35 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
-									<div class="col-xxl-5 m-auto">
-										<div class="card-small card-top mb-0">
-											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-										</div>
-										<div class="card card-bottom ">
-											<ChampionNotes />
-										</div>
+								<div class="col-xxl-7 m-auto">
+									<div class="card-small card-top mb-0">
+										<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 									</div>
-									<!-- VS Divider -->
-									<div class="vs-container">
-										<span>vs</span>
+									<div class="card card-bottom ">
+										<ChampionNotes />
 									</div>
-									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-5 m-auto">
-										<div class="card-small card-top  mb-0">
-											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-										</div>
-										<div class="card card-bottom">
-											<MatchupNotes />
-										</div>
-									</div>
-									<!-- <div class="col-xxl-2 col-xl-2">
-										<div class="card">
-											<SummonerRankedInfo />
-										</div>
-										<div class="card">
-											<LearningObjectives></LearningObjectives>
-										</div>
-									</div> -->
 								</div>
+								<!-- VS Divider -->
+								<!-- <div class="vs-container">
+									<span>vs</span>
+								</div> -->
+								<!-- Matchup Notes and Search for Enemy Champion -->
+								<div class="col-xxl-5 m-auto">
+									<div class="card-small card-top  mb-0">
+										<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+									</div>
+									<div class="card card-bottom">
+										<MatchupNotes />
+									</div>
+								</div>
+								<!-- <div class="col-xxl-2 col-xl-2">
+										<div class="card">
+											<SummonerRankedInfo />
+										</div>
+										<div class="card">
+											<LearningObjectives></LearningObjectives>
+										</div>
+									</div> -->
 							</div>
 							<div class="row">
 								<div class="col-xxl-6">
@@ -259,7 +257,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	flex-direction: column;
 	background: var(--card-background);
-	padding: 1rem;
+	padding: 2rem;
 	margin-bottom: 1rem;
 	border-radius: 6px;
 	border: 1px solid rgba(128, 128, 128, 0.1);
@@ -275,8 +273,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 330px;
-	min-height: 330px;
+	max-height: 390px;
+	min-height: 390px;
 	z-index: auto;
 }
 
@@ -290,8 +288,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 310px;
-	min-height: 310px;
+	max-height: 250px;
+	min-height: 250px;
 	z-index: auto;
 }
 
@@ -305,8 +303,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: 1rem 2rem;
 	margin-bottom: 1rem;
-	max-height: 500px;
-	min-height: 500px;
+	max-height: 570px;
+	min-height: 570px;
 	z-index: auto;
 }
 

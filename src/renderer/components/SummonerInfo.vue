@@ -1,5 +1,6 @@
 <template>
-	<div class="dropdown summoner-display" @click="dropdownOpen = !dropdownOpen" :aria-expanded="dropdownOpen.toString()">
+	<div class="dropdown summoner-display" @click="dropdownOpen = !dropdownOpen"
+		:aria-expanded="dropdownOpen.toString()">
 		<a class="btn dropdown-toggler" href="#" role="button" aria-expanded="false">
 			<div class="d-flex align-items-center">
 				<img :src="currentSelection ? getSummonerIcon(currentSelection.profileIconId) : getSummonerIcon(5541)"
@@ -24,9 +25,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useStore } from 'vuex';
-import { getUrlHelper } from '../globalSetup.js'; 
+import { getUrlHelper } from '../globalSetup.js';
 const store = useStore();
 
 const dropdownContainer = ref(null);
@@ -54,11 +55,21 @@ function selectSummoner(summonerDetail) {
 	dropdownOpen.value = false;
 }
 
-onMounted(() => {
-	document.addEventListener('click', handleClickOutside);
+function fetchSummonerDetailsIfNeeded() {
 	if (!allPlayerDetails.value.length) {
 		store.dispatch('summoner/fetchSummonerDataByAccountId');
 	}
+}
+
+watch(isLoggedIn, (newVal, oldVal) => {
+	if (newVal && !oldVal) {
+		fetchSummonerDetailsIfNeeded();
+	}
+});
+
+onMounted(() => {
+	document.addEventListener('click', handleClickOutside);
+	fetchSummonerDetailsIfNeeded();
 });
 
 onBeforeUnmount(() => {

@@ -25,32 +25,30 @@ export async function fetchAndSaveSummonerData(summonerNameValue) {
  * exists before fetching and saving new data.
  */
 export function initializeSummonerDataFetching() {
-  window.api.receive("summoner-name-response", async (newSummonerName) => {
-    console.log("Summoner name response received:", newSummonerName);
-
-    if (!newSummonerName) {
-      console.log(
-        "Summoner name not found. Requesting user to specify path manually."
-      );
-    } else {
+  window.api.receive("summoner-name-response", async (response) => {
+    // Check if the response contains a valid summoner name and no error
+    if (response && response.summonerName && !response.error) {
+      const newSummonerName = response.summonerName;
+      debug("New summoner name:", newSummonerName);
       const summonerData =
         store.getters["summoner/getSummonerDataByName"](newSummonerName);
 
       if (!summonerData) {
-        console.log(
-          "Summoner data not found. Fetching data for:",
-          newSummonerName
-        );
+        debug("Fetching summoner data for:", newSummonerName);
+        // Assuming fetchAndSaveSummonerData is an async function that fetches
+        // and then updates the store with the new summoner data.
         await fetchAndSaveSummonerData(newSummonerName);
       } else {
-        console.log(
-          "Summoner data already exists. Skipping fetch for:",
-          newSummonerName
-        );
+        debug("Summoner data already exists for:", newSummonerName);
       }
+    } else {
+      // Handle cases where summoner name couldn't be fetched or an error occurred
+      debug("Error fetching summoner name:", response.error);
+      // Optionally, request the user to specify the path manually or show an error message
     }
   });
 
+  // Trigger the IPC main process to fetch the summoner name
   window.api.send("get-summoner-name");
 }
 

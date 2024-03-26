@@ -1,8 +1,3 @@
-import {
-  saveToLocalStorage,
-  retrieveFromLocalStorage,
-} from "../plugins/storage.mjs";
-
 // src/store/userPreferences.js
 export const userPreferences = {
   namespaced: true,
@@ -28,23 +23,15 @@ export const userPreferences = {
     // Add mutations for other preferences as needed
   },
   actions: {
-    getFavoriteChampions({ commit }) {
-      const champions = retrieveFromLocalStorage("favoriteChampions") || [];
-      commit("SET_FAVORITE_CHAMPIONS", champions);
-    },
     updateFavoriteChampions({ commit }, champions) {
       commit("SET_FAVORITE_CHAMPIONS", champions);
-      saveToLocalStorage("favoriteChampions", champions);
     },
     toggleTheme({ commit }) {
       commit("TOGGLE_THEME");
-      // Persist theme preference as needed
     },
     setNotifications({ commit }, value) {
       commit("SET_NOTIFICATIONS", value);
-      // Persist notification settings as needed
     },
-    // Add actions for other preferences as needed
   },
   getters: {
     favoriteChampions: (state) => state.favoriteChampions,

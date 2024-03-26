@@ -18,6 +18,10 @@ class ImageUrlHelper {
     return "https://ddragon.leagueoflegends.com/cdn";
   }
 
+  get baseStatImageUrl() {
+    return "https://raw.communitydragon.org/pbe/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/statmods/";
+  }
+
   getChampionImageSource(type, championId) {
     let imagePath = "";
     // Now using getters to dynamically decide the base URL
@@ -64,6 +68,23 @@ class ImageUrlHelper {
   getItemImageUrl(itemId) {
     if (!itemId) return "";
     return `${this.baseVersionedUrl}/img/item/${itemId}.png`;
+  }
+
+  getStatImageUrl(statKey) {
+    const statIcons = {
+      adaptiveforce: "statmodsadaptiveforceicon.png",
+      adaptiveforcescaling: "statmodsadaptiveforcescalingicon.png",
+      armor: "statmodsarmoricon.png",
+      attackspeed: "statmodsattackspeedicon.png",
+      cdr: "statmodscdrscalingicon.png",
+      healthplus: "statmodshealthplusicon.png",
+      hp: "statmodshealthscalingicon.png",
+      spellblock: "statmodsmagicresicon.png",
+      movespeed: "statmodsmovementspeedicon.png",
+      tenacity: "statmodstenacityicon.png",
+    };
+    // Use the stat icon mapping to return the complete URL for an icon
+    return `${this.baseStatImageUrl}${statIcons[statKey.toLowerCase()]}`;
   }
 }
 

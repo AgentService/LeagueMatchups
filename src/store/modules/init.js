@@ -29,16 +29,20 @@ export const init = {
     async checkAndUpdateVersion({ commit, state }) {
       try {
         // Fetch the current game version from the server
-        const response = await axios.get(`${baseUrl}/api/utilities/version`);
-        const currentVersion = response.data.version;
+        if (!state.currentGameVersion) {
+          const response = await axios.get(`${baseUrl}/api/utilities/version`);
+          const currentVersion = response.data.version;
 
-        commit("SET_GAME_VERSION", currentVersion);
-        debug("Current game version:", currentVersion);
-        // Additional logic if the version has changed
-        if (state.currentGameVersion !== currentVersion) {
-          console.log("Game version has changed");
-          // Dispatch other actions if needed based on version change
-          // For example, dispatch('updateGameData') to fetch updated game data
+          commit("SET_GAME_VERSION", currentVersion);
+          debug("Current game version:", currentVersion);
+          // Additional logic if the version has changed
+          if (state.currentGameVersion !== currentVersion) {
+            console.log("Game version has changed");
+            // Dispatch other actions if needed based on version change
+            // For example, dispatch('updateGameData') to fetch updated game data
+          }
+        } else {
+          debug("Game version already set:", state.currentGameVersion);
         }
       } catch (error) {
         console.error("Error checking and updating game version:", error);

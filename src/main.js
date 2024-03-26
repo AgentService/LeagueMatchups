@@ -13,8 +13,15 @@ class MockAutoUpdater extends EventEmitter {
     this.mockUpdateInfo = {
       version: "2.0.0",
       releaseDate: "2024-03-17",
+      releaseName: "Current Exciting Features",
+      releaseNotes: "Current improvements and bug fixes.",
+    };
+
+    this.mockUpdateInfoUpdate = {
+      version: "3.3.3",
+      releaseDate: "2024-03-19",
       releaseName: "New Exciting Features",
-      releaseNotes: "A lot of improvements and bug fixes.",
+      releaseNotes: "New a lot of improvements and bug fixes.",
     };
     this.autoDownload = true; // Simulate autoDownload setting
   }
@@ -40,7 +47,7 @@ class MockAutoUpdater extends EventEmitter {
       this.emit("download-progress", { percent: 100 });
     }, 1500);
     setTimeout(() => {
-      this.emit("update-downloaded", this.mockUpdateInfo);
+      this.emit("update-downloaded", this.mockUpdateInfoUpdate);
     }, 2000);
   }
 
@@ -82,7 +89,7 @@ class MockAutoUpdater extends EventEmitter {
 const mockAutoUpdater = new MockAutoUpdater();
 
 let updater =
-  process.env.NODE_ENV === "DEVELOPMENT" ? mockAutoUpdater : autoUpdater;
+  process.env.NODE_ENV === "DEVELOPMENT" ? mockAutoUpdater : autoUpdater; // mockAutoUpdater for development, autoUpdater for production
 
 const log = require("electron-log");
 const path = require("path");
@@ -90,6 +97,7 @@ require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
 const findProcess = require("find-process");
+Debug.enable('*');
 
 const Store = require("electron-store");
 const store = new Store();
@@ -199,35 +207,38 @@ async function getCredentialsFromLockfile(lockfilePath) {
 
 ipcMain.on("get-summoner-name", async (event, selectedPath = null) => {
   console.log("IPC message received: get-summoner-name");
-  let summonerName = null;
-  // const summonerName = await getSummonerName(selectedPath);
+  let response = { summonerName: null, error: null };
+
   try {
     const lockfilePath = await getLeagueClientPathFromProcess();
     if (!lockfilePath) {
-      throw new Error("League client lockfile not found.");
-    }
-
-    const credentials = await getCredentialsFromLockfile(lockfilePath);
-    if (!credentials) {
-      throw new Error("Failed to extract credentials from lockfile.");
-    }
-
-    summonerName = await fetchSummonerName(credentials.port, credentials.token);
-    if (summonerName) {
-      console.log("Fetched Summoner Name:", summonerName);
-      console.log("credentials", credentials);
+      response.error = "League client lockfile not found.";
+      console.error(response.error);
     } else {
-      console.log("Summoner name could not be fetched.");
+      const credentials = await getCredentialsFromLockfile(lockfilePath);
+      if (!credentials) {
+        response.error = "Failed to extract credentials from lockfile.";
+        console.error(response.error);
+      } else {
+        const summonerName = await fetchSummonerName(
+          credentials.port,
+          credentials.token
+        );
+        if (summonerName) {
+          console.log("Fetched Summoner Name:", summonerName);
+          response.summonerName = summonerName;
+        } else {
+          response.error = "Summoner name could not be fetched.";
+          console.error(response.error);
+        }
+      }
     }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error("An unexpected error occurred:", error);
+    response.error = "An unexpected error occurred.";
   }
-  if (summonerName) {
-    console.log("Summoner Name:", summonerName);
-    event.reply("summoner-name-response", summonerName);
-  } else {
-    event.reply("summoner-name-response", null);
-  }
+
+  event.reply("summoner-name-response", response);
 });
 
 ipcMain.handle("get-api-key", async (event) => {
@@ -301,7 +312,10 @@ function createWindow(x = 0, y = 0) {
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    log.info("Loading main window from file", path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+    log.info(
+      "Loading main window from file",
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+    );
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
@@ -339,6 +353,7 @@ updater.on("update-available", (info) => {
 
 updater.on("update-not-available", (info) => {
   log.info("Update not available.", info);
+  mainWindow.webContents.send("current-release", info);
 });
 
 updater.on("update-error", (error) => {
@@ -352,7 +367,7 @@ updater.on("update-error", (error) => {
 // Notify the renderer when an update is downloaded and ready to be installed
 updater.on("update-downloaded", (info) => {
   log.info("Update downloaded.", info);
-  mainWindow.webContents.send("update-downloaded");
+  mainWindow.webContents.send("update-downloaded", info);
 });
 
 ipcMain.on("restart-app-to-update", () => {

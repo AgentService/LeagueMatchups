@@ -40,6 +40,7 @@ contextBridge.exposeInMainWorld("api", {
       "update-downloaded",
       "download-progress",
       "update-error",
+      "current-release"
     ];
     if (validReceiveChannels.includes(channel)) {
       const subscription = (event, ...args) => func(...args);

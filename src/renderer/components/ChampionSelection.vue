@@ -110,6 +110,8 @@
 										class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
+											<div class="cooldown">{{
+					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
@@ -157,15 +159,13 @@
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
-								<div class="stats-container">
+								<!-- <div class="stats-container">
 									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
-										<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats"
+										<img :src="getStatImageUrl('adaptiveforcescaling')" alt="Toggle Stats"
 											class="stat-toggle-icon" />
-										<!-- <img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" /> -->
 									</div>
 									<div class="stats-tooltip-container collapse" :class="{ show: !isStatsCollapsed }">
 										<div v-show="isStatsVisible" class="stats-tooltip">
-											<!-- Iterate through your selected stats -->
 											<div class="stat-item d-flex align-items-center"
 												v-for="statKey in selectedStatKeys" :key="statKey">
 												<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
@@ -173,7 +173,7 @@
 											</div>
 										</div>
 									</div>
-								</div>
+								</div> -->
 							</div>
 							<div class="abilities-container">
 								<div class="champion-abilities">
@@ -206,8 +206,8 @@
 										class="ability">
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
-											<div class="cooldown position-absolute">{{
-					spellData.spell.cooldownBurn.split('/')[0] }}</div>
+											<div class="cooldown">{{
+					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 
 											<div class="tooltip-container">
 												<div class="tooltip">
@@ -225,7 +225,7 @@
 					spellData.spell.cooldownBurn
 				}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																	spellData.spell.costBurn
+						spellData.spell.costBurn
 																	}}</span>
 															</p>
 														</div>
@@ -305,6 +305,7 @@
 import { useStore, mapActions } from 'vuex';
 import { ref, computed, watch } from 'vue';
 import { getUrlHelper } from '../globalSetup';
+import ImageUrlHelper from '../utils/imageHelper';
 
 import gsap from 'gsap';
 import Debug from 'debug';
@@ -321,10 +322,29 @@ export default {
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
 		const store = useStore();
+		const imageUrlHelper = new ImageUrlHelper(); // Instantiate if necessary
 
-		const favoriteChampions = computed(() => {
-			return store.state.userPreferences.favoriteChampions;
-		});
+		const favoriteChampions = computed(() => store.state.userPreferences.favoriteChampions);
+
+		const getStatImageUrl = (statKey) => imageUrlHelper.getStatImageUrl(statKey);
+
+		const toggleFavorite = (champion) => {
+			const isFav = favoriteChampions.value.some(c => c.id === champion.id);
+			if (isFav) {
+				// Remove the champion from favorites
+				const updatedFavorites = favoriteChampions.value.filter(c => c.id !== champion.id);
+				store.dispatch('userPreferences/updateFavoriteChampions', updatedFavorites);
+			} else {
+				// Add the champion to favorites
+				const updatedFavorites = [...favoriteChampions.value, champion];
+				store.dispatch('userPreferences/updateFavoriteChampions', updatedFavorites);
+			}
+		};
+
+		const isFavorite = (champion) => {
+			return favoriteChampions.value.some(c => c.id === champion.id);
+		};
+
 		const toggleSearch = () => {
 			showInput.value = !showInput.value;
 			if (showInput.value) {
@@ -363,7 +383,7 @@ export default {
 		};
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
-			toggleSearch, favoriteChampions
+			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl
 		};
 	},
 	// watch: {
@@ -390,7 +410,7 @@ export default {
 			selectedChampions: [],
 			isGridVisible: false,
 			championSelectedFromClient: null, // This will hold the auto-selected champion
-			selectedStatKeys: ['hp', 'armor', 'spellblock', 'attackdamage', 'movespeed'],
+			selectedStatKeys: ['hp', 'armor', 'spellblock', 'movespeed'],
 			abilityLabels: ['Q', 'W', 'E', 'R'],
 			isStatsCollapsed: false,
 			//Summoner Spells
@@ -453,7 +473,6 @@ export default {
 		await Promise.all(this.filteredChampions.map(async (champion) => {
 			this.championImageUrls[champion.id] = await this.getChampionImageSource('small', champion.id);
 		}));
-		await this.$store.dispatch('userPreferences/getFavoriteChampions');
 
 		this.loading = false; // Start with loading state
 
@@ -493,20 +512,6 @@ export default {
 		},
 	},
 	methods: {
-		toggleFavorite(champion) {
-			const index = this.favoriteChampions?.findIndex(c => c.id === champion.id);
-			if (index > -1) {
-				// Champion is already a favorite, remove them
-				this.favoriteChampions.splice(index, 1);
-			} else {
-				// Add the whole champion object as a favorite
-				this.favoriteChampions.push(champion);
-			}
-			this.$store.dispatch('userPreferences/updateFavoriteChampions', this.favoriteChampions);
-		},
-		isFavorite(champion) {
-			return this.favoriteChampions?.some(c => c.id === champion.id);
-		},
 		handleMouseEnter() {
 			this.isButtonHovered = true;
 			this.showFavorites = true;
@@ -593,21 +598,6 @@ export default {
 		getAbilityLabelByIndex(index) {
 			return this.abilityLabels[index] || ''; // Fallback to empty string if index is out of range
 		},
-		getStatImageUrl(statKey) {
-			const statIcons = {
-				AdaptiveForce: 'StatModsAdaptiveForceIcon.png',
-				armor: 'StatModsArmorIcon.png',
-				attackdamage: 'StatModsAttackDamageIcon.png',
-				// CDR: 'StatModsCDRScalingIcon.png',
-				hp: 'StatModsHealthScalingIcon.png',
-				spellblock: 'StatModsMagicResIcon.png',
-				// abilitypower: 'StatModsAbilityPowerIcon.png',
-				movespeed: 'StatModsMovementSpeedIcon.png',
-				statToggle: 'StatModsButton.png'
-			};
-			return `./img/dragontail/img/perk-images/StatMods/${statIcons[statKey]}`;
-		},
-
 		checkScrollable() {
 			const gridContainer = this.$refs.gridContainer; // You'll need to add a ref="gridContainer" to the element
 			if (gridContainer.scrollHeight > gridContainer.clientHeight) {
@@ -693,25 +683,6 @@ export default {
 				animation();
 			}
 		},
-		// getChampionImageSource(type, championId) {
-		// 	const ddragonBaseUrl = 'https://ddragon.leagueoflegends.com/';
-		// 	switch (type) {
-		// 		case 'small':
-		// 			// Assuming 'small' refers to the champion square assets
-		// 			return `${ddragonBaseUrl}cdn/14.1.1/img/champion/${championId}.png`;
-		// 		case 'loading':
-		// 			// Loading screen images
-		// 			return `${ddragonBaseUrl}img/champion/loading/${championId}_0.jpg`;
-		// 		case 'splash':
-		// 			// Full splash images
-		// 			return `${ddragonBaseUrl}img/champion/splash/${championId}_0.jpg`;
-		// 		case 'tiles':
-		// 			// If 'tiles' refer to another type of image, adjust the path accordingly
-		// 			return `${ddragonBaseUrl}cdn/14.1.1/img/tiles/${championId}_0.jpg`;
-		// 		default:
-		// 			return ''; // or some default path
-		// 	}
-		// }
 		async getChampionImageSource(type, championId) {
 			const urlHelper = getUrlHelper();
 			return urlHelper.getChampionImageSource(type, championId);
@@ -721,8 +692,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 .loading-indicator {
 	display: flex;
 	justify-content: center;
@@ -730,7 +699,6 @@ export default {
 	height: 100vh;
 	z-index: 1000;
 	color: red;
-	/* Full viewport height */
 	font-size: 20px;
 }
 
@@ -986,13 +954,12 @@ export default {
 	flex-direction: column;
 	align-items: center;
 	margin-right: 0.25rem;
-	margin-bottom: .5rem;
 }
 
 .cooldown {
 	font-size: 0.75rem;
 	font-weight: 500;
-	color: white;
+	color: var(--grey-1);
 	bottom: -18px;
 }
 
@@ -1072,8 +1039,6 @@ export default {
 	height: auto;
 }
 
-
-
 .champion-abilities-card {
 	margin: 10px auto;
 }
@@ -1126,13 +1091,11 @@ export default {
 	z-index: 999;
 	min-width: 300px;
 	margin-top: .5rem;
-	/* Other styles */
 }
 
 .tooltip .ability-label {
 	bottom: 1rem;
 }
-
 
 .tooltip div {
 	margin-bottom: 0.5rem;
@@ -1169,7 +1132,6 @@ export default {
 .ability-icon-passive {
 	width: 25px !important;
 }
-
 
 .spell-name {
 	color: var(--gold-1);
@@ -1213,8 +1175,6 @@ export default {
 	gap: 0rem;
 }
 
-
-
 .champion-card {
 	display: flex;
 	height: 250px;
@@ -1222,8 +1182,6 @@ export default {
 	padding: 1.5rem;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-
 
 .champion-portrait {
 	padding: 0.5rem;
@@ -1273,12 +1231,10 @@ export default {
 	flex-wrap: wrap;
 	gap: 0;
 	padding-top: 1rem;
-
 }
 
 .champion-grid.is-scrollable {
 	padding-right: 1rem;
-	/* Add some padding to the right to make room for the scrollbar */
 }
 
 .slim-row {
@@ -1287,7 +1243,6 @@ export default {
 	position: fixed;
 	justify-content: center;
 	height: auto;
-	/* Let the content define the height */
 	flex-grow: 0;
 }
 
@@ -1329,11 +1284,9 @@ export default {
 	outline: none;
 }
 
-/*  .search-container .input-group:hover input, */
 .search-container .input-group input:focus,
 .search-container .search-bar.active input {
 	width: 100%;
-	/* Full width of container */
 	padding: .375rem;
 	opacity: 1;
 	position: static;
@@ -1375,9 +1328,7 @@ export default {
 .champion-tile span {
 	display: block;
 	text-shadow: 1px 1px 2px var(--blue-6);
-	/* Make the span a block element to allow for text alignment */
 	text-align: center;
-	/* Center the text */
 	color: var(--gold-2);
 	display: block;
 	font-size: 1rem;
@@ -1387,8 +1338,6 @@ export default {
 	transform: scale(1.05);
 }
 
-
-/* Scrollbar styles for the search bar or its container */
 .champion-grid::-webkit-scrollbar {
 	padding-right: 10px;
 	width: .75rem;
@@ -1402,7 +1351,6 @@ export default {
 
 .champion-grid::-webkit-scrollbar-track {
 	background-color: var(--navbar-background-elements);
-	/* Black color for the track */
 }
 
 .red-theme .champion-grid::-webkit-scrollbar-thumb {
@@ -1414,30 +1362,35 @@ export default {
 /*
 .blue-theme .champion-image {
 	will-change: box-shadow, border-color;
-	border: 4px solid var(--blue-3);
-	box-shadow: 0 0 5px 5px rgba(0, 253, 255, 1);
+	box-shadow: 0 0 2px 2px rgba(0, 253, 255, 1);
 	border-color: #10FEFF;
-	border: 2px solid #10FEFF;
-	animation: blue-glow 1s ease-in infinite ; 
+	border: 1px solid #10FEFF;
+	/* animation: blue-glow 5s ease-in-out infinite ;
 }
-*/
-/* 
+
 .red-theme .champion-image {
 	will-change: box-shadow, border-color;
-	box-shadow: 0 0 5px 5px rgba(255, 0, 0, 1);
+	box-shadow: 0 0 2px 2px rgba(255, 0, 0, 1);
 	border-color: #FE1010;
-	border: 2px solid #fe1010;
+	border: 1px solid #fe1010;
+	 animation: red-glow 5s ease-in-out infinite ; 
 }
 */
+
 @keyframes blue-glow {
 
 	0% {
-		box-shadow: 0 0 3px 3px rgba(0, 253, 255, 1);
+		box-shadow: 0 0 1px 2px rgba(0, 253, 255, 1);
+		border-color: #10FEFF;
+	}
+
+	50% {
+		box-shadow: 0 0 1px 2px rgba(0, 253, 255, .5);
 		border-color: #10FEFF;
 	}
 
 	100% {
-		box-shadow: 0 0 3px 3px rgba(0, 253, 255, 10);
+		box-shadow: 0 0 1px 2px rgba(0, 253, 255, 1);
 		border-color: #10FEFF;
 	}
 }
@@ -1445,12 +1398,17 @@ export default {
 @keyframes red-glow {
 
 	0% {
-		box-shadow: 0 0 3px 3px rgba(255, 0, 0, 1);
+		box-shadow: 0 0 1px 2px rgba(255, 0, 0, 1);
+		border-color: #FE1010;
+	}
+
+	50% {
+		box-shadow: 0 0 1px 2px rgba(255, 0, 0, .5);
 		border-color: #FE1010;
 	}
 
 	100% {
-		box-shadow: 0 0 3px 3px rgb(255, 0, 0);
+		box-shadow: 0 0 1px 2px rgb(255, 0, 1);
 		border-color: #FE1010;
 	}
 }
@@ -1469,15 +1427,15 @@ export default {
 	}
 }
 
+/*
 .blue-theme {
 	border-bottom: 3px solid #00ffea81;
 }
 
 .red-theme {
-
 	border-bottom: 3px solid rgba(223, 58, 58, 0.5);
 }
-
+*/
 .blue-themex {
 	border-radius: 10px;
 	box-shadow:

@@ -3,9 +3,6 @@
 		<div class="d-flex">
 			<span>Review Notes</span>
 		</div>
-		<transition name="fade">
-			<i v-if="autoSaved" key="autoSaved" class="fas fa-check-circle text-success"></i>
-		</transition>
 		<div class="buttons-container">
 			<button @click="createNewNote" class="btn add-button">
 				<i class="fas fa-plus"></i>
@@ -16,7 +13,7 @@
 	<div class="notes-list notes-body">
 		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item mb-3">
 			<textarea spellcheck="false" v-model="noteText[item.noteId]" class="note-textarea"
-				placeholder="Type your notes here..." rows="5"></textarea>
+				placeholder="Type your notes here..." rows="6"></textarea>
 			<div class="note-footer d-flex">
 				<div class="note-date">{{ formatDate(item.createdAt) }}</div>
 				<div class="buttons-container d-flex justify-content-end">

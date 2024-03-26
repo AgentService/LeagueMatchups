@@ -33,7 +33,9 @@ if (import.meta.env.MODE !== "production") {
   console.log("DEBUG?: ", import.meta.env.VITE_DEBUG);
   Debug.enable(import.meta.env.VITE_DEBUG);
 }
+console.log("DEBUG?: ", import.meta.env.VITE_DEBUG);
 Debug.enable(import.meta.env.VITE_DEBUG);
+
 
 async function initializeApp() {
   await setupBaseUrl();
@@ -54,11 +56,7 @@ initializeApp()
 
     const token = store.state.auth.token;
     const refreshToken = store.state.auth.refreshToken;
-    console.log("Token from local storage:", token);
-    console.log("Refresh token from local storage:", refreshToken);
     if (token && refreshToken) {
-      console.log("Token and refresh token found in local storage");
-      console.log("Reauthenticating with token and refresh token");
       // Dispatch an action that handles reauthentication and potentially refreshes the token
       store.dispatch("auth/reauthenticate", { token, refreshToken });
     }
