@@ -10,7 +10,7 @@
             <div class="popup-content">
                 <p v-if="updateState.message">{{ updateState.message }}</p>
                 <p v-if="updateError" class="error-message">Error updating: {{ updateError }}</p>
-                <p v-if="appVersionInfo.available && updateState.showRestartButton">New Version: {{ appVersionInfo.available }}</p>
+                <!-- <p v-if="appVersionInfo.available && updateState.showRestartButton">New Version: {{ appVersionInfo.available }}</p> -->
             </div>
 
             <!-- Progress and Actions Section -->
@@ -94,7 +94,7 @@ const handleDownloadProgress = (progress) => {
     const roundedProgress = Math.round(progress.percent);
     debug("Download progress:", roundedProgress);
     updateState.progress = roundedProgress;
-    updateState.message = `Downloading update: ${roundedProgress}%`;
+    updateState.message = `Downloading: ${roundedProgress}%`;
     updateState.show = true;
 };
 
@@ -138,11 +138,11 @@ onUnmounted(() => {
     bottom: 20px;
     right: 20px;
     background: var(--dialog-background);
-    padding: 20px;
+    padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
-    width: 300px;
-    height: 250px;
+    width: 250px;
+    height: 180px;
     display: flex;
     color: var(--blue-7);
     flex-direction: column;
@@ -150,7 +150,7 @@ onUnmounted(() => {
 
 .popup-header {
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
 }
 
 .popup-content {
@@ -165,10 +165,10 @@ onUnmounted(() => {
 }
 
 .update-progress {
-    width: 100%;
+    width: 90%;
     background-color: var(--blue-7);
     border-radius: 0.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: .5rem;
 }
 
 .update-progress-bar {

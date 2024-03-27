@@ -40,7 +40,7 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
-									<div class="col-xxl-7 m-auto">
+									<div class="col-xxl-6 m-auto">
 										<div class="card-small card-top mb-0">
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
 										</div>
@@ -53,7 +53,7 @@
 										<span>vs</span>
 									</div>
 									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-5 m-auto">
+									<div class="col-xxl-6 m-auto">
 										<div class="card-small card-top mb-0">
 											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 										</div>
@@ -226,7 +226,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	z-index: 2;
 	font-size: 3rem;
 	top: 12%;
-	right: 42.65%;
+	right: 49.3%;
 	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
@@ -273,8 +273,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
 	padding: .5rem;
-	max-height: 390px;
-	min-height: 390px;
+	max-height: 360px;
+	min-height: 360px;
 	z-index: auto;
 }
 

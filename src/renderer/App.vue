@@ -1,17 +1,11 @@
 <template>
-	<!-- <div v-if="isUpdateAvailable" class="popup"> -->
-	<!-- <div class="popup">
-		An update is available! <button @click="checkForUpdates">Download</button>
-		<button @click="closeUpdateAvailablePopup">Close</button>
-	</div> -->
 	<Navbar @before-leave="handleBeforeLeave">
 	</Navbar>
 	<div class="app-wrapper">
-		<router-view v-slot="{ Component }">
 			<transition name="fade">
-				<component :is="Component" />
+				<router-view>
+				</router-view>
 			</transition>
-		</router-view>
 	</div>
 	<Update />
 </template>
@@ -29,14 +23,14 @@ const route = useRoute();
 const showNavbar = ref(route.path !== '/login');
 
 function handleBeforeLeave() {
-	showNavbar.value = false; // Hide Navbar, show placeholder
+	showNavbar.value = false; 
 	setTimeout(() => {
-		showNavbar.value = true; // Revert after transition duration
-	}, 1100); // Match your fade transition duration
+		showNavbar.value = true;
+	}, 1100);
 }
 
 onMounted(async () => {
-	store.dispatch('init/checkAndUpdateVersion'); // Adjust based on whether the action is global or namespaced
+	store.dispatch('init/checkAndUpdateVersion');
 });
 
 </script>

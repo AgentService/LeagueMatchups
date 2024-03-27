@@ -117,14 +117,7 @@ async function saveNotes(newValue) {
 
 
 <style scoped>
-.share-button {
-	text-transform: none;
-	color: var(--gold-1);
-}
 
-.share-button:hover {
-	color: var(--gold-2);
-}
 
 .notes-saved {
 	font-size: 1rem;
