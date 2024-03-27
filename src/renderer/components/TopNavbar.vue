@@ -1,11 +1,8 @@
 <template>
 	<div class="main-container">
-
 		<nav class="navbar navbar-expand-lg navbar-dark bg-dark me-4 ms-4">
 			<div class="container-fluid w-75">
-				<div class="d-flex justify-content-start">
-					<SummonerInfo></SummonerInfo>
-				</div>
+				<SummonerInfo></SummonerInfo>
 				<div class="mx-auto d-flex justify-content-center">
 					<router-link to="/championMatchup"
 						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Prepare</router-link>
@@ -32,28 +29,28 @@
 						<div class="button-divider"></div>
 						<!-- Profile Dropdown -->
 						<div class="d-flex align-items-center">
-							<span class="text-light"> {{ user.username }}
-							</span>
-							<div class="dropdown align-items-center">
-
-								<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
-									data-bs-toggle="dropdown" aria-expanded="false">
-									<!-- Show user icon if logged in, otherwise show login and registration options -->
-									<font-awesome-icon :icon="['fas', 'user-circle']"
-										:class="{ 'logged-out': !isLoggedIn }" /> </a>
+							<div class="dropdown" href="#" role="button" id="dropdownMenuLink2"
+								data-bs-toggle="dropdown" aria-expanded="false">
+								<div class="d-flex align-items-center">
+									<span class="text-light"> {{ user.username }}
+									</span>
+									<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
+										data-bs-toggle="dropdown" aria-expanded="false">
+										<!-- Show user icon if logged in, otherwise show login and registration options -->
+										<font-awesome-icon :icon="['fas', 'user-circle']"
+											:class="{ 'logged-out': !isLoggedIn }" /> </a>
+								</div>
 								<ul v-show="dropdownOpen" v-if="isLoggedIn" class="dropdown-menu"
 									aria-labelledby="dropdownMenuLink2">
-									<li class="dropdown-header">{{ user.username }}</li>
-									<li>
-										<hr class="dropdown-divider">
-									</li>
-									<div class="text-secondary">
-										<li><a class="dropdown-item" href="#">Send Feedback</a></li>
+									<!-- <li class="dropdown-header">{{ user.username }}</li> -->
+									<div class="text-light">
+										<li><a class="dropdown-item text-secondary" href="#">Send Feedback</a></li>
 										<li><a class="dropdown-item" href="#" @click="logout">Log Out</a></li>
 										<li>
 											<hr class="dropdown-divider">
 										</li>
-										<li><a class="dropdown-item" href='#' @click="toggleVersionInfoModal">Version:
+										<li><a class="dropdown-item text-secondary" href='#'
+												@click="toggleVersionInfoModal">Version:
 												{{
 							appVersionInfo.currentVersion }} </a></li>
 									</div>

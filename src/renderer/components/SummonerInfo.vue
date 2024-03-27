@@ -1,26 +1,27 @@
 <template>
-	<div class="dropdown summoner-display" @click="dropdownOpen = !dropdownOpen"
+	<div class="dropdown summoner-display" @mouseover="clearCloseDropdownTimeout" @mouseleave="setCloseDropdownTimeout"
 		:aria-expanded="dropdownOpen.toString()">
-		<a class="btn dropdown-toggler" href="#" role="button" aria-expanded="false">
+		<button class="btn dropdown-toggler" href="#" role="button" aria-expanded="false">
 			<div class="d-flex align-items-center">
 				<img :src="currentSelection ? getSummonerIcon(currentSelection.profileIconId) : getSummonerIcon(5541)"
 					alt="Summoner Icon" class="rounded-circle icon-image me-2">
 				<span class="text-light">{{ currentSelection?.gameName || 'Summoner' }}</span>
 				<span class="text-secondary ms-1 tag">#{{ currentSelection?.tagLine || '' }}</span>
 			</div>
-		</a>
-		<ul class="dropdown-menu" :class="{ 'show': dropdownOpen }">
-			<li class="dropdown-header">Summoner</li>
-			<li>
-				<hr class="dropdown-divider">
-			</li>
-			<li v-for="detail in allPlayerDetails" :key="detail.puuid" @click="selectSummoner(detail)">
-				<a class="dropdown-item d-flex align-items-center">
-					<img :src="getSummonerIcon(detail.profileIconId)" alt="Summoner Icon" class="icon-menu-image me-2">
-					<span>{{ detail.gameName }}</span>
-				</a>
-			</li>
-		</ul>
+			<ul class="dropdown-menu mt-2" :class="{ 'show': dropdownOpen }">
+				<li class="dropdown-header">Summoner</li>
+				<li>
+					<hr class="dropdown-divider">
+				</li>
+				<li v-for="detail in allPlayerDetails" :key="detail.puuid" @click="selectSummoner(detail)">
+					<a class="dropdown-item d-flex align-items-center">
+						<img :src="getSummonerIcon(detail.profileIconId)" alt="Summoner Icon"
+							class="icon-menu-image me-2">
+						<span>{{ detail.gameName }}</span>
+					</a>
+				</li>
+			</ul>
+		</button>
 	</div>
 </template>
 
@@ -34,6 +35,7 @@ const dropdownContainer = ref(null);
 const dropdownOpen = ref(false);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
+const closeDropdownTimeout = ref(null);
 
 const currentSelection = computed(() => {
 	const current = store.getters['summoner/getCurrentSummoner'];
@@ -49,6 +51,7 @@ function handleClickOutside(event) {
 		dropdownOpen.value = false;
 	}
 }
+
 function selectSummoner(summonerDetail) {
 	currentSelection.value = summonerDetail;
 	store.commit('summoner/setCurrentSummoner', summonerDetail);
@@ -73,6 +76,9 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+	if (closeDropdownTimeout.value) {
+		clearTimeout(closeDropdownTimeout.value);
+	}
 	document.removeEventListener('click', handleClickOutside);
 });
 </script>

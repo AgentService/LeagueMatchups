@@ -2,7 +2,7 @@
 	<div>
 
 		<div class="note-card champion-card">
-			
+
 			<div class="d-flex justify-content-between align-items-center">
 				<div class="background-image" :style="championBackgroundStyle"></div>
 				<div class="search-container">
@@ -11,15 +11,15 @@
 							<span class="input-group-text" @click="showGrid">
 								<i class="fa-solid fa-search fa-xs"></i>
 							</span>
-							<input type="text" @click="showGrid" v-model="searchTerm" @input="filterChampions"
-								placeholder="Your Champion" class="form-control" v-if="instanceId === 1"/>
-								
-								<input type="text" @click="showGrid" v-model="searchTerm" @input="filterChampions"
-								placeholder="Enemy Champion" class="form-control" v-if="instanceId === 2"/>
+							<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
+								placeholder="Your Champion" class="form-control" v-if="instanceId === 1" />
+
+							<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
+								placeholder="Enemy Champion" class="form-control" v-if="instanceId === 2" />
 						</div>
 					</div>
 				</div>
-				
+
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
 					<div class="fav-header">
@@ -39,7 +39,7 @@
 			<!-- Champion Grid Container -->
 			<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
 				<!-- Champion Grid -->
-				<div class="champion-grid" v-show="isGridVisible">
+				<div class="champion-grid" v-show="isGridVisible"  v-click-outside="outsideClickHandler">
 					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
 						@click="selectChampion(champion)">
 						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
@@ -57,7 +57,7 @@
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
 							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" @click="showGrid" />
+								alt="Champion Image" @click.stop="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -157,7 +157,7 @@
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
 							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" @click="showGrid" />
+								alt="Champion Image" @click.stop="showGrid" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -515,6 +515,10 @@ export default {
 		},
 	},
 	methods: {
+		outsideClickHandler() {
+			this.isGridVisible = false;
+		},
+
 		handleMouseEnter() {
 			this.isButtonHovered = true;
 			this.showFavorites = true;
@@ -523,6 +527,10 @@ export default {
 			this.isButtonHovered = false;
 			// Delay hiding to allow moving to the popup
 			this.delayHidePopup();
+		},
+		handleMouseLeaveGrid() {
+			this.isGridVisible = false;
+			this.isGridOpen = false;
 		},
 		handlePopupMouseEnter() {
 			this.isPopupHovered = true;
@@ -617,7 +625,6 @@ export default {
 		},
 		showGrid() {
 			this.isGridVisible = true;
-			this.selectedChampion = null; // Optionally reset the selected champion when showing the grid
 		},
 
 		// Method to hide the grid if you need it
@@ -1321,6 +1328,10 @@ export default {
 	width: 50px;
 	background: var(--hextech-black);
 	border: 0px solid var(--blue-7);
+}
+
+.champion-tile:hover {
+	transform: scale(1.05);
 }
 
 .champion-tile img {

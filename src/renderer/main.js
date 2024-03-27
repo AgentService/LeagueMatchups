@@ -2,6 +2,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
+import ClickOutsideDirective from './utils/ClickOutsideDirective';
 
 import VueLazyload from "vue3-lazy";
 import { store } from "../store"; // Import your Vuex store
@@ -45,6 +46,8 @@ async function initializeApp() {
 initializeApp()
   .then(() => {
     const vueApp = createApp(App);
+    vueApp.directive('click-outside', ClickOutsideDirective);
+
     vueApp.use(VueLazyload, {
       // options...
     });

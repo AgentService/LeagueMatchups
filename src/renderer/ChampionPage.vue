@@ -72,12 +72,12 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-xxl-6">
+								<div class="col-xxl-8">
 									<div class="card-large card-top card-bottom">
 										<GeneralNotes />
 									</div>
 								</div>
-								<div class="col-xxl-6">
+								<div class="col-xxl-4">
 									<div class="card-large card-top card-bottom">
 										<MatchHistory />
 									</div>
@@ -199,7 +199,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .save-button,
 .add-button,
 .delete-button {
-	opacity: 0.5;
+	align-items: flex-end;
 	color: var(--grey-1);
 }
 
@@ -272,7 +272,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-image: linear-gradient(to right, #091014, #05080f);
 	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
 	color: #e7e7e7;
-	padding: .5rem;
+	padding: 1rem;
 	max-height: 360px;
 	min-height: 360px;
 	z-index: auto;
@@ -288,7 +288,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: .5rem;
 	margin-bottom: 1rem;
-	max-height: 260px;
+	max-height: 250px;
 	min-height: 260px;
 	z-index: auto;
 }
@@ -303,7 +303,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: #e7e7e7;
 	padding: 2rem 2rem;
 	margin-bottom: 1rem;
-	max-height: 570px;
+	max-height: 560px;
 	min-height: 570px;
 	z-index: auto;
 }
@@ -318,14 +318,13 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 .card-header-custom h5 {
 	margin: 0;
-	/* Adjust as needed */
 }
 
 .notes-body {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	padding: .25rem .5rem;
+	padding: .5rem;
 }
 
 /* Textarea for the note content */

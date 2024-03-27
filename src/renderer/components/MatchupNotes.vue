@@ -1,9 +1,9 @@
 <template>
 	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span>Matchup Notes</span>
-		<div class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+		<button class="btn" @click="showNotesModal = true" aria-label="Shared">
 			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-		</div>
+		</button>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="matchup"
 			title="Shared Matchup Notes" :championA="championA" :championB="championB"
 			@update:isVisible="showNotesModal = $event" />
@@ -16,7 +16,7 @@
 		</div>
 		<!-- Textarea for notes, shown only when not loading -->
 		<textarea v-else spellcheck="false" v-model="localNotes" placeholder="Type your notes here..."
-			class="note-textarea" rows="12"></textarea>
+			class="note-textarea" rows="10"></textarea>
 	</div>
 
 	<div class="status-container">

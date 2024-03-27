@@ -381,20 +381,25 @@ router.get("/champion/others/:championName", async (req, res) => {
 
 // GET endpoint to retrieve general notes for a user
 router.get("/general", async (req, res) => {
-  const userId = req.user.id; // Directly use user ID
+  const userId = req.user.id;
   const { dbPool } = req.app.locals;
 
   try {
-    const { rows } = await dbPool.query(
-      `SELECT * FROM generalnotes WHERE User_ID = $1`,
-      [userId]
-    );
+    const query = `
+    SELECT generalnotes.*, array_agg(generalnotestags.tag_id) as tags
+    FROM generalnotes
+    LEFT JOIN generalnotestags ON generalnotes.note_id = generalnotestags.note_id
+    WHERE generalnotes.user_id = $1
+    GROUP BY generalnotes.note_id;
+    `;
+    const { rows } = await dbPool.query(query, [userId]);
+    const notesWithTags = rows.map((row) => snakeToCamelCase(row));
     res.status(200).json({
       message: "Notes retrieved successfully",
-      notes: rows.map((row) => snakeToCamelCase(row)), // Convert each note to camelCase
+      notes: notesWithTags,
     });
   } catch (error) {
-    debug("Error retrieving notes:", error);
+    console.error("Error retrieving notes with tags:", error);
     res.status(500).json({ message: "Error retrieving notes" });
   }
 });
@@ -506,25 +511,27 @@ router.post("/general/:noteId/tags", async (req, res) => {
   try {
     // Begin a transaction
     await dbPool.query("BEGIN");
+    debug("Associating tags with note:", noteId);
 
     // Insert tag associations
     const promises = tagIds.map((tagId) =>
       dbPool.query(
-        `INSERT INTO GeneralNotesTags (NoteID, TagID) VALUES ($1, $2)`,
+        `INSERT INTO GeneralNotesTags (Note_ID, Tag_ID) VALUES ($1, $2)`,
         [noteId, tagId]
       )
     );
-
+    debug("Tag associations:", promises);
     // Wait for all insertions to complete
     await Promise.all(promises);
 
     // Commit the transaction
     await dbPool.query("COMMIT");
-
+    debug("Tags associated successfully");
     res.status(200).json({ message: "Tags associated successfully" });
   } catch (error) {
     // Rollback the transaction in case of error
     await dbPool.query("ROLLBACK");
+    debug("Error associating tags with the note:", error);
     res.status(500).json({ message: "Error associating tags with the note" });
   }
 });
@@ -533,13 +540,13 @@ router.delete("/general/:noteId/tags/:tagId", async (req, res) => {
   const { dbPool } = req.app.locals;
   const noteId = req.params.noteId;
   const tagId = req.params.tagId;
-
+  debug("Disassociating tag with note:", noteId, tagId);
   try {
     const { rowCount } = await dbPool.query(
-      `DELETE FROM GeneralNotesTags WHERE NoteID = $1 AND TagID = $2`,
+      `DELETE FROM GeneralNotesTags WHERE Note_ID = $1 AND Tag_ID = $2`,
       [noteId, tagId]
     );
-
+    debug("Disassociating tag with note:", rowCount);
     if (rowCount > 0) {
       res.status(200).json({ message: "Tag disassociated successfully" });
     } else {

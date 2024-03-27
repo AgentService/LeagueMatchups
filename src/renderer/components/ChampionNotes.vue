@@ -11,7 +11,7 @@
 	</div>
 	<div class="notes-body">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="12"></textarea>
+			rows="10"></textarea>
 	</div>
 	<div class="status-container">
 		<!-- <div v-if="notesState === 'neutral'" key="neutral" class="status-message">

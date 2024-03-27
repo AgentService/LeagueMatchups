@@ -25,8 +25,10 @@ export const notes = {
       champions: {},
       matchups: {},
     },
+    tagsList: [],
   },
   mutations: {
+    // generalNotes
     ADD_GENERAL_NOTE(state, note) {
       state.generalNotes.push(note);
     },
@@ -39,7 +41,6 @@ export const notes = {
         state.generalNotes[index] = { ...state.generalNotes[index], ...note };
       }
     },
-
     SET_GENERAL_NOTES(state, notes) {
       state.generalNotes = notes;
     },
@@ -51,7 +52,6 @@ export const notes = {
         state.generalNotes.splice(index, 1);
       }
     },
-
     // championNotes
     SET_CHAMPION_PERSONAL_NOTES(state, { championName, data }) {
       state.championNotes[championName] = data;
@@ -68,7 +68,6 @@ export const notes = {
     SET_OTHER_USERS_CHAMPION_NOTES(state, { championName, notes }) {
       state.championNotesShared[championName] = notes;
     },
-
     // Matchup Notes Mutations
     SET_MATCHUP_NOTES(state, { matchupId, data }) {
       state.matchupNotes[matchupId] = data;
@@ -89,6 +88,7 @@ export const notes = {
       }
       state.lastFetchTimestamps[type][key] = timestamp;
     },
+    // Rating Mutations
     SET_CHAMPION_NOTES_RATING(state, { championName, noteId, rating }) {
       // Check if the champion's notes exist in the shared structure
       if (state.championNotesShared[championName]) {
@@ -119,6 +119,36 @@ export const notes = {
         }
       }
     },
+    // Tags Mutations
+    SET_NOTES(state, notes) {
+      state.notesList = notes;
+    },
+    SET_TAGS(state, tags) {
+      state.tagsList = tags;
+    },
+    ADD_TAG_TO_NOTE(state, { noteId, tagId }) {
+      const note = state.generalNotes.find((note) => note.noteId === noteId);
+      if (note) {
+        // Initialize the tags array if it doesn't exist
+        if (!note.tags) {
+          note.tags = [];
+        }
+        // Only add the tag if it's not already associated with the note
+        if (!note.tags.includes(tagId)) {
+          note.tags.push(tagId);
+        }
+      } else {
+        // Optionally, handle the case where the note doesn't exist
+        console.error(`Note with ID ${noteId} not found.`);
+      }
+    },
+
+    REMOVE_TAG_FROM_NOTE(state, { noteId, tagId }) {
+      const note = state.generalNotes.find((note) => note.noteId === noteId);
+      if (note) {
+        note.tags = note.tags.filter((t) => t !== tagId);
+      }
+    },
   },
   getters: {
     getGeneralNote: (state) => (noteId) => {
@@ -143,6 +173,11 @@ export const notes = {
     getMatchupNotesShared: (state) => (matchupId) => {
       return state.matchupNotesShared[matchupId] || [];
     },
+    // tags getters
+    getGeneralNoteById: (state) => (noteId) => {
+      return state.generalNotes.find((note) => note.id === noteId);
+    },
+    allTags: (state) => state.tagsList,
   },
   actions: {
     // generalNotes
@@ -177,7 +212,6 @@ export const notes = {
         // Handle the error appropriately
       }
     },
-
     async deleteGeneralNote({ commit }, noteId) {
       try {
         const authConfig = getAuthConfig();
@@ -284,13 +318,12 @@ export const notes = {
         // Handle error appropriately
       }
     },
-
     // Matchup Notes Actions
     async fetchMatchupNotes({ state, commit }, combinedId) {
       if (!state.matchupNotes[combinedId]) {
         try {
           const authConfig = getAuthConfig(); // Ensure this function is defined and correctly sets up authorization headers
-          debug("authConfig", authConfig)
+          debug("authConfig", authConfig);
           const response = await axios.get(
             `${baseUrl}/api/notes/matchup/${combinedId}`,
             authConfig
@@ -392,6 +425,46 @@ export const notes = {
         }
       } catch (error) {
         console.error("Error updating matchup note rating:", error);
+      }
+    },
+    // Tags Actions
+    async fetchTags({ commit }) {
+      try {
+        const authConfig = getAuthConfig();
+
+        const response = await axios.get(
+          `${baseUrl}/api/notes/tags`,
+          authConfig
+        ); // Updated URL path
+        commit("SET_TAGS", response.data.tags);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+      }
+    },
+    async addTagToNote({ commit }, { noteId, tagId }) {
+      try {
+        const authConfig = getAuthConfig();
+
+        await axios.post(
+          `${baseUrl}/api/notes/general/${noteId}/tags`,
+          {
+            tagIds: [tagId],
+          },
+          authConfig
+        );
+        commit("ADD_TAG_TO_NOTE", { noteId, tagId });
+      } catch (error) {
+        console.error("Error adding tag to note:", error);
+      }
+    },
+    async removeTagFromNote({ commit }, { noteId, tagId }) {
+      try {
+        const authConfig = getAuthConfig();
+        await axios.delete(
+          `${baseUrl}/api/notes/general/${noteId}/tags/${tagId}`, authConfig),
+        commit("REMOVE_TAG_FROM_NOTE", { noteId, tagId });
+      } catch (error) {
+        console.error("Error removing tag from note:", error);
       }
     },
   },

@@ -5,15 +5,16 @@
 			<p class="item-description">{{ tooltip.content.description }}</p>
 		</div>
 	</div>
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
+	<div class="card-header-custom d-flex justify-content-between">
 		<span class="d-flex align-items-center">Match History
-			<button class="btn " v-if="!selectedMatch" @click="fetchAndShowLastMatch">
-				<i class="fas fa-refresh"></i>
-			</button>
 		</span>
+		<button class="btn " v-if="!selectedMatch" @click="fetchAndShowLastMatch">
+			<span>Refresh </span>
+			<i class="fas fa-refresh"></i>
+		</button>
 
 	</div>
-	<div class="filter-container d-flex justify-content-between">
+	<!-- <div class="filter-container d-flex justify-content-between">
 		<div class="filter-header d-flex">
 			<i class="text-secondary fa-solid fa-filter"></i>
 		</div>
@@ -26,24 +27,27 @@
 			</button>
 		</div>
 
-	</div>
+	</div> -->
 	<!-- List of matches -->
 	<div v-if="!selectedMatch" class="matches-list">
 		<div v-for="(match, index) in rankedLastMatches" :key="index" class="match-card" @click="selectMatch(match)">
 			<div class="match-info">
-				<div class="champion-icon-container d-flex flex-column justify-content-end align-items-center">
+				<div class="champion-icon-container d-flex flex-column justify-content-start align-items-center">
 					<img :src="getChampionImageSource('small', getChampionNameById(getPlayerChampion(match)?.championId))"
 						alt="Your Champion" class="champion-icon">
-					<div class="timestamp mt-1 align-items-center">{{ calculateTimeSinceMatch(match.info.gameCreation) }}
+					<div class="timestamp mt-1">{{ calculateTimeSinceMatch(match.info.gameCreation)
+						}}
 						hours ago</div>
 
 				</div>
 				<div class="details-container">
 					<div class="stats-row">
-						<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">{{ isWin(match) ?
-							'Win' : 'Loss' }}</div>
-						<div>{{ getPlayerChampion(match).kills }} / <span class="deaths">{{ getPlayerChampion(match).deaths
-						}}</span> / {{ getPlayerChampion(match).assists }}</div>
+						<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">{{
+		isWin(match) ?
+			'Win' : 'Loss' }}</div>
+						<div>{{ getPlayerChampion(match).kills }} / <span class="deaths">{{
+		getPlayerChampion(match).deaths
+	}}</span> / {{ getPlayerChampion(match).assists }}</div>
 						<div>{{ calculateCsPerMinute(getPlayerChampion(match)) }} CS/Min.</div>
 						<div>{{ calculateVisionScorePerMinute(getPlayerChampion(match)) }} Vis/Min.</div>
 					</div>
@@ -197,20 +201,19 @@ export default {
 
 		const tooltip = reactive({
 			content: null,
-			itemId: null, // Track the currently hovered item
+			itemId: null,
 			isVisible: false,
 		});
 
 		onMounted(() => {
 			store.dispatch('items/fetchAllItems');
-			fetchAndShowLastMatch();
+			// fetchAndShowLastMatch();
 		});
 		const hideTooltip = () => {
 			tooltip.itemId = null; // Reset the currently hovered item when mouse leaves
 			tooltip.isVisible = false;
 		};
 		const getItemById = (itemId) => {
-			// Assuming store.state.items is an array of all items with their details
 			return store.getters['items/getItemById'](itemId);
 		};
 
@@ -444,7 +447,7 @@ export default {
 }
 
 .item-name {
-	font-size: 1.2em;
+	font-size: 1rem;
 	font-weight: bold;
 	color: var(--gold-1);
 }
@@ -453,14 +456,13 @@ export default {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-right: 5px;
+	margin-right: 3px;
 }
 
 .item-icon {
 	width: 30px;
 	height: 30px;
-	border-radius: 0%;
-	border: 2px solid #333;
+	border: 1px solid #333;
 }
 
 .back-button {
@@ -474,23 +476,17 @@ export default {
 	padding-top: 60px;
 }
 
-.btn {
-	width: auto;
-	display: block;
-	margin: 0 auto;
-}
-
 .stats-row,
 .items-row {
 	font-weight: normal;
-	font-size: .875rem;
+	font-size: .775rem;
 	display: flex;
 	align-items: center;
 }
 
 .stats-row {
 	justify-content: space-between;
-	padding: 0.5rem 0;
+	padding: 0.25rem 0;
 }
 
 .items-row {
@@ -526,8 +522,8 @@ export default {
 }
 
 .champion-image {
-	width: 40px;
-	height: 40px;
+	width: 35px;
+	height: 35px;
 }
 
 .participant-stats {
@@ -548,9 +544,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
-	/* Allows scrolling the entire list of matches */
 	max-height: calc(100vh - 100px);
-	/* Example: Adjust based on your layout */
 }
 
 .matches-list .match-card {
@@ -561,15 +555,16 @@ export default {
 .match-info {
 	display: flex;
 	width: 100%;
-	border-bottom: 1px solid rgba(51, 51, 51, 0.486);
-	padding: 1rem;
+	border-bottom: 1px solid var(--grey-3);
+	padding: .25rem;
 }
 
 .champion-icon-container {
-	flex-basis: 20%;
+	flex-basis: 33%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	padding: .5rem;
 }
 
 .right-side-details {
@@ -599,12 +594,11 @@ export default {
 	color: #fff;
 }
 
-
 .match-card {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	margin-bottom: 1rem;
+	margin-bottom: .5rem;
 }
 
 .win {
@@ -621,36 +615,37 @@ export default {
 }
 
 .champion-icon {
-	width: 50px;
-	height: 50px;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
-	border: 3px solid #333;
+	border: 1px solid #333;
 }
 
 .champion-icon-filter {
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
-	border: 3px solid var(--grey-2);
+	border: 1px solid var(--grey-2);
 }
 
 .stat-header {
-	font-size: 0.8em;
+	font-size: 0.7rem;
 	color: #aaa;
 }
 
 .stat-header {
-	font-size: 0.8em;
+	font-size: 0.7rem;
 	color: #aaa;
 }
 
 .stat-value {
-	font-size: 1em;
+	font-size: 0.7rem;
 	color: #fff;
 }
 
 .timestamp {
-	position: relative;
-	font-size: 0.7em;
+	text-align: start;
+	font-size: 0.7rem;
 	color: #777;
-}</style>
+}
+</style>
