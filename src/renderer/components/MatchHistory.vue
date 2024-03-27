@@ -556,15 +556,14 @@ export default {
 	display: flex;
 	width: 100%;
 	border-bottom: 1px solid var(--grey-3);
-	padding: .25rem;
+	padding-right: 2rem;
 }
 
 .champion-icon-container {
-	flex-basis: 33%;
+	flex-basis: 30%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: .5rem;
 }
 
 .right-side-details {

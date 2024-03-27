@@ -1,39 +1,25 @@
 <template>
     <div class="tag-menu-container">
         <div class="note-header d-flex justify-content-start align-items-start">
-            <div class="note-title">Issues</div>
+            <div class="note-title">Tags</div>
         </div>
         <div class="tag-selected">
-            <!-- Quadrats for selected tags -->
-            <div v-for="tag in selectedTags" :key="tag.tag_id" @click.stop="toggleTag(tag.tag_id)"
-                :class="['tag-quadrat', `d-flex`, `tag-${tag.tag_name.replace(/\s+/g, '')}`]">
+            <div v-for="tag in allTags" :key="tag.tag_id" :class="[
+                'tag-quadrat',
+                `tag-${tag.tag_name.replace(/\s+/g, '')}`,
+                { 'tag-unselected': !isSelected(tag) }
+            ]" @click.stop="toggleTag(tag.tag_id)">
                 &nbsp;{{ tag.tag_name }}&nbsp;
-                <span class="tag-close" @click.stop="toggleTag(tag.tag_id)">x</span>
+                <span v-if="isSelected(tag)" class="tag-close" @click.stop="toggleTag(tag.tag_id)">x</span>
             </div>
-
-            <!-- Modal for adding tags, positioned relative to the entire tag menu container -->
-            <div v-if="showAddTagView" class="add-tag-modal">
-                <div v-for="tag in allTags" :key="tag.tag_id" class="tag-quadrat-selection"
-                    @click="toggleTag(tag.tag_id)">
-                    {{ tag.tag_name }}
-                </div>
-                <button @click="toggleAddTagView">Done</button>
-            </div>
-        </div>
-        <div class="add-tag-button-container">
-            <button class="btn add-tag-button" @click="toggleAddTagView">
-                <i class="fas fa-plus"></i>
-                <span> Add</span>
-            </button>
         </div>
     </div>
-
 </template>
 
 
 
 <script setup>
-import { computed, ref, onMounted, watchEffect } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 const { noteId } = defineProps({
@@ -44,12 +30,7 @@ const { noteId } = defineProps({
 });
 
 const store = useStore();
-const showAddTagView = ref(false);
 
-const emit = defineEmits(['close']);
-const closeOverlay = () => {
-    emit('close');
-};
 const allTags = computed(() => store.getters['notes/allTags']);
 const selectedTags = computed(() => {
     // First, check if the notes array exists and the specific note is found
@@ -66,6 +47,10 @@ const selectedTags = computed(() => {
     return []; // If checks fail, return an empty array
 });
 
+const isSelected = (tag) => {
+    return selectedTags.value.some(selectedTag => selectedTag.tag_id === tag.tag_id);
+};
+
 const toggleTag = (tagId) => {
     const isTagSelected = selectedTags.value.some(tag => tag.tag_id === tagId);
     if (isTagSelected) {
@@ -75,19 +60,7 @@ const toggleTag = (tagId) => {
     }
 };
 
-
-const toggleAddTagView = () => {
-    showAddTagView.value = !showAddTagView.value;
-};
-
-watchEffect(() => {
-    // Whenever noteId changes, this will be run
-    const note = store.getters['notes/getGeneralNoteById'](noteId);
-    // perform actions based on the new note
-});
-
 onMounted(() => {
-    // Fetch all tags when the component is mounted
     store.dispatch('notes/fetchTags');
 });
 
@@ -98,22 +71,6 @@ onMounted(() => {
     display: none;
 }
 
-.tag-quadrat:hover .tag-close {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: start;
-    justify-content: center;
-    color: rgba(0, 0, 0, 0.897);
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: bold;
-    user-select: none;
-}
-
 .tag-CS {
     background-color: #ff4800;
 }
@@ -122,7 +79,7 @@ onMounted(() => {
     background-color: #7FFFD4;
 }
 
-.tag-BaseTiming {
+.tag-Recall {
     background-color: #D8BFD8;
 }
 
@@ -154,9 +111,7 @@ onMounted(() => {
     background-color: #ff5866;
 }
 
-/* Base style for all tags */
-.tag-quadrat {
-    position: relative;
+.tag-quadrat-selection {
     color: black !important;
     font-size: 12px;
     border-radius: 12px;
@@ -164,11 +119,48 @@ onMounted(() => {
     padding: 0.35rem;
     margin: 0px;
     flex: 0 0 auto;
+    display: block;
+}
+
+/* Base style for all tags */
+.tag-quadrat {
+    position: relative;
+    color: black !important;
+    font-size: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 0.125rem;
+    margin: 0.125rem 0.125rem;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+
+}
+
+.tag-quadrat:hover {
+    transform: scale(1.05);
+}
+
+.tag-quadrat:active {
+    outline: none;
+}
+
+.tag-quadrat-clicked {
+    transform: scale(0.95);
+    transition: none;
+}
+
+.tag-unselected {
+    background-color: #3535357a;
+    color: #a8a8a85d !important;
 }
 
 .tag-menu-container {
     position: relative;
-    flex-basis: 20%;
+    flex-basis: 36%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -182,11 +174,7 @@ onMounted(() => {
     justify-content: flex-start;
     padding: 0.5rem;
     gap: 0.5rem;
-    height: 100%;
-    width: 100%;
-    min-height: 70px;
 }
-
 
 .tag-menu {
     display: flex;
@@ -199,27 +187,8 @@ onMounted(() => {
     color: white;
 }
 
-.add-tag-modal {
-    position: absolute;
-    background-color: black;
-    border: 1px solid #ddd;
-    padding: 10px;
-    z-index: 10;
-}
-
 .tag-menu-container {
     display: flex;
     align-items: flex-start;
-}
-
-.add-tag-button-container {
-    margin-top: 1rem;
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.add-tag-button {
-    position: relative;
 }
 </style>

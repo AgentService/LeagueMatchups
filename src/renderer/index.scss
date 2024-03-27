@@ -124,6 +124,7 @@ button {
 		background-color 0.3s,
 		box-shadow 0.3s;
 	color: var(--grey-1) !important;
+	border: none;
 }
 
 button:hover {
@@ -141,6 +142,7 @@ button:hover {
     border-radius: 0.25rem;
     font-size: 1rem;
     margin: 0.5rem;
+	border: none;
 }
 
 .auth-buttons button:hover,
