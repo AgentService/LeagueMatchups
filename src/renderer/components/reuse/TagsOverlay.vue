@@ -163,7 +163,6 @@ onMounted(() => {
     flex-basis: 36%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     margin-bottom: 0;
 }
 
