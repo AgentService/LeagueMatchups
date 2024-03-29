@@ -493,7 +493,9 @@ router.get("/tags", async (req, res) => {
   const { dbPool } = req.app.locals;
 
   try {
-    const { rows } = await dbPool.query(`SELECT * FROM Tags`);
+    const { rows } = await dbPool.query(
+      `SELECT * FROM Tags ORDER BY tag_name ASC`
+    );
     res.status(200).json({
       message: "Tags retrieved successfully",
       tags: rows,

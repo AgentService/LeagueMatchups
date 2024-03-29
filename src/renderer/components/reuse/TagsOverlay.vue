@@ -1,18 +1,31 @@
 <template>
-    <div class="tag-menu-container">
-        <div class="note-header d-flex justify-content-start align-items-start">
+    <div class="tag-menu-container" :class="{ 'is-open': showAllTags }">
+        <div class="note-header d-flex justify-content-between align-items-center w-100 pe-3">
             <div class="note-title">Tags</div>
+            <!-- Toggle Button -->
+            <button class="btn button tag-panel-toggle" :class="{ 'highlighted': tagsEdited }"
+                @click="showAllTags ? finalizeTagEdits() : toggleTagVisibility()">
+                <span v-if="showAllTags">
+                    <i class="fas fa-check"></i> Done
+                </span>
+                <span v-else>
+                    <i class="fas fa-edit"></i> Edit
+                </span>
+            </button>
+
         </div>
-        <div class="tag-selected">
-            <div v-for="tag in allTags" :key="tag.tag_id" :class="[
-                'tag-quadrat',
-                `tag-${tag.tag_name.replace(/\s+/g, '')}`,
-                { 'tag-unselected': !isSelected(tag) }
-            ]" @click.stop="toggleTag(tag.tag_id)">
-                &nbsp;{{ tag.tag_name }}&nbsp;
-                <span v-if="isSelected(tag)" class="tag-close" @click.stop="toggleTag(tag.tag_id)">x</span>
-            </div>
+        <div class="tags-wrapper" :style="{ 'max-height': showAllTags ? '490px' : '300px' }">
+            <transition-group name="list" tag="div" class="tag-selected">
+                <div v-for="tag in sortedTags" :key="tag.tag_id"
+                    :class="['tag-quadrat', `tag-${tag.tag_name.replace(/\s+/g, '')}`, { 'tag-selected': isSelected(tag), 'tag-unselected': !isSelected(tag) }]"
+                    @click.stop="toggleTag(tag.tag_id)">
+                    {{ tag.tag_name }}
+                    <span v-if="isSelected(tag)" class="tag-close" @click.stop.prevent="toggleTag(tag.tag_id)">x</span>
+                </div>
+            </transition-group>
         </div>
+
+
     </div>
 </template>
 
@@ -31,11 +44,23 @@ const { noteId } = defineProps({
 
 const store = useStore();
 
+const showAllTags = ref(false);
+const tagsEdited = ref(false);
+
+const toggleTagVisibility = () => {
+    showAllTags.value = !showAllTags.value;
+    tagsEdited.value = true;
+};
+
+const finalizeTagEdits = () => {
+    tagsEdited.value = false;
+    showAllTags.value = false;
+};
+
 const allTags = computed(() => store.getters['notes/allTags']);
 const selectedTags = computed(() => {
     // First, check if the notes array exists and the specific note is found
     const note = store.state.notes?.generalNotes.find(n => n.noteId == noteId);
-
     // Now, check if the note has a `tags` array before calling map
     if (note && Array.isArray(note.tags)) {
         return note.tags.map(tagId => {
@@ -43,13 +68,34 @@ const selectedTags = computed(() => {
             return tag ? { tag_id: tag.tag_id, tag_name: tag.tag_name } : undefined;
         }).filter(tag => tag !== undefined);
     }
-
-    return []; // If checks fail, return an empty array
+    return [];
 });
 
+const sortedTags = computed(() => {
+    // Create a set for quick access to selected tag IDs
+    const selectedTagIds = new Set(selectedTags.value.map(tag => tag.tag_id));
+
+    // Filter out selected and unselected tags without sorting the selected ones
+    const selected = allTags.value.filter(tag => selectedTagIds.has(tag.tag_id));
+    const unselected = allTags.value
+        .filter(tag => !selectedTagIds.has(tag.tag_id))
+        .sort((a, b) => a.tag_name.localeCompare(b.tag_name, undefined, { sensitivity: 'base' }));
+
+    // When showing all tags, concatenate the selected and sorted unselected tags
+    // When not showing all tags, just return the selected ones as is
+    return showAllTags.value ? [...selected, ...unselected] : selected;
+});
+
+
 const isSelected = (tag) => {
-    return selectedTags.value.some(selectedTag => selectedTag.tag_id === tag.tag_id);
+    // Ensure tag is defined and has the tag_id property
+    if (tag && tag.hasOwnProperty('tag_id')) {
+        return selectedTags.value.some(selectedTag => selectedTag.tag_id === tag.tag_id);
+    }
+    // If tag is undefined or does not have the tag_id property, return false
+    return false;
 };
+
 
 const toggleTag = (tagId) => {
     const isTagSelected = selectedTags.value.some(tag => tag.tag_id === tagId);
@@ -67,10 +113,104 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.highlighted {
+    animation: pulse 3s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 1px rgba(255, 165, 0, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 0 0 2px rgba(209, 158, 64, 0.938);
+    }
+
+    100% {
+        box-shadow: 0 0 0 1px rgba(255, 165, 0, 0.7);
+    }
+}
+
+.list-enter-active,
+.list-move {
+    transition: all 0.5s ease;
+}
+
+.list-leave-active {
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.tag-panel-toggle {
+    color: #fff;
+    border: none;
+    padding: 0.55rem;
+    cursor: pointer;
+    text-align: center;
+}
+
+.tags-wrapper {
+    overflow-y: scroll;
+    transition: max-height 0.5s ease-in-out;
+    max-height: 0;
+}
+
+.tags-wrapper::-webkit-scrollbar {
+    width: 0;
+}
+
+.tags-wrapper::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    border-radius: 10px;
+}
+
+
 .tag-close {
     display: none;
 }
 
+.tag-ThreatAssessment {
+    background-color: #6a1b9a;
+    /* Purple */
+}
+
+.tag-ChampMastery {
+    background-color: #c2185b;
+    /* Pink */
+}
+
+.tag-Mental {
+    background-color: #00796b;
+    /* Teal */
+}
+
+.tag-Communication {
+    background-color: #fbc02d;
+    /* Yellow */
+}
+
+.tag-Roaming {
+    background-color: #455a64;
+    /* Blue Grey */
+}
+
+.tag-WardingLeaning {
+    background-color: #8d6e63;
+    /* Brown */
+}
+
+.tag-ObjectiveControl {
+    background-color: #7b1fa2;
+    /* Deep Purple */
+}
+
+.tag-Matchup {
+    background-color: #0288d1;
+    /* Light Blue */
+}
+
+/* Existing Styles */
 .tag-CS {
     background-color: #ff4800;
 }
@@ -111,6 +251,15 @@ onMounted(() => {
     background-color: #ff5866;
 }
 
+.tag-ObjectiveControl {
+    background-color: #8f003e;
+}
+
+.tag-Warding {
+    background-color: #ff8a80;
+}
+
+
 .tag-quadrat-selection {
     color: black !important;
     font-size: 12px;
@@ -130,14 +279,13 @@ onMounted(() => {
     border-radius: 12px;
     cursor: pointer;
     padding: 0.125rem;
-    margin: 0.125rem 0.125rem;
+    margin: 0.125rem;
     flex: 1 1 auto;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     text-align: center;
     user-select: none;
-
 }
 
 .tag-quadrat:hover {
@@ -154,36 +302,38 @@ onMounted(() => {
 }
 
 .tag-unselected {
-    background-color: #3535357a;
-    color: #a8a8a85d !important;
+    background-color: #3535352c;
+    color: #a8a8a82c !important;
+    opacity: 0.5;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 .tag-menu-container {
     position: relative;
-    flex-basis: 36%;
+    flex-basis: 30%;
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
+    transition: flex-basis 0.5s ease-in-out;
 }
 
 .tag-selected {
     display: flex;
     flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: flex-start;
+    align-content: center;
+    justify-content: center;
     padding: 0.5rem;
     gap: 0.5rem;
 }
 
+
 .tag-menu {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: flex-start;
     height: 100%;
-}
-
-.tag-quadrat {
-    color: white;
 }
 
 .tag-menu-container {
