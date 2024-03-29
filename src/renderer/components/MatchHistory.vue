@@ -544,6 +544,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
+	padding: .5rem 0;
 	max-height: calc(100vh - 100px);
 }
 
@@ -556,6 +557,7 @@ export default {
 	display: flex;
 	width: 100%;
 	border-bottom: 1px solid var(--grey-3);
+	padding: .5rem 0;
 	padding-right: 2rem;
 }
 

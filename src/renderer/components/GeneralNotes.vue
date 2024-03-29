@@ -1,35 +1,28 @@
 <template>
-	<div class="card-header-custom d-flex justify-content-between align-items-center me-3">
-		<div class="d-flex">
-			<span>Review Notes</span>
-		</div>
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
+		<span>Review Notes</span>
 		<div class="buttons-container">
 			<button @click="createNewNote" class="btn add-button">
-				<span>New </span>
 				<i class="fas fa-plus"></i>
+				<span> New </span>
 			</button>
 		</div>
 	</div>
 	<div class="notes-list notes-body">
-		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item mb-3 me-3">
+		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item">
 			<div class="note-content-wrapper">
 				<div class="note-textarea-container">
-					<div class="note-header d-flex justify-content-start align-items-start">
-						<div class="note-title">Note</div>
+					<div class="header">
+						<div class="note-date">{{ formatDate(item.createdAt) }}</div>
 					</div>
 					<textarea spellcheck="false" v-model="noteText[item.noteId]" class="note-textarea"
 						placeholder="Type your notes here..." rows="5"></textarea>
-					<div class="note-footer justify-content-between align-items-center">
-						<div class="note-date">{{ formatDate(item.createdAt) }}</div>
+					<div class="note-footer">
 						<div class="buttons-container">
-							<button @click="deleteNote(item.noteId)" class="btn button delete-button">
-								<i class="far fa-trash-alt"></i>
-								<span> Delete</span>
-							</button>
-							<button @click="saveNote(item.noteId)" class="btn save-button">
-								<i class="far fa-save"></i>
-								<span> Save</span>
-							</button>
+							<button @click="deleteNote(item.noteId)" class="btn button delete-button"><i
+									class="far fa-trash-alt"></i><span> Delete</span></button>
+							<button @click="saveNote(item.noteId)" class="btn save-button"><i
+									class="far fa-save"></i><span> Save</span></button>
 						</div>
 					</div>
 				</div>
@@ -136,6 +129,31 @@ onMounted(() => {
 </script>
 
 <style>
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	max-height: 25px;
+	min-height: 25px;
+	width: 100%;
+	padding: 0 0rem;
+	margin: .5rem 0;
+	overflow: hidden;
+}
+
+.header div {
+	font-weight: bold;
+}
+
+.note-textarea-container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.note-textarea {
+	width: 100%;
+}
 
 .buttons-container {
 	text-transform: none !important;
@@ -163,7 +181,6 @@ onMounted(() => {
 	align-self: center;
 	position: relative;
 	padding: 0 0.25rem;
-	color: var(--grey-2);
 }
 
 .note-item {
@@ -173,11 +190,11 @@ onMounted(() => {
 }
 
 .note-content-wrapper {
-	border: 1px solid var(--grey-3);
-	border-radius: 4px;
-	padding: 1.5rem 2rem;
+	border-bottom: 1px solid var(--grey-3);
 	display: flex;
 	height: 100%;
+	padding: .5rem 0;
+	margin: 0 1rem;
 }
 
 .note-textarea-container,
@@ -214,7 +231,6 @@ onMounted(() => {
 .note-footer {
 	display: flex;
 	justify-content: flex-end;
-	margin-top: .25rem;
 }
 
 .note-textarea-container {
@@ -222,17 +238,6 @@ onMounted(() => {
 	width: 100%;
 }
 
-.note-header {
-	margin-left: .5rem;
-	margin-bottom: .5rem;
-	display: flex;
-	justify-content: space-between;
-}
-
-.note-title {
-	font-weight: bold;
-	padding: .25rem 0;
-}
 
 .divider {
 	border-right: 1px solid var(--grey-3);

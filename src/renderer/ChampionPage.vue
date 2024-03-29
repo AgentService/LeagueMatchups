@@ -494,8 +494,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	text-transform: uppercase;
 	font-weight: 600;
 	text-align: start;
-	font-size: 1.1rem;
-	padding: .5rem 1rem;
+	font-size: 1rem;
+	padding: .5rem;
 	display: flex;
 	color: var(--gold-2);
 }

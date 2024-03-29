@@ -1,30 +1,30 @@
 <template>
-    <div class="tag-menu-container" :class="{ 'is-open': showAllTags }">
-        <div class="note-header d-flex justify-content-between align-items-center w-100 pe-3">
-            <div class="note-title">Tags</div>
-            <!-- Toggle Button -->
+    <div class="tag-menu-container" :class="{ 'editing': tagsEdited }">
+        <div class="header">
+            <div>Tags</div>
             <button class="btn button tag-panel-toggle" :class="{ 'highlighted': tagsEdited }"
-                @click="showAllTags ? finalizeTagEdits() : toggleTagVisibility()">
-                <span v-if="showAllTags">
-                    <i class="fas fa-check"></i> Done
-                </span>
-                <span v-else>
-                    <i class="fas fa-edit"></i> Edit
-                </span>
-            </button>
+            @click="showAllTags ? finalizeTagEdits() : toggleTagVisibility()">
+            <span v-if="showAllTags"><i class="fas fa-xmark"></i></span>
+        </button>
 
         </div>
-        <div class="tags-wrapper" :style="{ 'max-height': showAllTags ? '490px' : '300px' }">
+        <div class="tags-wrapper" :style="{ 'max-height': showAllTags ? '490px' : '100%', 'is-open': showAllTags }">
             <transition-group name="list" tag="div" class="tag-selected">
                 <div v-for="tag in sortedTags" :key="tag.tag_id"
                     :class="['tag-quadrat', `tag-${tag.tag_name.replace(/\s+/g, '')}`, { 'tag-selected': isSelected(tag), 'tag-unselected': !isSelected(tag) }]"
                     @click.stop="toggleTag(tag.tag_id)">
-                    {{ tag.tag_name }}
+                    &nbsp;&nbsp;&nbsp;{{ tag.tag_name }}&nbsp;&nbsp;&nbsp;
                     <span v-if="isSelected(tag)" class="tag-close" @click.stop.prevent="toggleTag(tag.tag_id)">x</span>
                 </div>
             </transition-group>
         </div>
-
+        <div class="note-footer d-flex align-items-end  justify-content-end">
+            <button class="btn button tag-panel-toggle" :class="{ 'highlighted': tagsEdited }"
+                @click="showAllTags ? finalizeTagEdits() : toggleTagVisibility()">
+                <span v-if="showAllTags"><i class="fas fa-check"></i> Done</span>
+                <span v-else><i class="fas fa-edit"></i> Show all</span>
+            </button>
+        </div>
 
     </div>
 </template>
@@ -88,11 +88,9 @@ const sortedTags = computed(() => {
 
 
 const isSelected = (tag) => {
-    // Ensure tag is defined and has the tag_id property
     if (tag && tag.hasOwnProperty('tag_id')) {
         return selectedTags.value.some(selectedTag => selectedTag.tag_id === tag.tag_id);
     }
-    // If tag is undefined or does not have the tag_id property, return false
     return false;
 };
 
@@ -113,47 +111,51 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.note-footer {
+    width: 100%;
+	display: flex;
+    flex: 1 1 auto;
+
+}
+@keyframes colorFadeAndBorder {
+
+    0%,
+    100% {
+        background-color: #0021475e;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0);
+    }
+
+    50% {
+        background-color: #001731;
+        box-shadow: 0 0 7px rgb(0, 98, 202);
+    }
+}
+
+.tag-menu-container.editing {
+    border-radius: 6px;
+    border: 2px dashed;
+    animation: colorFadeAndBorder 4s infinite;
+}
+
 .highlighted {
     animation: pulse 3s infinite ease-in-out;
 }
 
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 1px rgba(255, 165, 0, 0.7);
-    }
-
-    50% {
-        box-shadow: 0 0 0 2px rgba(209, 158, 64, 0.938);
-    }
-
-    100% {
-        box-shadow: 0 0 0 1px rgba(255, 165, 0, 0.7);
-    }
-}
-
 .list-enter-active,
 .list-move {
-    transition: all 0.5s ease;
-}
-
-.list-leave-active {
-    transition: all 0.3s ease;
-    opacity: 0;
-    transform: scale(0.95);
+    transition: all .5s ease;
 }
 
 .tag-panel-toggle {
     color: #fff;
     border: none;
-    padding: 0.55rem;
     cursor: pointer;
     text-align: center;
 }
 
 .tags-wrapper {
-    overflow-y: scroll;
+    overflow: hidden;
     transition: max-height 0.5s ease-in-out;
-    max-height: 0;
 }
 
 .tags-wrapper::-webkit-scrollbar {
@@ -167,7 +169,19 @@ onMounted(() => {
 
 
 .tag-close {
-    display: none;
+    position: absolute;
+    font-size: 0.75rem;
+    cursor: pointer;
+    top: -2px;
+    right: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.tag-quadrat:hover .tag-close {
+    opacity: 1;
+    visibility: visible;
 }
 
 .tag-ThreatAssessment {
@@ -259,26 +273,13 @@ onMounted(() => {
     background-color: #ff8a80;
 }
 
-
-.tag-quadrat-selection {
-    color: black !important;
-    font-size: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-    padding: 0.35rem;
-    margin: 0px;
-    flex: 0 0 auto;
-    display: block;
-}
-
-/* Base style for all tags */
 .tag-quadrat {
     position: relative;
     color: black !important;
     font-size: 12px;
     border-radius: 12px;
     cursor: pointer;
-    padding: 0.125rem;
+    padding: 0.125rem .5rem;
     margin: 0.125rem;
     flex: 1 1 auto;
     display: flex;
@@ -302,9 +303,10 @@ onMounted(() => {
 }
 
 .tag-unselected {
-    background-color: #3535352c;
-    color: #a8a8a82c !important;
-    opacity: 0.5;
+    padding: 0.25rem;
+    background-color: #000000;
+    color: #ffffff !important;
+    opacity: 0.75;
     text-align: center;
     justify-content: center;
     cursor: pointer;
@@ -312,11 +314,12 @@ onMounted(() => {
 
 .tag-menu-container {
     position: relative;
-    flex-basis: 30%;
+    flex-basis: 33%;
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
-    transition: flex-basis 0.5s ease-in-out;
+    padding: 0 0.5rem;
+    border: 2px dashed transparent;
 }
 
 .tag-selected {
@@ -324,8 +327,8 @@ onMounted(() => {
     flex-wrap: wrap;
     align-content: center;
     justify-content: center;
-    padding: 0.5rem;
-    gap: 0.5rem;
+    padding: 0.25rem;
+    gap: 0.25rem;
 }
 
 

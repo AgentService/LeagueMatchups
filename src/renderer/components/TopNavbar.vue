@@ -267,6 +267,7 @@ const logout = () => {
 
 
 .lockfile-indicator {
+	display: inline-block;
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
@@ -275,8 +276,6 @@ const logout = () => {
 
 .lockfile-indicator.active {
 	background-color: rgb(50, 255, 50);
-	border-radius: 50%;
-	display: inline-block;
 }
 
 .nav-link {
