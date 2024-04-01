@@ -11,11 +11,7 @@
 			<div class="grid-container ">
 				<div class="container-fluid">
 					<!-- Summoner Info Row -->
-					<div class="row">
-						<div class="col-9">
-							<!-- <SummonerInfo /> -->
-						</div>
-					</div>
+
 					<div class="row justify-content-evenly">
 						<!-- <div class="col-xxl-3 col-xl-3">
 							<div class="card">
@@ -26,9 +22,19 @@
 							<div class="card">
 							</div>
 						</div> -->
-						<div class="col-xxl-10 col-xl-10 mt-4">
 
-							<div class="card-container">
+						<div class="col-xxl-10 col-xl-10">
+							<div class="row align-items-start justify-content-start">
+								<!-- <SummonerInfo /> -->
+								<!-- <div class="d-flex">
+									<div class="tab-header d-flex flex-column justify-content-center align-items-center">
+										<span>Champion & Matchup</span>
+										<div class="active-border"></div>
+									</div>
+								</div> -->
+
+							</div>
+							<div class="card-container mt-4">
 
 								<div class="row ">
 									<!-- Champion Search for User's Champion -->
@@ -72,16 +78,16 @@
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-xxl-8">
-									<div class="card-large card-top card-bottom">
+								<div class="col-xxl-12">
+									<div class="card-large">
 										<GeneralNotes />
 									</div>
 								</div>
-								<div class="col-xxl-4">
+								<!-- <div class="col-xxl-0">
 									<div class="card-large card-top card-bottom">
-										<MatchHistory />
+										 <MatchHistory /> 
 									</div>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					</div>
@@ -94,7 +100,7 @@
 
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useStore } from 'vuex';
 
 // Debug
@@ -112,6 +118,7 @@ import MatchupNotes from './components/MatchupNotes.vue';
 
 import MatchHistory from './components/MatchHistory.vue';
 import GeneralNotes from './components/GeneralNotes.vue';
+import { on } from 'events';
 
 
 const debug = Debug('app:component:ChampionPage');
@@ -167,22 +174,20 @@ const handleMatchup = () => {
 const setChampionA = (champion) => {
 	championA.value = champion;
 	store.dispatch('matchups/setChampionA', champion);
-	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
-	store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
+	// store.dispatch('champions/fetchChampionTips', { championId: champion.id });
+	// store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
 
 };
 
 const setChampionB = (champion) => {
 	championB.value = champion;
 	store.dispatch('matchups/setChampionB', champion);
-	store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
 };
 
 watch([championA, championB], (/* newValues, oldValues */) => {
 	bothSelected = false;
 	handleMatchup();
 });
-
 </script>
 
 <style>
@@ -246,12 +251,12 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 .card-container-header {
 	text-transform: uppercase;
-	font-weight: 700;
 	text-align: start;
+	font-size: 1.1rem;
 	padding: .5rem;
 	padding-top: 0rem;
 	display: flex;
-	color: var(--gold-1);
+	color: var(--gold-4);
 }
 
 .card-container {
@@ -260,7 +265,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background: var(--card-background);
 	padding: 1.5rem;
 	margin-bottom: 1rem;
-	border-radius: 6px;
 	border: 1px solid rgba(128, 128, 128, 0.1);
 }
 
@@ -268,28 +272,34 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	border: 2px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #091014, #05080f);
-	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
+	border: 1px solid rgba(128, 128, 128, 0.1) !important;
+	box-shadow: 0px 12px 15px rgba(0, 0, 0, 1);
+	border-top: 0 !important;
+	border-radius: 0 !important;
+	background-image: linear-gradient(to right, #091014, #091014);
 	color: #e7e7e7;
 	padding: 1rem;
-	max-height: 360px;
-	min-height: 360px;
+	padding-top: 0;
+	max-height: 390px;
+	min-height: 390px;
 	z-index: auto;
+
 }
 
 .card-small {
 	position: relative;
 	display: flex;
+	border: 1px solid rgba(128, 128, 128, 0.1);
+	box-shadow: 0px 12px 15px rgba(0, 0, 0, 1);
+	border-bottom: 0;
+	border-radius: 0;
 	flex-direction: column;
-	border: 2px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #091014, #05080f);
-	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
+	background-image: linear-gradient(to right, #091014, #091014);
 	color: #e7e7e7;
-	padding: .5rem;
+	padding: .5rem 1.25rem;
 	margin-bottom: 1rem;
 	max-height: 250px;
-	min-height: 260px;
+	min-height: 250px;
 	z-index: auto;
 }
 
@@ -297,27 +307,14 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	border: 2px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #091014, #05080f);
-	box-shadow: 6px 10px 14px rgba(0, 0, 1, 1);
+	border: 1px solid rgba(128, 128, 128, 0.1);
+	background-image: linear-gradient(to right, #091014, #091014);
 	color: #e7e7e7;
-	padding: 2rem 2rem;
+	padding: 1rem 2rem;
 	margin-bottom: 1rem;
-	max-height: 560px;
-	min-height: 570px;
+	max-height: 520px;
+	min-height: 520px;
 	z-index: auto;
-}
-
-.card-top {
-	border-radius: 6px 6px 0 0;
-}
-
-.card-bottom {
-	border-radius: 0 0 6px 6px;
-}
-
-.card-header-custom h5 {
-	margin: 0;
 }
 
 .notes-body {
@@ -327,36 +324,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	padding: .5rem;
 }
 
-/* Textarea for the note content */
-.note-textarea {
-	border-radius: 10px;
-	resize: none;
-	width: 100%;
-	height: 100%;
-	border-color: rgba(128, 128, 128, 0.1);
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-	background: var(--background-1-gradient);
-	color: var(--gold-1);
-	line-height: 1.5;
-	padding: .5rem 1rem;
-	transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
-}
 
-.note-textarea:focus {
-	outline: none;
-	border-color: #FFFFFF;
-	background-color: rgba(255, 255, 255, 1);
-	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
-}
-
-.note-textarea::placeholder {
-	color: #A9A9A9;
-	font-style: italic;
-}
-
-.note-textarea:hover {
-	background-color: rgba(255, 255, 255, 1);
-}
 
 * {
 	box-sizing: border-box;
@@ -495,8 +463,27 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	font-weight: 600;
 	text-align: start;
 	font-size: 1rem;
-	padding: .5rem;
+	padding: 1rem .5rem;
+	padding-bottom: 0.5rem;
+	margin-bottom: 0.5rem;
 	display: flex;
-	color: var(--gold-2);
+	color: var(--gold-4);
+	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.tab-header {
+	background-color: transparent;
+	font-weight: 600;
+	font-size: 1rem;
+	margin: 1.5rem 0;
+	color: var(--gold-1);
+}
+
+.active-border {
+	background-color: #04D9FF;
+	width: 20%;
+	margin: 0.5rem 0;
+	align-self: center;
+	height: 3px;
 }
 </style>

@@ -1,5 +1,6 @@
 const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
 const fs = require("fs");
+const { createWebSocketConnection } = require("league-connect");
 
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
@@ -89,7 +90,7 @@ class MockAutoUpdater extends EventEmitter {
 const mockAutoUpdater = new MockAutoUpdater();
 
 let updater =
-  process.env.NODE_ENV === "DEVELOPMENT" ? mockAutoUpdater : autoUpdater; // mockAutoUpdater for development, autoUpdater for production
+  process.env.NODE_ENV === "DEVELOPMENT" ? autoUpdater : autoUpdater; // mockAutoUpdater for development, autoUpdater for production
 
 const log = require("electron-log");
 const path = require("path");
@@ -97,7 +98,7 @@ require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
 const findProcess = require("find-process");
-Debug.enable('*');
+Debug.enable("*");
 
 const Store = require("electron-store");
 const store = new Store();
@@ -247,6 +248,8 @@ ipcMain.handle("get-api-key", async (event) => {
   return process.env.RIOT_API_KEY;
 });
 
+let currentSummoner = null;
+
 async function fetchSummonerName(port, token) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Important: Ensure this is acceptable for your app's security requirements
 
@@ -269,7 +272,7 @@ async function fetchSummonerName(port, token) {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Summoner Name:", data.displayName);
+      currentSummoner = data;
       return data.displayName;
     } else {
       console.error(`HTTP error! status: ${response.status}`);
@@ -290,8 +293,10 @@ function createWindow(x = 0, y = 0) {
   mainWindow = new BrowserWindow({
     x: x,
     y: y,
-    minWidth: 1600, // set the minimum width
-    minHeight: 800, // set the minimum height
+    minWidth: 1600, // set the minimum width 1600
+    minHeight: 800, // set the minimum height 800
+    width: 2560,
+    height: 1240,
     // maxHeight: 800,
     // maxWidth: 1280,
     partition: "nopersist",
@@ -444,3 +449,74 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+// websocket
+
+ipcMain.handle("setup-webSocket", async () => {
+  try {
+    const ws = await createWebSocketConnection({
+      authenticationOptions: {
+        awaitConnection: true,
+      },
+      pollInterval: 1000,
+      maxRetries: 1,
+    });
+    debug("WebSocket connection established.");
+
+    let lastChampionId = null;
+    let lastActionCompleted = false;
+
+    ws.subscribe("/lol-champ-select/v1/session", (sessionData) => {
+      const summonerAction = sessionData.actions.flat().find((action) => {
+        return (
+          action.actorCellId ===
+          sessionData.myTeam.find(
+            (member) => member.puuid === currentSummoner.puuid
+          )?.cellId
+        );
+      });
+
+      if (summonerAction && summonerAction.type === "pick") {
+        const championIdChanged = summonerAction.championId !== lastChampionId;
+        const actionCompletedChanged =
+          summonerAction.completed !== lastActionCompleted;
+
+        if (championIdChanged || actionCompletedChanged) {
+          lastChampionId = summonerAction.championId;
+          lastActionCompleted = summonerAction.completed;
+
+          debouncedChampionAction(
+            summonerAction.championId,
+            summonerAction.completed
+          );
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Failed to connect to the LCU WebSocket:", error);
+  }
+});
+
+const debouncedChampionAction = debounce((championId, completed) => {
+  if (completed) {
+    mainWindow.webContents.send("champion-picked", { championId });
+    debug(`Summoner has picked champion ID: ${championId}`);
+  } else {
+    mainWindow.webContents.send("champion-selected", { championId });
+    debug(`Summoner is selecting champion ID: ${championId}`);
+  }
+}, 250);
+
+function debounce(func, wait) {
+  let timeout;
+
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}

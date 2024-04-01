@@ -31,8 +31,10 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { useStore } from 'vuex';
 import Debug from 'debug';
 const debug = Debug('app:components:App');
+const store = useStore();
 
 const updateDownloaded = ref(false);
 const updateError = ref(null);

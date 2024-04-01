@@ -25,6 +25,9 @@ export const champions = {
     getChampionList: (state) => {
       return state.championList;
     },
+    getChampionDetails: (state) => {
+      return state.championDetails;
+    },
   },
   mutations: {
     SET_CHAMPION_LIST_DATA(state, listData) {

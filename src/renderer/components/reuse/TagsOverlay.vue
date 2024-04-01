@@ -1,19 +1,17 @@
 <template>
     <div class="tag-menu-container" :class="{ 'editing': tagsEdited }">
-        <div class="header">
-            <div>Tags</div>
+        <div class="header justify-content-end">
             <button class="btn button tag-panel-toggle" :class="{ 'highlighted': tagsEdited }"
             @click="showAllTags ? finalizeTagEdits() : toggleTagVisibility()">
             <span v-if="showAllTags"><i class="fas fa-xmark"></i></span>
         </button>
-
         </div>
         <div class="tags-wrapper" :style="{ 'max-height': showAllTags ? '490px' : '100%', 'is-open': showAllTags }">
             <transition-group name="list" tag="div" class="tag-selected">
                 <div v-for="tag in sortedTags" :key="tag.tag_id"
                     :class="['tag-quadrat', `tag-${tag.tag_name.replace(/\s+/g, '')}`, { 'tag-selected': isSelected(tag), 'tag-unselected': !isSelected(tag) }]"
                     @click.stop="toggleTag(tag.tag_id)">
-                    &nbsp;&nbsp;&nbsp;{{ tag.tag_name }}&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;{{ tag.tag_name }}&nbsp;&nbsp;
                     <span v-if="isSelected(tag)" class="tag-close" @click.stop.prevent="toggleTag(tag.tag_id)">x</span>
                 </div>
             </transition-group>
@@ -25,11 +23,8 @@
                 <span v-else><i class="fas fa-edit"></i> Show all</span>
             </button>
         </div>
-
     </div>
 </template>
-
-
 
 <script setup>
 import { computed, ref, onMounted } from 'vue';
@@ -43,7 +38,6 @@ const { noteId } = defineProps({
 });
 
 const store = useStore();
-
 const showAllTags = ref(false);
 const tagsEdited = ref(false);
 
@@ -86,14 +80,12 @@ const sortedTags = computed(() => {
     return showAllTags.value ? [...selected, ...unselected] : selected;
 });
 
-
 const isSelected = (tag) => {
     if (tag && tag.hasOwnProperty('tag_id')) {
         return selectedTags.value.some(selectedTag => selectedTag.tag_id === tag.tag_id);
     }
     return false;
 };
-
 
 const toggleTag = (tagId) => {
     const isTagSelected = selectedTags.value.some(tag => tag.tag_id === tagId);
@@ -118,7 +110,6 @@ onMounted(() => {
 
 }
 @keyframes colorFadeAndBorder {
-
     0%,
     100% {
         background-color: #0021475e;
@@ -318,7 +309,7 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
-    padding: 0 0.5rem;
+    padding: 0 0rem;
     border: 2px dashed transparent;
 }
 

@@ -1,6 +1,6 @@
 <template>
 	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<span>Review Notes</span>
+		<span>Daily Notes</span>
 		<div class="buttons-container">
 			<button @click="createNewNote" class="btn add-button">
 				<i class="fas fa-plus"></i>
@@ -9,6 +9,10 @@
 		</div>
 	</div>
 	<div class="notes-list notes-body">
+		<div class="header">
+			<div class="header-date">Day</div>
+			<div class="header-tag">Tags</div>
+		</div>
 		<li v-for="item in limitedNotes" :key="item.noteId" class="note-item">
 			<div class="note-content-wrapper">
 				<div class="note-textarea-container">
@@ -129,6 +133,20 @@ onMounted(() => {
 </script>
 
 <style>
+
+.header-date {
+	flex-basis: 66%;
+	align-self: center;
+	position: relative;
+	padding: 0 0.25rem;
+}
+
+.header-tag {
+	flex-basis: 33%;
+	align-self: center;
+	position: relative;
+	padding: 0 0.25rem;
+}
 .header {
 	display: flex;
 	justify-content: space-between;

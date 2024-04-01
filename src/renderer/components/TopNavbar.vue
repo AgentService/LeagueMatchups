@@ -32,7 +32,7 @@
 							<div class="dropdown" href="#" role="button" id="dropdownMenuLink2"
 								data-bs-toggle="dropdown" aria-expanded="false">
 								<div class="d-flex align-items-center">
-									<span class="text-light"> {{ user.username }}
+									<span class="text-light"> {{ user?.username }}
 									</span>
 									<a class="btn dropdown-toggler" href="#" role="button" id="dropdownMenuLink2"
 										data-bs-toggle="dropdown" aria-expanded="false">

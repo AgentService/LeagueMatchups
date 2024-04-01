@@ -16,7 +16,7 @@
 		</div>
 		<!-- Textarea for notes, shown only when not loading -->
 		<textarea v-else spellcheck="false" v-model="localNotes" placeholder="Type your notes here..."
-			class="note-textarea" rows="10"></textarea>
+			class="note-textarea" rows="11"></textarea>
 	</div>
 
 	<div class="status-container">

@@ -40,7 +40,7 @@ contextBridge.exposeInMainWorld("api", {
       "update-downloaded",
       "download-progress",
       "update-error",
-      "current-release"
+      "current-release",
     ];
     if (validReceiveChannels.includes(channel)) {
       const subscription = (event, ...args) => func(...args);
@@ -63,5 +63,20 @@ contextBridge.exposeInMainWorld("api", {
     if (validReceiveChannels.includes(channel)) {
       ipcRenderer.removeListener(channel, func);
     }
+  },
+});
+
+contextBridge.exposeInMainWorld("ws", {
+  receive: (channel, func) => {
+    ipcRenderer.on(channel, (event, ...args) => func(...args));
+  },
+  setupWebSocket: () => ipcRenderer.invoke("setup-webSocket"),
+  onWebSocketMessage: (callback) => {
+    ipcRenderer.on("webSocket-message", (event, ...args) => callback(...args));
+
+    // Return a cleanup function to unregister the event listener
+    return () => {
+      ipcRenderer.removeListener("webSocket-message", callback);
+    };
   },
 });

@@ -2,16 +2,16 @@
 	<div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span>Champion Notes</span>
 		<div class=" d-flex align-items-center justify-content-evenly">
-			<div key="share-button" class="btn button share-button" @click="showNotesModal = true" aria-label="Shared">
+			<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared">
 				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-			</div>
+			</button>
 		</div>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
 	</div>
 	<div class="notes-body">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="10"></textarea>
+			rows="11"></textarea>
 	</div>
 	<div class="status-container">
 		<!-- <div v-if="notesState === 'neutral'" key="neutral" class="status-message">
@@ -150,15 +150,6 @@ async function saveChampionNotes() {
 	justify-content: center;
 	border-right: 1px solid var(--grey-3);
 	margin-right: 1rem;
-}
-
-.share-button {
-	text-transform: none;
-	color: var(--gold-1);
-}
-
-.share-button:hover {
-	color: var(--gold-2);
 }
 
 h3 {

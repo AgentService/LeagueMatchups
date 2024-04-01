@@ -4,7 +4,7 @@ Elixir, Phoenix, and Absinthe
 Postgres
 
 PRE RELEASE TODOS:
-DONE ENTER LOLPATH ON INITIAL LOAD 
+> GET /data-store/v1/install-dir ????? DONE ENTER LOLPATH ON INITIAL LOAD 
 - FIGURE OUT UPDATE SYSTEM
 DONE POLISH USER ACCOUNTS
     - Prompt User for login on initial login
@@ -52,3 +52,44 @@ Server
 - Image Hosting solution
 - Deploy Server < both use one server
 
+
+
+GPT
+🧙🏾‍♂️: Absolut, hier ist eine Zusammenfassung deiner Pläne, der Features, die dir wichtig sind, und der Ideen, die du gut fandest, zusammen mit einem Schritt-für-Schritt-Plan, um deine Ziele zu erreichen:
+
+Was du machen wolltest:
+Neugestaltung der Review-Seite: Implementierung einer verbesserten Seite für Match-Reviews, die spezifische und allgemeine Feedbackelemente unterstützt.
+Matchbasierte Reviews: Übergang von täglichen zu matchbasierten Reviews, um präzisere und relevantere Rückmeldungen zu ermöglichen.
+Integration vordefinierter Fragen: Einbeziehung von hardcoded Fragen im UI, um den Review-Prozess zu erleichtern und zu standardisieren.
+Speicherung der Antworten: Erfassung der Nutzerantworten zu diesen Fragen, um wertvolle Daten für Analysen zu sammeln.
+Möglichkeit zur Erweiterung: Offenheit für spätere Anpassungen, wie das Hinzufügen von spezifischeren Fragen oder die Entwicklung eines flexibleren Systems zur Fragenverwaltung.
+Wichtige Features und Ideen:
+Schlanke Lösung für den Start: Beginne mit einer einfachen Implementierung, die es ermöglicht, schnell Feedback zu sammeln, ohne sofort eine komplexe Infrastruktur aufzubauen.
+GameID für externe Links: Nutzung der GameID, um Reviews mit externen Analysen (z.B. auf op.gg) zu verknüpfen.
+Tags für Organisationszwecke: Weiterhin Tags verwenden, um die Inhalte der Reviews zu organisieren und zu kategorisieren.
+Vordefinierte und Custom Notes kombinieren: Neben den vordefinierten Fragen auch die Möglichkeit für freie Notizen lassen, um den Nutzern Flexibilität in ihren Reviews zu bieten.
+Erweiterbarkeit und Flexibilität: Langfristig ein System anstreben, das es erlaubt, dynamisch auf sich ändernde Anforderungen und Ideen zu reagieren.
+Step-by-Step Plan:
+Review-Seite gestalten: Entwirf das Layout und die Funktionalitäten der neuen Review-Seite, inklusive Platz für vordefinierte Fragen und freie Notizen.
+
+Hardcoded Fragen integrieren: Wähle einige grundlegende, aber wichtige Fragen aus, die du direkt im UI implementierst, um den Review-Prozess zu standardisieren und zu vereinfachen.
+
+Datenbankanpassungen vornehmen: Stelle sicher, dass deine Datenbank die Speicherung von matchbasierten Reviews unterstützt. Überlege, ob du neue Tabellen oder Spalten benötigst, um die Reviews effektiv zu speichern.
+
+Antworten erfassen: Implementiere die Funktionalität, um Nutzerantworten zu den vordefinierten Fragen sowie eventuelle freie Notizen zu speichern. Plane, wie du diese Daten für zukünftige Analysen nutzen kannst.
+
+Feedback einholen und iterieren: Nachdem die ersten Reviews eingegangen sind, sammle Feedback von den Nutzern und überlege, welche Anpassungen oder Erweiterungen notwendig sind, um das System weiter zu verbessern.
+
+Langfristige Planung: Denke über die Einführung eines flexibleren Systems zur Fragenverwaltung nach und wie du spezifischere oder dynamischere Fragen basierend auf den Lernzielen der Nutzer integrieren kannst.
+
+Mit diesem Plan hast du eine klare Richtung, wie du vorangehen kannst, und gleichzeitig die Flexibilität, auf Feedback und neue Ideen zu reagieren.
+
+Bist du bereit, den ersten Schritt zu machen, oder gibt es noch Unklarheiten, die wir klären sollten?
+
+
+Create Lobby:
+POST
+/lol-lobby/v2/lobby
+{"customGameLobby":{
+"configuration":{"gameMode":"PRACTICETOOL","gameMutator":"","gameServerRegion":"","mapId":11,"mutators":{"id":1},"spectatorPolicy":"AllAllowed","teamSize":5}
+,"lobbyName":"Name","lobbyPassword":null},"isCustom":true}

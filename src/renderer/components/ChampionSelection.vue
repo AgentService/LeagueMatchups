@@ -1,9 +1,11 @@
 <template>
+
 	<div>
 
 		<div class="note-card champion-card">
 
 			<div class="d-flex justify-content-between align-items-center">
+
 				<div class="background-image" :style="championBackgroundStyle"></div>
 				<div class="search-container">
 					<div class="search-bar position-relative">
@@ -19,6 +21,7 @@
 						</div>
 					</div>
 				</div>
+
 
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
@@ -37,32 +40,39 @@
 			</div>
 
 			<!-- Champion Grid Container -->
-			<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
-				<!-- Champion Grid -->
-				<div class="champion-grid" v-show="isGridVisible"  v-click-outside="outsideClickHandler">
-					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
-						@click="selectChampion(champion)">
-						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
-						<!-- <span>{{ champion.name }}</span> -->
+			<transition name="fade" mode="in-out">
+				<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
+					<div class="champion-grid" v-show="isGridVisible" v-click-outside="outsideClickHandler">
+						<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
+							@click="selectChampion(champion)">
+							<img :src="championImageUrls[champion.id]" alt="Champion Image" />
+							<!-- <span>{{ champion.name }}</span> -->
+						</div>
 					</div>
+
 				</div>
-			</div>
+			</transition>
+
 			<div v-if="loading" class="loading-indicator">
 				Loading...
 			</div>
 
 			<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
-				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
-					<div :class="[themeClass, 'champion-content']">
-						<!-- Champion Image Container -->
-						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" @click.stop="showGrid" />
-						</div>
-						<div class="champion-info">
-							<div class="champion-name-container">
-								<div class="champion-name">{{ selectedChampion.name }}</div>
-								<!-- <div class="stats-container">
+				<transition name="fade" mode="out-in">
+
+					<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
+						<div :class="[themeClass, 'champion-content']">
+							<!-- Champion Image Container -->
+
+							<div class="champion-portrait">
+								<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
+									:class="{ 'champion-picked': championPicked }" alt="Champion Image"
+									@click.stop="showGrid" :ref="getInstanceIdRef" />
+							</div>
+							<div class="champion-info">
+								<div class="champion-name-container">
+									<div class="champion-name">{{ selectedChampion.name }}</div>
+									<!-- <div class="stats-container">
 									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
 										<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" />
 									</div>
@@ -76,68 +86,71 @@
 										</div>
 									</div>
 								</div> -->
-								<div @click="toggleFavorite(selectedChampion)" class="favorite-icon"
-									:class="{ 'is-favorite': isFavorite(selectedChampion) }">
-									<i class="fa fa-star fa-xs"></i>
-								</div>
+									<div @click="toggleFavorite(selectedChampion)" class="favorite-icon"
+										:class="{ 'is-favorite': isFavorite(selectedChampion) }">
+										<i class="fa fa-star fa-xs"></i>
+									</div>
 
-							</div>
-							<div class="abilities-container">
-								<div class="champion-abilities">
-									<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
-										<div class="ability-content">
-											<div class="ability-icon-wrapper">
-												<img :src="selectedChampionPassiveUrl"
-													:alt="selectedChampion?.passive.full"
-													class="ability-icon-passive" />
-											</div>
-										</div>
-										<div class="tooltip-container">
-											<div class="tooltip">
-												<div class="tooltip-content">
-													<div class="tooltip-header">
-														<img :src="getPassiveImageUrl(selectedChampion?.passive)"
-															:alt="selectedChampion?.passive.name"
-															class="tooltip-spell-icon" />
-														<span class="ability-label">P</span>
-													</div>
-													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
-													<p class="spell-description">{{
-					selectedChampion?.passive.description }}
-													</p>
+								</div>
+								<div class="abilities-container">
+									<div class="champion-abilities">
+										<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
+											<div class="ability-content">
+												<div class="ability-icon-wrapper">
+													<img :src="selectedChampionPassiveUrl"
+														:alt="selectedChampion?.passive.full"
+														class="ability-icon-passive" />
 												</div>
 											</div>
-										</div>
-									</div>
-									<div v-for="(spellData, index) in selectedChampionSpell" :key="index"
-										class="ability">
-										<div class="ability-icon-wrapper">
-											<img :src="spellData.url" class="ability-icon" />
-											<div class="cooldown">{{
-					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
-											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
 														<div class="tooltip-header">
-															<img :src="spellData.url" :alt="spellData.spell.name"
+															<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+																:alt="selectedChampion?.passive.name"
 																class="tooltip-spell-icon" />
-															<span class="ability-label">{{ getAbilityLabelByIndex(index)
-																}}</span>
+															<span class="ability-label">P</span>
 														</div>
-														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
-														<div>
-															<p class="spell-cooldown">Cooldown: <span
-																	class="value-text">{{
+														<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
+														<p class="spell-description">{{
+					selectedChampion?.passive.description }}
+														</p>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div v-for="(spellData, index) in selectedChampionSpell" :key="index"
+											class="ability">
+											<div class="ability-icon-wrapper">
+												<img :src="spellData.url" class="ability-icon" />
+												<div class="cooldown">{{
+					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+												<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
+												<div class="tooltip-container">
+													<div class="tooltip">
+														<div class="tooltip-content">
+															<div class="tooltip-header">
+																<img :src="spellData.url" :alt="spellData.spell.name"
+																	class="tooltip-spell-icon" />
+																<span class="ability-label">{{
+					getAbilityLabelByIndex(index)
+				}}</span>
+															</div>
+															<h5 class="spell-name">{{ spellData.spell.name }}</h5>
+															<div>
+																<p class="spell-cooldown">Cooldown: <span
+																		class="value-text">{{
 					spellData.spell.cooldownBurn
 				}}</span></p>
-															<p class="spell-cost">Cost: <span class="value-text">{{
+																<p class="spell-cost">Cost: <span class="value-text">{{
 						spellData.spell.costBurn
 					}}</span>
+																</p>
+															</div>
+															<p class="spell-description">{{ spellData.spell.description
+																}}
 															</p>
 														</div>
-														<p class="spell-description">{{ spellData.spell.description }}
-														</p>
 													</div>
 												</div>
 											</div>
@@ -147,7 +160,7 @@
 							</div>
 						</div>
 					</div>
-				</div>
+				</transition>
 
 
 				<!-- Instance 2: Icon Left + Icons Right -->
@@ -157,7 +170,7 @@
 						<!-- Champion Image Container -->
 						<div class="champion-portrait">
 							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" @click.stop="showGrid" />
+								alt="Champion Image" @click.stop="showGrid" :ref="getInstanceIdRef" />
 						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
@@ -218,8 +231,9 @@
 														<div class="tooltip-header">
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
-															<span class="ability-label">{{ getAbilityLabelByIndex(index)
-																}}</span>
+															<span class="ability-label">{{
+					getAbilityLabelByIndex(index)
+				}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
@@ -228,11 +242,12 @@
 					spellData.spell.cooldownBurn
 				}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-						spellData.spell.costBurn
+																	spellData.spell.costBurn
 																	}}</span>
 															</p>
 														</div>
-														<p class="spell-description">{{ spellData.spell.description }}
+														<p class="spell-description">{{ spellData.spell.description
+															}}
 														</p>
 													</div>
 												</div>
@@ -306,11 +321,13 @@
 
 <script>
 import { useStore, mapActions } from 'vuex';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { getUrlHelper } from '../globalSetup';
 import ImageUrlHelper from '../utils/imageHelper';
 
-import gsap from 'gsap';
+import { gsap } from "gsap";
+import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionSelection');
 
@@ -325,11 +342,13 @@ export default {
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
 		const store = useStore();
-		const imageUrlHelper = new ImageUrlHelper(); // Instantiate if necessary
-
+		const imageUrlHelper = new ImageUrlHelper();
 		const favoriteChampions = computed(() => store.state.userPreferences.favoriteChampions);
+		const championPicked = ref(false);
 
 		const getStatImageUrl = (statKey) => imageUrlHelper.getStatImageUrl(statKey);
+
+
 
 		const toggleFavorite = (champion) => {
 			const isFav = favoriteChampions.value.some(c => c.id === champion.id);
@@ -364,29 +383,29 @@ export default {
 
 		const blueAnimation = () => {
 			gsap.to(elementToAnimate.value, {
-				boxShadow: '0 0 4px 5px rgba(0, 253, 255, 0.7)', // Blue glow
-				borderColor: '#41fcfc', // Light blue
-				repeat: -1, // repeat indefinitely
+				boxShadow: '0 0 6px 8px rgba(0, 253, 255, .1)', // Blue glow
+				repeat: 1, // repeat indefinitely
 				yoyo: true, // go back and forth
 				ease: 'power1.inOut',
-				duration: 3
+				duration: 1,
+				scale: .9,
 			});
 		};
 
 		// Define the animation for the red theme
 		const redAnimation = () => {
 			gsap.to(elementToAnimate.value, {
-				boxShadow: '0 0 6px 5px rgba(255, 0, 0, 0.7)', // Red glow
-				borderColor: '#fa6969', // Light red
-				repeat: -1, // repeat indefinitely
+				boxShadow: '0 0 6px 8px rgba(255, 0, 0, 0.2)', // Red glow
+				repeat: 1, // repeat indefinitely
 				yoyo: true, // go back and forth
 				ease: 'power1.inOut',
-				duration: 3
+				duration: 1,
+				scale: .9
 			});
 		};
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
-			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl
+			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl, championPicked
 		};
 	},
 	// watch: {
@@ -441,21 +460,16 @@ export default {
 	},
 
 	async mounted() {
+
+
 		const store = useStore();
-		this.loading = true; // Start with loading state
-		console.log('ChampionSelection mounted');
-		const urlHelper = getUrlHelper();
-
 		let { championA, championB } = store.state.matchups;
-
 		if (!championA) {
-			// If no champions are selected initially
 			championA = {
 				id: "Hwei"
 			}
 		}
 		if (!championB) {
-			// If no champions are selected initially
 			championB = {
 				id: "Azir"
 			}
@@ -464,12 +478,9 @@ export default {
 		const championDetails = store.state.champions.championDetails;
 		this.champions = championDetails ? Object.values(championDetails) : [];
 
-		// Determine the champion ID to preselect based on the component's instance
 		const preselectedChampionId = this.instanceId === 1 ? championA?.id : championB?.id;
-		// Find the corresponding champion in the details array using the ID
 		const preselectedChampion = this.champions.find(champion => champion.id === preselectedChampionId);
 
-		// If the preselected champion is found, select it
 		if (preselectedChampion) {
 			await this.selectChampion(preselectedChampion);
 		}
@@ -479,10 +490,41 @@ export default {
 
 		this.loading = false; // Start with loading state
 
+		window.ws.receive("champion-selected", ({ championId }) => {
+			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
+				this.fetchChampionById(championId).then(champion => {
+					this.selectChampion(champion);
+				}
+				);
+			}
+		});
+
+		window.ws.receive("champion-picked", ({ championId }) => {
+			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
+				this.fetchChampionById(championId).then(champion => {
+					this.selectChampion(champion);
+				}
+				);
+			}
+			this.championPicked = true;
+			this.isGridVisible = false;
+			setTimeout(() => {
+				this.championPicked = false;
+			}, 2000);
+		});
 	},
-
-
+	onBeforeUnmount() {
+		ipcRenderer.removeAllListeners("champion-picked");
+		ipcRenderer.removeAllListeners("champion-selected");
+	},
 	computed: {
+		fetchChampionById() {
+			return async (key) => {
+				const championList = computed(() => this.$store.getters['champions/getChampionDetails']);
+				const champions = championList.value ? Object.values(championList.value) : [];
+				return champions.find(champion => champion.key === String(key.toString()));
+			};
+		},
 		championImageSource(type, championId) {
 			return this.getChampionImageSource(type, championId);
 		},
@@ -515,10 +557,10 @@ export default {
 		},
 	},
 	methods: {
+
 		outsideClickHandler() {
 			this.isGridVisible = false;
 		},
-
 		handleMouseEnter() {
 			this.isButtonHovered = true;
 			this.showFavorites = true;
@@ -639,8 +681,8 @@ export default {
 			});
 		},
 		async selectChampion(champion) {
+			this.animateChampion();
 			this.selectedChampion = champion;
-
 			// Fetch and store passive image URL
 			this.selectedChampionPassiveUrl = this.getPassiveImageUrl(champion.passive);
 
@@ -702,6 +744,20 @@ export default {
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.5s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+	opacity: 0;
+}
+
+.champion-picked {
+	border: 2px solid var(--gold-4);
+}
+
 .loading-indicator {
 	display: flex;
 	justify-content: center;
@@ -728,10 +784,8 @@ export default {
 
 .favorite-icon.is-favorite .fa:active {
 	color: darkgoldenrod;
-	/* Slightly darken the color when pressed */
 }
 
-/* Scale down when active/pressed to simulate a button press */
 .favorite-icon:active {
 	transform: scale(0.9);
 }
@@ -780,9 +834,7 @@ export default {
 .fav-item {
 	display: flex;
 	align-items: center;
-	/* Maintain gap between items */
 	width: calc(25%);
-	/* Adjust width to fit 4 items per row, accounting for gap */
 }
 
 
@@ -801,7 +853,7 @@ export default {
 .champion-image {
 	width: 40px;
 	height: 40px;
-	object-fit: cover;
+	cursor: pointer;
 }
 
 .stat-toggle-container {
@@ -1017,13 +1069,7 @@ export default {
 	display: flex;
 }
 
-.champion-image {
-	cursor: pointer;
-	border: px solid #fff;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-	border-radius: 5px;
-	transition: transform 0.3s ease;
-}
+
 
 .stats-container {
 	display: flex;
@@ -1373,28 +1419,23 @@ export default {
 	height: 2rem;
 }
 
-/*
 .blue-theme .champion-image {
 	will-change: box-shadow, border-color;
-	box-shadow: 0 0 2px 2px rgba(0, 253, 255, 1);
-	border-color: #10FEFF;
-	border: 1px solid #10FEFF;
-	/* animation: blue-glow 5s ease-in-out infinite ;
+	box-shadow: 0 0 2px 0px rgba(0, 253, 255, .3);
+	border: 1px solid #10ffff38;
 }
 
 .red-theme .champion-image {
 	will-change: box-shadow, border-color;
-	box-shadow: 0 0 2px 2px rgba(255, 0, 0, 1);
-	border-color: #FE1010;
-	border: 1px solid #fe1010;
-	 animation: red-glow 5s ease-in-out infinite ; 
+	box-shadow: 0 0 2px 0px rgba(255, 0, 0, .3);
+	border: 1px solid #fe10103d;
 }
-*/
+
 
 @keyframes blue-glow {
 
 	0% {
-		box-shadow: 0 0 1px 2px rgba(0, 253, 255, 1);
+		box-shadow: 0 0 1px 12px rgba(0, 253, 255, 1);
 		border-color: #10FEFF;
 	}
 
@@ -1404,7 +1445,7 @@ export default {
 	}
 
 	100% {
-		box-shadow: 0 0 1px 2px rgba(0, 253, 255, 1);
+		box-shadow: 0 0 1px 12px rgba(0, 253, 255, 1);
 		border-color: #10FEFF;
 	}
 }

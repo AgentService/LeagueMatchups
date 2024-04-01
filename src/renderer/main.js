@@ -2,7 +2,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import ClickOutsideDirective from './utils/ClickOutsideDirective';
+import ClickOutsideDirective from "./utils/ClickOutsideDirective";
 
 import VueLazyload from "vue3-lazy";
 import { store } from "../store"; // Import your Vuex store
@@ -37,16 +37,16 @@ if (import.meta.env.MODE !== "production") {
 console.log("DEBUG?: ", import.meta.env.VITE_DEBUG);
 Debug.enable(import.meta.env.VITE_DEBUG);
 
-
 async function initializeApp() {
   await setupBaseUrl();
   await store.dispatch("init/initializeApp");
+  await store.dispatch("wsClient/setupWebSocket");
 }
 
 initializeApp()
   .then(() => {
     const vueApp = createApp(App);
-    vueApp.directive('click-outside', ClickOutsideDirective);
+    vueApp.directive("click-outside", ClickOutsideDirective);
 
     vueApp.use(VueLazyload, {
       // options...
@@ -54,6 +54,7 @@ initializeApp()
 
     vueApp.use(router);
     vueApp.use(store);
+
     vueApp.component("font-awesome-icon", FontAwesomeIcon);
     vueApp.mount("#app");
 
