@@ -60,39 +60,6 @@ export default {
 <style scoped>
    
 
-.note-textarea {
-  border-radius: 10px;
-  resize:none;
-  height: 100%;
-  width: 100%;
-  border-color: var(--grey-4);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-  background:var(--background-1-gradient);
-  color: var(--gold-2);
-  font-family: 'Arial', sans-serif;
-  line-height: 1.5;
-  padding: 0.5rem;
-
-}
-.note-textarea:focus {
-  outline: none;
-  border-color: #FFFFFF;
-  background-color: rgba(255, 255, 255, 1); /* Slightly more opaque on focus */
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2); /* Adding a glow effect */
-}
-.note-textarea::placeholder {
-  color: #A9A9A9; /* Lighter than the text color for subtlety */
-  font-style: italic;
-}
-.note-textarea {
-  transition: background-color 0.3s, box-shadow 0.3s, border-color 0.3s;
-}
-.note-textarea:hover {
-  background-color: rgba(255, 255, 255, 1); /* Slightly more visible on hover */
-}
-.card-header-custom {
-  padding: 0.75rem 1.25rem;
-}
 
 /* Transition styles for fade effect */
 .fade-enter-active, .fade-leave-active {

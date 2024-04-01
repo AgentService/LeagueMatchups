@@ -1,11 +1,8 @@
 <template>
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<span>Champion Notes</span>
-		<div class=" d-flex align-items-center justify-content-evenly">
-			<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared">
-				<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-			</button>
-		</div>
+	<div class="d-flex justify-content-end align-items-center">
+		<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared">
+			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
+		</button>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
 	</div>

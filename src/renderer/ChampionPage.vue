@@ -12,15 +12,14 @@
 				<div class="container-fluid">
 					<!-- Summoner Info Row -->
 					<div class="row align-items-start">
-						<div class="col-xxl-2 col-xl-2 mt-4">
+						<!-- <div class="col-xxl-2 col-xl-2 mt-4">
 							<div class="card-fluid mb-4">
 								<ChampionTips :champion="championA" />
 							</div>
 							<div class="card-fluid mt-4">
 								Placeholder
-								<!-- <LearningObjectives></LearningObjectives> -->
 							</div>
-						</div>
+						</div> -->
 						<div class="col-xxl-8 col-xl-8">
 							<div class="row align-items-start justify-content-start">
 								<!-- <SummonerInfo /> -->
@@ -47,19 +46,18 @@
 										</div>
 									</div> -->
 										<div class="col-xxl-6 position-relative">
-											<div class="card card-large">
+											<div class="card-large">
 												<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-
 												<ChampionNotes />
 											</div>
 										</div>
 										<!-- VS Divider -->
 										<div class="vs-container">
-											<span>vs</span>
+											<!-- <span>vs</span> -->
 										</div>
 										<!-- Matchup Notes and Search for Enemy Champion -->
 										<div class="col-xxl-6 position-relative">
-											<div class="card card-large">
+											<div class="card-large">
 												<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
 												<MatchupNotes />
 											</div>
@@ -77,7 +75,7 @@
 							</div>
 							<div class="row">
 								<div class="col-xxl-12">
-									<div class="card-large">
+									<div class="card-wide">
 										<GeneralNotes />
 									</div>
 								</div>
@@ -229,7 +227,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	z-index: 2;
 	font-size: 3rem;
 	top: 12%;
-	right: 40.8%;
+	right: 49%;
 	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
@@ -274,7 +272,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-color: transparent !important;
 	color: #e7e7e7;
 	padding: 1rem;
-	margin: 1rem;
 	max-height: 390px;
 	min-height: 390px;
 	z-index: auto;
@@ -300,13 +297,24 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid rgba(128, 128, 128, 0.1);
-	background-image: linear-gradient(to right, #091014, #091014);
-	color: #e7e7e7;
+	color: var(--gold-1);
 	padding: 1rem 2rem;
-	max-height: 600px;
-	min-height: 600px;
-	z-index: auto;
+	max-height: 670px;
+	min-height: 670px;
+	z-index: 1;
+}
+
+.card-wide {
+	user-select: none;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	color: var(--gold-1);
+	padding: 1rem 2rem;
+	max-height: 670px;
+	min-height: 670px;
+	background-image: linear-gradient(to right, #091014, #091014);
+	z-index: 1;
 }
 
 .card-fluid {

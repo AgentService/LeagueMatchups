@@ -1,10 +1,12 @@
 <template>
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
+		<span v-show="instanceId === 1">Champion Notes</span>
+		<span v-show="instanceId === 2">Matchup Notes</span>
+	</div>
+	<div class="background-image" :style="championBackgroundStyle"></div>
 
-	<div class="note-card champion-card ">
-
-		<div class="d-flex justify-content-between align-items-center ">
-
-			<div class="background-image" :style="championBackgroundStyle"></div>
+	<div class="note-card champion-card">
+		<div class=" d-flex justify-content-between align-items-center ">
 			<div class="search-container">
 				<div class="search-bar position-relative">
 					<div class="input-group">
@@ -56,6 +58,7 @@
 		</div>
 
 		<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
+
 			<transition name="fade" mode="out-in">
 
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
@@ -738,6 +741,10 @@ export default {
 </script>
 
 <style scoped>
+.test {
+	z-index: 111;
+	background-color: red;
+}
 /* Fade In Animation */
 @keyframes fadeIn {
 	from {
@@ -1074,7 +1081,8 @@ export default {
 .champion-content {
 	display: flex;
 	color: #fff;
-	padding: .5rem;
+	padding: 2rem;
+	padding-bottom: 0;
 }
 
 .champion-detail-container {
@@ -1083,6 +1091,7 @@ export default {
 	justify-content: center;
 	align-items: center;
 	position: relative;
+	
 }
 
 .champion-detail-wrapper {
@@ -1254,6 +1263,7 @@ export default {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease;
 	user-select: none;
+	z-index: 1;
 }
 
 .champion-abilities {
@@ -1266,14 +1276,14 @@ export default {
 	display: flex;
 	height: 250px;
 	flex-direction: column;
-	padding: 1rem;
+	padding: 0rem;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .champion-portrait {
-	padding: 0.5rem;
+	margin-top: .5rem;
+	padding: 1rem 0rem;
 	display: flex;
-	align-items: flex-end;
 }
 
 .champion-portrait img {

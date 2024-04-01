@@ -1,6 +1,5 @@
 <template>
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<span>Matchup Notes</span>
+	<div class="d-flex justify-content-end align-items-center">
 		<button class="btn" @click="showNotesModal = true" aria-label="Shared">
 			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 		</button>

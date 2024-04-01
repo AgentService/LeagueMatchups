@@ -125,6 +125,7 @@ button {
 		box-shadow 0.3s;
 	border: none;
 	color: var(--gold-1) !important;
+	z-index: 1000;
 }
 
 button:hover {
@@ -217,7 +218,6 @@ button:hover {
 .note-textarea {
 	border-radius: 2px;
 	resize: none;
-	z-index: 1;
 	width: 100%;
 	border-color: rgba(128, 128, 128, 0.11);
 	background: linear-gradient(to right, #091014, #060c11);
@@ -251,10 +251,8 @@ button:hover {
 	color: #e6e6e6;
 	border: none;
 	border-radius: 5px;
-	padding: 0.5rem;
 	line-height: 1.5;
 	resize: vertical;
-	z-index: -1;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 	transition:
 		background-color 0.3s,
