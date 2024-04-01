@@ -217,6 +217,7 @@ button:hover {
 /* Textarea for the note content */
 .note-textarea {
 	border-radius: 2px;
+	z-index: 1;
 	resize: none;
 	width: 100%;
 	border-color: rgba(128, 128, 128, 0.11);

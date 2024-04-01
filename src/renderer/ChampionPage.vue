@@ -301,7 +301,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	padding: 1rem 2rem;
 	max-height: 670px;
 	min-height: 670px;
-	z-index: 1;
+	z-index: 5;
 }
 
 .card-wide {

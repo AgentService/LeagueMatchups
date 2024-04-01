@@ -3,9 +3,9 @@
 		<span v-show="instanceId === 1">Champion Notes</span>
 		<span v-show="instanceId === 2">Matchup Notes</span>
 	</div>
-	<div class="background-image" :style="championBackgroundStyle"></div>
 
 	<div class="note-card champion-card">
+		<div class="background-image" :style="championBackgroundStyle"></div>
 		<div class=" d-flex justify-content-between align-items-center ">
 			<div class="search-container">
 				<div class="search-bar position-relative">
@@ -905,7 +905,7 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 0;
+	z-index: -1;
 	background-size: cover;
 	background-position: top center;
 	background-repeat: no-repeat;
@@ -1263,7 +1263,6 @@ export default {
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease;
 	user-select: none;
-	z-index: 1;
 }
 
 .champion-abilities {
