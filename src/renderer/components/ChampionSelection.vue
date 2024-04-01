@@ -1,78 +1,76 @@
 <template>
 
-	<div>
+	<div class="note-card champion-card ">
 
-		<div class="note-card champion-card">
+		<div class="d-flex justify-content-between align-items-center ">
 
-			<div class="d-flex justify-content-between align-items-center">
+			<div class="background-image" :style="championBackgroundStyle"></div>
+			<div class="search-container">
+				<div class="search-bar position-relative">
+					<div class="input-group">
+						<span class="input-group-text" @click="showGrid">
+							<i class="fa-solid fa-search fa-xs"></i>
+						</span>
+						<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
+							placeholder="Your Champion" class="form-control" v-if="instanceId === 1" />
 
-				<div class="background-image" :style="championBackgroundStyle"></div>
-				<div class="search-container">
-					<div class="search-bar position-relative">
-						<div class="input-group">
-							<span class="input-group-text" @click="showGrid">
-								<i class="fa-solid fa-search fa-xs"></i>
-							</span>
-							<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
-								placeholder="Your Champion" class="form-control" v-if="instanceId === 1" />
-
-							<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
-								placeholder="Enemy Champion" class="form-control" v-if="instanceId === 2" />
-						</div>
-					</div>
-				</div>
-
-
-				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
-					v-if="instanceId === 1">
-					<div class="fav-header">
-						<i class="fa-solid fa-star fa-sm"></i>
-						<span></span>
-					</div>
-					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
-						@mouseleave="handlePopupMouseLeave">
-						<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
-							@click="selectChampion(champion)">
-							<img :src="championImageUrls[champion.id]" alt="Champion Image" />
-						</div>
+						<input type="text" @click.stop="showGrid" v-model="searchTerm" @input="filterChampions"
+							placeholder="Enemy Champion" class="form-control" v-if="instanceId === 2" />
 					</div>
 				</div>
 			</div>
 
-			<!-- Champion Grid Container -->
-			<transition name="fade" mode="in-out">
-				<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
-					<div class="champion-grid" v-show="isGridVisible" v-click-outside="outsideClickHandler">
-						<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
-							@click="selectChampion(champion)">
-							<img :src="championImageUrls[champion.id]" alt="Champion Image" />
-							<!-- <span>{{ champion.name }}</span> -->
-						</div>
-					</div>
 
+			<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
+				v-if="instanceId === 1">
+				<div class="fav-header">
+					<i class="fa-solid fa-star fa-sm"></i>
+					<span></span>
 				</div>
-			</transition>
-
-			<div v-if="loading" class="loading-indicator">
-				Loading...
+				<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
+					@mouseleave="handlePopupMouseLeave">
+					<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
+						@click="selectChampion(champion)">
+						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
+					</div>
+				</div>
 			</div>
+		</div>
 
-			<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
-				<transition name="fade" mode="out-in">
+		<!-- Champion Grid Container -->
+		<transition name="fade" mode="in-out">
+			<div class="champion-grid-container" :class="{ 'open': isGridVisible }">
+				<div class="champion-grid" v-show="isGridVisible" v-click-outside="outsideClickHandler">
+					<div v-for="champion in filteredChampions" :key="champion.id" class="champion-tile"
+						@click="selectChampion(champion)">
+						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
+						<!-- <span>{{ champion.name }}</span> -->
+					</div>
+				</div>
 
-					<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
-						<div :class="[themeClass, 'champion-content']">
-							<!-- Champion Image Container -->
+			</div>
+		</transition>
 
-							<div class="champion-portrait">
-								<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-									:class="{ 'champion-picked': championPicked }" alt="Champion Image"
-									@click.stop="showGrid" :ref="getInstanceIdRef" />
-							</div>
-							<div class="champion-info">
-								<div class="champion-name-container">
-									<div class="champion-name">{{ selectedChampion.name }}</div>
-									<!-- <div class="stats-container">
+		<div v-if="loading" class="loading-indicator">
+			Loading...
+		</div>
+
+		<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
+			<transition name="fade" mode="out-in">
+
+				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
+					<div :class="[themeClass, 'champion-content']">
+						<!-- Champion Image Container -->
+
+						<div class="champion-portrait">
+							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
+								:class="{ 'champion-picked': championPicked }" alt="Champion Image"
+								@click.stop="showGrid" :ref="getInstanceIdRef" />
+						</div>
+						<div class="champion-info">
+							<div class="champion-name-container">
+								<div class="champion-name">{{ selectedChampion.name }}</div>
+								<!-- <div class="stats-container">
 									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
 										<img :src="getStatImageUrl('statToggle')" alt="Toggle Stats" class="stat-toggle-icon" />
 									</div>
@@ -86,117 +84,18 @@
 										</div>
 									</div>
 								</div> -->
-									<div @click="toggleFavorite(selectedChampion)" class="favorite-icon"
-										:class="{ 'is-favorite': isFavorite(selectedChampion) }">
-										<i class="fa fa-star fa-xs"></i>
-									</div>
-
+								<div @click="toggleFavorite(selectedChampion)" class="favorite-icon"
+									:class="{ 'is-favorite': isFavorite(selectedChampion) }">
+									<i class="fa fa-star fa-xs"></i>
 								</div>
-								<div class="abilities-container">
-									<div class="champion-abilities">
-										<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
-											<div class="ability-content">
-												<div class="ability-icon-wrapper">
-													<img :src="selectedChampionPassiveUrl"
-														:alt="selectedChampion?.passive.full"
-														class="ability-icon-passive" />
-												</div>
-											</div>
-											<div class="tooltip-container">
-												<div class="tooltip">
-													<div class="tooltip-content">
-														<div class="tooltip-header">
-															<img :src="getPassiveImageUrl(selectedChampion?.passive)"
-																:alt="selectedChampion?.passive.name"
-																class="tooltip-spell-icon" />
-															<span class="ability-label">P</span>
-														</div>
-														<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
-														<p class="spell-description">{{
-					selectedChampion?.passive.description }}
-														</p>
-													</div>
-												</div>
-											</div>
-										</div>
-										<div v-for="(spellData, index) in selectedChampionSpell" :key="index"
-											class="ability">
-											<div class="ability-icon-wrapper">
-												<img :src="spellData.url" class="ability-icon" />
-												<div class="cooldown">{{
-					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
-												<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
-												<div class="tooltip-container">
-													<div class="tooltip">
-														<div class="tooltip-content">
-															<div class="tooltip-header">
-																<img :src="spellData.url" :alt="spellData.spell.name"
-																	class="tooltip-spell-icon" />
-																<span class="ability-label">{{
-					getAbilityLabelByIndex(index)
-				}}</span>
-															</div>
-															<h5 class="spell-name">{{ spellData.spell.name }}</h5>
-															<div>
-																<p class="spell-cooldown">Cooldown: <span
-																		class="value-text">{{
-					spellData.spell.cooldownBurn
-				}}</span></p>
-																<p class="spell-cost">Cost: <span class="value-text">{{
-						spellData.spell.costBurn
-					}}</span>
-																</p>
-															</div>
-															<p class="spell-description">{{ spellData.spell.description
-																}}
-															</p>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</transition>
 
-
-				<!-- Instance 2: Icon Left + Icons Right -->
-				<div class="champion-detail-wrapper champion-detail--instance2 " v-if="instanceId === 2">
-					<!-- Champion Image Container -->
-					<div :class="[themeClass, 'champion-content']">
-						<!-- Champion Image Container -->
-						<div class="champion-portrait">
-							<img class="champion-image" :src="championImageUrls[selectedChampion.id]"
-								alt="Champion Image" @click.stop="showGrid" :ref="getInstanceIdRef" />
-						</div>
-						<div class="champion-info">
-							<div class="champion-name-container">
-								<div class="champion-name">{{ selectedChampion.name }}</div>
-								<!-- <div class="stats-container">
-									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
-										<img :src="getStatImageUrl('adaptiveforcescaling')" alt="Toggle Stats"
-											class="stat-toggle-icon" />
-									</div>
-									<div class="stats-tooltip-container collapse" :class="{ show: !isStatsCollapsed }">
-										<div v-show="isStatsVisible" class="stats-tooltip">
-											<div class="stat-item d-flex align-items-center"
-												v-for="statKey in selectedStatKeys" :key="statKey">
-												<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
-												<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
-											</div>
-										</div>
-									</div>
-								</div> -->
 							</div>
 							<div class="abilities-container">
 								<div class="champion-abilities">
 									<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
 										<div class="ability-content">
 											<div class="ability-icon-wrapper">
-												<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+												<img :src="selectedChampionPassiveUrl"
 													:alt="selectedChampion?.passive.full"
 													class="ability-icon-passive" />
 											</div>
@@ -212,7 +111,7 @@
 													</div>
 													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
 													<p class="spell-description">{{
-					selectedChampion?.passive.description }}
+				selectedChampion?.passive.description }}
 													</p>
 												</div>
 											</div>
@@ -223,8 +122,8 @@
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
 											<div class="cooldown">{{
-					spellData.spell.cooldownBurn.split('/')[0] }}s</div>
-
+				spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
 													<div class="tooltip-content">
@@ -232,18 +131,18 @@
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{
-					getAbilityLabelByIndex(index)
-				}}</span>
+				getAbilityLabelByIndex(index)
+			}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
 															<p class="spell-cooldown">Cooldown: <span
 																	class="value-text">{{
-					spellData.spell.cooldownBurn
-				}}</span></p>
+				spellData.spell.cooldownBurn
+			}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-																	spellData.spell.costBurn
-																	}}</span>
+					spellData.spell.costBurn
+				}}</span>
 															</p>
 														</div>
 														<p class="spell-description">{{ spellData.spell.description
@@ -253,8 +152,103 @@
 												</div>
 											</div>
 										</div>
-
 									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</transition>
+
+
+			<!-- Instance 2: Icon Left + Icons Right -->
+			<div class="champion-detail-wrapper champion-detail--instance2 " v-if="instanceId === 2">
+				<!-- Champion Image Container -->
+				<div :class="[themeClass, 'champion-content']">
+					<!-- Champion Image Container -->
+					<div class="champion-portrait">
+						<img class="champion-image" :src="championImageUrls[selectedChampion.id]" alt="Champion Image"
+							@click.stop="showGrid" :ref="getInstanceIdRef" />
+					</div>
+					<div class="champion-info">
+						<div class="champion-name-container">
+							<div class="champion-name">{{ selectedChampion.name }}</div>
+							<!-- <div class="stats-container">
+									<div @mouseover="isStatsVisible = true" @mouseleave="isStatsVisible = false">
+										<img :src="getStatImageUrl('adaptiveforcescaling')" alt="Toggle Stats"
+											class="stat-toggle-icon" />
+									</div>
+									<div class="stats-tooltip-container collapse" :class="{ show: !isStatsCollapsed }">
+										<div v-show="isStatsVisible" class="stats-tooltip">
+											<div class="stat-item d-flex align-items-center"
+												v-for="statKey in selectedStatKeys" :key="statKey">
+												<div class="stat-value">{{ selectedChampion.stats[statKey] }}</div>
+												<img :src="getStatImageUrl(statKey)" :alt="statKey" class="stat-icon" />
+											</div>
+										</div>
+									</div>
+								</div> -->
+						</div>
+						<div class="abilities-container">
+							<div class="champion-abilities">
+								<div class="ability ability-icon-wrapper" v-if="selectedChampion?.passive">
+									<div class="ability-content">
+										<div class="ability-icon-wrapper">
+											<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+												:alt="selectedChampion?.passive.full" class="ability-icon-passive" />
+										</div>
+									</div>
+									<div class="tooltip-container">
+										<div class="tooltip">
+											<div class="tooltip-content">
+												<div class="tooltip-header">
+													<img :src="getPassiveImageUrl(selectedChampion?.passive)"
+														:alt="selectedChampion?.passive.name"
+														class="tooltip-spell-icon" />
+													<span class="ability-label">P</span>
+												</div>
+												<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
+												<p class="spell-description">{{
+				selectedChampion?.passive.description }}
+												</p>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div v-for="(spellData, index) in selectedChampionSpell" :key="index" class="ability">
+									<div class="ability-icon-wrapper">
+										<img :src="spellData.url" class="ability-icon" />
+										<div class="cooldown">{{
+				spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+
+										<div class="tooltip-container">
+											<div class="tooltip">
+												<div class="tooltip-content">
+													<div class="tooltip-header">
+														<img :src="spellData.url" :alt="spellData.spell.name"
+															class="tooltip-spell-icon" />
+														<span class="ability-label">{{
+				getAbilityLabelByIndex(index)
+			}}</span>
+													</div>
+													<h5 class="spell-name">{{ spellData.spell.name }}</h5>
+													<div>
+														<p class="spell-cooldown">Cooldown: <span class="value-text">{{
+				spellData.spell.cooldownBurn
+			}}</span></p>
+														<p class="spell-cost">Cost: <span class="value-text">{{
+																spellData.spell.costBurn
+																}}</span>
+														</p>
+													</div>
+													<p class="spell-description">{{ spellData.spell.description
+														}}
+													</p>
+												</div>
+											</div>
+										</div>
+									</div>
+
 								</div>
 							</div>
 						</div>
@@ -550,7 +544,7 @@ export default {
 
 				return {
 					backgroundImage: `url('${imageUrl}')`,
-					opacity: 0.05
+					opacity: 0.03
 				};
 			}
 			return {};
@@ -744,14 +738,50 @@ export default {
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-	transition: opacity 0.5s ease;
+/* Fade In Animation */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
-.fade-enter,
+/* Fade Out Animation */
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+	}
+}
+
+/* Transition Classes */
+.fade-enter-active,
+.fade-leave-active {
+	animation-duration: 0.5s;
+}
+
+.fade-enter-from,
 .fade-leave-to {
 	opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+	opacity: 1;
+}
+
+.fade-enter-active {
+	animation-name: fadeIn;
+}
+
+.fade-leave-active {
+	animation-name: fadeOut;
 }
 
 .champion-picked {
@@ -870,7 +900,7 @@ export default {
 	height: 100%;
 	z-index: 0;
 	background-size: cover;
-	background-position: center;
+	background-position: top center;
 	background-repeat: no-repeat;
 }
 
@@ -1223,6 +1253,7 @@ export default {
 	border-radius: 10px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease;
+	user-select: none;
 }
 
 .champion-abilities {
@@ -1246,10 +1277,9 @@ export default {
 }
 
 .champion-portrait img {
-	width: 120px;
+	width: 100px;
 	height: auto;
-	border-radius: 5px;
-	border: 2px solid var(--gold-4);
+	border-radius: 2px;
 }
 
 .champion-info {
@@ -1257,7 +1287,7 @@ export default {
 	flex-direction: column;
 	justify-content: space-between;
 	flex-grow: 1;
-	padding: .5rem;
+	padding: 1rem;
 }
 
 .champion-name-container {

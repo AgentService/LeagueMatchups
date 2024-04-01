@@ -94,10 +94,10 @@ const handleSubmit = async () => {
 </script>
 
 
-<style>
+<style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 2.5s ease;
+    transition: opacity 1s ease;
 }
 
 .fade-enter,

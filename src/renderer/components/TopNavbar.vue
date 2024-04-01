@@ -302,7 +302,7 @@ const logout = () => {
 	color: #f8f9fa;
 	border-radius: 0.5rem;
 	box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-
+	user-select: none;
 }
 
 .main-container>* {

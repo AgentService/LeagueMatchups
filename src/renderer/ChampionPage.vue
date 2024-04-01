@@ -11,19 +11,17 @@
 			<div class="grid-container ">
 				<div class="container-fluid">
 					<!-- Summoner Info Row -->
-
-					<div class="row justify-content-evenly">
-						<!-- <div class="col-xxl-3 col-xl-3">
-							<div class="card">
+					<div class="row align-items-start">
+						<div class="col-xxl-2 col-xl-2 mt-4">
+							<div class="card-fluid mb-4">
 								<ChampionTips :champion="championA" />
 							</div>
-							<div class="card">
+							<div class="card-fluid mt-4">
+								Placeholder
+								<!-- <LearningObjectives></LearningObjectives> -->
 							</div>
-							<div class="card">
-							</div>
-						</div> -->
-
-						<div class="col-xxl-10 col-xl-10">
+						</div>
+						<div class="col-xxl-8 col-xl-8">
 							<div class="row align-items-start justify-content-start">
 								<!-- <SummonerInfo /> -->
 								<!-- <div class="d-flex">
@@ -34,11 +32,39 @@
 								</div> -->
 
 							</div>
-							<div class="card-container mt-4">
+							<div class="row mb-4 mt-4">
 
-								<div class="row ">
-									<!-- Champion Search for User's Champion -->
-									<!-- <div class="col-xxl-2 col-xl-2">
+
+								<div class="col-xxl-12">
+									<div class="card-container flex-row">
+
+										<!-- Champion Search for User's Champion -->
+										<!-- <div class="col-xxl-2 col-xl-2">
+										<div class="card">
+											<SummonerRankedInfo />
+										</div>
+										<div class="card">
+										</div>
+									</div> -->
+										<div class="col-xxl-6 position-relative">
+											<div class="card card-large">
+												<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+
+												<ChampionNotes />
+											</div>
+										</div>
+										<!-- VS Divider -->
+										<div class="vs-container">
+											<span>vs</span>
+										</div>
+										<!-- Matchup Notes and Search for Enemy Champion -->
+										<div class="col-xxl-6 position-relative">
+											<div class="card card-large">
+												<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+												<MatchupNotes />
+											</div>
+										</div>
+										<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
 											<SummonerRankedInfo />
 										</div>
@@ -46,35 +72,7 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
-									<div class="col-xxl-6 m-auto">
-										<div class="card-small card-top mb-0">
-											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-										</div>
-										<div class="card card-bottom ">
-											<ChampionNotes />
-										</div>
 									</div>
-									<!-- VS Divider -->
-									<div class="vs-container">
-										<span>vs</span>
-									</div>
-									<!-- Matchup Notes and Search for Enemy Champion -->
-									<div class="col-xxl-6 m-auto">
-										<div class="card-small card-top mb-0">
-											<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-										</div>
-										<div class="card card-bottom">
-											<MatchupNotes />
-										</div>
-									</div>
-									<!-- <div class="col-xxl-2 col-xl-2">
-										<div class="card">
-											<SummonerRankedInfo />
-										</div>
-										<div class="card">
-											<LearningObjectives></LearningObjectives>
-										</div>
-									</div> -->
 								</div>
 							</div>
 							<div class="row">
@@ -83,7 +81,7 @@
 										<GeneralNotes />
 									</div>
 								</div>
-								<!-- <div class="col-xxl-0">
+								<!-- <div class="col-xxl-9">
 									<div class="card-large card-top card-bottom">
 										 <MatchHistory /> 
 									</div>
@@ -231,7 +229,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	z-index: 2;
 	font-size: 3rem;
 	top: 12%;
-	right: 49.3%;
+	right: 40.8%;
 	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
@@ -241,6 +239,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 		0 0 20px #00ffeac3;
 	transform: scale(.775);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
+	user-select: none;
 }
 
 .vs-container:hover {
@@ -263,8 +262,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	flex-direction: column;
 	background: var(--card-background);
-	padding: 1.5rem;
-	margin-bottom: 1rem;
 	border: 1px solid rgba(128, 128, 128, 0.1);
 }
 
@@ -272,14 +269,12 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	border: 1px solid rgba(128, 128, 128, 0.1) !important;
-	box-shadow: 0px 12px 15px rgba(0, 0, 0, 1);
-	border-top: 0 !important;
+	border: 0 !important;
 	border-radius: 0 !important;
-	background-image: linear-gradient(to right, #091014, #091014);
+	background-color: transparent !important;
 	color: #e7e7e7;
 	padding: 1rem;
-	padding-top: 0;
+	margin: 1rem;
 	max-height: 390px;
 	min-height: 390px;
 	z-index: auto;
@@ -289,21 +284,19 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .card-small {
 	position: relative;
 	display: flex;
-	border: 1px solid rgba(128, 128, 128, 0.1);
-	box-shadow: 0px 12px 15px rgba(0, 0, 0, 1);
 	border-bottom: 0;
 	border-radius: 0;
 	flex-direction: column;
 	background-image: linear-gradient(to right, #091014, #091014);
 	color: #e7e7e7;
 	padding: .5rem 1.25rem;
-	margin-bottom: 1rem;
 	max-height: 250px;
 	min-height: 250px;
 	z-index: auto;
 }
 
 .card-large {
+	user-select: none;
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -311,10 +304,21 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-image: linear-gradient(to right, #091014, #091014);
 	color: #e7e7e7;
 	padding: 1rem 2rem;
-	margin-bottom: 1rem;
-	max-height: 520px;
-	min-height: 520px;
+	max-height: 600px;
+	min-height: 600px;
 	z-index: auto;
+}
+
+.card-fluid {
+	user-select: none;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid rgba(128, 128, 128, 0.1);
+	background-image: linear-gradient(to right, #091014, #091014);
+	padding: 1rem 1rem;
+	min-height: 440px;
+	max-height: 440px;
 }
 
 .notes-body {
@@ -469,6 +473,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	color: var(--gold-4);
 	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+	user-select: none;
+
 }
 
 .tab-header {
