@@ -101,7 +101,6 @@ const path = require("path");
 require("dotenv").config();
 const Debug = require("debug");
 const debug = Debug("app:main");
-const findProcess = require("find-process");
 Debug.enable("*");
 
 const Store = require("electron-store");
@@ -389,7 +388,7 @@ ipcMain.on("restart-app-to-update", () => {
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
   // updater.checkForUpdates();
-  if (process.env.NODE_ENV === "DEVELOPMENT") {
+  if (process.env.NODE_ENV == "DEVELOPMENT") {
     updater.checkForUpdates();
   }
 });
