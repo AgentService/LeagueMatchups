@@ -336,9 +336,10 @@ function createMainWindow() {
 
 updater.logger = require("electron-log");
 updater.logger.transports.file.level = "info";
+let mainWindowReady = false;
 
 ipcMain.on("start-download", (event) => {
-  mockAutoUpdater.downloadUpdate();
+  updater.downloadUpdate();
 });
 
 updater.on("error", (err) => {
@@ -355,14 +356,14 @@ updater.on("download-progress", (progressObj) => {
   log_message += " - Downloaded " + progressObj.percent + "%";
   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
   log.info(log_message);
-  if (mainWindow && mainWindow.webContents) {
+  if (mainWindowReady && mainWindow && mainWindow.webContents) {
     mainWindow.webContents.send("download-progress", progressObj);
   }
 });
 
 updater.on("update-available", (info) => {
   log.info("Update available.", info);
-  if (mainWindow && mainWindow.webContents) {
+  if (mainWindowReady && mainWindow && mainWindow.webContents) {
     mainWindow.webContents.send("update-available", info);
   }
 });
@@ -373,7 +374,7 @@ updater.on("update-available", (info) => {
 // });
 
 updater.on("update-error", (error) => {
-  if (mainWindow && mainWindow.webContents) {
+  if (mainWindowReady && mainWindow && mainWindow.webContents) {
     mainWindow.webContents.send("update-error", error);
   }
   dialog.showErrorBox(
@@ -438,6 +439,11 @@ app.on("ready", async () => {
   debug("App is ready");
 });
 
+mainWindow.once("ready-to-show", () => {
+  mainWindowReady = true;
+  // Now that mainWindow is ready, check if there are any queued messages
+  // and send them to the renderer. This part depends on how you decide to queue messages.
+});
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
