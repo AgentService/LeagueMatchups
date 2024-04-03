@@ -32,8 +32,6 @@
 
 							</div>
 							<div class="row mb-4 mt-4">
-
-
 								<div class="col-xxl-12">
 									<div class="card-container flex-row">
 
@@ -299,9 +297,9 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	flex-direction: column;
 	color: var(--gold-1);
 	padding: 1rem 2rem;
-	max-height: 670px;
-	min-height: 670px;
-	z-index: 5;
+	max-height: 600px;
+	min-height: 600px;
+	z-index: auto;
 }
 
 .card-wide {
@@ -314,7 +312,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	max-height: 670px;
 	min-height: 670px;
 	background-image: linear-gradient(to right, #091014, #091014);
-	z-index: 1;
+	z-index: 0;
 }
 
 .card-fluid {

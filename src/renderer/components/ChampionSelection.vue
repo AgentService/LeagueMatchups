@@ -4,9 +4,9 @@
 		<span v-show="instanceId === 2">Matchup Notes</span>
 	</div>
 
-	<div class="note-card champion-card">
+	<div class="note-card champion-card ">
 		<div class="background-image" :style="championBackgroundStyle"></div>
-		<div class=" d-flex justify-content-between align-items-center ">
+		<div class="d-flex justify-content-between align-items-center">
 			<div class="search-container">
 				<div class="search-bar position-relative">
 					<div class="input-group">
@@ -22,21 +22,38 @@
 				</div>
 			</div>
 
-
-			<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
-				v-if="instanceId === 1">
-				<div class="fav-header">
-					<i class="fa-solid fa-star fa-sm"></i>
-					<span></span>
-				</div>
-				<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
-					@mouseleave="handlePopupMouseLeave">
-					<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
-						@click="selectChampion(champion)">
-						<img :src="championImageUrls[champion.id]" alt="Champion Image" />
+			<div class="button-container">
+				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
+					v-if="instanceId === 1">
+					<button class="btn button">
+						<i class="fa-solid fa-star fa-sm"></i> Favorites
+					</button>
+					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
+						@mouseleave="handlePopupMouseLeave">
+						<div v-for="champion in favoriteChampions" :key="champion.id" class="fav-item"
+							@click="selectChampion(champion)">
+							<img :src="championImageUrls[champion.id]" alt="Champion Image" />
+						</div>
 					</div>
 				</div>
+				<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared"
+					v-if="instanceId === 1">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
+				</button>
+				<button key="share-button" class="btn button" @click="showMatchupNotesModal = true" aria-label="Shared"
+					v-if="instanceId === 2">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
+				</button>
+				<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
+					title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
+
+				<SharedNotesModal ref="MatchupNotesModalRef" :isVisible="showMatchupNotesModal" notesType="matchup"
+					title="Shared Matchup Notes" :championA="championA" :championB="championB"
+					@update:isVisible="showMatchupNotesModal = $event" />
+
+
 			</div>
+
 		</div>
 
 		<!-- Champion Grid Container -->
@@ -58,9 +75,7 @@
 		</div>
 
 		<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
-
 			<transition name="fade" mode="out-in">
-
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
@@ -114,7 +129,7 @@
 													</div>
 													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
 													<p class="spell-description">{{
-				selectedChampion?.passive.description }}
+			selectedChampion?.passive.description }}
 													</p>
 												</div>
 											</div>
@@ -125,7 +140,7 @@
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
 											<div class="cooldown">{{
-				spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+			spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
@@ -134,18 +149,18 @@
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{
-				getAbilityLabelByIndex(index)
-			}}</span>
+			getAbilityLabelByIndex(index)
+		}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
 															<p class="spell-cooldown">Cooldown: <span
 																	class="value-text">{{
-				spellData.spell.cooldownBurn
-			}}</span></p>
+			spellData.spell.cooldownBurn
+		}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-					spellData.spell.costBurn
-				}}</span>
+				spellData.spell.costBurn
+			}}</span>
 															</p>
 														</div>
 														<p class="spell-description">{{ spellData.spell.description
@@ -212,7 +227,7 @@
 												</div>
 												<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
 												<p class="spell-description">{{
-				selectedChampion?.passive.description }}
+			selectedChampion?.passive.description }}
 												</p>
 											</div>
 										</div>
@@ -222,7 +237,7 @@
 									<div class="ability-icon-wrapper">
 										<img :src="spellData.url" class="ability-icon" />
 										<div class="cooldown">{{
-				spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+			spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 
 										<div class="tooltip-container">
 											<div class="tooltip">
@@ -231,14 +246,14 @@
 														<img :src="spellData.url" :alt="spellData.spell.name"
 															class="tooltip-spell-icon" />
 														<span class="ability-label">{{
-				getAbilityLabelByIndex(index)
-			}}</span>
+			getAbilityLabelByIndex(index)
+		}}</span>
 													</div>
 													<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 													<div>
 														<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-				spellData.spell.cooldownBurn
-			}}</span></p>
+			spellData.spell.cooldownBurn
+																}}</span></p>
 														<p class="spell-cost">Cost: <span class="value-text">{{
 																spellData.spell.costBurn
 																}}</span>
@@ -318,34 +333,67 @@
 
 <script>
 import { useStore, mapActions } from 'vuex';
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import { getUrlHelper } from '../globalSetup';
 import ImageUrlHelper from '../utils/imageHelper';
+import SharedNotesModal from './reuse/NotesShareModal.vue';
 
 import { gsap } from "gsap";
-import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 
 import Debug from 'debug';
 const debug = Debug('app:component:ChampionSelection');
 
+
+
+
+
 export default {
+	components: {
+		SharedNotesModal
+	},
 	props: {
 		instanceId: {
 			type: Number,
 			required: true
 		}
 	},
-	setup(props) {
+	emits: ['championSelected'], // Declare custom events here
+	setup(props, { emit }) {
+		const championA = computed(() => store.getters['matchups/getChampionA']);
+		const championB = computed(() => store.getters['matchups/getChampionB']);
+		const store = useStore();
+
+		const showNotesModal = ref(false);
+		const showMatchupNotesModal = ref(false);
+		const NotesSharedModalRef = ref(null);
+		const MatchupNotesModalRef = ref(null);
+		const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
+
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
-		const store = useStore();
 		const imageUrlHelper = new ImageUrlHelper();
 		const favoriteChampions = computed(() => store.state.userPreferences.favoriteChampions);
 		const championPicked = ref(false);
 
 		const getStatImageUrl = (statKey) => imageUrlHelper.getStatImageUrl(statKey);
 
-
+		const fetchOtherUsersNotes = (type) => {
+			if (type === 'matchup') {
+				store.dispatch('notes/fetchOtherUsersMatchupNotes', currentMatchup.value.combinedId);
+				MatchupNotesModalRef.value?.fetchData(currentMatchup.value.combinedId);
+			} else {
+				store.dispatch('notes/fetchOtherUsersChampionNotes', championA.value.id);
+				NotesSharedModalRef.value?.fetchData(championA.value.id);
+			}
+		};
+		watch([showNotesModal, showMatchupNotesModal], async ([newValChampion, newValMatchup]) => {
+			if (newValChampion === true) {
+				fetchOtherUsersNotes('champion');
+			}
+			if (newValMatchup === true) {
+				fetchOtherUsersNotes('matchup');
+			}
+		}, { immediate: false });
 
 		const toggleFavorite = (champion) => {
 			const isFav = favoriteChampions.value.some(c => c.id === champion.id);
@@ -402,14 +450,10 @@ export default {
 		};
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
-			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl, championPicked
+			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl, championPicked, showNotesModal, showMatchupNotesModal, fetchOtherUsersNotes, championA, championB,
+			NotesSharedModalRef, MatchupNotesModalRef
 		};
 	},
-	// watch: {
-	// 	selectedChampion(newVal) {
-	// 		this.searchTerm = newVal?.id;
-	// 	}
-	// },
 	data() {
 		return {
 			loading: true, // Initial loading state
@@ -457,8 +501,6 @@ export default {
 	},
 
 	async mounted() {
-
-
 		const store = useStore();
 		let { championA, championB } = store.state.matchups;
 		if (!championA) {
@@ -554,7 +596,6 @@ export default {
 		},
 	},
 	methods: {
-
 		outsideClickHandler() {
 			this.isGridVisible = false;
 		},
@@ -741,10 +782,17 @@ export default {
 </script>
 
 <style scoped>
+.button-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .test {
 	z-index: 111;
 	background-color: red;
 }
+
 /* Fade In Animation */
 @keyframes fadeIn {
 	from {
@@ -905,7 +953,7 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: -1;
+	z-index: 0;
 	background-size: cover;
 	background-position: top center;
 	background-repeat: no-repeat;
@@ -1081,8 +1129,6 @@ export default {
 .champion-content {
 	display: flex;
 	color: #fff;
-	padding: 2rem;
-	padding-bottom: 0;
 }
 
 .champion-detail-container {
@@ -1091,7 +1137,7 @@ export default {
 	justify-content: center;
 	align-items: center;
 	position: relative;
-	
+
 }
 
 .champion-detail-wrapper {
@@ -1260,7 +1306,6 @@ export default {
 .note-card {
 	color: #e7e7de;
 	border-radius: 10px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	transition: transform 0.3s ease;
 	user-select: none;
 }
@@ -1273,10 +1318,9 @@ export default {
 
 .champion-card {
 	display: flex;
-	height: 250px;
+	height: 200px;
 	flex-direction: column;
 	padding: 0rem;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .champion-portrait {
@@ -1325,7 +1369,7 @@ export default {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0;
-	padding-top: 1rem;
+	padding-top: .25rem;
 }
 
 .champion-grid.is-scrollable {

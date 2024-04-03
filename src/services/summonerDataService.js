@@ -27,8 +27,8 @@ export async function fetchAndSaveSummonerData(summonerNameValue) {
 export function initializeSummonerDataFetching() {
   window.api.receive("summoner-name-response", async (response) => {
     // Check if the response contains a valid summoner name and no error
-    if (response && response.summonerName && !response.error) {
-      const newSummonerName = response.summonerName;
+    if (response && response.displayName && !response.error) {
+      const newSummonerName = response.displayName;
       debug("New summoner name:", newSummonerName);
       const summonerData =
         store.getters["summoner/getSummonerDataByName"](newSummonerName);
@@ -47,8 +47,6 @@ export function initializeSummonerDataFetching() {
       // Optionally, request the user to specify the path manually or show an error message
     }
   });
-
-  // Trigger the IPC main process to fetch the summoner name
   window.api.send("get-summoner-name");
 }
 

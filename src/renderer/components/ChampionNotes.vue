@@ -1,14 +1,14 @@
 <template>
-	<div class="d-flex justify-content-end align-items-center">
+	<!-- <div class="share-button d-flex justify-content-end align-items-center">
 		<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared">
 			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 		</button>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
-	</div>
+	</div> -->
 	<div class="notes-body">
 		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="10"></textarea>
+			rows="11"></textarea>
 	</div>
 	<div class="status-container">
 		<!-- <div v-if="notesState === 'neutral'" key="neutral" class="status-message">
@@ -132,6 +132,11 @@ async function saveChampionNotes() {
 
 
 <style scoped>
+.share-button {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+}
 .filter-container {
 	border: 1px solid var(--grey-3);
 	border-radius: 12px;

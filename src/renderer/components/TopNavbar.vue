@@ -130,7 +130,6 @@ const showTooltip = ref(false); // Controls the visibility of the tooltip
 const clientConnected = ref(false);
 
 const store = useStore();
-let intervalId;
 
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 const user = computed(() => store.state.auth.user);
@@ -169,32 +168,12 @@ const isLoggedIn = computed(() => {
 
 const dropdownOpen = ref(true);
 
-async function checkClientStatusConnection() {
-	try {
-		const isClientConnected = await window.api.checkClientStatus();
-
-		clientConnected.value = isClientConnected;
-		// Adjust checking interval based on the connection state
-		clearInterval(intervalId);
-		if (isClientConnected) {
-			intervalId = setInterval(checkClientStatusConnection, 60000);
-		} else {
-			intervalId = setInterval(checkClientStatusConnection, 5000);
-		}
-	} catch (error) {
-		console.error("Error checking client status:", error);
-		clientConnected.value = false;
-		// Ensure to check more frequently if an error occurred
-		clearInterval(intervalId);
-		intervalId = setInterval(checkClientStatusConnection, 5000);
-	}
-}
-
-
-
 onMounted(async () => {
-	checkClientStatusConnection(); // Initial check to set the interval based on the current state
-
+	window.ws.receive('client-status', (status) => {
+		clientConnected.value = status.connected;
+		console.log('Client connection status:', status.connected);
+		// Here, you can trigger any additional logic or UI updates based on the connection status
+	});
 	// const summonerIcon = computed(() => {
 	// 	const iconId = currentSummoner.value?.profileIconId;
 	// 	if (!iconId) {
@@ -205,7 +184,6 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
-	clearInterval(intervalId); // Clear the interval when the component is unmounted
 });
 
 const logout = () => {

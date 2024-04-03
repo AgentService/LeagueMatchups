@@ -1,6 +1,10 @@
 const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
 const fs = require("fs");
-const { createWebSocketConnection } = require("league-connect");
+const {
+  createWebSocketConnection,
+  authenticate,
+  LeagueClient,
+} = require("league-connect");
 
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
@@ -122,124 +126,111 @@ if (require("electron-squirrel-startup")) {
 store.set("leagueClientPath", null);
 store.set("detectionMethod", store.get("detectionMethod", "process")); // Default to 'process'
 
-ipcMain.handle("check-client-status", async () => {
-  const detectionMethod = store.get("detectionMethod", "process"); // Fallback to 'lockfile' if not set
-  switch (detectionMethod) {
-    case "lockfile":
-      return await checkLockfileExists(); // Your existing lockfile check logic
-    case "process":
-      return await checkLeagueClientProcess(); // New method to implement
-    default:
-      console.error("Invalid detection method.");
-      return false;
+async function initializeWebSocket(credentials) {
+  try {
+    debug("Attempting to establish WebSocket connection...");
+    // If successful, proceed to establish the WebSocket connection
+    if (credentials) {
+      const ws = await createWebSocketConnection({
+        authenticationOptions: { awaitConnection: true },
+        pollInterval: 1000,
+        maxRetries: 10,
+      });
+      debug("WebSocket connection established.");
+      setupWebSocketSubscriptions(ws);
+    }
+  } catch (error) {
+    debug("League client not detected or WebSocket connection failed:", error);
+  }
+}
+
+function setupWebSocketSubscriptions(ws) {
+  ws.subscribe("/lol-summoner/v1/current-summoner", (data) => {
+    if (data && data.type === "Update") {
+      console.log(`The summoner ${data.data.displayName} was updated.`);
+      // Here you can update your application's state or UI based on the received summoner information
+    }
+  });
+
+  let lastChampionId = null;
+  let lastActionCompleted = false;
+
+  ws.subscribe("/lol-champ-select/v1/session", (sessionData) => {
+    const summonerAction = sessionData.actions.flat().find((action) => {
+      return (
+        action.actorCellId ===
+        sessionData.myTeam.find(
+          (member) => member.puuid === currentSummoner.puuid
+        )?.cellId
+      );
+    });
+    debug("summonerAction", summonerAction);
+    if (summonerAction && summonerAction.type === "pick") {
+      debug("summonerAction", summonerAction);
+      const championIdChanged = summonerAction.championId !== lastChampionId;
+      const actionCompletedChanged =
+        summonerAction.completed !== lastActionCompleted;
+
+      if (championIdChanged || actionCompletedChanged) {
+        lastChampionId = summonerAction.championId;
+        lastActionCompleted = summonerAction.completed;
+        debug("lastChampionId", lastChampionId);
+        debouncedChampionAction(
+          summonerAction.championId,
+          summonerAction.completed
+        );
+      }
+    }
+  });
+}
+async function setupLeagueClientMonitoring() {
+  try {
+    const credentials = await authenticate({
+      awaitConnection: true,
+      pollInterval: 2500,
+    });
+    console.log("League client found. Credentials obtained.");
+
+    initializeWebSocket(credentials)
+      .then(() => {
+        fetchSummonerName(credentials).catch(console.error);
+      })
+      .catch(console.error);
+    const client = new LeagueClient(credentials, { pollInterval: 1000 });
+    mainWindow.webContents.send("client-status", { connected: true });
+
+    client.on("connect", (newCredentials) => {
+      console.log("League client connected.");
+      initializeWebSocket(newCredentials)
+        .then(() => {
+          fetchSummonerName(newCredentials).catch(console.error);
+          mainWindow.webContents.send("client-status", { connected: true });
+        })
+        .catch(console.error);
+    });
+    client.on("disconnect", () => {
+      console.log("League client disconnected.");
+      mainWindow.webContents.send("client-status", { connected: false });
+    });
+    client.start();
+  } catch (error) {
+    console.error("Error setting up monitoring:", error);
+  }
+}
+
+setupLeagueClientMonitoring();
+
+ipcMain.handle("check-client-status", async (event) => {
+  try {
+    await authenticate({ awaitConnection: false });
+    return { connected: true };
+  } catch (error) {
+    return { connected: false, reason: error.message };
   }
 });
 
-async function checkLeagueClientProcess() {
-  try {
-    const processes = await findProcess("name", "LeagueClientUx.exe");
-    if (processes.length > 0) {
-      const riotCredentials = await getLeagueClientCredentials();
-      return riotCredentials;
-    }
-    return false;
-  } catch (error) {
-    console.error("Error checking League client process:", error);
-    return false;
-  }
-}
-
-async function getLeagueClientCredentials() {
-  const processes = await findProcess("name", "LeagueClientUx.exe");
-  for (const proc of processes) {
-    const cmd = proc.cmd || ""; // Command line string
-    const portMatch = cmd.match(/--app-port=(\d+)/);
-    const tokenMatch = cmd.match(/--remoting-auth-token=([\w-]+)/);
-
-    if (portMatch && tokenMatch) {
-      return { port: portMatch[1], token: tokenMatch[1] };
-    }
-  }
-  return null;
-}
-
-async function getLeagueClientPathFromProcess() {
-  const processes = await findProcess("name", "LeagueClientUx.exe");
-  for (const proc of processes) {
-    const installDir = extractInstallDirectory(proc.cmd);
-    if (installDir) {
-      console.log("Extracted Install Directory:", installDir); // Should accurately reflect the full path
-      const lockfilePath = path.join(installDir, "lockfile");
-      console.log("Constructed Lockfile Path:", lockfilePath);
-      if (fs.existsSync(lockfilePath)) {
-        console.log("Lockfile found.");
-        return lockfilePath;
-      } else {
-        console.log("Lockfile not found at the constructed path.");
-      }
-    }
-  }
-  return null;
-}
-
-function extractInstallDirectory(cmd) {
-  // Specifically match the --install-directory parameter and capture the full path, accounting for possible spaces within quotes
-  const regex = /--install-directory=([^"]+?)"/;
-  const match = cmd.match(regex);
-  if (match && match[1]) {
-    let directoryPath = match[1];
-    // Remove leading and trailing quotes if present
-    directoryPath = directoryPath.replace(/^"|"$/g, "");
-    return directoryPath;
-  }
-  return null;
-}
-
-async function getCredentialsFromLockfile(lockfilePath) {
-  const lockfileContent = fs.readFileSync(lockfilePath, "utf8");
-  const parts = lockfileContent.split(":");
-  if (parts.length >= 4) {
-    const port = parts[2];
-    const token = parts[3];
-    return { port, token };
-  }
-  return null;
-}
-
-ipcMain.on("get-summoner-name", async (event, selectedPath = null) => {
-  console.log("IPC message received: get-summoner-name");
-  let response = { summonerName: null, error: null };
-
-  try {
-    const lockfilePath = await getLeagueClientPathFromProcess();
-    if (!lockfilePath) {
-      response.error = "League client lockfile not found.";
-      console.error(response.error);
-    } else {
-      const credentials = await getCredentialsFromLockfile(lockfilePath);
-      if (!credentials) {
-        response.error = "Failed to extract credentials from lockfile.";
-        console.error(response.error);
-      } else {
-        const summonerName = await fetchSummonerName(
-          credentials.port,
-          credentials.token
-        );
-        if (summonerName) {
-          console.log("Fetched Summoner Name:", summonerName);
-          response.summonerName = summonerName;
-        } else {
-          response.error = "Summoner name could not be fetched.";
-          console.error(response.error);
-        }
-      }
-    }
-  } catch (error) {
-    console.error("An unexpected error occurred:", error);
-    response.error = "An unexpected error occurred.";
-  }
-
-  event.reply("summoner-name-response", response);
+ipcMain.on("get-summoner-name", async (event) => {
+  event.reply("summoner-name-response", currentSummoner);
 });
 
 ipcMain.handle("get-api-key", async (event) => {
@@ -250,7 +241,9 @@ ipcMain.handle("get-api-key", async (event) => {
 
 let currentSummoner = null;
 
-async function fetchSummonerName(port, token) {
+async function fetchSummonerName(credentials) {
+  const { port, password } = credentials;
+  debug("Fetching summoner name...", port, password);
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Important: Ensure this is acceptable for your app's security requirements
 
   try {
@@ -262,7 +255,7 @@ async function fetchSummonerName(port, token) {
       {
         method: "GET",
         headers: {
-          Authorization: `Basic ${Buffer.from(`riot:${token}`).toString(
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString(
             "base64"
           )}`,
           Accept: "application/json",
@@ -288,7 +281,21 @@ async function fetchSummonerName(port, token) {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-function createWindow(x = 0, y = 0) {
+function createMainWindow() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const allDisplays = screen.getAllDisplays();
+  const externalDisplay = allDisplays.find(
+    (display) => display.bounds.x > primaryDisplay.bounds.x
+  );
+
+  let x = 0,
+    y = 0;
+
+  if (externalDisplay) {
+    x = externalDisplay.bounds.x; // +50 for a slight offset from the corner
+    y = externalDisplay.bounds.y + 50;
+  }
+
   debug("Creating main window");
   mainWindow = new BrowserWindow({
     x: x,
@@ -356,10 +363,10 @@ updater.on("update-available", (info) => {
   mainWindow.webContents.send("update-available", info);
 });
 
-updater.on("update-not-available", (info) => {
-  log.info("Update not available.", info);
-  mainWindow.webContents.send("current-release", info);
-});
+// updater.on("update-not-available", (info) => {
+//   log.info("Update not available.", info);
+//   mainWindow.webContents.send("current-release", info);
+// });
 
 updater.on("update-error", (error) => {
   mainWindow.webContents.send("update-error", error);
@@ -370,10 +377,10 @@ updater.on("update-error", (error) => {
 });
 
 // Notify the renderer when an update is downloaded and ready to be installed
-updater.on("update-downloaded", (info) => {
-  log.info("Update downloaded.", info);
-  mainWindow.webContents.send("update-downloaded", info);
-});
+// updater.on("update-downloaded", (info) => {
+//   log.info("Update downloaded.", info);
+//   mainWindow.webContents.send("update-downloaded", info);
+// });
 
 ipcMain.on("restart-app-to-update", () => {
   updater.quitAndInstall();
@@ -382,7 +389,9 @@ ipcMain.on("restart-app-to-update", () => {
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
   // updater.checkForUpdates();
-  updater.checkForUpdatesAndNotify();
+  if (process.env.NODE_ENV === "DEVELOPMENT") {
+    updater.checkForUpdates();
+  }
 });
 
 // Renderer sends this after user confirmation
@@ -390,29 +399,37 @@ ipcMain.on("confirm-update-installation", () => {
   updater.quitAndInstall();
 });
 
+async function checkForUpdatesAndInitialize() {
+  if (process.env.NODE_ENV === "DEVELOPMENT") {
+    // In development, skip update checks and directly initialize the app
+    log.info("In development mode, skipping update checks.");
+    createMainWindow();
+    return;
+  }
+
+  // Production environment, proceed with update checks
+  updater.on("update-downloaded", (info) => {
+    log.info("Update downloaded. Will quit and install:", info);
+    updater.quitAndInstall();
+  });
+
+  updater.on("update-not-available", (info) => {
+    log.info("No update available. Proceeding with app initialization:", info);
+    createMainWindow();
+  });
+
+  try {
+    await updater.checkForUpdatesAndNotify();
+  } catch (error) {
+    log.error("Error in auto-updater:", error);
+    createMainWindow(); // Proceed to create the main window even if update check fails
+  }
+}
+
 app.on("ready", async () => {
   debug("checking for updates");
-  autoUpdater.checkForUpdatesAndNotify();
+  checkForUpdatesAndInitialize();
   debug("App is ready");
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const allDisplays = screen.getAllDisplays();
-  const externalDisplay = allDisplays.find(
-    (display) => display.bounds.x > primaryDisplay.bounds.x
-  );
-
-  if (externalDisplay) {
-    createWindow(externalDisplay.bounds.x + 50, externalDisplay.bounds.y + 50); // +50 for a slight offset from the corner
-  } else {
-    createWindow(); // Fallback to the primary display if the right monitor is not found
-  }
-  //   setInterval(() => {
-  //     mainWindow.webContents.send("update-available");
-  //   }, 10000); // Emit 'update-available' every 10 seconds
-
-  //   setInterval(() => {
-  //     mainWindow.webContents.send("update-downloaded");
-  //   }, 10000); // Emit 'update-downloaded' every 10 seconds, starting 10 second
-  // autoUpdater.checkForUpdatesAndNotify();
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -446,57 +463,11 @@ app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
+    createMainWindow();
   }
 });
 
 // websocket
-
-ipcMain.handle("setup-webSocket", async () => {
-  try {
-    const ws = await createWebSocketConnection({
-      authenticationOptions: {
-        awaitConnection: true,
-      },
-      pollInterval: 1000,
-      maxRetries: 1,
-    });
-    debug("WebSocket connection established.");
-
-    let lastChampionId = null;
-    let lastActionCompleted = false;
-
-    ws.subscribe("/lol-champ-select/v1/session", (sessionData) => {
-      const summonerAction = sessionData.actions.flat().find((action) => {
-        return (
-          action.actorCellId ===
-          sessionData.myTeam.find(
-            (member) => member.puuid === currentSummoner.puuid
-          )?.cellId
-        );
-      });
-
-      if (summonerAction && summonerAction.type === "pick") {
-        const championIdChanged = summonerAction.championId !== lastChampionId;
-        const actionCompletedChanged =
-          summonerAction.completed !== lastActionCompleted;
-
-        if (championIdChanged || actionCompletedChanged) {
-          lastChampionId = summonerAction.championId;
-          lastActionCompleted = summonerAction.completed;
-
-          debouncedChampionAction(
-            summonerAction.championId,
-            summonerAction.completed
-          );
-        }
-      }
-    });
-  } catch (error) {
-    console.error("Failed to connect to the LCU WebSocket:", error);
-  }
-});
-
 const debouncedChampionAction = debounce((championId, completed) => {
   if (completed) {
     mainWindow.webContents.send("champion-picked", { championId });

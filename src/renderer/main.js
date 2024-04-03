@@ -40,7 +40,6 @@ Debug.enable(import.meta.env.VITE_DEBUG);
 async function initializeApp() {
   await setupBaseUrl();
   await store.dispatch("init/initializeApp");
-  await store.dispatch("wsClient/setupWebSocket");
 }
 
 initializeApp()

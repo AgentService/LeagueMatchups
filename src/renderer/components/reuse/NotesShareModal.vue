@@ -4,18 +4,16 @@
 		<div class="modal-dialog modal-xl modal-dialog-centered">
 			<div class="modal-content modal-container">
 				<div class="p-3">
-					<div class="background-image-container" :style="championBackgroundStyle"></div>
-
 					<div class="modal-header flex-row position-relative">
 						<div class="modal-title d-flex justify-content-between align-items-start w-100 flex-column">
 							<span class="" id="modalLabel">{{ modalTitle }}</span>
 							<p v-if="champion">Champion Notes for {{ champion.name }}</p>
 							<p v-else-if="championA && championB">Matchup Notes for {{ championA.name }} vs {{
-								championB.name }}</p>
+			championB.name }}</p>
 
 						</div>
-						<button @click="$emit('update:isVisible', false)" type="button" class="btn-close btn-close-white"
-							data-bs-dismiss="modal" aria-label="Close"></button>
+						<button @click="$emit('update:isVisible', false)" type="button"
+							class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 
 					<div class="modal-body ">
@@ -59,11 +57,11 @@
 											alt="Champion image" class="modal-champion-image">
 									</div>
 									<div v-else-if="championA && championB" class="">
-										<img :src="getChampionImageSource('small', championA.name)" alt="Champion A image"
-											class="modal-champion-image me-2">
+										<img :src="getChampionImageSource('small', championA.name)"
+											alt="Champion A image" class="modal-champion-image me-2">
 										<span>vs</span>
-										<img :src="getChampionImageSource('small', championB.name)" alt="Champion B image"
-											class="modal-champion-image ms-2">
+										<img :src="getChampionImageSource('small', championB.name)"
+											alt="Champion B image" class="modal-champion-image ms-2">
 									</div>
 									<FilterBar @update:filter="handleFilterUpdate"></FilterBar>
 								</div>
@@ -112,10 +110,11 @@
 										</div>
 										<span class="badge"
 											:class="{ 'bg-primary': notesType === 'champion', 'bg-warning text-dark': notesType === 'matchup', 'bg-danger': notesType === 'general' }">{{
-												notesType }} Notes</span>
+			notesType }} Notes</span>
 									</div>
 									<div class="card-body ">
-										<p class="card-text text-light">{{ filteredNotes[selectedNoteIndex]?.content }}</p>
+										<p class="card-text text-light">{{ filteredNotes[selectedNoteIndex]?.content }}
+										</p>
 									</div>
 									<div class="card-footer justify-content-between pb-0">
 										<div class="user">
@@ -123,7 +122,8 @@
 											<!-- <img src="https://i.pravatar.cc/40?u={{ note.username }}" alt="user__image" class="user__image"> -->
 											<div class="user__info">
 												<p>{{ filteredNotes[selectedNoteIndex]?.username }}</p>
-												<small>{{ formatDate(filteredNotes[selectedNoteIndex]?.updatedAt) }}</small>
+												<small>{{ formatDate(filteredNotes[selectedNoteIndex]?.updatedAt)
+													}}</small>
 											</div>
 										</div>
 										<Rating :initialRating="filteredNotes[selectedNoteIndex]?.personalRating"
@@ -145,8 +145,8 @@
 
 	</div>
 </template>
-  
-  
+
+
 
 <script setup>
 import { computed, ref } from 'vue';
@@ -174,14 +174,12 @@ const showFavorites = ref(false);
 const sortDescending = ref(true); // Start with true for descending order
 const selectedNoteIndex = ref(0);
 
-const isVisible	= computed(() => props.isVisible);
+const isVisible = computed(() => props.isVisible);
 const sharedNotes = ref([]);
 const champion = computed(() => props.champion);
 const championA = computed(() => props.championA);
 const championB = computed(() => props.championB);
 const notesType = computed(() => props.notesType);
-
-console.log(champion.value, championA.value, championB.value);
 
 const handleFilterUpdate = ({ type, value }) => {
 	// Update your filters based on the filter bar events
@@ -287,7 +285,7 @@ const updateRating = (notesType, noteId, rating) => {
 
 <style scoped>
 .modal-container {
-	background: var(--card-background);
+	background: #000000;
 	border: 1px solid rgba(128, 128, 128, 0.1);
 	min-width: 1100px;
 	max-width: 1100px;
@@ -307,7 +305,6 @@ const updateRating = (notesType, noteId, rating) => {
 	padding: 1rem;
 	width: 500px;
 	height: 500px;
-	z-index: auto;
 	background-color: #05080f;
 }
 
@@ -324,10 +321,8 @@ const updateRating = (notesType, noteId, rating) => {
 	border: none;
 	width: 600px;
 	height: 450px;
-	z-index: 1;
 	padding: 1rem;
 	background-color: #05080f;
-
 }
 
 .list-group-item {
@@ -356,7 +351,7 @@ const updateRating = (notesType, noteId, rating) => {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 0;
+	z-index: -10;
 	background-size: cover;
 	background-position: left top;
 	background-repeat: no-repeat;

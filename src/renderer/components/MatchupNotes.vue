@@ -1,21 +1,15 @@
 <template>
-	<div class="d-flex justify-content-end align-items-center">
+	<!-- <div class="d-flex justify-content-end align-items-center">
 		<button class="btn" @click="showNotesModal = true" aria-label="Shared">
 			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 		</button>
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="matchup"
-			title="Shared Matchup Notes" :championA="championA" :championB="championB"
-			@update:isVisible="showNotesModal = $event" />
-	</div>
-
+		title="Shared Matchup Notes" :championA="championA" :championB="championB"
+		@update:isVisible="showNotesModal = $event" />
+	</div> -->
 	<div class="notes-body">
-		<!-- Loading indicator -->
-		<div v-if="loadingNotes" class="loading-indicator">
-			Loading notes...
-		</div>
-		<!-- Textarea for notes, shown only when not loading -->
-		<textarea v-else spellcheck="false" v-model="localNotes" placeholder="Type your notes here..."
-			class="note-textarea" rows="10"></textarea>
+		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
+			rows="11"></textarea>
 	</div>
 
 	<div class="status-container">
@@ -26,22 +20,18 @@
 			<i class="fas fa-edit text-warning"></i>
 		</div>
 	</div>
+
 </template>
 
 <script setup>
 import { computed, ref, watch, onMounted } from 'vue';
 import { useStore } from 'vuex';
-import SharedNotesModal from './reuse/NotesShareModal.vue';
 import Debug from 'debug';
 
 const debug = Debug('app:component:MatchupNotes');
 const store = useStore();
 
 const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
-const championA = computed(() => store.getters['matchups/getChampionA']);
-const championB = computed(() => store.getters['matchups/getChampionB']);
-const showNotesModal = ref(false);
-const NotesSharedModalRef = ref(null);
 const autoSaved = ref(false);
 const userEditing = ref(false);
 const localNotesValue = ref('');
@@ -116,6 +106,7 @@ async function saveNotes(newValue) {
 
 
 <style scoped>
+
 .notes-saved {
 	font-size: 1rem;
 	text-transform: none;

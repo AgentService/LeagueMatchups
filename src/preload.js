@@ -68,12 +68,14 @@ contextBridge.exposeInMainWorld("api", {
 
 contextBridge.exposeInMainWorld("ws", {
   receive: (channel, func) => {
-    ipcRenderer.on(channel, (event, ...args) => func(...args));
+    const validChannels = ["client-status"]; // Whitelist channels
+    if (validChannels.includes(channel)) {
+      ipcRenderer.on(channel, (event, ...args) => func(...args));
+    }
   },
-  setupWebSocket: () => ipcRenderer.invoke("setup-webSocket"),
+  // setupWebSocket: () => ipcRenderer.invoke("setup-webSocket"),
   onWebSocketMessage: (callback) => {
     ipcRenderer.on("webSocket-message", (event, ...args) => callback(...args));
-
     // Return a cleanup function to unregister the event listener
     return () => {
       ipcRenderer.removeListener("webSocket-message", callback);

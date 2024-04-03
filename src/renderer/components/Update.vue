@@ -109,7 +109,9 @@ const handleUpdateError = (error) => {
 };
 
 onMounted(async () => {
-    checkForUpdates(); // Check for updates when the component mounts
+    if(!process.env.NODE_ENV === 'DEVELOPMENT') {
+        checkForUpdates();
+    }
     const unsubscribeUpdateAvailable = window.api.receive('update-available', handleUpdateAvailable);
     const unsubscribeUpdateDownloaded = window.api.receive('update-downloaded', handleUpdateDownloaded);
     const unsubscribeDownloadProgress = window.api.receive('download-progress', handleDownloadProgress);
