@@ -114,7 +114,7 @@ log.info("App starting...");
 log.info("dirname", __dirname);
 log.info("NODE_ENV", process.env.NODE_ENV);
 
-let mainWindow;
+let mainWindow = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -332,6 +332,12 @@ function createMainWindow() {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
+
+  mainWindow.once("ready-to-show", () => {
+    mainWindowReady = true;
+    // Now that mainWindow is ready, check if there are any queued messages
+    // and send them to the renderer. This part depends on how you decide to queue messages.
+  });
 }
 
 updater.logger = require("electron-log");
@@ -353,7 +359,7 @@ updater.on("error", (err) => {
 
 // Notify the renderer about the update progress
 updater.on("download-progress", (progressObj) => {
-  clog.info("Inside updater.on('download-progress')");
+  log.info("Inside updater.on('download-progress')");
 
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message += " - Downloaded " + progressObj.percent + "%";
@@ -456,11 +462,6 @@ app.on("ready", async () => {
   debug("App is ready");
 });
 
-mainWindow.once("ready-to-show", () => {
-  mainWindowReady = true;
-  // Now that mainWindow is ready, check if there are any queued messages
-  // and send them to the renderer. This part depends on how you decide to queue messages.
-});
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
