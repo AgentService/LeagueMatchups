@@ -171,7 +171,7 @@ const dropdownOpen = ref(true);
 // Assuming you're within an async function for direct await usage
 async function getClientStatus() {
 	try {
-		const status = await windows.api.checkClientStatus();
+		const status = await window.api.checkClientStatus();
 		clientConnected.value = status.connected;
 		console.log('Client status:', status);
 	} catch (error) {
