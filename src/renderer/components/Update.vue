@@ -109,7 +109,11 @@ const handleUpdateError = (error) => {
 };
 
 onMounted(async () => {
-    if(!process.env.NODE_ENV === 'DEVELOPMENT') {
+    if (!process.env.NODE_ENV === 'DEVELOPMENT') {
+        debug('Checking for updates...', process.env.NODE_ENV);
+        checkForUpdates();
+    } else if (process.env.NODE_ENV === 'production') {
+        debug('Checking for updates...', process.env.NODE_ENV);
         checkForUpdates();
     }
     const unsubscribeUpdateAvailable = window.api.receive('update-available', handleUpdateAvailable);
