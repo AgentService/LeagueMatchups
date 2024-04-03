@@ -343,6 +343,7 @@ ipcMain.on("start-download", (event) => {
 });
 
 updater.on("error", (err) => {
+  log.info("Inside updater.on('error')");
   log.error("Error in auto-updater.", err);
   dialog.showErrorBox(
     "Update Error",
@@ -352,6 +353,8 @@ updater.on("error", (err) => {
 
 // Notify the renderer about the update progress
 updater.on("download-progress", (progressObj) => {
+  clog.info("Inside updater.on('download-progress')");
+
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message += " - Downloaded " + progressObj.percent + "%";
   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
@@ -361,11 +364,27 @@ updater.on("download-progress", (progressObj) => {
   }
 });
 
+let queuedMessages = [];
+
+function processQueuedMessages() {
+  queuedMessages.forEach((message) => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send(message.type, message.info);
+    }
+  });
+  // Clear the queue after processing
+  queuedMessages = [];
+}
+
 updater.on("update-available", (info) => {
   log.info("Update available.", info);
   if (mainWindowReady && mainWindow && mainWindow.webContents) {
     mainWindow.webContents.send("update-available", info);
   }
+  // } else {
+  //   // Queue the message or handle it according to your app's logic
+  //   queuedMessages.push({ type: "update-available", info: info });
+  // }
 });
 
 // updater.on("update-not-available", (info) => {
@@ -396,9 +415,7 @@ ipcMain.on("restart-app-to-update", () => {
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
   // updater.checkForUpdates();
-  if (process.env.NODE_ENV == "DEVELOPMENT") {
-    updater.checkForUpdates();
-  }
+  updater.checkForUpdates();
 });
 
 // Renderer sends this after user confirmation
