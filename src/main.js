@@ -157,7 +157,6 @@ function setupWebSocketSubscriptions(ws) {
         )?.cellId
       );
     });
-    log.info("summonerAction", summonerAction);
     if (summonerAction && summonerAction.type === "pick") {
       log.info("summonerAction", summonerAction);
       const championIdChanged = summonerAction.championId !== lastChampionId;
@@ -515,12 +514,13 @@ app.on("activate", () => {
 
 // websocket
 const debouncedChampionAction = debounce((championId, completed) => {
+  log.info("Debounced champion action", championId, completed);
   if (completed) {
     mainWindow.webContents.send("champion-picked", { championId });
-    debug(`Summoner has picked champion ID: ${championId}`);
+    log.info(`Summoner has picked champion ID: ${championId}`);
   } else {
     mainWindow.webContents.send("champion-selected", { championId });
-    debug(`Summoner is selecting champion ID: ${championId}`);
+    log.info(`Summoner is selecting champion ID: ${championId}`);
   }
 }, 250);
 
