@@ -168,12 +168,24 @@ const isLoggedIn = computed(() => {
 
 const dropdownOpen = ref(true);
 
+// Assuming you're within an async function for direct await usage
+async function getClientStatus() {
+	try {
+		const status = await windows.api.checkClientStatus();
+		clientConnected.value = status.connected;
+		console.log('Client status:', status);
+	} catch (error) {
+		console.error('Error checking client status:', error);
+	}
+}
+
 onMounted(async () => {
 	window.ws.receive('client-status', (status) => {
 		clientConnected.value = status.connected;
 		console.log('Client connection status:', status.connected);
 		// Here, you can trigger any additional logic or UI updates based on the connection status
 	});
+	getClientStatus();
 	// const summonerIcon = computed(() => {
 	// 	const iconId = currentSummoner.value?.profileIconId;
 	// 	if (!iconId) {
