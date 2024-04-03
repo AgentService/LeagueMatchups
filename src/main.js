@@ -183,6 +183,7 @@ function setupWebSocketSubscriptions(ws) {
   });
 }
 async function setupLeagueClientMonitoring() {
+  log.info("ENV", process.env);
   try {
     const credentials = await authenticate({
       awaitConnection: true,
@@ -354,12 +355,16 @@ updater.on("download-progress", (progressObj) => {
   log_message += " - Downloaded " + progressObj.percent + "%";
   log_message += " (" + progressObj.transferred + "/" + progressObj.total + ")";
   log.info(log_message);
-  mainWindow.webContents.send("download-progress", progressObj);
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.send("download-progress", progressObj);
+  }
 });
 
 updater.on("update-available", (info) => {
   log.info("Update available.", info);
-  mainWindow.webContents.send("update-available", info);
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.send("update-available", info);
+  }
 });
 
 // updater.on("update-not-available", (info) => {
@@ -368,7 +373,9 @@ updater.on("update-available", (info) => {
 // });
 
 updater.on("update-error", (error) => {
-  mainWindow.webContents.send("update-error", error);
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.send("update-error", error);
+  }
   dialog.showErrorBox(
     "Error: ",
     error == null ? "unknown" : (error.stack || error).toString()
