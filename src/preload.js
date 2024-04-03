@@ -68,7 +68,11 @@ contextBridge.exposeInMainWorld("api", {
 
 contextBridge.exposeInMainWorld("ws", {
   receive: (channel, func) => {
-    const validChannels = ["client-status"]; // Whitelist channels
+    const validChannels = [
+      "client-status",
+      "champion-picked",
+      "champion-selected",
+    ]; // Whitelist channels
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
