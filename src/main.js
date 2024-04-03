@@ -145,13 +145,6 @@ async function initializeWebSocket(credentials) {
 }
 
 function setupWebSocketSubscriptions(ws) {
-  ws.subscribe("/lol-summoner/v1/current-summoner", (data) => {
-    if (data && data.type === "Update") {
-      console.log(`The summoner ${data.data.displayName} was updated.`);
-      // Here you can update your application's state or UI based on the received summoner information
-    }
-  });
-
   let lastChampionId = null;
   let lastActionCompleted = false;
 
@@ -164,9 +157,9 @@ function setupWebSocketSubscriptions(ws) {
         )?.cellId
       );
     });
-    debug("summonerAction", summonerAction);
+    log.info("summonerAction", summonerAction);
     if (summonerAction && summonerAction.type === "pick") {
-      debug("summonerAction", summonerAction);
+      log.info("summonerAction", summonerAction);
       const championIdChanged = summonerAction.championId !== lastChampionId;
       const actionCompletedChanged =
         summonerAction.completed !== lastActionCompleted;
@@ -174,7 +167,7 @@ function setupWebSocketSubscriptions(ws) {
       if (championIdChanged || actionCompletedChanged) {
         lastChampionId = summonerAction.championId;
         lastActionCompleted = summonerAction.completed;
-        debug("lastChampionId", lastChampionId);
+        log.info("lastChampionId", lastChampionId);
         debouncedChampionAction(
           summonerAction.championId,
           summonerAction.completed
