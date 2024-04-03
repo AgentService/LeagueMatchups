@@ -335,6 +335,7 @@ function createMainWindow() {
 
   mainWindow.once("ready-to-show", () => {
     mainWindowReady = true;
+    isAppStartup = false; 
     // Now that mainWindow is ready, check if there are any queued messages
     // and send them to the renderer. This part depends on how you decide to queue messages.
   });
@@ -421,7 +422,12 @@ ipcMain.on("restart-app-to-update", () => {
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
   // updater.checkForUpdates();
-  updater.checkForUpdates();
+  if (process.env.NODE_ENV === "DEVELOPMENT") {
+    // In development, skip update checks and directly initialize the app
+    updater.checkForUpdates();
+    return;
+  }
+  updater.checkForUpdatesAndNotify();
 });
 
 // Renderer sends this after user confirmation
@@ -430,6 +436,7 @@ ipcMain.on("confirm-update-installation", () => {
 });
 
 async function checkForUpdatesAndInitialize() {
+  let isAppStartup = true;
   if (process.env.NODE_ENV === "DEVELOPMENT") {
     // In development, skip update checks and directly initialize the app
     log.info("In development mode, skipping update checks.");
@@ -441,8 +448,17 @@ async function checkForUpdatesAndInitialize() {
 
   // Production environment, proceed with update checks
   updater.on("update-downloaded", (info) => {
-    log.info("Update downloaded. Will quit and install:", info);
-    updater.quitAndInstall();
+    if (isAppStartup) {
+      // It's safe to restart and install the update immediately during startup
+      log.info("Update downloaded at startup. Will quit and install:", info);
+      updater.quitAndInstall();
+    } else {
+      // During app usage, ask the user for confirmation
+      log.info("Update downloaded during app usage.", info);
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("update-downloaded", info);
+      }
+    }
   });
 
   updater.on("update-not-available", (info) => {
