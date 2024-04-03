@@ -433,7 +433,9 @@ async function checkForUpdatesAndInitialize() {
   if (process.env.NODE_ENV === "DEVELOPMENT") {
     // In development, skip update checks and directly initialize the app
     log.info("In development mode, skipping update checks.");
-    createMainWindow();
+    if (!mainWindow) {
+      createMainWindow();
+    }
     return;
   }
 
@@ -445,14 +447,18 @@ async function checkForUpdatesAndInitialize() {
 
   updater.on("update-not-available", (info) => {
     log.info("No update available. Proceeding with app initialization:", info);
-    createMainWindow();
+    if (!mainWindow) {
+      createMainWindow();
+    }
   });
 
   try {
     await updater.checkForUpdatesAndNotify();
   } catch (error) {
     log.error("Error in auto-updater:", error);
-    createMainWindow(); // Proceed to create the main window even if update check fails
+    if (!mainWindow) {
+      createMainWindow();
+    }
   }
 }
 
