@@ -115,6 +115,7 @@ log.info("dirname", __dirname);
 log.info("NODE_ENV", process.env.NODE_ENV);
 
 let mainWindow = null;
+let isAppStartup = true;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -183,21 +184,22 @@ function setupWebSocketSubscriptions(ws) {
   });
 }
 async function setupLeagueClientMonitoring() {
-  log.info("ENV", process.env);
   try {
     const credentials = await authenticate({
       awaitConnection: true,
       pollInterval: 2500,
     });
     console.log("League client found. Credentials obtained.");
-
+    mainWindow.webContents.send("client-status", { connected: true });
+    log.info("league client started", credentials)
     initializeWebSocket(credentials)
       .then(() => {
+        log.info("initializeWebSocket completed")
+        log.info("fetching summoner name")
         fetchSummonerName(credentials).catch(console.error);
       })
       .catch(console.error);
     const client = new LeagueClient(credentials, { pollInterval: 1000 });
-    mainWindow.webContents.send("client-status", { connected: true });
 
     client.on("connect", (newCredentials) => {
       console.log("League client connected.");
@@ -436,7 +438,6 @@ ipcMain.on("confirm-update-installation", () => {
 });
 
 async function checkForUpdatesAndInitialize() {
-  let isAppStartup = true;
   if (process.env.NODE_ENV === "DEVELOPMENT") {
     // In development, skip update checks and directly initialize the app
     log.info("In development mode, skipping update checks.");
