@@ -182,12 +182,16 @@ async function setupLeagueClientMonitoring() {
       pollInterval: 2500,
     });
     console.log("League client found. Credentials obtained.");
-    mainWindow.webContents.send("client-status", { connected: true });
-    log.info("league client started", credentials)
+
+    if (mainWindowReady && mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send("client-status", { connected: true });
+    }
+
+    log.info("league client started", credentials);
     initializeWebSocket(credentials)
       .then(() => {
-        log.info("initializeWebSocket completed")
-        log.info("fetching summoner name")
+        log.info("initializeWebSocket completed");
+        log.info("fetching summoner name");
         fetchSummonerName(credentials).catch(console.error);
       })
       .catch(console.error);
@@ -329,7 +333,7 @@ function createMainWindow() {
 
   mainWindow.once("ready-to-show", () => {
     mainWindowReady = true;
-    isAppStartup = false; 
+    isAppStartup = false;
     // Now that mainWindow is ready, check if there are any queued messages
     // and send them to the renderer. This part depends on how you decide to queue messages.
   });
