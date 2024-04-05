@@ -148,40 +148,42 @@ async function initializeWebSocket(credentials) {
 function setupWebSocketSubscriptions(ws) {
   let oldLocalPlayerData = null; // To keep track of the previous state of the local player
 
-  const newSessionData = new ChampSelectSession(newRawSessionData);
-  const newLocalPlayerData = newSessionData.getLocalPlayer();
+  ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
+    const newSessionData = new ChampSelectSession(newRawSessionData);
+    const newLocalPlayerData = newSessionData.getLocalPlayer();
 
-  if (
-    !oldLocalPlayerData ||
-    oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
-    oldLocalPlayerData.championPickIntent !==
-      newLocalPlayerData.championPickIntent
-  ) {
-    // Reflect the local player's pick behavior
-    if (newLocalPlayerData.championId !== 0) {
-      log.info(
-        "Local player has locked in a champion.",
-        newLocalPlayerData.championId
-      );
-      mainWindow.webContents.send(
-        "champion-selected",
-        newLocalPlayerData.championId
-      );
+    if (
+      !oldLocalPlayerData ||
+      oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
+      oldLocalPlayerData.championPickIntent !==
+        newLocalPlayerData.championPickIntent
+    ) {
+      // Reflect the local player's pick behavior
+      if (newLocalPlayerData.championId !== 0) {
+        log.info(
+          "Local player has locked in a champion.",
+          newLocalPlayerData.championId
+        );
+        mainWindow.webContents.send(
+          "champion-selected",
+          newLocalPlayerData.championId
+        );
 
-      // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
-    } else if (newLocalPlayerData.championPickIntent !== 0) {
-      log.info(
-        "Local player has picked a champion.",
-        newLocalPlayerData.championPickIntent
-      );
-      mainWindow.webContents.send(
-        "champion-picked",
-        newLocalPlayerData.championPickIntent
-      );
+        // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
+      } else if (newLocalPlayerData.championPickIntent !== 0) {
+        log.info(
+          "Local player has picked a champion.",
+          newLocalPlayerData.championPickIntent
+        );
+        mainWindow.webContents.send(
+          "champion-picked",
+          newLocalPlayerData.championPickIntent
+        );
+      }
+      // Update oldLocalPlayerData for the next comparison
+      oldLocalPlayerData = newLocalPlayerData;
     }
-    // Update oldLocalPlayerData for the next comparison
-    oldLocalPlayerData = newLocalPlayerData;
-  }
+  });
 }
 
 async function setupLeagueClientMonitoring() {
