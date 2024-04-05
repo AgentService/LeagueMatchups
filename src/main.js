@@ -148,7 +148,6 @@ async function initializeWebSocket(credentials) {
 function setupWebSocketSubscriptions(ws) {
   let oldLocalPlayerData = null; // To keep track of the previous state of the local player
 
-  ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
     const newSessionData = new ChampSelectSession(newRawSessionData);
     const newLocalPlayerData = newSessionData.getLocalPlayer();
 
