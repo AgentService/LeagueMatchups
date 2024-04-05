@@ -149,11 +149,9 @@ function setupWebSocketSubscriptions(ws) {
   let oldLocalPlayerData = null; // To keep track of the previous state of the local player
 
   ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
-    log.info("Received new session data:", newRawSessionData);
     const newSessionData = new ChampSelectSession(newRawSessionData);
     const newLocalPlayerData = newSessionData.getLocalPlayer();
 
-    // Check if it's the first update or if there's a change in pick intent or champion selection for the local player
     if (
       !oldLocalPlayerData ||
       oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
@@ -162,14 +160,14 @@ function setupWebSocketSubscriptions(ws) {
     ) {
       // Reflect the local player's pick behavior
       if (newLocalPlayerData.championId !== 0) {
-        log.info("Local player has locked in a champion.");
+        log.info("Local player has locked in a champion.", newLocalPlayerData.championId);
+        mainWindow.webContents.send("champion-selected", newLocalPlayerData.championId);
 
         // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
       } else if (newLocalPlayerData.championPickIntent !== 0) {
-        log.info("Local player has picked a champion.");
-        // Handle the pick intent, e.g., updating UI to indicate the intended pick
+        log.info("Local player has picked a champion.", newLocalPlayerData.championPickIntent);
+        mainWindow.webContents.send("champion-picked", newLocalPlayerData.championPickIntent);
       }
-
       // Update oldLocalPlayerData for the next comparison
       oldLocalPlayerData = newLocalPlayerData;
     }
