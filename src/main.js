@@ -8,7 +8,7 @@ const {
 
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
-import ChampSelectSession from './classes/ChampSelectSession';
+import ChampSelectSession from "./classes/ChampSelectSession";
 
 autoUpdater.channel = "alpha";
 
@@ -145,11 +145,11 @@ async function initializeWebSocket(credentials) {
   }
 }
 
-
 function setupWebSocketSubscriptions(ws) {
   let oldLocalPlayerData = null; // To keep track of the previous state of the local player
 
   ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
+    log.info("Received new session data:", newRawSessionData);
     const newSessionData = new ChampSelectSession(newRawSessionData);
     const newLocalPlayerData = newSessionData.getLocalPlayer();
 
@@ -162,14 +162,11 @@ function setupWebSocketSubscriptions(ws) {
     ) {
       // Reflect the local player's pick behavior
       if (newLocalPlayerData.championId !== 0) {
-        console.log(
-          `Local player has locked in champion with ID: ${newLocalPlayerData.championId}`
-        );
+        log.info("Local player has locked in a champion.");
+
         // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
       } else if (newLocalPlayerData.championPickIntent !== 0) {
-        console.log(
-          `Local player intends to pick champion with ID: ${newLocalPlayerData.championPickIntent}`
-        );
+        log.info("Local player has picked a champion.");
         // Handle the pick intent, e.g., updating UI to indicate the intended pick
       }
 
