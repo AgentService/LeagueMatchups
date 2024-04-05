@@ -529,7 +529,7 @@ export default {
 
 		this.loading = false; // Start with loading state
 
-		window.ws.receive("champion-selected", ({ championId }) => {
+		window.ws.receive("champion-selected", (championId) => {
 			debug('Champion selected:', championId);
 			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
 				debug('Fetching champion by id:', championId);
@@ -541,7 +541,7 @@ export default {
 			}
 		});
 
-		window.ws.receive("champion-picked", ({ championId }) => {
+		window.ws.receive("champion-picked", (championId) => {
 			debug('Champion picked:', championId);
 			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
 				this.fetchChampionById(championId).then(champion => {
