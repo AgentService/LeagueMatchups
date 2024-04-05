@@ -8,6 +8,7 @@ const {
 
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
+import ChampSelectSession from './classes/ChampSelectSession';
 
 autoUpdater.channel = "alpha";
 
@@ -144,37 +145,40 @@ async function initializeWebSocket(credentials) {
   }
 }
 
+
 function setupWebSocketSubscriptions(ws) {
-  let lastChampionId = null;
-  let lastActionCompleted = false;
+  let oldLocalPlayerData = null; // To keep track of the previous state of the local player
 
-  ws.subscribe("/lol-champ-select/v1/session", (sessionData) => {
-    const summonerAction = sessionData.actions.flat().find((action) => {
-      return (
-        action.actorCellId ===
-        sessionData.myTeam.find(
-          (member) => member.puuid === currentSummoner.puuid
-        )?.cellId
-      );
-    });
-    if (summonerAction && summonerAction.type === "pick") {
-      log.info("summonerAction", summonerAction);
-      const championIdChanged = summonerAction.championId !== lastChampionId;
-      const actionCompletedChanged =
-        summonerAction.completed !== lastActionCompleted;
+  ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
+    const newSessionData = new ChampSelectSession(newRawSessionData);
+    const newLocalPlayerData = newSessionData.getLocalPlayer();
 
-      if (championIdChanged || actionCompletedChanged) {
-        lastChampionId = summonerAction.championId;
-        lastActionCompleted = summonerAction.completed;
-        log.info("lastChampionId", lastChampionId);
-        debouncedChampionAction(
-          summonerAction.championId,
-          summonerAction.completed
+    // Check if it's the first update or if there's a change in pick intent or champion selection for the local player
+    if (
+      !oldLocalPlayerData ||
+      oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
+      oldLocalPlayerData.championPickIntent !==
+        newLocalPlayerData.championPickIntent
+    ) {
+      // Reflect the local player's pick behavior
+      if (newLocalPlayerData.championId !== 0) {
+        console.log(
+          `Local player has locked in champion with ID: ${newLocalPlayerData.championId}`
         );
+        // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
+      } else if (newLocalPlayerData.championPickIntent !== 0) {
+        console.log(
+          `Local player intends to pick champion with ID: ${newLocalPlayerData.championPickIntent}`
+        );
+        // Handle the pick intent, e.g., updating UI to indicate the intended pick
       }
+
+      // Update oldLocalPlayerData for the next comparison
+      oldLocalPlayerData = newLocalPlayerData;
     }
   });
 }
+
 async function setupLeagueClientMonitoring() {
   try {
     const credentials = await authenticate({
@@ -518,7 +522,6 @@ app.on("activate", () => {
 
 // websocket
 const debouncedChampionAction = debounce((championId, completed) => {
-  log.info("Debounced champion action", championId, completed);
   if (completed) {
     mainWindow.webContents.send("champion-picked", { championId });
     log.info(`Summoner has picked champion ID: ${championId}`);
