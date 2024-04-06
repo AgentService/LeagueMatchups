@@ -85,6 +85,9 @@
 								:class="{ 'champion-picked': championPicked }" alt="Champion Image"
 								@click.stop="showGrid" :ref="getInstanceIdRef" />
 						</div>
+						<div v-if="championPicked" class="d-flex position-absolute">
+							<span>Locked</span>
+						</div>
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
@@ -529,36 +532,52 @@ export default {
 
 		this.loading = false; // Start with loading state
 
-		window.ws.receive("champion-selected", (championId) => {
-			debug('Champion selected:', championId);
-			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
-				debug('Fetching champion by id:', championId);
-				this.fetchChampionById(championId).then(champion => {
-					debug('Selected champion:', champion);
-					this.selectChampion(champion);
+		if (this.instanceId === 1) {
+			window.ws.receive("champion-selected", (championId) => {
+				if (championId && this.selectedChampion?.key !== championId) {
+					this.fetchChampionById(championId).then(champion => {
+						this.selectChampion(champion);
+					});
 				}
-				);
-			}
-		});
+			});
 
-		window.ws.receive("champion-picked", (championId) => {
-			debug('Champion picked:', championId);
-			if (championId && this.instanceId === 1 && this.selectedChampion?.key !== championId) {
-				this.fetchChampionById(championId).then(champion => {
-					this.selectChampion(champion);
+			window.ws.receive("champ-select-session-update", (session) => {
+				debug("champ-select-session-update", session);
+			});
+
+			window.ws.receive("champ-select-phase-update", (phase) => {
+				if (phase === "BAN_PICK") {
+					debug("BAN_PICK");
+				} else if (phase === "BAN") {
+					debug("BAN");
+				} else if (phase === "PICK") {
+					debug("PICK");
+				} else if (phase === "FINALIZATION") {
+					debug("FINALIZATION");
+				} else if (phase === '') {
+					debug("No phase");
 				}
-				);
-			}
-			this.championPicked = true;
-			this.isGridVisible = false;
-			setTimeout(() => {
-				this.championPicked = false;
-			}, 2000);
-		});
+			});
+
+			window.ws.receive("champion-picked", (championId) => {
+				if (championId && this.selectedChampion?.key !== championId) {
+					this.fetchChampionById(championId).then(champion => {
+						this.selectChampion(champion);
+					});
+				}
+				this.championPicked = true;
+				this.isGridVisible = false;
+				setTimeout(() => {
+					this.championPicked = false;
+				}, 4000);
+			});
+		}
 	},
 	onBeforeUnmount() {
-		ipcRenderer.removeAllListeners("champion-picked");
-		ipcRenderer.removeAllListeners("champion-selected");
+		window.ws.off("champion-selected", this.handleChampionSelected);
+		window.ws.off("champion-picked", this.handleChampionPicked);
+		window.ws.off("champ-select-session-update", this.handleChampSelectSessionUpdate);
+		window.ws.off("champ-select-phase-update", this.handleChampSelectPhaseUpdate);
 	},
 	computed: {
 		fetchChampionById() {

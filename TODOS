@@ -4,14 +4,25 @@ Elixir, Phoenix, and Absinthe
 Postgres
 
 PRE RELEASE TODOS:
+- FIX Favorites ( maybe save to db ?)
+LCU
+- Champion Select Detection
+- In Queue Detection
+- React on Match Finish
+
+
+DONE
 > GET /data-store/v1/install-dir ????? DONE ENTER LOLPATH ON INITIAL LOAD 
-- FIGURE OUT UPDATE SYSTEM
-DONE POLISH USER ACCOUNTS
+> FIGURE OUT UPDATE SYSTEM
+> DONE POLISH USER ACCOUNTS
     - Prompt User for login on initial login
     - Then load app / or reload page / Review notes dont get updated after login in, erst nach reload
-DONE FIX TOKEN REFRESH
-- BASE Tags
-- FIX Favorites
+> BASE Tags
+> AUTH Token refresh automatically
+- Move Match History to new tab
+- Auto Select selected Champion from Client
+
+
 
 *** General Notes DONT UPDATE WHEN YOU EDIT SAVE THEM ***
 *** Weekly Recap in combination with Weekly reflection? ***
@@ -24,12 +35,9 @@ DONE Auto Save
 - Daily Notes Expandable, Filterable, Tags
     - probably have to not use textfield, but some sort of input into div creation
 - Add Clips to Notes
-- AUTH Token refresh automatically
 - Show more Button for Match History
-- Move Match History to new tab
 - Use current Match History again in Prepare for intensity rating after match
-- set a default image in case a championImage is not found for e.g. new champ
-    - or / and add fallback to use CDN to get images if not found
+
 => Find problems in games and find a solution > MACRO CONCEPT
     - alot of problems are often tied to a common macro concept solution
     - e.g. jungler died a grubs 
@@ -42,17 +50,10 @@ After Game:
 Champ vs Champ > WINLOSS > My Feelings > Comments > Focus Level > Performance > Matchup Thoughts
 After Game Screen to distract from b ad thoughts
 
-LCU
-- Champion Select Detection
-- Auto Select selected Champion from Client
-- In Queue Detection
-- React on Match Finish
+
 
 Server
 - Image Hosting solution
-- Deploy Server < both use one server
-
-
 
 GPT
 🧙🏾‍♂️: Absolut, hier ist eine Zusammenfassung deiner Pläne, der Features, die dir wichtig sind, und der Ideen, die du gut fandest, zusammen mit einem Schritt-für-Schritt-Plan, um deine Ziele zu erreichen:

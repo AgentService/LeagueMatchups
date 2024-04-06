@@ -72,6 +72,15 @@ contextBridge.exposeInMainWorld("ws", {
       "client-status",
       "champion-picked",
       "champion-selected",
+      "enemy-champion-locked",
+      "champ-select-session-update",
+      "champ-select-phase-update",
+      "champ-select-local-player-ban-turn",
+      "champ-select-local-player-pick-turn",
+      "champ-select-enemy-ban-turn",
+      "champ-select-enemy-pick-turn",
+      "champ-select-done",
+
     ]; // Whitelist channels
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (event, ...args) => func(...args));

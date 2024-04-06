@@ -2,10 +2,10 @@
 	<Navbar @before-leave="handleBeforeLeave">
 	</Navbar>
 	<div class="app-wrapper">
-			<transition name="fade">
-				<router-view>
-				</router-view>
-			</transition>
+		<transition name="fade">
+			<router-view>
+			</router-view>
+		</transition>
 	</div>
 	<Update />
 </template>
@@ -23,7 +23,7 @@ const route = useRoute();
 const showNavbar = ref(route.path !== '/login');
 
 function handleBeforeLeave() {
-	showNavbar.value = false; 
+	showNavbar.value = false;
 	setTimeout(() => {
 		showNavbar.value = true;
 	}, 1100);

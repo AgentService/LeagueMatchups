@@ -9,6 +9,8 @@ const {
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
 import ChampSelectSession from "./classes/ChampSelectSession";
+import { setupWebSocketEventHandlers } from "./classes/WebSocketEvents";
+import WebSocketEventHandlers from "./classes/WebSocketEventHandlers";
 
 autoUpdater.channel = "alpha";
 
@@ -138,7 +140,9 @@ async function initializeWebSocket(credentials) {
         maxRetries: 10,
       });
       debug("WebSocket connection established.");
-      setupWebSocketSubscriptions(ws);
+      const webSocketEventHandlers = new WebSocketEventHandlers(mainWindow);
+      webSocketEventHandlers.setup(ws);
+      // setupWebSocketEventHandlers(ws, mainWindow);
     }
   } catch (error) {
     debug("League client not detected or WebSocket connection failed:", error);
@@ -146,45 +150,119 @@ async function initializeWebSocket(credentials) {
 }
 
 function setupWebSocketSubscriptions(ws) {
-  let oldLocalPlayerData = null; // To keep track of the previous state of the local player
+  let champSelectSession = null;
 
-  ws.subscribe("/lol-champ-select/v1/session", (newRawSessionData) => {
-    const newSessionData = new ChampSelectSession(newRawSessionData);
-    const newLocalPlayerData = newSessionData.getLocalPlayer();
+  ws.subscribe("/lol-champ-select/v1/session", (event) => {
+    if (event.eventType === "Delete") {
+      log.info("Champ select session deleted.");
+      champSelectSession = null;
+      mainWindow.webContents.send("champ-select-session-update", null);
+      mainWindow.webContents.send("champ-select-phase-update", null);
+      return;
+    }
 
-    if (
-      !oldLocalPlayerData ||
-      oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
-      oldLocalPlayerData.championPickIntent !==
-        newLocalPlayerData.championPickIntent
-    ) {
-      // Reflect the local player's pick behavior
-      if (newLocalPlayerData.championId !== 0) {
-        log.info(
-          "Local player has locked in a champion.",
-          newLocalPlayerData.championId
-        );
+    const oldSessionData = champSelectSession;
+    const newSessionData = new ChampSelectSession(event);
+    champSelectSession = newSessionData;
+
+    mainWindow.webContents.send("champ-select-session-update", newSessionData);
+
+    if (oldSessionData !== null) {
+      if (newSessionData.getPhase() !== oldSessionData.getPhase()) {
+        log.info("Champ select phase updated:", newSessionData.getPhase());
         mainWindow.webContents.send(
-          "champion-selected",
-          newLocalPlayerData.championId
-        );
-
-        // Handle the champion lock-in behavior, e.g., updating UI to show the locked-in champion
-      } else if (newLocalPlayerData.championPickIntent !== 0) {
-        log.info(
-          "Local player has picked a champion.",
-          newLocalPlayerData.championPickIntent
-        );
-        mainWindow.webContents.send(
-          "champion-picked",
-          newLocalPlayerData.championPickIntent
+          "champ-select-phase-update",
+          newSessionData.getPhase()
         );
       }
-      // Update oldLocalPlayerData for the next comparison
-      oldLocalPlayerData = newLocalPlayerData;
+
+      if (
+        newSessionData.isBanPhase() &&
+        oldSessionData.getPhase() === "PLANNING"
+      ) {
+        log.info("Ban phase started.");
+        mainWindow.webContents.send(
+          "champ-select-local-player-ban-turn",
+          newSessionData.ownBanActionId
+        );
+      }
+
+      if (
+        newSessionData.inProgressActionIds.includes(
+          newSessionData.ownPickActionId
+        ) &&
+        !oldSessionData.inProgressActionIds.includes(
+          newSessionData.ownPickActionId
+        )
+      ) {
+        log.info("Pick phase started.");
+        mainWindow.webContents.send(
+          "champ-select-local-player-pick-turn",
+          newSessionData.ownPickActionId
+        );
+      }
+
+      // Reflecting changes in champion picks
+      reflectChampionPicksChanges(oldSessionData, newSessionData);
+
+      // Placeholder for additional logic you may need
+      // ...
+    } else {
+      mainWindow.webContents.send(
+        "champ-select-phase-update",
+        newSessionData.getPhase()
+      );
     }
   });
 }
+
+// let previousPickState = {
+//   championId: null,
+//   completed: false,
+// };
+
+// function reflectChampionPicksChanges(oldSession, newSession) {
+//   const newLocalPlayerPickAction = newSession.getActionById(
+//     newSession.ownPickActionId
+//   );
+
+//   // Proceed only if there's a new pick action to consider
+//   if (newLocalPlayerPickAction) {
+//     const isChampionChange =
+//       previousPickState.championId !== newLocalPlayerPickAction.championId;
+//     const isCompletionChange =
+//       previousPickState.completed !== newLocalPlayerPickAction.completed;
+
+//     // Trigger events only if there's a change in champion selection or completion status
+//     if (isChampionChange || isCompletionChange) {
+//       if (newLocalPlayerPickAction.completed) {
+//         log.info(
+//           "Local player has picked a champion:",
+//           newLocalPlayerPickAction
+//         );
+//         mainWindow.webContents.send(
+//           "champion-picked",
+//           newLocalPlayerPickAction.championId
+//         );
+//       } else {
+//         log.info(
+//           "Local player is selecting a champion:",
+//           newLocalPlayerPickAction
+//         );
+//         mainWindow.webContents.send(
+//           "champion-selected",
+//           newLocalPlayerPickAction.championId
+//         );
+//       }
+
+//       // Update the previous state for the next comparison
+//       previousPickState = {
+//         championId: newLocalPlayerPickAction.championId,
+//         completed: newLocalPlayerPickAction.completed,
+//       };
+//     }
+//   }
+// }
 
 async function setupLeagueClientMonitoring() {
   try {
@@ -198,7 +276,6 @@ async function setupLeagueClientMonitoring() {
       mainWindow.webContents.send("client-status", { connected: true });
     }
 
-    log.info("league client started", credentials);
     initializeWebSocket(credentials)
       .then(() => {
         log.info("initializeWebSocket completed");
@@ -551,3 +628,5 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
+
+export { mainWindow };

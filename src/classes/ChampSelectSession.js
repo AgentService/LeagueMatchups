@@ -1,6 +1,14 @@
 // src/classes/ChampSelectSession.js
+import Debug from "debug";
+const debug = Debug("app:champ-select-session");
+Debug.enable("*");
+
 export default class ChampSelectSession {
   constructor(data) {
+    this.ownBanActionId = -1;
+    this.ownPickActionId = -1;
+    this.inProgressActionIds = [];
+
     this.gameId = data.gameId;
     this.timer = data.timer;
     this.chatDetails = data.chatDetails;
@@ -28,13 +36,55 @@ export default class ChampSelectSession {
     this.hasSimultaneousBans = data.hasSimultaneousBans;
     this.hasSimultaneousPicks = data.hasSimultaneousPicks;
     this.isCustomGame = data.isCustomGame;
-    // Additional properties can be initialized here
+
+    for (let actionGroup of this.actions)
+      for (let action of actionGroup) {
+        if (action.isInProgress) this.inProgressActionIds.push(action.id);
+        if (action.actorCellId === data.localPlayerCellId) {
+          if (action.type === "ban") {
+            this.ownBanActionId = action.id;
+          } else if (action.type === "pick") {
+            this.ownPickActionId = action.id;
+          }
+        }
+      }
   }
 
-  getPickedChampionIds() {
-    return this.myTeam
-      .map((player) => player.championId)
-      .filter((id) => id !== 0);
+  findOwnActionId(actionType) {
+    for (let actionGroup of this.actions) {
+      for (let action of actionGroup) {
+        if (
+          action.actorCellId === this.localPlayerCellId &&
+          action.type === actionType
+        ) {
+          return action.id;
+        }
+      }
+    }
+    return -1;
+  }
+
+  findInProgressActionIds() {
+    let ids = [];
+    for (let actionGroup of this.actions) {
+      for (let action of actionGroup) {
+        if (action.isInProgress) {
+          ids.push(action.id);
+        }
+      }
+    }
+    return ids;
+  }
+
+  getActionById(id) {
+    for (let actionGroup of this.actions) {
+      for (let action of actionGroup) {
+        if (action.id === id) {
+          return action;
+        }
+      }
+    }
+    return null;
   }
 
   getLocalPlayer() {
@@ -43,62 +93,69 @@ export default class ChampSelectSession {
     );
   }
 
-  // Check if the local player has locked in their champion
-  isLocalPlayerLockedIn() {
-    const localPlayer = this.getLocalPlayer();
-    return localPlayer && localPlayer.championId !== 0;
+  getPhase() {
+    // 'PLANNING' | 'BAN_PICK' | 'FINALIZATION' | ''
+    switch (this.timer.phase) {
+      case "PLANNING":
+        return "PLANNING";
+      case "BAN_PICK":
+        return "BAN_PICK";
+      case "FINALIZATION":
+        return "FINALIZATION";
+      case '':
+        return '';
+    }
   }
 
-  getMyTeamLockedInChampions() {
-    return this.myTeam
-      .filter((player) => player.championId !== 0)
-      .map((player) => player.championId);
+  isBanPhase() {
+    return this.actions
+      .flat()
+      .some((action) => action.type === "BAN" && !action?.completed);
   }
 
-  // Get locked-in champion IDs for the enemy team
-  getTheirTeamLockedInChampions() {
-    return this.theirTeam
-      .filter((player) => player.championId !== 0)
-      .map((player) => player.championId);
+  isPickPhase() {
+    return this.actions
+      .flat()
+      .some((action) => action.type === "PICK" && !action?.completed);
   }
 
-  // Get the current champion selection state for both teams
-  getChampionSelectionState() {
-    const myTeamSelections = this.myTeam.map((player) => ({
-      cellId: player.cellId,
-      championId: player.championId,
-      championPickIntent: player.championPickIntent,
-    }));
-
-    const theirTeamSelections = this.theirTeam.map((player) => ({
-      cellId: player.cellId,
-      championId: player.championId,
-      // Pick intent is typically not available for the enemy team
-    }));
-
-    return { myTeamSelections, theirTeamSelections };
+  isEnemyTurn() {
+    return this.actions
+      .flat()
+      .some(
+        (action) =>
+          action.isInProgress &&
+          !action.isAllyAction &&
+          action.actorCellId !== this.localPlayerCellId
+      );
   }
 
-  // Detect changes in the local player's pick intent or locked pick
-  hasLocalPlayerPickChanged(oldSessionData) {
-    const oldLocalPlayerData = oldSessionData.getLocalPlayer();
-    const newLocalPlayerData = this.getLocalPlayer();
-    return (
-      !oldLocalPlayerData ||
-      oldLocalPlayerData.championId !== newLocalPlayerData.championId ||
-      oldLocalPlayerData.championPickIntent !==
-        newLocalPlayerData.championPickIntent
-    );
+  isLocalPlayerTurn() {
+    return this.actions
+      .flat()
+      .some(
+        (action) =>
+          action.actorCellId === this.localPlayerCellId && action.isInProgress
+      );
   }
 
-  // Detect changes in the enemy team's locked picks
-  haveTheirTeamPicksChanged(oldSessionData) {
-    const oldEnemyChampionIds = oldSessionData
-      .getTheirTeamLockedInChampions()
-      .sort();
-    const newEnemyChampionIds = this.getTheirTeamLockedInChampions().sort();
-    return oldEnemyChampionIds.toString() !== newEnemyChampionIds.toString();
+  isLocalPlayerTurnCompleted() {
+    return this.actions
+      .flat()
+      .some(
+        (action) =>
+          action.actorCellId === this.localPlayerCellId &&
+          !action.isInProgress &&
+          action.completed
+      );
   }
 
-  // Add more  methods as needed...
+  getLockedInChampions(isAlly = true) {
+    const team = isAlly ? this.myTeam : this.theirTeam;
+    return team
+      .filter((member) => member.championId > 0)
+      .map((member) => member.championId);
+  }
+
+  // Add other methods as needed based on the functionalities you wish to implement.
 }

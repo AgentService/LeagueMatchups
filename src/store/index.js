@@ -16,12 +16,11 @@ import { validateApiResponse, handleApiError } from "./modules/utilities.js";
 import VuexPersistence from "vuex-persist";
 import axios from "axios";
 
-
 // VuexPersistence for auth module
 const vuexLocalAuth = new VuexPersistence({
-  key: 'authState', // Unique key for localStorage
+  key: "authState", // Unique key for localStorage
   storage: window.localStorage,
-  modules: ['auth'] // Specify the module name here
+  modules: ["auth"], // Specify the module name here
 });
 
 const vuexLocal = new VuexPersistence({
@@ -113,7 +112,7 @@ export const store = createStore({
         );
         const data = validateApiResponse(response);
         commit(vuexMutation, data);
-        
+
         return data;
       } catch (error) {
         return handleApiError(error);
