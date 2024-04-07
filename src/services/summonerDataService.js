@@ -2,17 +2,23 @@
 import store from "../store/index"; // Import the store directly
 import Debug from "debug";
 const debug = Debug("app:services:summoner-data");
+Debug.enable("*");
 
 // Function that invokes the fetching of summoner data
-export async function fetchAndSaveSummonerData(summonerNameValue) {
+export async function fetchAndSaveSummonerData(summonerNameValue, tagLine) {
   try {
-    console.log("Fetching summoner data for:", summonerNameValue);
-    if (summonerNameValue) {
+    console.log(
+      "Fetching summoner data for:",
+      summonerNameValue,
+      "with tagLine:",
+      tagLine
+    );
+    if (summonerNameValue && tagLine) {
       debug("Fetching summoner data for:", summonerNameValue);
       await store.dispatch("summoner/fetchSummonerData", {
         region: "europe",
         gameName: summonerNameValue,
-        tagLine: "euw1",
+        tagLine: tagLine,
       });
     }
   } catch (error) {
@@ -29,15 +35,16 @@ export function initializeSummonerDataFetching() {
     // Check if the response contains a valid summoner name and no error
     if (response && response.displayName && !response.error) {
       const newSummonerName = response.displayName;
-      debug("New summoner name:", newSummonerName);
+      const tagLine = response.tagLine;
       const summonerData =
         store.getters["summoner/getSummonerDataByName"](newSummonerName);
-
+      debug("Summoner data:", summonerData, "for:", newSummonerName, tagLine);
+      
       if (!summonerData) {
         debug("Fetching summoner data for:", newSummonerName);
         // Assuming fetchAndSaveSummonerData is an async function that fetches
         // and then updates the store with the new summoner data.
-        await fetchAndSaveSummonerData(newSummonerName);
+        await fetchAndSaveSummonerData(newSummonerName, tagLine);
       } else {
         debug("Summoner data already exists for:", newSummonerName);
       }

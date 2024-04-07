@@ -45,7 +45,7 @@ const router = useRouter();
 const store = useStore();
 const form = reactive({
     email: 'markusromaniw@gmx.de',
-    password: '123',
+    password: '',
     username: '', // Only for registration
     confirmPassword: '' // Only for registration
 });
@@ -81,7 +81,7 @@ const handleSubmit = async () => {
         if (authMode.value === 'login' || (authMode.value === 'register' && form.password === form.confirmPassword)) {
             // Attempt login or registration
             await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', form);
-            router.replace('/championMatchup');
+            router.replace('/ChampionPage');
         } else {
             throw new Error('Passwords do not match');
         }

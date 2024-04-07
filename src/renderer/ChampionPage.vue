@@ -10,57 +10,102 @@
 			</div>
 			<div class="grid-container ">
 				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xxl-8 col-xl-8 mt-4">
+							<transition name="slide-down" mode="out-in">
+
+								<div v-if="currentPhase">
+									<div class="d-flex justify-content-between align-items-center w-100 text-light">
+										<!-- Locked Indicator or Empty Space -->
+										<transition name="slide-up" mode="out-in">
+											<div v-if="playerLocked" class="locked-indicator" key="locked">
+												<span>Locked</span>
+											</div>
+											<div v-else-if="playerTurn" class="locked-indicator " key="empty">
+												<span>Select your Champion</span>
+											</div>
+											<div v-else class="locked-indicator">
+												<span></span>
+											</div>
+										</transition>
+										<!-- Phase Text -->
+										<transition name="slide-up" mode="out-in">
+											<div :key="currentPhase" class="phase-text ">
+												{{ phaseText }}
+											</div>
+										</transition>
+										<!-- Timer -->
+										<transition name="slide-up" mode="out-in">
+											<div v-if="playerTurn" class="timer">
+												<div>{{ formatTime(timerValue) }}</div>
+											</div>
+											<div v-else class="timer">
+												<div></div>
+											</div>
+										</transition>
+
+									</div>
+									<div class="teams-container">
+										<div class="my-team">
+											<!-- Iterate over myTeamPicks for champion keys -->
+											<div v-for="championId in myTeamPicks" :key="championId">
+												<!-- Use championKey to get the image URL from myTeamImageUrls -->
+												<img :src="myTeamImageUrls[championId]" alt="Champion icon"
+													class="champion-icon" />
+											</div>
+										</div>
+										<div class="enemy-team">
+											<!-- Iterate over enemyTeamPicks for champion keys -->
+											<div v-for="championId in enemyTeamPicks" :key="championId"
+												class="champion-icon">
+												<!-- Use championKey to get the image URL from enemyTeamImageUrls -->
+												<img :src="enemyTeamImageUrls[championId]" alt="Champion icon"
+													class="champion-icon" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</transition>
+
+						</div>
+					</div>
 					<!-- Summoner Info Row -->
 					<div class="row align-items-start">
-						<!-- <div class="col-xxl-2 col-xl-2 mt-4">
-							<div class="card-fluid mb-4">
+						<div class="col-xxl-2 col-xl-2 mt-4">
+							<div class="card-widget">
+								<LatestNoteWidget />
+							</div>
+							<!-- <ChampionTips :champion="championA" /> -->
+							<div class="card-tips mt-2">
 								<ChampionTips :champion="championA" />
 							</div>
-							<div class="card-fluid mt-4">
-								Placeholder
-							</div>
-						</div> -->
-						<div class="col-xxl-8 col-xl-8">
-							<div class="row align-items-start justify-content-start">
-								<!-- <SummonerInfo /> -->
-								<!-- <div class="d-flex">
-									<div class="tab-header d-flex flex-column justify-content-center align-items-center">
-										<span>Champion & Matchup</span>
-										<div class="active-border"></div>
-									</div>
-								</div> -->
-
-							</div>
+						</div>
+						<div class="col-xxl-6 col-xl-6">
 							<div class="row mb-4 mt-4">
-								<div class="col-xxl-12">
-									<div class="card-container flex-row">
+								<div class="col-xxl-12 ">
+									<div class="card-container">
 
-										<!-- Champion Search for User's Champion -->
-										<!-- <div class="col-xxl-2 col-xl-2">
-										<div class="card">
-											<SummonerRankedInfo />
-										</div>
-										<div class="card">
-										</div>
-									</div> -->
-										<div class="col-xxl-6 position-relative">
-											<div class="card-large">
-												<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-												<ChampionNotes />
+										<div class="d-flex flex-row ">
+											<!-- Champion Search for User's Champion -->
+											<div class="col-xxl-6 position-relative">
+												<div class="card-large"
+													:class="{ 'ban-pick-border-animation': playerTurn }">
+													<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+													<ChampionNotes />
+												</div>
 											</div>
-										</div>
-										<!-- VS Divider -->
-										<div class="vs-container">
-											<!-- <span>vs</span> -->
-										</div>
-										<!-- Matchup Notes and Search for Enemy Champion -->
-										<div class="col-xxl-6 position-relative">
-											<div class="card-large">
-												<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-												<MatchupNotes />
+											<!-- VS Divider -->
+											<div class="vs-container">
+												<!-- <span>vs</span> -->
 											</div>
-										</div>
-										<!-- <div class="col-xxl-2 col-xl-2">
+											<!-- Matchup Notes and Search for Enemy Champion -->
+											<div class="col-xxl-6 position-relative">
+												<div class="card-large">
+													<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+													<MatchupNotes />
+												</div>
+											</div>
+											<!-- <div class="col-xxl-2 col-xl-2">
 										<div class="card">
 											<SummonerRankedInfo />
 										</div>
@@ -68,15 +113,18 @@
 											<LearningObjectives></LearningObjectives>
 										</div>
 									</div> -->
+										</div>
 									</div>
 								</div>
+
 							</div>
 							<div class="row">
 								<div class="col-xxl-12">
-									<div class="card-wide">
-										<GeneralNotes />
+									<div class="col-xxl-4">
+
 									</div>
 								</div>
+
 								<!-- <div class="col-xxl-9">
 									<div class="card-large card-top card-bottom">
 										 <MatchHistory /> 
@@ -94,8 +142,9 @@
 
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue';
+import { ref, watch, onMounted, computed, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
+import ImageUrlHelper from './utils/imageHelper';
 
 // Debug
 import Debug from 'debug';
@@ -107,25 +156,146 @@ import SummonerRankedInfo from './components/SummonerRankedInfo.vue';
 import LearningObjectives from "./components/LearningObjectives.vue";
 
 import ChampionNotes from './components/ChampionNotes.vue';
+import LatestNoteWidget from './components/reuse/LatestNoteWidget.vue';
 
 import MatchupNotes from './components/MatchupNotes.vue';
 
 import MatchHistory from './components/MatchHistory.vue';
-import GeneralNotes from './components/GeneralNotes.vue';
+import DailyNotes from './components/DailyNotes.vue';
 import { on } from 'events';
 
 
 const debug = Debug('app:component:ChampionPage');
+const imageUrlHelper = new ImageUrlHelper();
 
 const isLoading = ref(true);
+const currentPhase = ref('');
+const timerValue = ref(0);
+const playerTurn = ref(false);
+const playerLocked = ref(false);
+const myTeamPicks = ref([]);
+const enemyTeamPicks = ref([]);
+
+let intervalId; // Keep track of the interval ID for clearing later
+let cleanups = []; // Store cleanup functions
+
+// Reactive properties for image URLs
+const myTeamImageUrls = ref({});
+const enemyTeamImageUrls = ref({});
+
+const getChampionImageSource = async (size, championId) => {
+	return imageUrlHelper.getChampionImageSource(size, championId);
+};
+
+const updateTeamImageUrls = async (teamPicks, teamImageUrls) => {
+	const championDetails = store.state.champions.championDetails;
+
+	for (const pick of teamPicks) {
+		// Ensure we're comparing like types, convert number IDs to strings
+		debug("pick", pick);
+		const championKeyAsString = pick.toString();
+
+		// Find the champion object by its key
+		const champion = Object.values(championDetails).find(champ => champ.key === championKeyAsString);
+
+		if (champion) {
+			// Use the champion ID to fetch and store the image URL
+			const imageUrl = await getChampionImageSource('small', champion.id);
+			// Now, correctly use teamImageUrls parameter to update
+			teamImageUrls.value[pick.championId] = imageUrl; // Store using the numeric ID for direct template access
+			debug(`updateTeamImageUrls: ${pick} - ${imageUrl}`);
+			debug("updateTeamImageUrls:", teamImageUrls);
+		}
+	}
+};
+
+const phaseText = computed(() => {
+	switch (currentPhase.value) {
+		case "PLANNING":
+			return "Planning Phase";
+		case "BAN_PICK":
+			return "Pick & Ban";
+		case "FINALIZATION":
+			return "Prepare your Loadout";
+		default:
+			playerLocked.value = false;
+			return "Waiting for Champ Select";
+	}
+});
 
 async function fetchData() {
 	// Simulate fetching data
 	isLoading.value = false;
 }
 
-onMounted(() => {
+function formatTime(seconds) {
+	if (seconds === null) return '';
+	const mins = Math.floor(seconds / 60);
+	const secs = seconds % 60;
+	return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function startTimer(durationMs) {
+	if (intervalId) clearInterval(intervalId); // Clear any existing timer to prevent overlaps
+
+	timerValue.value = Math.floor(durationMs / 1000); // Initialize timer with duration in seconds
+
+	intervalId = setInterval(() => {
+		if (timerValue.value > 0) {
+			timerValue.value -= 1;
+		} else {
+			clearInterval(intervalId);
+			intervalId = null; // Reset the interval ID for future use
+		}
+	}, 1000);
+}
+
+const updateTeamPicks = async ({ myTeam, theirTeam }) => {
+	// Extract championIds from the objects
+	const myTeamIds = myTeam.map(pick => pick.championId);
+	const theirTeamIds = theirTeam.map(pick => pick.championId);
+
+	// Assuming updateTeamImageUrls is designed to work with arrays of IDs
+	await updateTeamImageUrls(myTeamIds, myTeamImageUrls); // Update to match your actual implementation
+	await updateTeamImageUrls(theirTeamIds, enemyTeamImageUrls); // Update to match your actual implementation
+};
+
+onMounted(async () => {
 	fetchData();
+
+	const cleanupTeamSelect = window.ws.receive("champ-select-team-picks-update", ({ myTeam, theirTeam }) => {
+		debug(`Received team picks: ${JSON.stringify(myTeam)} - ${JSON.stringify(theirTeam)}`);
+		updateTeamPicks({ myTeam, theirTeam });
+	});
+
+	const cleanupPhaseUpdate = window.ws.receive("champ-select-phase-update", ({ phase, timeLeft }) => {
+		debug(`Received phase update: ${phase} - ${timeLeft}`);
+		currentPhase.value = phase;
+	});
+
+	const cleanupPickTurn = window.ws.receive("champ-select-local-player-pick-turn", (timeInMs) => {
+		playerTurn.value = true;
+		startTimer(timeInMs);
+	});
+
+	// Handling the 'champion-picked' event to reset the timer and update states
+	const cleanupPicked = window.ws.receive("champion-picked", () => {
+		if (intervalId) {
+			clearInterval(intervalId);
+			intervalId = null;
+		}
+		playerLocked.value = true;
+		playerTurn.value = false;
+		timerValue.value = 0; // Reset the timer display
+	});
+	cleanups.push(cleanupPhaseUpdate, cleanupPickTurn, cleanupPicked, cleanupTeamSelect);
+});
+
+onUnmounted(() => {
+	if (intervalId) {
+		clearInterval(intervalId);
+	}
+	cleanups.forEach(cleanup => cleanup()); // Call each cleanup function
 });
 
 const championA = ref(null);
@@ -168,7 +338,7 @@ const handleMatchup = () => {
 const setChampionA = (champion) => {
 	championA.value = champion;
 	store.dispatch('matchups/setChampionA', champion);
-	// store.dispatch('champions/fetchChampionTips', { championId: champion.id });
+	store.dispatch('champions/fetchChampionTips', { championId: champion.id });
 	// store.dispatch('notes/fetchChampionPersonalNotes', champion.id);
 
 };
@@ -185,6 +355,133 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 </script>
 
 <style>
+.teams-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.my-team,
+.enemy-team {
+	display: flex;
+}
+
+.champion-icon {
+	width: 50px;
+	height: auto;
+	background: var(--hextech-black);
+	border: 0px solid var(--blue-7);
+}
+
+
+.widget-footer {
+	bottom: -5px;
+	right: -2px;
+	display: flex;
+	position: absolute;
+	justify-content: end;
+	color: var(--grey-1);
+	font-size: 0.85rem;
+}
+
+.widget-header {
+	font-size: .9rem;
+	display: flex;
+	line-height: 1;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	color: var(--gold-3);
+	padding: .25rem 0;
+}
+
+.widget-header-title {
+	font-weight: 600;
+}
+
+.widget-header-right {
+	margin-left: auto;
+	font-weight: 400;
+	font-size: 0.75rem;
+	color: var(--grey-1);
+}
+
+.champion-select-widget {
+	color: #fff;
+	padding: 10px;
+	border-radius: 8px;
+	height: 50px;
+}
+
+.placeholder {
+	visibility: hidden;
+}
+
+.locked-indicator,
+.timer,
+.enemy-picks {
+	width: 10%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.phase-text {
+	width: 20%;
+	text-align: center;
+
+}
+
+/* If a section might be empty but you still want to reserve the space */
+.locked-indicator {
+	min-height: 60px;
+}
+
+/* Assuming enemy picks might have multiple items */
+.enemy-picks {
+	display: flex;
+	justify-content: space-around;
+	/* Adjust layout of enemy picks */
+}
+
+
+/* Transitions */
+.slide-down-enter-active,
+.slide-down-leave-active,
+.slide-up-enter-active,
+.slide-up-leave-active {
+	transition: all 0.5s ease;
+}
+
+.slide-down-enter-from,
+.slide-up-leave-to {
+	transform: translateY(-100%);
+}
+
+.slide-down-leave-to,
+.slide-up-enter-from {
+	transform: translateY(100%);
+}
+
+.ban-pick-border-animation {
+	animation: pulseBorder 2s infinite;
+}
+
+@keyframes pulseBorder {
+	0% {
+		border-color: transparent;
+	}
+
+	50% {
+		border-color: var(--blue-laser-2);
+	}
+
+	100% {
+		border-color: transparent;
+	}
+}
+
 .loading-indicator {
 	display: flex;
 	justify-content: center;
@@ -257,6 +554,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .card-container {
 	display: flex;
 	flex-direction: column;
+
 	background: var(--card-background);
 	border: 1px solid rgba(128, 128, 128, 0.1);
 }
@@ -296,10 +594,11 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	flex-direction: column;
 	color: var(--gold-1);
-	padding: 1rem 2rem;
+	padding: 1rem 1rem;
 	max-height: 600px;
 	min-height: 600px;
 	z-index: auto;
+	border: 2px solid transparent;
 }
 
 .card-wide {
@@ -307,12 +606,46 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
+	background-image: linear-gradient(to right, #091014, #091014);
 	color: var(--gold-1);
-	padding: 1rem 2rem;
-	max-height: 670px;
-	min-height: 670px;
+	padding: 1rem 1rem;
+	z-index: 0;
+}
+
+.card-widget {
+	flex-direction: column;
+	user-select: none;
+	position: relative;
+	display: flex;
+	color: var(--gold-1);
 	background-image: linear-gradient(to right, #091014, #091014);
 	z-index: 0;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: box-shadow 0.3s ease-in-out;
+	padding: 1rem;
+}
+
+.card-tips {
+	flex-direction: column;
+	user-select: none;
+	position: relative;
+	display: flex;
+	color: var(--gold-1);
+	background-image: linear-gradient(to right, #091014, #091014);
+	z-index: 0;
+	border-radius: 12px;
+	transition: box-shadow 0.3s ease-in-out;
+	padding: 1rem 1rem;
+	min-height: 350px;
+	max-height: 350px;
+}
+
+.card-widget:hover {
+	background-color: #214153;
+	/* Slightly darker on hover to indicate interactivity */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	/* Elevated shadow on hover */
 }
 
 .card-fluid {
@@ -473,11 +806,10 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	font-weight: 600;
 	text-align: start;
 	font-size: 1rem;
-	padding: 1rem .5rem;
 	padding-bottom: 0.5rem;
 	margin-bottom: 0.5rem;
 	display: flex;
-	color: var(--gold-4);
+	color: var(--gold-3);
 	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
 	user-select: none;
 

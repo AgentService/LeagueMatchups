@@ -61,15 +61,15 @@ class WebSocketEventHandlers extends EventEmitter {
     const newSessionData = new ChampSelectSession(event);
     this.champSelectSession = newSessionData;
 
-    // this.sendToMainWindow("champ-select-session-update", newSessionData);
+    this.sendToMainWindow("champ-select-session-update", newSessionData);
 
     if (oldSessionData !== null) {
       if (newSessionData.getPhase() !== oldSessionData.getPhase()) {
         debug("1 Champ select phase updated:", newSessionData.getPhase());
-        this.sendToMainWindow(
-          "champ-select-phase-update",
-          newSessionData.getPhase()
-        );
+        this.sendToMainWindow("champ-select-phase-update", {
+          phase: newSessionData.getPhase(),
+          timeLeft: newSessionData.timer.adjustedTimeLeftInPhase || 0,
+        });
       }
       if (
         newSessionData.inProgressActionIds.includes(
@@ -83,13 +83,13 @@ class WebSocketEventHandlers extends EventEmitter {
           debug("Pick phase started for local player");
           this.sendToMainWindow(
             "champ-select-local-player-pick-turn",
-            newSessionData.ownPickActionId
+            newSessionData.timer.adjustedTimeLeftInPhase
           );
         }
       }
       this.reflectChanges(oldSessionData, newSessionData);
     } else {
-      debug("oldSessionData null", oldSessionData);
+      // debug("oldSessionData null", oldSessionData);
     }
   }
 
@@ -108,34 +108,28 @@ class WebSocketEventHandlers extends EventEmitter {
       this.handlePlayerPickChanges(oldSessionData, newSessionData);
     }
 
-    if (newSessionData.isEnemyTurn()) {
-      console.log("It's now the enemy's turn.");
-      this.handleEnemyChampionLocks(oldSessionData, newSessionData);
-    }
-  }
+    const oldPicks = [
+      ...oldSessionData.getLockedInChampions(true),
+      ...oldSessionData.getLockedInChampions(false),
+    ];
+    const newPicks = [
+      ...newSessionData.getLockedInChampions(true),
+      ...newSessionData.getLockedInChampions(false),
+    ];
 
-  handleEnemyChampionLocks(oldSessionData, newSessionData) {
-    const oldEnemyPicks = oldSessionData.getLockedInChampions(false);
-    const newEnemyPicks = newSessionData.getLockedInChampions(false);
-    debug("newEnemyPicks enemy picks:", newEnemyPicks);
-    const newlyLockedInEnemies = newEnemyPicks.filter(
-      (newPick) =>
-        !oldEnemyPicks.some(
-          (oldPick) => newPick.championId === oldPick.championId
-        )
+    const newlyLockedInChampions = newPicks.filter(
+      (newPick) => !oldPicks.includes(newPick)
     );
 
-    newlyLockedInEnemies.forEach((enemyPick) => {
-      debug(`Enemy has locked in champion: ${enemyPick.championId}`);
-      this.sendToMainWindow("enemy-champion-locked", enemyPick.championId);
-    });
-  }
-
-  getLockedInEnemyPicks(sessionData) {
-    // Return an array of enemy picks where championId is greater than 0
-    return sessionData.theirTeam
-      .filter((member) => member.championId > 0)
-      .map((member) => ({ championId: member.championId }));
+    if (newlyLockedInChampions.length > 0) {
+      debug("Newly locked in champions:", newlyLockedInChampions);
+      debug("My team:", newSessionData.myTeam);
+      debug("Their team:", newSessionData.theirTeam);
+      this.sendToMainWindow("champ-select-team-picks-update", {
+        myTeam: newSessionData.myTeam,
+        theirTeam: newSessionData.theirTeam,
+      });
+    }
   }
 
   handlePlayerPickChanges(oldSessionData, newSessionData) {
@@ -148,12 +142,16 @@ class WebSocketEventHandlers extends EventEmitter {
         newLocalPlayerPickAction.championId;
       const isCompletionChange =
         this.previousPickState.completed !== newLocalPlayerPickAction.completed;
-      debug("completed", newLocalPlayerPickAction.completed);
+      // debug("completed", newLocalPlayerPickAction.completed);
       if (isChampionChange || isCompletionChange) {
         if (newLocalPlayerPickAction.completed) {
           debug(
             "Local player has picked a champion:",
             newLocalPlayerPickAction
+          );
+          this.sendToMainWindow(
+            "champ-select-local-player-pick-turn",
+            newSessionData.timer.adjustedTimeLeftInPhase
           );
           this.sendToMainWindow(
             "champion-picked",

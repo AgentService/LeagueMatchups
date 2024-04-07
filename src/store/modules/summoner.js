@@ -16,8 +16,9 @@ export const summoner = {
   getters: {
     getSummonerDataByName: (state) => (summonerName) => {
       return (
-        state.playerDetails.find((detail) => detail.name === summonerName) ||
-        null
+        state.playerDetails.find(
+          (detail) => detail.gameName === summonerName
+        ) || null
       );
     },
     getAllPlayerDetails: (state) => {
@@ -28,10 +29,20 @@ export const summoner = {
     },
   },
   mutations: {
-    setPlayerDetails(state, data) {
-      state.playerDetails = data;
+    setPlayerDetails(state, newDataArray) {
+      newDataArray.forEach(newData => {
+        const index = state.playerDetails.findIndex(detail => detail.gameName === newData.gameName);
+    
+        if (index !== -1) {
+          // Existing entry found, update it
+          state.playerDetails[index] = newData;
+        } else {
+          // No existing entry found, add the new entry to the array
+          state.playerDetails.push(newData);
+        }
+      });
     },
-    setCurrentSummoner(state, summoner) { 
+    setCurrentSummoner(state, summoner) {
       state.currentSummoner = summoner;
     },
   },
@@ -78,7 +89,9 @@ export const summoner = {
           if (response.status !== 200) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
+          debug("Summoner data fetched:", response.data);
           commit("setPlayerDetails", response.data);
+          commit("setCurrentSummoner", response.data[0]);
         } catch (error) {
           console.error("Error fetching PlayerDetails:", error);
         }
@@ -93,6 +106,7 @@ export const summoner = {
           ...authConfig,
         });
         commit("setPlayerDetails", response.data);
+        debugger
         if (response.data.length > 0) {
           commit("setCurrentSummoner", response.data[0]); // Set the first summoner as the current selection
         }

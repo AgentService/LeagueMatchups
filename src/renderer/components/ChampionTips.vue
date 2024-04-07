@@ -1,6 +1,8 @@
 <template>
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<span>Champion Tips</span>
+	<div class="widget-header">
+		<i class="fa-solid fa-lightbulb"></i>
+		<span class="widget-header-title ms-1">Tips for {{ championA?.id }}</span>
+		<span class="widget-header-right"></span>
 	</div>
 	<div class="overflow-auto d-flex flex-grow-1" v-if="championTips && Object.keys(championTips).length > 0">
 		<transition name="fade" mode="out-in">
@@ -9,9 +11,9 @@
 					<!-- Iterate over each key in championTips -->
 					<div v-for="(value, key) in championTips" :key="key" class="flex-item">
 						<!-- Button for each tip -->
-						<button type="button" class="btn text-secondary justify-content-center align-items-center"
+						<button type="button" class="tip-button text-secondary justify-content-center align-items-center"
 							@click="selectedTip = key">
-							<i :class="['me-2', getIconForKey(key)]" aria-hidden="true"></i>
+							<i :class="['', getIconForKey(key)]" aria-hidden="true"></i>
 							<div class="text-content">{{ formatCategory(key) }}</div>
 						</button>
 					</div>
@@ -23,7 +25,7 @@
 					<div class="tip-details">
 						<p>{{ championTips[selectedTip]?.long }}</p>
 					</div>
-					<button type="button" class="btn" @click="selectedTip = null">
+					<button type="button" class="btn ps-0" @click="selectedTip = null">
 						<i class="fas fa-chevron-left"></i> Back
 					</button>
 				</div>
@@ -55,6 +57,8 @@ const championTips = computed(() => {
 	return store.getters['champions/getChampionTips'](championId);
 });
 const selectedTip = ref(null);
+
+const championA = computed(() => store.getters['matchups/getChampionA']);
 
 const formatCategory = (key) => {
 	if (!key) return '';
@@ -89,19 +93,22 @@ watch(() => props.champion, (newChampion) => {
 
 
 <style>
-.tips-card {
+.tip-button {
 	display: flex;
-	height: 100%;
 	flex-direction: column;
-	padding: 1rem;
-	margin: auto;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	hyphens: auto;
-	text-align:left;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	color: var(--black);
+	font-size: .875rem !important;
 }
 
-.title-bar {
-	text-align: center;
+.tips-card {
+	margin: .5rem 0;
+	hyphens: auto;
+	font-size: 0.9rem;
+	overflow-y: auto;
+	font-weight: 400;
 }
 
 .flex-container {
@@ -175,32 +182,20 @@ watch(() => props.champion, (newChampion) => {
 	color: var(--gold-1);
 	overflow: auto;
 	flex-grow: 1;
-	font-weight: 500;
-	padding: 0 1rem;
 
 }
 
 .details-header {
 	color: var(--gold-1);
-	display: flex;
-	align-items: center;
-	flex-shrink: 0;
-	margin-bottom: 1rem;
-	padding: 0 1rem;
+	margin-bottom: .5rem;
 }
 
 .details-title {
-	flex-grow: 1;
-	font-weight: 700;
-	margin-bottom: .1rem;
+	font-size: 1rem;
+	font-weight: 600;
 }
 
 .content-container {
-	justify-content: start;
-	align-items: start;
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
-	height: 100%;
+	padding: .5rem;
 }
 </style>

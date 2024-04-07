@@ -9,7 +9,7 @@
 	</div> -->
 	<div class="notes-body">
 		<textarea spellcheck="false" v-model="localNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="11"></textarea>
+			rows="12"></textarea>
 	</div>
 
 	<div class="status-container">

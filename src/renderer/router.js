@@ -1,26 +1,32 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from "vue-router";
 import store from "../store";
 // // Lazy load the components
 // const ChampionMatchup = () => import('./ChampionPage.vue');
 // const UserJourney = () => import('./UserJourney.vue');
 // //... other lazy-loaded imports
 
-import ChampionMatchup from "./ChampionPage.vue";
+import ChampionPage from "./ChampionPage.vue";
 import UserJourney from "./UserJourney.vue";
 import LoginPage from "./components/LoginPage.vue";
+import JournalPage from "./JournalPage.vue";
 //... other imports
 
 const routes = [
   { path: "/", redirect: "/login" },
   { path: "/login", component: LoginPage, meta: { requiresAuth: false } },
   {
-    path: "/championMatchup",
-    component: ChampionMatchup,
+    path: "/ChampionPage",
+    component: ChampionPage,
     meta: { requiresAuth: true },
   },
   {
     path: "/userJourney",
     component: UserJourney,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/JournalPage",
+    component: JournalPage,
     meta: { requiresAuth: true },
   },
   // Other routes...
@@ -40,7 +46,7 @@ router.beforeEach(async (to, from, next) => {
     next("/login");
   } else if (isLoggedIn && to.path === "/login") {
     // Redirect logged-in users away from the login page (to championMatchup, for example)
-    next("/championMatchup");
+    next("/ChampionPage");
   } else {
     // Proceed as normal for all other cases
     next();

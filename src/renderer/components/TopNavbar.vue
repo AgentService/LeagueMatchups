@@ -4,10 +4,12 @@
 			<div class="container-fluid w-75">
 				<SummonerInfo></SummonerInfo>
 				<div class="mx-auto d-flex justify-content-center">
-					<router-link to="/championMatchup"
+					<router-link to="/ChampionPage"
 						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Prepare</router-link>
+					<router-link to="/JournalPage"
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Journal</router-link>
 					<router-link to="/userJourney"
-						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Journey</router-link>
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Test</router-link>
 				</div>
 				<div class="d-flex justify-content-center align-items-center ">
 					<div class="button-container">

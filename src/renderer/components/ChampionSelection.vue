@@ -85,9 +85,7 @@
 								:class="{ 'champion-picked': championPicked }" alt="Champion Image"
 								@click.stop="showGrid" :ref="getInstanceIdRef" />
 						</div>
-						<div v-if="championPicked" class="d-flex position-absolute">
-							<span>Locked</span>
-						</div>
+
 						<div class="champion-info">
 							<div class="champion-name-container">
 								<div class="champion-name">{{ selectedChampion.name }}</div>
@@ -371,6 +369,7 @@ export default {
 		const NotesSharedModalRef = ref(null);
 		const MatchupNotesModalRef = ref(null);
 		const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
+		let cleanups = []; // Store cleanup functions
 
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
@@ -454,7 +453,7 @@ export default {
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
 			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl, championPicked, showNotesModal, showMatchupNotesModal, fetchOtherUsersNotes, championA, championB,
-			NotesSharedModalRef, MatchupNotesModalRef
+			NotesSharedModalRef, MatchupNotesModalRef, cleanups
 		};
 	},
 	data() {
@@ -533,7 +532,7 @@ export default {
 		this.loading = false; // Start with loading state
 
 		if (this.instanceId === 1) {
-			window.ws.receive("champion-selected", (championId) => {
+			const cleanUpChampionSelected = window.ws.receive("champion-selected", (championId) => {
 				if (championId && this.selectedChampion?.key !== championId) {
 					this.fetchChampionById(championId).then(champion => {
 						this.selectChampion(champion);
@@ -541,25 +540,25 @@ export default {
 				}
 			});
 
-			window.ws.receive("champ-select-session-update", (session) => {
-				debug("champ-select-session-update", session);
+			const cleanUpSessionUpdate = window.ws.receive("champ-select-session-update", (session) => {
+				// debug("champ-select-session-update", session);
 			});
 
-			window.ws.receive("champ-select-phase-update", (phase) => {
+			const cleanUpPhaseUpdate = window.ws.receive("champ-select-phase-update", (phase) => {
 				if (phase === "BAN_PICK") {
-					debug("BAN_PICK");
+					debug("Phase:", phase);
 				} else if (phase === "BAN") {
-					debug("BAN");
+					debug("Phase:", phase);
 				} else if (phase === "PICK") {
-					debug("PICK");
+					debug("Phase:", phase);
 				} else if (phase === "FINALIZATION") {
-					debug("FINALIZATION");
+					debug("Phase:", phase);
 				} else if (phase === '') {
-					debug("No phase");
+					debug("Phase:", phase);
 				}
 			});
 
-			window.ws.receive("champion-picked", (championId) => {
+			const cleanUpChampionPicked = window.ws.receive("champion-picked", (championId) => {
 				if (championId && this.selectedChampion?.key !== championId) {
 					this.fetchChampionById(championId).then(champion => {
 						this.selectChampion(champion);
@@ -571,13 +570,11 @@ export default {
 					this.championPicked = false;
 				}, 4000);
 			});
+			this.cleanups.push(cleanUpChampionSelected, cleanUpSessionUpdate, cleanUpPhaseUpdate, cleanUpChampionPicked);
 		}
 	},
 	onBeforeUnmount() {
-		window.ws.off("champion-selected", this.handleChampionSelected);
-		window.ws.off("champion-picked", this.handleChampionPicked);
-		window.ws.off("champ-select-session-update", this.handleChampSelectSessionUpdate);
-		window.ws.off("champ-select-phase-update", this.handleChampSelectPhaseUpdate);
+		this.cleanups.forEach(cleanup => cleanup()); // Call each cleanup function
 	},
 	computed: {
 		fetchChampionById() {

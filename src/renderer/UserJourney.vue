@@ -34,7 +34,6 @@
             <!-- Main Content Area for Notes and Reflections -->
             <div class="col-xxl-9 col-xl-9">
               <div class="card">
-								<GeneralNotes />
                 <!-- Consider adding an "Add Note" button here that opens a modal for note entry -->
               </div>
               <div class="card">
@@ -50,12 +49,12 @@
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
 <script setup>
 import LearningObjectives from "./components/LearningObjectives.vue";
-import GeneralNotes from './components/GeneralNotes.vue';
 import MatchHistory from './components/MatchHistory.vue';
 
 </script>

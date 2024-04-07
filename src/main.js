@@ -264,6 +264,32 @@ function setupWebSocketSubscriptions(ws) {
 //   }
 // }
 
+async function fetchSummonerNameWithRetry(
+  credentials,
+  retries = 3,
+  interval = 5000,
+  initialDelay = 2000 // Default initial delay of 2000ms
+) {
+  // Wait for the initial delay before starting the retries
+  if (initialDelay > 0) {
+    console.log(`Waiting for ${initialDelay}ms before the first attempt...`);
+    await new Promise((resolve) => setTimeout(resolve, initialDelay));
+  }
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      return await fetchSummonerName(credentials); // Replace with your actual fetching logic
+    } catch (error) {
+      console.log(`Attempt ${attempt} failed, retrying in ${interval}ms...`);
+      // Wait for the interval delay before retrying, except after the last attempt
+      if (attempt < retries) {
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
+    }
+  }
+  throw new Error("All attempts to fetch summoner name failed.");
+}
+
 async function setupLeagueClientMonitoring() {
   try {
     const credentials = await authenticate({
@@ -276,20 +302,26 @@ async function setupLeagueClientMonitoring() {
       mainWindow.webContents.send("client-status", { connected: true });
     }
 
+    const client = new LeagueClient(credentials, { pollInterval: 1000 });
+
     initializeWebSocket(credentials)
       .then(() => {
         log.info("initializeWebSocket completed");
         log.info("fetching summoner name");
-        fetchSummonerName(credentials).catch(console.error);
+        fetchSummonerNameWithRetry(credentials)
+          .then((summonerName) => {
+            log.info("Summoner name fetched:", summonerName);
+            mainWindow.webContents.send("summoner-name-response", currentSummoner);
+          })
+          .catch(console.error);
       })
       .catch(console.error);
-    const client = new LeagueClient(credentials, { pollInterval: 1000 });
 
     client.on("connect", (newCredentials) => {
       console.log("League client connected.");
       initializeWebSocket(newCredentials)
         .then(() => {
-          fetchSummonerName(newCredentials).catch(console.error);
+          fetchSummonerNameWithRetry(newCredentials).catch(console.error);
           mainWindow.webContents.send("client-status", { connected: true });
         })
         .catch(console.error);
@@ -386,8 +418,8 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     x: x,
     y: y,
-    minWidth: 1600, // set the minimum width 1600
-    minHeight: 800, // set the minimum height 800
+    minWidth: 1840, // set the minimum width 1600
+    minHeight: 900, // set the minimum height 800
     width: 2560,
     height: 1240,
     // maxHeight: 800,

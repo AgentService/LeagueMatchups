@@ -125,7 +125,7 @@ button {
 		box-shadow 0.3s;
 	border: none;
 	color: var(--gold-1) !important;
-	z-index: 1000;
+	z-index: 1;
 }
 
 button:hover {
@@ -211,7 +211,6 @@ button:hover {
 	width: 100%;
 	height: 100%;
 	color: var(--gold-1);
-	/*background: #005b8281;*/
 }
 
 /* Textarea for the note content */
@@ -223,7 +222,7 @@ button:hover {
 	border-color: rgba(128, 128, 128, 0.11);
 	background: linear-gradient(to right, #091014, #060c11);
 	color: var(--gold-1);
-	line-height: 1.5;
+	font-size: .95rem;
 	padding: 0.75rem 1rem;
 	transition:
 		background-color 0.3s,
@@ -252,8 +251,7 @@ button:hover {
 	color: #e6e6e6;
 	border: none;
 	border-radius: 5px;
-	line-height: 1.5;
-	resize: vertical;
+	resize: none;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 	transition:
 		background-color 0.3s,
@@ -314,4 +312,98 @@ h1 {
 	a:hover {
 		color: #747bff;
 	}
+}
+
+.tag-quadrat:hover .tag-close {
+	opacity: 1;
+	visibility: visible;
+}
+
+.tag-ThreatAssessment {
+	background-color: #6a1b9a;
+	/* Purple */
+}
+
+.tag-ChampMastery {
+	background-color: #c2185b;
+	/* Pink */
+}
+
+.tag-Mental {
+	background-color: #00796b;
+	/* Teal */
+}
+
+.tag-Communication {
+	background-color: #fbc02d;
+	/* Yellow */
+}
+
+.tag-Roaming {
+	background-color: #455a64;
+	/* Blue Grey */
+}
+
+.tag-WardingLeaning {
+	background-color: #8d6e63;
+	/* Brown */
+}
+
+.tag-ObjectiveControl {
+	background-color: #7b1fa2;
+	/* Deep Purple */
+}
+
+.tag-Matchup {
+	background-color: #0288d1;
+	/* Light Blue */
+}
+
+/* Existing Styles */
+.tag-CS {
+	background-color: #ff4800;
+}
+
+.tag-WaveControl {
+	background-color: #7fffd4;
+}
+
+.tag-Recall {
+	background-color: #d8bfd8;
+}
+
+.tag-JungleTracking {
+	background-color: #f0e68c;
+}
+
+.tag-SupportTracking {
+	background-color: #e6e6fa;
+}
+
+.tag-Lane {
+	background-color: #add8e6;
+}
+
+.tag-Micro {
+	background-color: #f08080;
+}
+
+.tag-Teamfight {
+	background-color: #90ee90;
+}
+
+.tag-ClosingGames {
+	background-color: #ff58e9;
+}
+
+.tag-LeadTransition {
+	background-color: #ff5866;
+}
+
+.tag-ObjectiveControl {
+	background-color: #8f003e;
+}
+
+.tag-Warding {
+	background-color: #ff8a80;
 }

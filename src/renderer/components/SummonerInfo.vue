@@ -59,20 +59,18 @@ function selectSummoner(summonerDetail) {
 }
 
 function fetchSummonerDetailsIfNeeded() {
-	if (!allPlayerDetails.value.length) {
-		store.dispatch('summoner/fetchSummonerDataByAccountId');
-	}
+	store.dispatch('summoner/fetchSummonerDataByAccountId');
 }
 
 watch(isLoggedIn, (newVal, oldVal) => {
 	if (newVal && !oldVal) {
 		fetchSummonerDetailsIfNeeded();
+		window.api.send("get-summoner-name");
 	}
 });
 
 onMounted(() => {
 	document.addEventListener('click', handleClickOutside);
-	fetchSummonerDetailsIfNeeded();
 });
 
 onBeforeUnmount(() => {

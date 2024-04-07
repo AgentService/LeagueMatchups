@@ -50,7 +50,8 @@ initializeApp()
     vueApp.use(VueLazyload, {
       // options...
     });
-
+    initializeSummonerDataFetching();
+    startSummonerNameCheck();
     vueApp.use(router);
     vueApp.use(store);
 
@@ -67,6 +68,3 @@ initializeApp()
   .catch((error) => {
     console.error("Error during app initialization:", error);
   });
-
-initializeSummonerDataFetching();
-startSummonerNameCheck();

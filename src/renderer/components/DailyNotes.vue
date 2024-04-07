@@ -54,7 +54,7 @@ import TagsOverlay from './reuse/TagsOverlay.vue';
 
 const store = useStore();
 const noteText = ref({});
-const notesDisplayLimit = ref(3);
+const notesDisplayLimit = ref(5);
 const isExpanded = ref(false);
 const notesOrdered = computed(() => {
 	return store.state.notes?.generalNotes
@@ -63,10 +63,6 @@ const notesOrdered = computed(() => {
 
 // tags overlay
 const activeNoteId = ref(null);
-const showTagOverlay = (noteId) => {
-	debugger
-	activeNoteId.value = noteId;
-};
 
 const limitedNotes = computed(() => {
 	return notesOrdered.value.slice(0, notesDisplayLimit.value);
