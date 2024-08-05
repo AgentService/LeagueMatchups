@@ -54,6 +54,7 @@ After Game Screen to distract from b ad thoughts
 
 Server
 - Image Hosting solution
+- Static IP auch als Webseite nutzen
 
 GPT
 🧙🏾‍♂️: Absolut, hier ist eine Zusammenfassung deiner Pläne, der Features, die dir wichtig sind, und der Ideen, die du gut fandest, zusammen mit einem Schritt-für-Schritt-Plan, um deine Ziele zu erreichen:
@@ -94,3 +95,38 @@ POST
 {"customGameLobby":{
 "configuration":{"gameMode":"PRACTICETOOL","gameMutator":"","gameServerRegion":"","mapId":11,"mutators":{"id":1},"spectatorPolicy":"AllAllowed","teamSize":5}
 ,"lobbyName":"Name","lobbyPassword":null},"isCustom":true}
+
+
+name ideas:
+
+riftmind.com
+riftmind.gg
+improve.gg
+improve.wtf
+notilt.gg
+notilt.wtf
+notilt.win
+
+Domain,Available,Premium,Price
+improve.gg,available,,€63.56
+improve.wtf,available,,€4.59
+climbs.gg,available,,€63.56
+climb.wtf,available,,€4.59
+climbs.wtf,available,,€4.59
+climbs.lol,available,,€1.66
+rift.wtf,available,,€4.59
+riftmind.com,available,,€9.47
+riftmind.gg,available,,€63.56
+riftmind.wtf,available,,€4.59
+riftmind.win,available,,€5.51
+riftmind.lol,available,,€1.66
+riftmind.xyz,available,,€0.91
+notilt.gg,available,,€63.56
+notilt.wtf,available,,€4.59
+notilt.win,available,,€5.51
+notilt.lol,available,,€1.66
+notilt.xyz,available,,€0.91
+muteall.lol,available,,€1.66 (Retail €23.94/yr)
+muteall.gg,available,,€63.56 (Renews at €65.41/yr+)
+muteall.chat,available,,€8.27 (Retail €29.47/yr)
+muteall.wtf,available,,€4.59 (Retail €27.63/yr)

@@ -104,7 +104,7 @@ watch(() => props.champion, (newChampion) => {
 }
 
 .tips-card {
-	margin: .5rem 0;
+	margin: 0 0;
 	hyphens: auto;
 	font-size: 0.9rem;
 	overflow-y: auto;
@@ -114,7 +114,8 @@ watch(() => props.champion, (newChampion) => {
 .flex-container {
 	display: flex;
 	flex-wrap: wrap;
-	gap: .5rem;
+	gap: .25rem;
+	margin-top: 1rem;
 	justify-content: space-between;
 }
 

@@ -1,4 +1,4 @@
-// api/auth.mjs
+// auth.mjs
 import express from "express";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
@@ -7,10 +7,8 @@ import { verifyToken } from "../utils/authMiddleware.mjs";
 import { snakeToCamelCase } from "./utilities.mjs";
 import Debug from "debug";
 const debug = Debug("api:auth");
-
 import bcrypt from "bcrypt";
 
-// Assuming dbPool is initialized somewhere in your app setup
 export function initializePassportStrategy(dbPool) {
   passport.use(
     new LocalStrategy(
@@ -27,6 +25,9 @@ export function initializePassportStrategy(dbPool) {
           if (result.rows.length > 0) {
             const user = snakeToCamelCase(result.rows[0]);
             debug("User: ", user);
+            if (!user.verified) {
+              return done(null, false, { message: "Email not verified." });
+            }
             const match = await bcrypt.compare(password, user.passwordHash);
             if (match) {
               // User authenticated successfully
@@ -57,8 +58,6 @@ export function initializePassportStrategy(dbPool) {
 }
 
 const router = express.Router();
-
-// Mock user data
 
 router.post(
   "/login",
@@ -147,6 +146,7 @@ router.post("/verifyToken", verifyToken, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
 router.post("/token", async (req, res) => {
   const { refreshToken } = req.body;
   const { dbPool } = req.app.locals;
@@ -179,7 +179,7 @@ router.post("/token", async (req, res) => {
     });
     debug("New token issued:", newToken);
     // Respond with the new access token (and optionally, the new refresh token)
-    res.json({ accessToken: newToken});
+    res.json({ accessToken: newToken });
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       debug("Refresh token expired:", error);

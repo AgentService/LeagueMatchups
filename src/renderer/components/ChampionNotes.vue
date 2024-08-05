@@ -1,184 +1,236 @@
 <template>
-	<!-- <div class="share-button d-flex justify-content-end align-items-center">
-		<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared">
-			<i class="fa fa-sm fa-users" aria-hidden="true"></i>
-		</button>
+	<div class="notes-container">
+		<!-- Custom Header -->
+
+		<!-- Editor and Status Message -->
+		<!-- Editor and Status Message -->
+		<EditorMenuBar :editor="editor" />
+		<div class="editor-wrapper">
+			<editor-content :editor="editor" class="editor-content" />
+		</div>
+		<div class="status-container">
+			<div v-if="notesState === 'editing'" key="editing" class="status-message">
+				<i class="fas fa-edit text-warning"></i> Editing...
+			</div>
+			<div v-if="notesState === 'saved'" key="saved" class="status-message">
+				<i class="fas fa-check text-success"></i> Saved!
+			</div>
+		</div>
+
+		<!-- Shared Notes Modal -->
 		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
-	</div> -->
-	<div class="notes-body">
-		<textarea spellcheck="false" v-model="editableNotes" placeholder="Type your notes here..." class="note-textarea"
-			rows="12"></textarea>
-	</div>
-	<div class="status-container">
-		<!-- <div v-if="notesState === 'neutral'" key="neutral" class="status-message">
-			<i class="fa fa-save text-success"></i>
-		</div> -->
-		<div v-if="notesState === 'editing'" key="editing" class="status-message">
-			<i class="fas fa-edit text-warning"></i>
-		</div>
-		<div v-if="notesState === 'saved'" key="saved" class="status-message">
-			<i class="fas fa-check text-success"></i>
-		</div>
 	</div>
 </template>
 
 
-
 <script setup>
-import { computed, ref, watch, onMounted } from 'vue';
+import { ref, onBeforeUnmount, onMounted, watch, computed } from 'vue';
+import { useEditor, EditorContent } from '@tiptap/vue-3';
+import StarterKit from '@tiptap/starter-kit';
+import Underline from '@tiptap/extension-underline';
+import Link from '@tiptap/extension-link';
+import EditorMenuBar from './EditorMenuBar.vue';
 import { useStore } from 'vuex';
 import SharedNotesModal from './reuse/NotesShareModal.vue';
 
-import Debug from 'debug';
-const debug = Debug('app:component:ChampionNotes');
+// Initialize Vuex store
 const store = useStore();
-
 const championA = computed(() => store.getters['matchups/getChampionA']);
 const championId = ref('');
-const editableNotes = ref('');
-const championSwitched = ref(false);
-const autoSaved = ref(false);
-const notesState = ref('neutral'); // 'neutral', 'editing', 'saved'
-
-const showNotesModal = ref(false); // Controls the visibility of the modal
+const notesState = ref('neutral');
+const showNotesModal = ref(false);
 const NotesSharedModalRef = ref(null);
 
-let saveTimeout = null;
-let isInitialLoad = ref(true); // Flag for initial data load
+// Editor setup
+const editor = useEditor({
+	extensions: [
+		StarterKit,
+		Underline,
+		Link.configure({
+			openOnClick: false,
+		}),
+	],
+	content: '', // Initial empty content, will be set after fetching
+	editorProps: {
+		attributes: {
+			class: 'ProseMirror',
+			spellcheck: 'false',       // Disable spellcheck
+			autocorrect: 'off',        // Disable autocorrect
+			autocapitalize: 'off',     // Disable autocapitalize
+			'data-gramm': 'false',     // Disable Grammarly
+		},
+	},
+	onUpdate: ({ editor }) => {
+		notesState.value = 'editing';
+		debouncedSave(editor.getHTML());
+	},
+});
 
-async function fetchOtherUsersNotes() {
-	await store.dispatch('notes/fetchOtherUsersChampionNotes', championId.value);
-	// Ensure the child component is mounted and its method is available
-	NotesSharedModalRef.value?.fetchData(championId.value);
+// Ensure editor cleanup
+onBeforeUnmount(() => {
+	if (editor.value) {
+		editor.value.destroy();
+	}
+});
+
+let saveTimeout = null;
+
+// Fetch notes for the current champion
+async function fetchAndSetNotes(currentChampionId) {
+	await store.dispatch('notes/fetchChampionPersonalNotes', currentChampionId);
+	const fetchedNotes = store.getters['notes/getChampionPersonalNotes'](
+		currentChampionId
+	);
+	editor.value?.commands.setContent(fetchedNotes || '<p>Start typing...</p>');
 }
 
-// Call fetchOtherUsersNotes when the modal is opened
+// Debounced save function to prevent excessive API calls
+function debouncedSave(content) {
+	if (saveTimeout) clearTimeout(saveTimeout);
+	saveTimeout = setTimeout(async () => {
+		await saveChampionNotes(content);
+		notesState.value = 'saved'; // Update state to 'saved' after successful save
+		setTimeout(() => {
+			notesState.value = 'neutral'; // Reset to 'neutral' after some time
+		}, 2000);
+	}, 2000); // Save 1 second after the last keystroke
+}
+
+// Save champion notes
+async function saveChampionNotes(content) {
+	try {
+		await store.dispatch('notes/updateChampionPersonalNotes', {
+			championName: championId.value,
+			content,
+		});
+	} catch (error) {
+		console.error('Error saving notes:', error);
+	}
+}
+
+watch(championA, async (newChampionA) => {
+	if (newChampionA && newChampionA.id !== championId.value) {
+		championId.value = newChampionA.id;
+		await fetchAndSetNotes(championId.value); // Fetch and set notes for the new champion
+	}
+}, { immediate: true });
+
+// Fetch other users' notes when the modal is opened
 watch(showNotesModal, (newVal) => {
 	if (newVal === true) {
 		fetchOtherUsersNotes();
 	}
 });
 
-function debouncedSave() {
-	if (saveTimeout) clearTimeout(saveTimeout);
-	saveTimeout = setTimeout(async () => {
-		await saveChampionNotes();
-		autoSaved.value = true;
-
-		// Set a timeout to hide the "saved" message after 2 seconds
-		setTimeout(() => {
-			autoSaved.value = false;
-		}, 2000);
-	}, 2000);
+async function fetchOtherUsersNotes() {
+	await store.dispatch('notes/fetchOtherUsersChampionNotes', championId.value);
+	NotesSharedModalRef.value?.fetchData(championId.value);
 }
 
-
-// Function to fetch and set the notes for the current champion
-async function fetchAndSetNotes(currentChampionId) {
-	await store.dispatch('notes/fetchChampionPersonalNotes', currentChampionId);
-	editableNotes.value = store.getters['notes/getChampionPersonalNotes'](currentChampionId);
-
-	// Delay the setting of isInitialLoad to false to avoid immediate auto-save
-	setTimeout(() => {
-		isInitialLoad.value = false;
-	}, 2000);
-}
-
-// Watcher for championA to fetch and set notes
-watch(championA, async (newChampionA) => {
-	if (newChampionA && newChampionA.id !== championId.value) {
-		championId.value = newChampionA.id;
-		championSwitched.value = true
-		await fetchAndSetNotes(championId.value);
-	}
-}, { immediate: true });
-
-watch(editableNotes, (newValue, oldValue) => {
-	if (!isInitialLoad.value && newValue !== oldValue) {
-		if (championSwitched.value) {
-			championSwitched.value = false;
-			return;
-		}
-		notesState.value = 'editing';
-		debouncedSave();
-	}
-});
-
+// Fetch notes on component mount
 onMounted(async () => {
 	if (championA.value && championA.value.id) {
 		championId.value = championA.value.id;
 		await fetchAndSetNotes(championId.value);
 	}
 });
-
-async function saveChampionNotes() {
-	try {
-		await store.dispatch('notes/updateChampionPersonalNotes', {
-			championName: championId.value,
-			content: editableNotes.value,
-		});
-		notesState.value = 'saved'; // Update state to 'saved' after successful save
-		setTimeout(() => {
-			notesState.value = 'neutral'; // Reset to 'neutral' after some time
-		}, 2000);
-	} catch (error) {
-		console.error('Error saving notes:', error);
-	}
-}
-
 </script>
 
+<style>
+.editor-wrapper {
+	flex: 1;
+	display: flex;
+	overflow: hidden;
+	border-radius: 8px;
+}
 
+.ProseMirror {
+	flex: 1;
+	min-height: 360px;
+	max-height: 360px;
+	overflow-y: auto;
+	box-sizing: border-box;
+	outline: none;
+	border: 1px solid #dddddd15;
+	border-radius: 8px;
+	padding: 12px 14px;
+	font-size: 0.9rem;
+	font-weight: 400;
+	background: linear-gradient(to right, #091014, #060c11a8);
+}
 
-<style scoped>
+.ProseMirror:focus {
+	border: 1px solid #dddddd98;
+}
+
+/* Specific rule to remove margin from <p> inside <li> */
+.ProseMirror ul li p {
+	margin-bottom: 0 !important;
+	/* Ensure no margin-bottom */
+}
+
+.notes-container {
+	display: flex;
+	position: relative;
+	flex-direction: column;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.header-actions {
+	display: flex;
+	align-items: center;
+}
+
+.editor-wrapper {
+	flex: 1;
+	overflow: hidden;
+	border-radius: 4px;
+	margin-bottom: .5rem;
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+}
+
+.menu-bar {
+	margin-bottom: 10px;
+}
+
+.menu-bar button {
+	margin-right: 5px;
+	padding: 5px 10px;
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background-color 0.3s ease;
+}
+
+.menu-bar button.is-active {
+	color: #007bff;
+}
+
+.menu-bar button:hover {
+	background-color: rgba(0, 123, 255, 0.1);
+}
+
+.menu-bar i {
+	font-size: 16px;
+}
+
 .share-button {
-	position: absolute;
-	top: 1rem;
-	right: 1rem;
-}
-.filter-container {
-	border: 1px solid var(--grey-3);
-	border-radius: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0 1rem;
-}
-
-.filter-header {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-right: 1px solid var(--grey-3);
-	margin-right: 1rem;
-}
-
-h3 {
-	color: #333;
-	margin-bottom: 20px;
-}
-
-.notes-saved {
-	font-size: 1rem;
-	text-transform: none;
-}
-
-/* Transition styles for fade */
-.fade-enter-active,
-.fade-leave-active {
-	transition: opacity 0.5s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-	opacity: 0;
+	text-align: right;
 }
 
 .status-container {
 	position: absolute;
-	height: 25px;
-	bottom: 1rem;
-	right: 2rem;
+	text-align: right;
+	bottom: 0;
+	right: 18px;
+	font-size: 0.8rem;
+	font-weight: 400;
 }
 </style>

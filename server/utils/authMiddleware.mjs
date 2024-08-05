@@ -1,39 +1,41 @@
 // authMiddleware.mjs
 /* eslint-disable quotes */
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import Debug from "debug";
+const debug = Debug("api:authMiddleware");
 
 export function verifyToken(req, res, next) {
-	const token = req.headers['authorization']?.split(' ')[1]; // Assuming token is sent as a Bearer token
+  const token = req.headers["authorization"]?.split(" ")[1]; // Assuming token is sent as a Bearer token
 
-	if (!token) {
-		return res.status(403).send('A token is required for authentication');
-	}
+  if (!token) {
+    return res.status(403).send("A token is required for authentication");
+  }
 
-	try {
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-		req.user = decoded;
-		next(); // Call next() to continue to the route handler if the token is valid
-	} catch (err) {
-		return res.status(401).send('Invalid Token');
-	}
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next(); // Call next() to continue to the route handler if the token is valid
+  } catch (err) {
+    return res.status(401).send("Invalid Token");
+  }
 }
 
-
 export function extractEmailFromToken(req, res, next) {
-	const authHeader = req.headers.authorization;
-	if (authHeader && authHeader.startsWith('Bearer ')) {
-		const token = authHeader.substring(7, authHeader.length); // Remove 'Bearer ' from the start
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7, authHeader.length); // Remove 'Bearer ' from the start
 
-		try {
-			const decoded = jwt.verify(token, process.env.JWT_SECRET);
-			req.userEmail = decoded.email; // Attach the email to the request object
-			req.id = decoded.id;
-		} catch (error) {
-			return res.status(401).json({ error: 'Invalid token' });
-		}
-	} else {
-		return res.status(401).json({ error: 'Authorization header missing or invalid' });
-	}
-	next();
-};
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.userEmail = decoded.email; // Attach the email to the request object
+      req.id = decoded.id;
+    } catch (error) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
+  } else {
+    return res
+      .status(401)
+      .json({ error: "Authorization header missing or invalid" });
+  }
+  next();
+}

@@ -2,6 +2,7 @@
 import express from "express";
 import axios from "axios";
 import Debug from "debug";
+import { getLatestVersion } from "./utilities.mjs"; // Import the getLatestVersion function
 
 const router = express.Router();
 const debug = Debug("api:items");
@@ -9,9 +10,11 @@ const debug = Debug("api:items");
 
 router.get("/all", async (req, res) => {
   try {
-    // Example: Fetching item data from an external API
-    const apiUrl =
-      "https://ddragon.leagueoflegends.com/cdn/14.1.1/data/en_US/item.json";
+    const latestVersion = await getLatestVersion(); // Get the latest version
+    if (!latestVersion) {
+      throw new Error("Failed to retrieve the latest version");
+    }
+    const apiUrl = `https://ddragon.leagueoflegends.com/cdn/${latestVersion}/data/en_US/item.json`;
     const response = await axios.get(apiUrl);
 
     // Optionally process the data here

@@ -2,39 +2,29 @@
 	<div class="app-wrapper">
 		<div v-if="isLoading" class="loading-indicator">Loading...</div>
 		<div v-else class="app-container">
-			<div class="background-container ">
-				<!--
-        <img v-if="championA" :src="`/img/champion_splash/${championA.id}.png`" class="background-image left mirrored-image" alt="Champion A" />
-        <img v-if="championB" :src="`/img/champion_splash/${championB.id}.png`" class="background-image right" alt="Champion B" />
-        -->
-			</div>
-			<div class="grid-container ">
+			<div class="grid-container">
 				<div class="container-fluid">
 					<div class="row">
-						<div class="col-xxl-8 col-xl-8 mt-4">
+						<div class="col-xxl-12 col-xl-12 mt-4">
 							<transition name="slide-down" mode="out-in">
-
 								<div v-if="currentPhase">
 									<div class="d-flex justify-content-between align-items-center w-100 text-light">
-										<!-- Locked Indicator or Empty Space -->
 										<transition name="slide-up" mode="out-in">
 											<div v-if="playerLocked" class="locked-indicator" key="locked">
 												<span>Locked</span>
 											</div>
-											<div v-else-if="playerTurn" class="locked-indicator " key="empty">
+											<div v-else-if="playerTurn" class="locked-indicator" key="empty">
 												<span>Select your Champion</span>
 											</div>
 											<div v-else class="locked-indicator">
 												<span></span>
 											</div>
 										</transition>
-										<!-- Phase Text -->
 										<transition name="slide-up" mode="out-in">
-											<div :key="currentPhase" class="phase-text ">
+											<div :key="currentPhase" class="phase-text">
 												{{ phaseText }}
 											</div>
 										</transition>
-										<!-- Timer -->
 										<transition name="slide-up" mode="out-in">
 											<div v-if="playerTurn" class="timer">
 												<div>{{ formatTime(timerValue) }}</div>
@@ -43,22 +33,17 @@
 												<div></div>
 											</div>
 										</transition>
-
 									</div>
 									<div class="teams-container">
 										<div class="my-team">
-											<!-- Iterate over myTeamPicks for champion keys -->
 											<div v-for="championId in myTeamPicks" :key="championId">
-												<!-- Use championKey to get the image URL from myTeamImageUrls -->
 												<img :src="myTeamImageUrls[championId]" alt="Champion icon"
 													class="champion-icon" />
 											</div>
 										</div>
 										<div class="enemy-team">
-											<!-- Iterate over enemyTeamPicks for champion keys -->
 											<div v-for="championId in enemyTeamPicks" :key="championId"
 												class="champion-icon">
-												<!-- Use championKey to get the image URL from enemyTeamImageUrls -->
 												<img :src="enemyTeamImageUrls[championId]" alt="Champion icon"
 													class="champion-icon" />
 											</div>
@@ -66,70 +51,42 @@
 									</div>
 								</div>
 							</transition>
-
 						</div>
 					</div>
-					<!-- Summoner Info Row -->
 					<div class="row align-items-start">
 						<div class="col-xxl-2 col-xl-2 mt-4">
 							<div class="card-widget">
 								<LatestNoteWidget />
 							</div>
-							<!-- <ChampionTips :champion="championA" /> -->
 							<div class="card-tips mt-2">
 								<ChampionTips :champion="championA" />
 							</div>
 						</div>
-						<div class="col-xxl-6 col-xl-6">
+						<div class="col-xxl-8 col-xl-8">
 							<div class="row mb-4 mt-4">
-								<div class="col-xxl-12 ">
-									<div class="card-container">
-
-										<div class="d-flex flex-row ">
-											<!-- Champion Search for User's Champion -->
-											<div class="col-xxl-6 position-relative">
-												<div class="card-large"
-													:class="{ 'ban-pick-border-animation': playerTurn }">
-													<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-													<ChampionNotes />
-												</div>
+								<div class="col-xxl-6">
+									<div class="d-flex flex-row justify-content-evenly">
+											<div class="card-large mb-4"
+												:class="{ 'ban-pick-border-animation': playerTurn }">
+												<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+												<ChampionNotes />
 											</div>
-											<!-- VS Divider -->
-											<div class="vs-container">
-												<!-- <span>vs</span> -->
-											</div>
-											<!-- Matchup Notes and Search for Enemy Champion -->
-											<div class="col-xxl-6 position-relative">
-												<div class="card-large">
-													<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-													<MatchupNotes />
-												</div>
-											</div>
-											<!-- <div class="col-xxl-2 col-xl-2">
-										<div class="card">
-											<SummonerRankedInfo />
-										</div>
-										<div class="card">
-											<LearningObjectives></LearningObjectives>
-										</div>
-									</div> -->
+										<div class="vs-container">
+											<span>vs</span>
 										</div>
 									</div>
 								</div>
-
+								<div class="col-xxl-6">
+											<div class="card-large mb-4">
+												<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+												<MatchupNotes />
+											</div>
+								</div>
 							</div>
 							<div class="row">
 								<div class="col-xxl-12">
-									<div class="col-xxl-4">
-
-									</div>
+									<div class="col-xxl-4"></div>
 								</div>
-
-								<!-- <div class="col-xxl-9">
-									<div class="card-large card-top card-bottom">
-										 <MatchHistory /> 
-									</div>
-								</div> -->
 							</div>
 						</div>
 					</div>
@@ -138,8 +95,6 @@
 		</div>
 	</div>
 </template>
-
-
 
 <script setup>
 import { ref, watch, onMounted, computed, onUnmounted } from 'vue';
@@ -355,6 +310,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 </script>
 
 <style>
+
 .teams-container {
 	display: flex;
 	justify-content: space-between;
@@ -520,9 +476,9 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	align-items: start;
 	position: absolute;
 	z-index: 2;
-	font-size: 3rem;
-	top: 12%;
-	right: 49%;
+	font-size: 4rem;
+	top: 14%;
+	right: 40.8%;
 	width: 10px !important;
 	height: 40px;
 	padding: 1rem;
@@ -554,9 +510,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .card-container {
 	display: flex;
 	flex-direction: column;
-
-	background: var(--card-background);
-	border: 1px solid rgba(128, 128, 128, 0.1);
+	border-radius: 12px;
 }
 
 .card {
@@ -595,10 +549,11 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	flex-direction: column;
 	color: var(--gold-1);
 	padding: 1rem 1rem;
-	max-height: 600px;
-	min-height: 600px;
+	max-height: 750px;
+	min-height: 750px;
 	z-index: auto;
-	border: 2px solid transparent;
+	border-radius: 12px;
+	background-image: linear-gradient(to right, #091014, #091014);
 }
 
 .card-wide {
@@ -637,8 +592,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	border-radius: 12px;
 	transition: box-shadow 0.3s ease-in-out;
 	padding: 1rem 1rem;
-	min-height: 350px;
-	max-height: 350px;
+	min-height: 360px;
+	max-height: 360px;
 }
 
 .card-widget:hover {
@@ -700,11 +655,8 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .app-container {
 	flex: 1;
 	position: relative;
-	justify-content: center;
 	align-items: center;
 	flex-grow: 1;
-	flex-direction: column;
-	border-top: 2px solid var(--blue-laser-gradient);
 }
 
 .grid-container {
@@ -802,7 +754,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 
 .card-header-custom {
 	background-color: transparent;
-	text-transform: uppercase;
 	font-weight: 600;
 	text-align: start;
 	font-size: 1rem;

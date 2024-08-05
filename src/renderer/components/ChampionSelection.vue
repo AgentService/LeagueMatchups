@@ -1,8 +1,8 @@
 <template>
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
+	<!-- <div class="card-header-custom d-flex justify-content-between align-items-center">
 		<span v-show="instanceId === 1">Champion Notes</span>
 		<span v-show="instanceId === 2">Matchup Notes</span>
-	</div>
+	</div> -->
 
 	<div class="note-card champion-card ">
 		<div class="background-image" :style="championBackgroundStyle"></div>
@@ -36,12 +36,14 @@
 						</div>
 					</div>
 				</div>
-				<button key="share-button" class="btn button" @click="showNotesModal = true" aria-label="Shared"
-					v-if="instanceId === 1">
+				<button key="championA-community-notes-button" class="btn button " @click="showNotesModal = true"
+					aria-label="Community Notes for {{ championA.name }}"
+					:title="'Community Notes for ' + championA.name" v-if="instanceId === 1">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
 				</button>
-				<button key="share-button" class="btn button" @click="showMatchupNotesModal = true" aria-label="Shared"
-					v-if="instanceId === 2">
+				<button key="championB-community-notes-button" class="btn button"
+					@click="showMatchupNotesModal = true" aria-label="Community Notes for {{ championB.name }}"
+					:title="'Community Notes for ' + championB.name" v-if="instanceId === 2">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
 				</button>
 				<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
@@ -274,6 +276,15 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- Custom Header -->
+	<div class="card-header-custom d-flex justify-content-between align-items-center">
+		<!-- Header Title -->
+		<span v-if="instanceId === 1">Champion Notes</span>
+		<span v-if="instanceId === 2">Matchup Notes</span>
+		<div class="header-actions">
 		</div>
 	</div>
 	<!-- Overlay for Summoner Spell Selection -->
@@ -957,7 +968,7 @@ export default {
 
 .champion-image {
 	width: 40px;
-	height: 40px;
+	height: 30px;
 	cursor: pointer;
 }
 
@@ -1338,20 +1349,23 @@ export default {
 
 .champion-card {
 	display: flex;
-	height: 200px;
+	min-height: 250px;
 	flex-direction: column;
 	padding: 0rem;
+
 }
 
 .champion-portrait {
 	margin-top: .5rem;
 	padding: 1rem 0rem;
 	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .champion-portrait img {
-	width: 100px;
-	height: auto;
+	width: 90px;
+	height: 90px;
 	border-radius: 2px;
 }
 
@@ -1382,6 +1396,7 @@ export default {
 
 .champion-grid-container.open {
 	flex: 1;
+	max-height: 300px;
 }
 
 .champion-grid {

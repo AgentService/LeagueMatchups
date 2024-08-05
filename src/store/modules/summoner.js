@@ -106,7 +106,6 @@ export const summoner = {
           ...authConfig,
         });
         commit("setPlayerDetails", response.data);
-        debugger
         if (response.data.length > 0) {
           commit("setCurrentSummoner", response.data[0]); // Set the first summoner as the current selection
         }

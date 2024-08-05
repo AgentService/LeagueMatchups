@@ -8,7 +8,7 @@
             </div>
             <div class="content-container">
                 <div class="note-content">
-                    <div class="note-preview">{{ truncate(latestNote.content, 100) }}</div>
+                    <div class="note-preview">{{ truncate(latestNote.content, 455) }}</div>
                 </div>
                 <div class="tags-container">
                     <div v-for="tag in latestNoteTags" :key="tag.tag_id" class="tag-quadrat"
@@ -84,16 +84,17 @@ onMounted(() => {
     flex: 1;
     font-size: 0.9rem;
     overflow: hidden;
+    text-align: justify;
     display: -webkit-box;
-    -webkit-line-clamp: 7;
+    -webkit-line-clamp: 10;
     -webkit-box-orient: vertical;
-    padding: .5rem .0rem;
+    padding: .25rem 0rem;
     font-weight: 400;
 }
 
 .latest-note-widget {
     display: flex;
-    max-height: 290px;
+    height: 360px;
     flex-direction: column;
     justify-content: space-between;
     cursor: pointer;

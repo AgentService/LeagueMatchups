@@ -77,15 +77,23 @@ async function fetchAndSetSecrets() {
     "DB_PASSWORD",
     "DB_PORT",
     "JWT_SECRET",
-    "JWT_REFRESH_SECRET"
+    "JWT_REFRESH_SECRET",
+    "BREVO_API_KEY",
+    "VITE_API_BASE_URL"
   ];
 
   for (const secretName of secrets) {
-    const secretPath = `projects/${projectName}/secrets/${secretName}/versions/latest`;
-    const [version] = await client.accessSecretVersion({ name: secretPath });
-    process.env[secretName] = version.payload.data.toString("utf8");
+    try {
+      const secretPath = `projects/${projectName}/secrets/${secretName}/versions/latest`;
+      const [version] = await client.accessSecretVersion({ name: secretPath });
+      const secretValue = version.payload.data.toString("utf8");
+      process.env[secretName] = secretValue;
+      debug(`Secret ${secretName} fetched successfully: ${secretValue}`);
+    } catch (error) {
+      debug(`Failed to fetch secret ${secretName}: ${error.message}`);
+    }
   }
-  debug("Secrets fetched and set successfully", process.env);
+  debug("Secrets fetched and set successfully.");
 }
 
 async function startServer() {
@@ -171,6 +179,7 @@ if (process.env.NODE_ENV === "development") {
   });
 } else {
   debug("Starting server in production mode");
+  dotenv.config(); // Load environment variables
   fetchAndSetSecrets()
     .then(initializeRiotAPI)
     .then(initializeChampionDataCache)

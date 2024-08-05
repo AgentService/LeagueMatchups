@@ -418,7 +418,7 @@ function createMainWindow() {
   mainWindow = new BrowserWindow({
     x: x,
     y: y,
-    minWidth: 1840, // set the minimum width 1600
+    minWidth: 1850, // set the minimum width 1600
     minHeight: 900, // set the minimum height 800
     width: 2560,
     height: 1240,

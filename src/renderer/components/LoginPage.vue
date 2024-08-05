@@ -1,25 +1,19 @@
 <template>
     <div class="auth-container">
         <div class="background-image-container" :style="championBackgroundStyle">
-            <div class="background-overlay"></div> <!-- Overlay added here -->
+            <div class="background-overlay"></div>
         </div>
         <transition name="fade">
-
-            <div class="auth-container">
+            <div class="auth-container">O
                 <div class="auth-card" v-if="!showDirectoryPicker">
                     <div class="auth-header">
-                        <!-- <span v-if="authMode === 'login'">Already a member? Log In</span>
-                <span v-else>Start for free</span> -->
                         <h2>{{ authMode === 'login' ? 'Login' : 'Register' }}</h2>
                         <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+                        <div v-if="infoMessage" class="info-message">{{ infoMessage }}</div>
                     </div>
                     <form @submit.prevent="handleSubmit" class="auth-form">
                         <input type="email" v-model="form.email" placeholder="Email" required>
-                        <input type="text" v-if="authMode === 'register'" v-model="form.username" placeholder="Username"
-                            required>
                         <input type="password" v-model="form.password" placeholder="Password" required>
-                        <input type="password" v-if="authMode === 'register'" v-model="form.confirmPassword"
-                            placeholder="Confirm Password" required>
                         <button class="button-login" type="submit" :disabled="isSubmitting">
                             {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
                         </button>
@@ -30,9 +24,9 @@
                 </div>
             </div>
         </transition>
-
     </div>
 </template>
+
 
 
 <script setup>
@@ -44,7 +38,7 @@ import { getUrlHelper } from '../globalSetup';
 const router = useRouter();
 const store = useStore();
 const form = reactive({
-    email: 'markusromaniw@gmx.de',
+    email: '',
     password: '',
     username: '', // Only for registration
     confirmPassword: '' // Only for registration
@@ -52,6 +46,7 @@ const form = reactive({
 const authMode = ref('login');
 const isSubmitting = ref(false);
 const errorMessage = ref('');
+const infoMessage = ref('');
 const showDirectoryPicker = ref(false);
 
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
@@ -59,7 +54,6 @@ const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 const championBackgroundStyle = computed(() => {
     const urlHelper = getUrlHelper();
     const imageUrl = urlHelper.getChampionImageSource('splash', 'Ahri');
-
     return {
         backgroundImage: `url('${imageUrl}')`,
         opacity: 1
@@ -73,15 +67,22 @@ const toggleAuthMode = () => {
 const handleSubmit = async () => {
     isSubmitting.value = true;
     errorMessage.value = '';
+    infoMessage.value = '';
 
     try {
         if (authMode.value === 'register' && form.password !== form.confirmPassword) {
             throw new Error('Passwords do not match');
         }
         if (authMode.value === 'login' || (authMode.value === 'register' && form.password === form.confirmPassword)) {
-            // Attempt login or registration
-            await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', form);
-            router.replace('/ChampionPage');
+            const payload = { ...form };
+            await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', payload);
+            if (authMode.value === 'register') {
+                infoMessage.value = 'Please check your email to verify your account and complete the registration.';
+                form.password = '';
+                authMode.value = 'login';
+            } else {
+                router.replace('/ChampionPage');
+            }
         } else {
             throw new Error('Passwords do not match');
         }
@@ -92,7 +93,6 @@ const handleSubmit = async () => {
     }
 };
 </script>
-
 
 <style scoped>
 .fade-enter-active,
@@ -107,14 +107,12 @@ const handleSubmit = async () => {
 
 .background-image-container {
     position: absolute;
-    /* Ensure the container can hold the pseudo-element */
     width: 100%;
     height: 100%;
     background-size: cover;
     background-position: bottom right;
     background-repeat: no-repeat;
     z-index: -1;
-    /* Ensure it's behind other content */
 }
 
 .background-image-container::before {
