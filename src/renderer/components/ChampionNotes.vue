@@ -1,28 +1,38 @@
 <template>
 	<div class="notes-container">
 		<!-- Custom Header -->
+		<div class="widget-header">
+			<i class="fas fa-sticky-note note-icon"></i>
+			<span class="widget-header-title ms-1">Champion Notes</span>
+		</div>
 
-		<!-- Editor and Status Message -->
 		<!-- Editor and Status Message -->
 		<EditorMenuBar :editor="editor" />
 		<div class="editor-wrapper">
-			<editor-content :editor="editor" class="editor-content" />
+			<editor-content :editor="editor" class="editor-content" :class="[borderColorClass]" />
 		</div>
-		<div class="status-container">
-			<div v-if="notesState === 'editing'" key="editing" class="status-message">
-				<i class="fas fa-edit text-warning"></i> Editing...
+		<div class="editor-footer-bar">
+			<div class="left-status">
+				<!-- Save Button -->
+				<button @click="manualSave" :class="['btn', 'button', buttonTextColorClass]">
+					<i class="fas fa-save"></i> Save
+				</button>
 			</div>
-			<div v-if="notesState === 'saved'" key="saved" class="status-message">
-				<i class="fas fa-check text-success"></i> Saved!
+			<div class="right-status">
+				<!-- Status Messages -->
+				<span v-if="notesState === 'unsaved'" :class="[buttonTextColorClass]">
+					<i class="fas fa-exclamation-triangle text-warning"></i> Unsaved
+				</span>
+				<span v-else-if="notesState === 'saved'" :class="[buttonTextColorClass]">
+					<i class="fas fa-check-circle text-success"></i> Saved
+				</span>
+				<span v-else-if="notesState === 'neutral'">
+					<i class="fas fa-check-circle text-muted"></i>
+				</span>
 			</div>
 		</div>
-
-		<!-- Shared Notes Modal -->
-		<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
-			title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
 	</div>
 </template>
-
 
 <script setup>
 import { ref, onBeforeUnmount, onMounted, watch, computed } from 'vue';
@@ -62,8 +72,8 @@ const editor = useEditor({
 		},
 	},
 	onUpdate: ({ editor }) => {
-		notesState.value = 'editing';
-		debouncedSave(editor.getHTML());
+		notesState.value = 'unsaved';
+		// debouncedSave(editor.getHTML());
 	},
 });
 
@@ -75,6 +85,31 @@ onBeforeUnmount(() => {
 });
 
 let saveTimeout = null;
+
+// Computed property for button text color
+const buttonTextColorClass = computed(() => {
+	switch (notesState.value) {
+		case 'unsaved':
+			return 'text-warning';
+		case 'saved':
+			return 'text-success';
+		default:
+			return 'text-muted';
+	}
+});
+
+// Computed property for border color class
+const borderColorClass = computed(() => {
+	switch (notesState.value) {
+		case 'unsaved':
+			return 'border-warning';
+		case 'saved':
+			return 'border-success';
+		default:
+			return 'border-muted';
+	}
+});
+
 
 // Fetch notes for the current champion
 async function fetchAndSetNotes(currentChampionId) {
@@ -93,8 +128,8 @@ function debouncedSave(content) {
 		notesState.value = 'saved'; // Update state to 'saved' after successful save
 		setTimeout(() => {
 			notesState.value = 'neutral'; // Reset to 'neutral' after some time
-		}, 2000);
-	}, 2000); // Save 1 second after the last keystroke
+		}, 1000);
+	}, 1000); // Save 1 second after the last keystroke
 }
 
 // Save champion notes
@@ -107,6 +142,16 @@ async function saveChampionNotes(content) {
 	} catch (error) {
 		console.error('Error saving notes:', error);
 	}
+}
+
+// Manual save function triggered by the save button
+async function manualSave() {
+	const content = editor.value?.getHTML();
+	await saveChampionNotes(content);
+	notesState.value = 'saved';
+	setTimeout(() => {
+		notesState.value = 'neutral'; // Reset to 'neutral' after some time
+	}, 1000);
 }
 
 watch(championA, async (newChampionA) => {
@@ -137,100 +182,126 @@ onMounted(async () => {
 });
 </script>
 
+
 <style>
+
+
+.champion-matchup-icon {
+	width: 50px;
+	height: auto;
+	background: var(--hextech-black);
+	border: 0px solid var(--blue-7);
+}
+
+.notes-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	position: relative;
+	width: 100%;
+	background: #091014;
+	border-radius: 0 0 12px 12px;
+	
+	padding: 3rem 3rem;
+	padding-bottom: 3rem;
+	color: var(--gold-1);
+}
+
 .editor-wrapper {
 	flex: 1;
 	display: flex;
 	overflow: hidden;
 	border-radius: 8px;
+	/* Leave space for footer */
+	width: 100%;
+}
+
+.editor-content {
+	flex: 1;
+	width: 100%;
+	/* Ensure it takes full width */
+	min-height: 335px;
+	max-height: 335px;
+	border: 1px solid;
+	margin: 2px;
+	border-radius: 8px;
+	transition: border-color 0.3s ease;
+	padding: .5rem;
+}
+
+.editor-content:focus {
+	/* Highlighted border color */
 }
 
 .ProseMirror {
 	flex: 1;
-	min-height: 360px;
-	max-height: 360px;
+	width: 100%;
+	/* Ensure it takes full width */
+	min-height: 322px;
+	/* Minimum height to prevent shrinking */
+	max-height: 322px;
 	overflow-y: auto;
 	box-sizing: border-box;
 	outline: none;
-	border: 1px solid #dddddd15;
-	border-radius: 8px;
-	padding: 12px 14px;
+	border-radius: 12px;
+	padding: .5rem;
 	font-size: 0.9rem;
 	font-weight: 400;
 	background: linear-gradient(to right, #091014, #060c11a8);
+	transition: border-color 0.3s ease;
+	/* Smooth transition for border color */
 }
 
-.ProseMirror:focus {
-	border: 1px solid #dddddd98;
+.ProseMirror:focus-within {
+	border-color: #ffffff;
+	/* Highlight border color when focused */
+}
+
+.editor-footer-bar {
+	display: flex;
+	justify-content: space-between;
+	padding-right: 10px;
+	font-size: 0.9rem;
+	position: relative;
+	right: 0;
+	border-radius: 12px;
+	left: 0;
+	bottom: 0;
+}
+
+.left-status,
+.right-status {
+	display: flex;
+	align-items: center;
 }
 
 /* Specific rule to remove margin from <p> inside <li> */
 .ProseMirror ul li p {
 	margin-bottom: 0 !important;
-	/* Ensure no margin-bottom */
 }
 
-.notes-container {
-	display: flex;
-	position: relative;
-	flex-direction: column;
-	height: 100vh;
-	overflow: hidden;
+.text-warning {
+	color: #ffc107 !important;
 }
 
-.header-actions {
-	display: flex;
-	align-items: center;
+.text-success {
+	color: #28a745 !important;
 }
 
-.editor-wrapper {
-	flex: 1;
-	overflow: hidden;
-	border-radius: 4px;
-	margin-bottom: .5rem;
-	padding: 5px;
-	display: flex;
-	flex-direction: column;
+.text-muted {
+	color: #6c757d !important;
 }
 
-.menu-bar {
-	margin-bottom: 10px;
+.border-warning {
+	border-color: #ffc107 !important;
 }
 
-.menu-bar button {
-	margin-right: 5px;
-	padding: 5px 10px;
-	border: none;
-	background-color: transparent;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: background-color 0.3s ease;
+.border-success {
+	border-color: #28a745 !important;
 }
 
-.menu-bar button.is-active {
-	color: #007bff;
-}
-
-.menu-bar button:hover {
-	background-color: rgba(0, 123, 255, 0.1);
-}
-
-.menu-bar i {
-	font-size: 16px;
-}
-
-.share-button {
-	text-align: right;
-}
-
-.status-container {
-	position: absolute;
-	text-align: right;
-	bottom: 0;
-	right: 18px;
-	font-size: 0.8rem;
-	font-weight: 400;
+.border-muted {
+	border-color: #6c757d2c !important;
 }
 </style>

@@ -41,6 +41,7 @@ const props = defineProps({
 <style scoped>
 .menu-bar {
     margin-bottom: 10px;
+    margin-top: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;

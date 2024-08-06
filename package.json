@@ -1,11 +1,12 @@
 {
   "name": "SoloQ",
   "productName": "SoloQ",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "SoloQ is a desktop application that helps you in your journey to become a better League of Legends player. You can make notes about your games, track your progress, and get insights about your performance.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
   "scripts": {
+    "build-and-publish": "npm run package && npm run make && npm run publish",
     "start": "cross-env NODE_ENV=DEVELOPMENT electron-forge start",
     "start_prod": "cross-env NODE_ENV=production electron-forge start",
     "build": "cross-env NODE_ENV=production npm run package && npm run dist",

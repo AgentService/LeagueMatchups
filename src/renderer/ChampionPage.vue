@@ -63,29 +63,30 @@
 							</div>
 						</div>
 						<div class="col-xxl-8 col-xl-8">
-							<div class="row mb-4 mt-4">
+							<div class="row mb-0 mt-4">
 								<div class="col-xxl-6">
 									<div class="d-flex flex-row justify-content-evenly">
-											<div class="card-large mb-4"
-												:class="{ 'ban-pick-border-animation': playerTurn }">
-												<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-												<ChampionNotes />
-											</div>
+										<div class="card-large"
+											:class="{ 'ban-pick-border-animation': playerTurn }">
+											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+										</div>
 										<div class="vs-container">
 											<span>vs</span>
 										</div>
 									</div>
 								</div>
 								<div class="col-xxl-6">
-											<div class="card-large mb-4">
-												<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-												<MatchupNotes />
-											</div>
+									<div class="card-large">
+										<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+									</div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-xxl-12">
-									<div class="col-xxl-4"></div>
+								<div class="col-xxl-6">
+									<ChampionNotes />
+								</div>
+								<div class="col-xxl-6">
+									<MatchupNotes />
 								</div>
 							</div>
 						</div>
@@ -310,7 +311,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 </script>
 
 <style>
-
 .teams-container {
 	display: flex;
 	justify-content: space-between;
@@ -341,14 +341,15 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 .widget-header {
-	font-size: .9rem;
+	padding-bottom: 0.25rem;
+	margin-bottom: 0rem;
 	display: flex;
-	line-height: 1;
-	justify-content: space-between;
+	font-size: 0.9rem;
 	align-items: center;
 	width: 100%;
 	color: var(--gold-3);
-	padding: .25rem 0;
+	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+
 }
 
 .widget-header-title {
@@ -549,10 +550,11 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	flex-direction: column;
 	color: var(--gold-1);
 	padding: 1rem 1rem;
-	max-height: 750px;
-	min-height: 750px;
+	max-height: 230px;
+	min-height: 230px;
+	width: 100%;
 	z-index: auto;
-	border-radius: 12px;
+	border-radius: 12px 12px 0 0;
 	background-image: linear-gradient(to right, #091014, #091014);
 }
 
@@ -756,7 +758,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background-color: transparent;
 	font-weight: 600;
 	text-align: start;
-	font-size: 1rem;
 	padding-bottom: 0.5rem;
 	margin-bottom: 0.5rem;
 	display: flex;

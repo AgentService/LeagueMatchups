@@ -279,14 +279,6 @@
 		</div>
 	</div>
 
-	<!-- Custom Header -->
-	<div class="card-header-custom d-flex justify-content-between align-items-center">
-		<!-- Header Title -->
-		<span v-if="instanceId === 1">Champion Notes</span>
-		<span v-if="instanceId === 2">Matchup Notes</span>
-		<div class="header-actions">
-		</div>
-	</div>
 	<!-- Overlay for Summoner Spell Selection -->
 	<!-- 
 									<div class="tooltip-container">
@@ -1031,22 +1023,16 @@ export default {
 
 .overlay-grid-item {
 	width: 50px;
-	/* Match the ability icon size */
 	height: 50px;
-	/* Match the ability icon size */
 	border: 1px solid #333;
-	/* Match the ability icon border */
 	border-radius: 4px;
-	/* Optional, if ability icons have rounded corners */
 	overflow: hidden;
-	/* Keep the images within the bounds */
 }
 
 .overlay-spell-icon {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	/* Ensure the image covers the item area */
 }
 
 .overlay-grid {
@@ -1064,9 +1050,7 @@ export default {
 .summoner-spells-container {
 	display: flex;
 	position: relative;
-
 	justify-content: center;
-	/* Adjust as necessary to align with the rest of your layout */
 	align-items: start;
 	margin-left: 1rem;
 
@@ -1075,7 +1059,6 @@ export default {
 .summoner-ability {
 	border: 2px solid var(--gold-4);
 	margin: 0 5px;
-	/* Space between the summoner spell icons */
 }
 
 .summoner-ability-icon-wrapper {
@@ -1085,9 +1068,7 @@ export default {
 
 .summoner-ability-icon {
 	width: 35px;
-	/* Adjust based on your icon size */
 	height: 35px;
-	/* Adjust based on your icon size */
 }
 
 .summoner-ability-label {
@@ -1107,7 +1088,6 @@ export default {
 
 .stats-tooltip {
 	text-align: left;
-	/* Add this line to right-align the content */
 	position: absolute;
 	right: -1%;
 	bottom: 0;
@@ -1349,7 +1329,7 @@ export default {
 
 .champion-card {
 	display: flex;
-	min-height: 250px;
+	min-height: 180px;
 	flex-direction: column;
 	padding: 0rem;
 
@@ -1423,7 +1403,7 @@ export default {
 
 .search-bar .input-group-text {
 	height: 30px;
-	color: var(--gold-1);
+	color: var(--gold-2);
 	background: var(--grey-cool);
 	border: 0;
 	z-index: 100;
