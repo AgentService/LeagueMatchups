@@ -36,7 +36,7 @@
 						</div>
 					</div>
 				</div>
-				<button key="championA-community-notes-button" class="btn button " @click="showNotesModal = true"
+				<button key="championA-community-notes-button" class="btn button position-absolute bottom-0 " @click="showNotesModal = true"
 					aria-label="Community Notes for {{ championA.name }}"
 					:title="'Community Notes for ' + championA.name" v-if="instanceId === 1">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared

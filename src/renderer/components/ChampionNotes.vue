@@ -203,8 +203,8 @@ onMounted(async () => {
 	background: #091014;
 	border-radius: 0 0 12px 12px;
 	
-	padding: 3rem 3rem;
-	padding-bottom: 3rem;
+	padding: 2.5rem 2.5rem;
+	padding-bottom: 1.5rem;
 	color: var(--gold-1);
 }
 
