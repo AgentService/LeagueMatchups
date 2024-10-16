@@ -9,7 +9,7 @@ const {
 const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
 import ChampSelectSession from "./classes/ChampSelectSession";
-import { setupWebSocketEventHandlers } from "./classes/WebSocketEvents";
+// import { setupWebSocketEventHandlers } from "./classes/WebSocketEvents";
 import WebSocketEventHandlers from "./classes/WebSocketEventHandlers";
 
 autoUpdater.channel = "alpha";
@@ -141,7 +141,9 @@ async function initializeWebSocket(credentials) {
       });
       debug("WebSocket connection established.");
       const webSocketEventHandlers = new WebSocketEventHandlers(mainWindow);
+
       webSocketEventHandlers.setup(ws);
+
       // setupWebSocketEventHandlers(ws, mainWindow);
     }
   } catch (error) {
@@ -149,72 +151,72 @@ async function initializeWebSocket(credentials) {
   }
 }
 
-function setupWebSocketSubscriptions(ws) {
-  let champSelectSession = null;
+// function setupWebSocketSubscriptions(ws) {
+//   let champSelectSession = null;
 
-  ws.subscribe("/lol-champ-select/v1/session", (event) => {
-    if (event.eventType === "Delete") {
-      log.info("Champ select session deleted.");
-      champSelectSession = null;
-      mainWindow.webContents.send("champ-select-session-update", null);
-      mainWindow.webContents.send("champ-select-phase-update", null);
-      return;
-    }
+//   ws.subscribe("/lol-champ-select/v1/session", (event) => {
+//     if (event.eventType === "Delete") {
+//       log.info("Champ select session deleted.");
+//       champSelectSession = null;
+//       mainWindow.webContents.send("champ-select-session-update", null);
+//       mainWindow.webContents.send("champ-select-phase-update", null);
+//       return;
+//     }
 
-    const oldSessionData = champSelectSession;
-    const newSessionData = new ChampSelectSession(event);
-    champSelectSession = newSessionData;
+//     const oldSessionData = champSelectSession;
+//     const newSessionData = new ChampSelectSession(event);
+//     champSelectSession = newSessionData;
 
-    mainWindow.webContents.send("champ-select-session-update", newSessionData);
+//     mainWindow.webContents.send("champ-select-session-update", newSessionData);
 
-    if (oldSessionData !== null) {
-      if (newSessionData.getPhase() !== oldSessionData.getPhase()) {
-        log.info("Champ select phase updated:", newSessionData.getPhase());
-        mainWindow.webContents.send(
-          "champ-select-phase-update",
-          newSessionData.getPhase()
-        );
-      }
+//     if (oldSessionData !== null) {
+//       if (newSessionData.getPhase() !== oldSessionData.getPhase()) {
+//         log.info("Champ select phase updated:", newSessionData.getPhase());
+//         mainWindow.webContents.send(
+//           "champ-select-phase-update",
+//           newSessionData.getPhase()
+//         );
+//       }
 
-      if (
-        newSessionData.isBanPhase() &&
-        oldSessionData.getPhase() === "PLANNING"
-      ) {
-        log.info("Ban phase started.");
-        mainWindow.webContents.send(
-          "champ-select-local-player-ban-turn",
-          newSessionData.ownBanActionId
-        );
-      }
+//       if (
+//         newSessionData.isBanPhase() &&
+//         oldSessionData.getPhase() === "PLANNING"
+//       ) {
+//         log.info("Ban phase started.");
+//         mainWindow.webContents.send(
+//           "champ-select-local-player-ban-turn",
+//           newSessionData.ownBanActionId
+//         );
+//       }
 
-      if (
-        newSessionData.inProgressActionIds.includes(
-          newSessionData.ownPickActionId
-        ) &&
-        !oldSessionData.inProgressActionIds.includes(
-          newSessionData.ownPickActionId
-        )
-      ) {
-        log.info("Pick phase started.");
-        mainWindow.webContents.send(
-          "champ-select-local-player-pick-turn",
-          newSessionData.ownPickActionId
-        );
-      }
+//       if (
+//         newSessionData.inProgressActionIds.includes(
+//           newSessionData.ownPickActionId
+//         ) &&
+//         !oldSessionData.inProgressActionIds.includes(
+//           newSessionData.ownPickActionId
+//         )
+//       ) {
+//         log.info("Pick phase started.");
+//         mainWindow.webContents.send(
+//           "champ-select-local-player-pick-turn",
+//           newSessionData.ownPickActionId
+//         );
+//       }
 
-      // Reflecting changes in champion picks
-      reflectChampionPicksChanges(oldSessionData, newSessionData);
+//       // Reflecting changes in champion picks
+//       reflectChampionPicksChanges(oldSessionData, newSessionData);
 
-      // Placeholder for additional logic you may need
-      // ...
-    } else {
-      mainWindow.webContents.send(
-        "champ-select-phase-update",
-        newSessionData.getPhase()
-      );
-    }
-  });
-}
+//       // Placeholder for additional logic you may need
+//       // ...
+//     } else {
+//       mainWindow.webContents.send(
+//         "champ-select-phase-update",
+//         newSessionData.getPhase()
+//       );
+//     }
+//   });
+// }
 
 // let previousPickState = {
 //   championId: null,
@@ -296,6 +298,9 @@ async function setupLeagueClientMonitoring() {
       awaitConnection: true,
       pollInterval: 2500,
     });
+
+    global.credentials = credentials;
+    
     console.log("League client found. Credentials obtained.");
 
     if (mainWindowReady && mainWindow && mainWindow.webContents) {
@@ -304,6 +309,7 @@ async function setupLeagueClientMonitoring() {
 
     const client = new LeagueClient(credentials, { pollInterval: 1000 });
 
+    // Initialize WebSocket and event handlers
     initializeWebSocket(credentials)
       .then(() => {
         log.info("initializeWebSocket completed");
@@ -311,7 +317,10 @@ async function setupLeagueClientMonitoring() {
         fetchSummonerNameWithRetry(credentials)
           .then((summonerName) => {
             log.info("Summoner name fetched:", summonerName);
-            mainWindow.webContents.send("summoner-name-response", currentSummoner);
+            mainWindow.webContents.send(
+              "summoner-name-response",
+              currentSummoner
+            );
           })
           .catch(console.error);
       })
@@ -326,17 +335,54 @@ async function setupLeagueClientMonitoring() {
         })
         .catch(console.error);
     });
+
     client.on("disconnect", () => {
       console.log("League client disconnected.");
       mainWindow.webContents.send("client-status", { connected: false });
     });
+
     client.start();
   } catch (error) {
     console.error("Error setting up monitoring:", error);
   }
 }
 
+
 setupLeagueClientMonitoring();
+
+ipcMain.handle("get-current-game-phase", async () => {
+  try {
+    const credentials = await authenticate({ awaitConnection: false });
+    const { port, password } = credentials;
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Ignore TLS verification for local requests
+
+    const response = await fetch(
+      `https://127.0.0.1:${port}/lol-gameflow/v1/gameflow-phase`,
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString(
+            "base64"
+          )}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Restore TLS verification after request
+
+    if (response.ok) {
+      const currentPhase = await response.json();
+      return currentPhase; // Return the current phase
+    } else {
+      throw new Error(`Failed to fetch game phase. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error fetching game phase:", error);
+    return null; // Return null or a default value in case of error
+  }
+});
+
 
 ipcMain.handle("check-client-status", async (event) => {
   try {

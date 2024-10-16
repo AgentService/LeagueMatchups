@@ -1,7 +1,11 @@
-scp -r -i ~/.ssh/id_rsa /c/App/app/MatchupX/server azateqq@35.207.145.5:/home/azateqq/
+scp -r -i ~/.ssh/id_rsa /c/App/app/MatchupX/server/api azateqq@35.207.145.5:/home/azateqq/
 ssh -i ~/.ssh/id_rsa azateqq@35.207.145.5
 ssh -i ~/.ssh/id_rsa github.barstool368@35.207.145.5
 psql -h 10.55.48.3 -U dbadmin -d "db-1"
 
 npm version patch # or 'minor' or 'major', depending on your update
 git push origin master --tags
+
+
+
+$ npm run build

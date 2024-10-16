@@ -17,8 +17,11 @@ let championDetailsCache = { data: null, version: null };
 const championsFilePath = "./api-data/champions.json";
 const championDetailsDirPath = "./api-data/champion_data";
 
-async function updateChampionData(currentVersion) {
+export async function updateChampionData(currentVersion, dbPool) {
   let localVersionInfo;
+  if (!currentVersion) {
+    currentVersion = await getLatestVersion();
+  }
 
   try {
     localVersionInfo = await readJsonFile(championsFilePath);
@@ -27,31 +30,27 @@ async function updateChampionData(currentVersion) {
     console.error("Error reading local champion version:", error);
     localVersionInfo = { version: null };
   }
-  debug("currentVersion", currentVersion);
-  if (localVersionInfo.version !== currentVersion) {
-    console.log(
-      `New version found: ${currentVersion}. Updating champion data...`
-    );
 
-    // Ensure the champion_data directory exists
+  if (localVersionInfo.version !== currentVersion) {
     if (!existsSync(championDetailsDirPath)) {
       mkdirSync(championDetailsDirPath, { recursive: true });
     }
-    debug("fetchChampionList");
+
     const championsList = await fetchChampionList(currentVersion);
 
-    // Prepare the object to write, including metadata and new data
     const fileContent = {
       type: "champion",
       format: "standAloneComplex",
-      version: currentVersion, // Updated version
-      data: championsList, // New champion data
+      version: currentVersion,
+      data: championsList,
     };
 
-    debug("writeJsonFile");
     writeJsonFile(championsFilePath, fileContent);
+    debug("champions.json updated successfully.");
 
-    debug("fetchAllChampionDetails");
+    // Update the database with the new champions
+    await updateChampionsDatabase(dbPool, championsList);
+
     const allChampionDetails = await fetchAllChampionDetails(currentVersion);
     for (const championName in allChampionDetails) {
       const filePath = `${championDetailsDirPath}/${championName}.json`;
@@ -67,6 +66,30 @@ async function updateChampionData(currentVersion) {
     console.log("Champion data is already up-to-date.");
   }
 }
+
+
+async function updateChampionsDatabase(dbPool, championsList) {
+  // Fetch existing champion names from the database
+  const existingChampions = await dbPool.query(`SELECT name FROM champions`);
+  const existingChampionNames = existingChampions.rows.map(row => row.name);
+
+  // Loop through each champion in the fetched list
+  for (const championKey in championsList) {
+    const champion = championsList[championKey];
+
+    // If the champion doesn't already exist in the database, insert it
+    if (!existingChampionNames.includes(champion.name)) {
+      await dbPool.query(
+        `INSERT INTO champions (key, name) VALUES ($1, $2)
+         ON CONFLICT (key) DO NOTHING;`,
+        [parseInt(champion.key), champion.name]
+      );
+      debug(`Inserted new champion: ${champion.name}`);
+    }
+  }
+}
+
+
 
 async function fetchChampionList(currentVersion) {
   try {
@@ -146,9 +169,13 @@ async function loadChampionDetailsCache(currentVersion) {
   }
 }
 
-export async function initializeChampionDataCache() {
+export async function initializeChampionDataCache(dbPool) {
   const currentVersion = await getLatestVersion();
-  await updateChampionData(currentVersion);
+
+  debug("Updating champions database...");
+  await updateChampionData(currentVersion, dbPool);
+  debug("Champions database updated successfully.");
+
   // Load from local cache first
   await loadChampionListCache(currentVersion);
   await loadChampionDetailsCache(currentVersion);
@@ -180,21 +207,30 @@ async function updateChampionDataCache(currentVersion) {
 }
 
 const getChampionTips = (req, res) => {
-  const championId = req.params.championId;
+  const championId = req.params.championId;  // Use championId directly
   const filePath = `./api-data/champion_tips.json`;
 
   try {
     const championData = readJsonFile(filePath);
+
+    // Log the championId and available keys for debugging
+    console.debug("Requested championId:", championId);
+    console.debug("Available champions in JSON:", Object.keys(championData));
+
     if (championData[championId]) {
       res.json({ championId, ...championData[championId] });
     } else {
-      res.status(404).json({ error: "Champion tips not found" });
+      console.warn("No tips available for champion:", championId);
+      res.status(200).json({ message: "No tips available for this champion." });
     }
   } catch (error) {
     console.error("Error reading JSON file:", error);
     res.status(500).json({ error: "Failed to read champion data file" });
   }
 };
+
+
+
 
 // const getChampionTips = async (req, res) => {
 //   const championName = req.params.championId; // Here, championId is actually the champion's name

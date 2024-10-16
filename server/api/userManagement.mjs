@@ -58,10 +58,6 @@ async function sendVerificationEmail(email, verificationToken) {
   // Use the Brevo API key from environment variables
   const brevoApiKey = process.env.BREVO_API_KEY;
 
-  // Log the API key to verify it's being set correctly (remove in production)
-  debug(`Brevo API Key: ${brevoApiKey}`);
-  console.log(`Brevo API Key: ${brevoApiKey}`);
-
   // Configure Brevo SDK
   const defaultClient = SibApiV3Sdk.ApiClient.instance;
   const apiKey = defaultClient.authentications["api-key"];

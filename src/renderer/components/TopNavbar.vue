@@ -10,6 +10,9 @@
 						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Journal</router-link>
 					<router-link to="/userJourney"
 						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Test</router-link>
+					<router-link to="/ReviewPage"
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Review</router-link>	
+
 				</div>
 				<div class="d-flex justify-content-center align-items-center ">
 					<div class="button-container">

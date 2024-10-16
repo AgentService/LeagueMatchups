@@ -172,20 +172,55 @@ async function startServer() {
 if (process.env.NODE_ENV === "development") {
   debug("Starting server in development mode", process.env.NODE_ENV);
   import("dotenv").then((dotenv) => {
+    debug("Loading environment variables from .env");
     dotenv.config();
-    initializeRiotAPI(); // Initialize Riot API client after loading .env
-    initializeChampionDataCache(); // Initialize champion data cache
-    startServer();
+
+    debug("Initializing Riot API client");
+    initializeRiotAPI();
+
+    debug("Starting the server...");
+    startServer().then(() => {
+      const { dbPool } = app.locals; // Access dbPool after startServer
+      debug("Server started. dbPool initialized.");
+      debug("Initializing champion data cache with dbPool...");
+      debug("Checking dbPool before initialzeCDC:", dbPool);
+
+      initializeChampionDataCache(dbPool).then(() => {
+        debug("Champion data cache initialized successfully DEV.");
+      }).catch((error) => {
+        debug("Error initializing champion data cache:", error);
+      });
+    });
   });
 } else {
   debug("Starting server in production mode");
   dotenv.config(); // Load environment variables
   fetchAndSetSecrets()
-    .then(initializeRiotAPI)
-    .then(initializeChampionDataCache)
-    .then(startServer) // Your function to start the server, define routes, etc.
-    .catch(console.error); // Proper error handling
+    .then(() => {
+      debug("Secrets fetched and set successfully.");
+      debug("Initializing Riot API client");
+      initializeRiotAPI();
+
+      debug("Starting the server...");
+      return startServer();
+    })
+    .then(() => {
+      const { dbPool } = app.locals; // Access dbPool after startServer
+      debug("Server started. dbPool initialized.");
+      debug("Initializing champion data cache with dbPool...");
+      debug("Checking dbPool before initialzeCDC:", dbPool);
+
+      return initializeChampionDataCache(dbPool);
+    })
+    .then(() => {
+      debug("Champion data cache initialized successfully PROD.");
+    })
+    .catch((error) => {
+      debug("Error during server startup or champion data cache initialization:", error);
+    });
 }
+
+
 
 // else {
 // 	debug("Starting server in production mode");

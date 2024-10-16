@@ -13,7 +13,7 @@
 					:alt="currentMatchup.championAName" class="champion-matchup-icon" /> -->
 				<!-- Champion Names and "vs" -->
 				<span class="vs-text">
-					vs </span>
+					 </span>
 				<!-- Champion B -->
 				<!-- <img :src="getChampionImageSource('small', currentMatchup.championBName)"
 					:alt="currentMatchup.championBName" class="champion-matchup-icon" /> -->

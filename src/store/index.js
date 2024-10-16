@@ -15,6 +15,7 @@ import { validateApiResponse, handleApiError } from "./modules/utilities.js";
 
 import VuexPersistence from "vuex-persist";
 import axios from "axios";
+import { metrics } from "./modules/metrics.js";
 
 // VuexPersistence for auth module
 const vuexLocalAuth = new VuexPersistence({
@@ -36,6 +37,7 @@ const vuexLocal = new VuexPersistence({
     "summoner",
     "userPreferences",
     "wsClient",
+    "metrics",
   ],
   reducer: (state) => ({
     champions: state.champions,
@@ -47,6 +49,7 @@ const vuexLocal = new VuexPersistence({
     summoner: state.summoner,
     userPreferences: state.userPreferences,
     wsClient: state.wsClient,
+    metrics: state.metrics,
   }),
 });
 
@@ -64,6 +67,7 @@ export const store = createStore({
     notes: notes,
     userPreferences: userPreferences,
     wsClient: wsClient,
+    metrics: metrics,
   },
 
   actions: {

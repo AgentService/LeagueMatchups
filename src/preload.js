@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld("api", {
     ipcRenderer.on("update-downloaded", callback),
   onUpdateError: (callback) => ipcRenderer.on("update-error", callback),
   checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
+  getCurrentGamePhase: () => ipcRenderer.invoke("get-current-game-phase"),
   send: (channel, data) => {
     const validChannels = ["open-path-dialog", "get-summoner-name"]; // Add more valid channels as needed
     if (validChannels.includes(channel)) {
@@ -78,7 +79,12 @@ contextBridge.exposeInMainWorld("ws", {
       "champ-select-local-player-pick-turn",
       "champ-select-enemy-pick-turn",
       "champ-select-done",
-    ]; // Whitelist channels
+      "game-end-event",
+      "game-start-event",
+      'gameflow-phase-change',
+      "get-current-game-phase",
+      "post-game-stats",
+    ];
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
       // Return a cleanup function

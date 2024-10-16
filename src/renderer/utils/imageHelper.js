@@ -24,21 +24,29 @@ class ImageUrlHelper {
 
   getChampionImageSource(type, championId) {
     let imagePath = "";
-    // Now using getters to dynamically decide the base URL
-    let baseUrl = this.baseVersionedUrl; // This now uses the getter for dynamic access
+    let baseUrl = this.baseVersionedUrl; // Use the getter for dynamic access
+
+    if (!championId) {
+      debugger
+      return ""; // Return early if no champion
+    } 
+
+    // Normalize championId by removing spaces (and any other necessary normalization)
+    const normalizedChampionId = championId.replace(/\s+/g, '');
+
     switch (type) {
       case "small":
-        imagePath = `/img/champion/${championId}.png`;
+        imagePath = `/img/champion/${normalizedChampionId}.png`;
         break;
       case "loading":
-        imagePath = `/img/champion/loading/${championId}_0.jpg`;
+        imagePath = `/img/champion/loading/${normalizedChampionId}_0.jpg`;
         break;
       case "splash":
         baseUrl = this.baseUnversionedUrl; // Splash images are version-independent
-        imagePath = `/img/champion/splash/${championId}_0.jpg`;
+        imagePath = `/img/champion/splash/${normalizedChampionId}_0.jpg`;
         break;
       case "tiles":
-        imagePath = `/img/tiles/${championId}_0.jpg`;
+        imagePath = `/img/tiles/${normalizedChampionId}_0.jpg`;
         break;
       default:
         imagePath = ""; // Or some default path
@@ -47,6 +55,7 @@ class ImageUrlHelper {
 
     return `${baseUrl}${imagePath}`;
   }
+
 
   getPassiveImageUrl(passive) {
     if (!passive?.image?.full) return "";

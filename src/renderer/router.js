@@ -9,6 +9,7 @@ import ChampionPage from "./ChampionPage.vue";
 import UserJourney from "./UserJourney.vue";
 import LoginPage from "./components/LoginPage.vue";
 import JournalPage from "./JournalPage.vue";
+import ReviewPage from "./components/ReviewPage.vue";
 //... other imports
 
 const routes = [
@@ -29,7 +30,7 @@ const routes = [
     component: JournalPage,
     meta: { requiresAuth: true },
   },
-  // Other routes...
+  { path: "/ReviewPage", name: "ReviewPage", component: ReviewPage }, // Review page route
 ];
 
 const router = createRouter({

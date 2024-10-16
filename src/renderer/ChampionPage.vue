@@ -1,99 +1,199 @@
 <template>
 	<div class="app-wrapper">
+
 		<div v-if="isLoading" class="loading-indicator">Loading...</div>
+
 		<div v-else class="app-container">
+
 			<div class="grid-container">
+
 				<div class="container-fluid">
+
 					<div class="row">
+
 						<div class="col-xxl-12 col-xl-12 mt-4">
+
 							<transition name="slide-down" mode="out-in">
+
 								<div v-if="currentPhase">
+
 									<div class="d-flex justify-content-between align-items-center w-100 text-light">
+
 										<transition name="slide-up" mode="out-in">
+
 											<div v-if="playerLocked" class="locked-indicator" key="locked">
+
 												<span>Locked</span>
+
 											</div>
+
 											<div v-else-if="playerTurn" class="locked-indicator" key="empty">
+
 												<span>Select your Champion</span>
+
 											</div>
+
 											<div v-else class="locked-indicator">
+
 												<span></span>
+
 											</div>
+
 										</transition>
+
 										<transition name="slide-up" mode="out-in">
+
 											<div :key="currentPhase" class="phase-text">
+
 												{{ phaseText }}
+
 											</div>
+
 										</transition>
+
 										<transition name="slide-up" mode="out-in">
+
 											<div v-if="playerTurn" class="timer">
+
 												<div>{{ formatTime(timerValue) }}</div>
+
 											</div>
+
 											<div v-else class="timer">
+
 												<div></div>
+
 											</div>
+
 										</transition>
+
 									</div>
+
 									<div class="teams-container">
+
 										<div class="my-team">
+
 											<div v-for="championId in myTeamPicks" :key="championId">
+
 												<img :src="myTeamImageUrls[championId]" alt="Champion icon"
 													class="champion-icon" />
+
 											</div>
+
 										</div>
+
 										<div class="enemy-team">
+
 											<div v-for="championId in enemyTeamPicks" :key="championId"
 												class="champion-icon">
+
 												<img :src="enemyTeamImageUrls[championId]" alt="Champion icon"
 													class="champion-icon" />
+
 											</div>
+
 										</div>
+
 									</div>
+
 								</div>
+
 							</transition>
+
 						</div>
+
 					</div>
+
 					<div class="row align-items-start">
+
 						<div class="col-xxl-2 col-xl-2 mt-4">
+
 							<div class="card-widget">
+
 								<LatestNoteWidget />
+
 							</div>
+
 							<div class="card-tips mt-2">
+
 								<ChampionTips :champion="championA" />
+
 							</div>
+
 						</div>
+
 						<div class="col-xxl-8 col-xl-8">
+
 							<div class="row mb-0 mt-4">
+
 								<div class="col-xxl-6">
+
 									<div class="d-flex flex-row justify-content-evenly">
-										<div class="card-large"
-											:class="{ 'ban-pick-border-animation': playerTurn }">
+
+										<div class="card-large" :class="{ 'ban-pick-border-animation': playerTurn }">
+
 											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+
 										</div>
+
 										<div class="vs-container">
+
 											<span>vs</span>
+
 										</div>
+
 									</div>
+
 								</div>
+
 								<div class="col-xxl-6">
+
 									<div class="card-large">
+
 										<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+
 									</div>
+
 								</div>
+
 							</div>
-							<div class="row">
+
+							<div class="row mb-4">
+
 								<div class="col-xxl-6">
+
 									<ChampionNotes />
+
+								</div>
+
+								<div class="col-xxl-6">
+
+									<MatchupNotes />
+
+								</div>
+
+							</div>
+
+							<div class="row">
+
+								<div class="col-xxl-6">
+									<PostGameReviewHistory />
 								</div>
 								<div class="col-xxl-6">
-									<MatchupNotes />
+									<!-- <PostGameReview /> -->
 								</div>
 							</div>
+
 						</div>
+
 					</div>
+
 				</div>
+
 			</div>
+
 		</div>
+
 	</div>
 </template>
 
@@ -118,6 +218,10 @@ import MatchupNotes from './components/MatchupNotes.vue';
 
 import MatchHistory from './components/MatchHistory.vue';
 import DailyNotes from './components/DailyNotes.vue';
+import EndOfGameQuestions from './components/EndOfGameQuestions.vue';
+import PostGameReview from './components/PostGameReview.vue';
+import PostGameReviewHistory from './components/PostGameReviewHistory.vue';
+
 import { on } from 'events';
 
 
@@ -304,7 +408,7 @@ const setChampionB = (champion) => {
 	store.dispatch('matchups/setChampionB', champion);
 };
 
-watch([championA, championB], (/* newValues, oldValues */) => {
+watch([championA, championB], ( /* newValues, oldValues */) => {
 	bothSelected = false;
 	handleMatchup();
 });
@@ -315,6 +419,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	z-index: 1000;
 }
 
 .my-team,
@@ -328,7 +433,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	background: var(--hextech-black);
 	border: 0px solid var(--blue-7);
 }
-
 
 .widget-footer {
 	bottom: -5px;
@@ -349,7 +453,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	width: 100%;
 	color: var(--gold-3);
 	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
-
 }
 
 .widget-header-title {
@@ -387,23 +490,24 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .phase-text {
 	width: 20%;
 	text-align: center;
-
 }
 
 /* If a section might be empty but you still want to reserve the space */
+
 .locked-indicator {
 	min-height: 60px;
 }
 
 /* Assuming enemy picks might have multiple items */
+
 .enemy-picks {
 	display: flex;
 	justify-content: space-around;
 	/* Adjust layout of enemy picks */
 }
 
-
 /* Transitions */
+
 .slide-down-enter-active,
 .slide-down-leave-active,
 .slide-up-enter-active,
@@ -449,6 +553,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 /* Save and delete buttons */
+
 .save-button,
 .add-button,
 .delete-button {
@@ -470,7 +575,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	gap: 5px;
 }
 
-
 .vs-container {
 	display: flex;
 	justify-content: center;
@@ -484,9 +588,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	height: 40px;
 	padding: 1rem;
 	color: #fff;
-	text-shadow: 0 0 5px #00ffeacd,
-		0 0 10px #00ffeac2,
-		0 0 20px #00ffeac3;
+	text-shadow: 0 0 5px #00ffeacd, 0 0 10px #00ffeac2, 0 0 20px #00ffeac3;
 	transform: scale(.775);
 	transition: transform 0.3s ease, box-shadow 0.3s ease;
 	user-select: none;
@@ -495,8 +597,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 .vs-container:hover {
 	cursor: default;
 }
-
-
 
 .card-container-header {
 	text-transform: uppercase;
@@ -526,7 +626,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	max-height: 390px;
 	min-height: 390px;
 	z-index: auto;
-
 }
 
 .card-small {
@@ -550,11 +649,13 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	flex-direction: column;
 	color: var(--gold-1);
 	padding: 1rem 1rem;
-	max-height: 230px;
-	min-height: 230px;
+	max-height: 320px;
+	min-height: 320px;
 	width: 100%;
 	z-index: auto;
 	border-radius: 12px 12px 0 0;
+	border: 1px solid rgba(128, 128, 128, 0.1);
+	border-bottom: 0;
 	background-image: linear-gradient(to right, #091014, #091014);
 }
 
@@ -624,8 +725,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	padding: .5rem;
 }
 
-
-
 * {
 	box-sizing: border-box;
 }
@@ -635,7 +734,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	justify-content: start;
 	align-items: center;
 	color: var(--gold-3);
-
 }
 
 .title-bar h5 {
@@ -651,7 +749,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	width: 100%;
 	max-width: 1920px;
 	min-height: 100%;
-
 }
 
 .app-container {
@@ -695,7 +792,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	.card-container {
 		max-height: 100%;
 	}
-
 }
 
 .gradient-top-border::after {
@@ -721,6 +817,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 /* Gradient Border Class for right border */
+
 .gradient-border2::after {
 	content: "";
 	position: absolute;
@@ -733,6 +830,7 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 }
 
 /* Gradient Border Laser Class for vertical border */
+
 .gradient-border-laser::after {
 	content: "";
 	position: absolute;
@@ -764,7 +862,6 @@ watch([championA, championB], (/* newValues, oldValues */) => {
 	color: var(--gold-3);
 	border-bottom: 1px solid rgba(128, 128, 128, 0.1);
 	user-select: none;
-
 }
 
 .tab-header {

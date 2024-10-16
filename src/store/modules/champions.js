@@ -150,6 +150,8 @@ export const champions = {
       );
       if (championTips) {
         debug("Champion tips:", championTips);
+      } else {
+        debug("No champion tips found for:", championId);
       }
       return championTips;
     },

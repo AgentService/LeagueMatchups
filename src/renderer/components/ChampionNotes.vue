@@ -202,9 +202,9 @@ onMounted(async () => {
 	width: 100%;
 	background: #091014;
 	border-radius: 0 0 12px 12px;
-	
-	padding: 2.5rem 2.5rem;
+	padding: 2rem 2rem;
 	padding-bottom: 1.5rem;
+	border: 1px solid rgba(128, 128, 128, 0.1);
 	color: var(--gold-1);
 }
 

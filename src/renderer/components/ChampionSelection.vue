@@ -6,8 +6,14 @@
 
 	<div class="note-card champion-card ">
 		<div class="background-image" :style="championBackgroundStyle"></div>
+		<!-- <div class="widget-header">
+			<i class="fas fa-sticky-note note-icon"></i>
+			<span class="widget-header-title ms-1" v-if="instanceId === 1">Select your Champion</span>
+			<span class="widget-header-title ms-1" v-if="instanceId === 2">Select your Opponent</span>
+		</div> -->
 		<div class="d-flex justify-content-between align-items-center">
 			<div class="search-container">
+				
 				<div class="search-bar position-relative">
 					<div class="input-group">
 						<span class="input-group-text" @click="showGrid">
@@ -36,15 +42,15 @@
 						</div>
 					</div>
 				</div>
-				<button key="championA-community-notes-button" class="btn button position-absolute bottom-0 " @click="showNotesModal = true"
+				<button key="championA-community-notes-button" class="btn button shared-button" @click="showNotesModal = true"
 					aria-label="Community Notes for {{ championA.name }}"
-					:title="'Community Notes for ' + championA.name" v-if="instanceId === 1">
-					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
+					:title="'Community Notes for ' + championA?.name" v-if="instanceId === 1">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 				</button>
-				<button key="championB-community-notes-button" class="btn button"
+				<button key="championB-community-notes-button" class="btn button shared-button"
 					@click="showMatchupNotesModal = true" aria-label="Community Notes for {{ championB.name }}"
-					:title="'Community Notes for ' + championB.name" v-if="instanceId === 2">
-					<i class="fa fa-sm fa-users" aria-hidden="true"></i> Shared
+					:title="'Community Notes for ' + championB?.name" v-if="instanceId === 2">
+					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 				</button>
 				<SharedNotesModal ref="NotesSharedModalRef" :isVisible="showNotesModal" notesType="champion"
 					title="Shared Champion Notes" :champion="championA" @update:isVisible="showNotesModal = $event" />
@@ -79,6 +85,7 @@
 		<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
 			<transition name="fade" mode="out-in">
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
+					
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 
@@ -612,7 +619,7 @@ export default {
 
 				return {
 					backgroundImage: `url('${imageUrl}')`,
-					opacity: 0.03
+					opacity: 0.2
 				};
 			}
 			return {};
@@ -805,6 +812,14 @@ export default {
 </script>
 
 <style scoped>
+.shared-button {
+	position: absolute;
+	bottom: -4rem;
+	right: 2rem;
+
+}
+
+
 .button-container {
 	display: flex;
 	justify-content: center;
@@ -903,7 +918,6 @@ export default {
 }
 
 .fav-button {
-	z-index: 112;
 	position: relative;
 	cursor: pointer;
 	border-radius: 6px;
@@ -926,15 +940,15 @@ export default {
 
 .fav-popup {
 	position: absolute;
-	top: -20px;
-	right: 140%;
+	top: -10px;
+	right: 120%;
 	background: var(--grey-4);
 	border: 1px solid var(--grey-3);
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	align-items: center;
-	z-index: 5;
+	z-index: 1111;
 	min-width: 182px;
 }
 
@@ -1329,10 +1343,9 @@ export default {
 
 .champion-card {
 	display: flex;
-	min-height: 180px;
+	min-height: 260px;
 	flex-direction: column;
-	padding: 0rem;
-
+	padding: 0 .5rem;
 }
 
 .champion-portrait {

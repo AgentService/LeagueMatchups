@@ -68,11 +68,9 @@ export const auth = {
     },
     async login({ commit }, credentials) {
       try {
-        const response = await axios.post(
-          `${baseUrl}/api/auth/login`,
-          credentials
-        );
+        const response = await axios.post(`${baseUrl}/api/auth/login`, credentials);
         const data = validateApiResponse(response);
+
         commit("SET_USER", data.user);
         commit("SET_TOKEN", data.token);
         commit("SET_REFRESH_TOKEN", data.refreshToken);
@@ -85,70 +83,63 @@ export const auth = {
       }
     },
 
-    // Inside your Vuex store actions
     async refreshToken({ commit, state, dispatch }) {
       if (!state.refreshToken) {
-        dispatch("logout");
-      } else {
-        try {
-          const refreshToken = state.refreshToken;
+        await dispatch("logout");
+        return;
+      }
 
-          const response = await axios.post(`${baseUrl}/api/auth/token`, {
-            refreshToken: refreshToken,
-          });
-          const { accessToken } = response.data;
+      try {
+        const refreshToken = state.refreshToken;
+        const response = await axios.post(`${baseUrl}/api/auth/token`, {
+          refreshToken,
+        });
+        const { accessToken } = response.data;
 
-          commit("SET_TOKEN", accessToken);
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${accessToken}`;
+        // Update the token in state and set Authorization headers
+        commit("SET_TOKEN", accessToken);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
-          return accessToken; // Ensure that the new access token is returned from the action
-        } catch (error) {
-          // Handle error, such as logging out the user if the refresh token is invalid
-          dispatch("logout");
-          console.error("Error refreshing the token:", error);
-          throw error; // Rethrow the error so the caller knows the refresh failed
-        }
+        return accessToken;
+      } catch (error) {
+        dispatch("logout"); // If refresh fails, log the user out
+        console.error("Error refreshing the token:", error);
+        throw error;
       }
     },
 
-    async reauthenticate({ commit, state }, { token, refreshToken }) {
+
+    async reauthenticate({ commit, state, dispatch }, { token, refreshToken }) {
       commit("SET_AUTH_LOADING", true);
       try {
-        // Attempt to verify the access token
-        let config = getAuthConfig(token); // Ensure getAuthConfig uses the provided token
+        // Ensure the token is valid before verifying
+        const validToken = await dispatch("ensureValidToken");
+        if (!validToken) throw new Error("Token refresh failed");
+
+        // Attempt to verify the access token with the API
+        let config = getAuthConfig(validToken);
         await axios.post(`${baseUrl}/api/auth/verifyToken`, {}, config);
-        // If verification is successful, only renew the session with the current token if it has changed
-        if (state.token !== token) {
-          commit("SET_TOKEN", token);
-          axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        // Set the token only if it has changed
+        if (state.token !== validToken) {
+          commit("SET_TOKEN", validToken);
+          axios.defaults.headers.common["Authorization"] = `Bearer ${validToken}`;
         }
       } catch (error) {
-        // Check if the error is a 401 Unauthorized
         if (error.response && error.response.status === 401) {
-          // If the token is expired or invalid, attempt to refresh it
           try {
-            const refreshResponse = await axios.post(
-              `${baseUrl}/api/auth/token`,
-              { refreshToken }
-            );
-            const newToken = refreshResponse.data.token;
-
-            // Only update the token if it is different from the current one
-            if (state.token !== newToken) {
-              commit("SET_TOKEN", newToken);
+            const refreshResponse = await dispatch("refreshToken");
+            if (refreshResponse) {
+              commit("SET_TOKEN", refreshResponse);
               axios.defaults.headers.common[
                 "Authorization"
-              ] = `Bearer ${newToken}`;
+              ] = `Bearer ${refreshResponse}`;
             }
           } catch (refreshError) {
-            // Handle failure to refresh the token, e.g., by logging out the user
             console.error("Token refresh failed:", refreshError);
-            store.dispatch("auth/logout");
+            dispatch("logout");
           }
         } else {
-          // For any other errors, log and continue the promise chain
           console.error("Token verification failed:", error);
         }
       } finally {
@@ -158,14 +149,14 @@ export const auth = {
 
     async logout({ commit }) {
       try {
-        // Retrieve the user ID or other identifier as needed
         const userId = this.state.auth.user.id;
         const token = this.state.auth.token;
-        let config = getAuthConfig(token); // Ensure getAuthConfig uses the provided token
+        let config = getAuthConfig(token);
 
-        // Call the /logout API to invalidate the refresh token server-side
+        // Invalidate the refresh token on the server
         await axios.post(`${baseUrl}/api/auth/logout`, { userId }, config);
-        // Proceed with client-side logout
+
+        // Clear tokens from Vuex store and localStorage
         commit("SET_USER", null);
         commit("SET_TOKEN", null);
         commit("SET_REFRESH_TOKEN", null);
@@ -173,19 +164,35 @@ export const auth = {
         delete axios.defaults.headers.common["Authorization"];
 
         debug("Logout successful");
-        router.push("/login"); // Make sure this is the last action
+        router.push("/login");
       } catch (error) {
         console.error("Logout failed:", error);
-        // Proceed with client-side logout
+
+        // Proceed with client-side logout even if the API call fails
         commit("SET_USER", null);
         commit("SET_TOKEN", null);
         commit("SET_REFRESH_TOKEN", null);
 
         delete axios.defaults.headers.common["Authorization"];
 
-        debug("Logout successful");
-        router.push("/login"); // Make sure this is the last action
+        router.push("/login");
       }
     },
+    async ensureValidToken({ state, dispatch }) {
+      if (isTokenExpired(state.token)) {
+        // Token is expired, refresh it
+        return await dispatch("refreshToken");
+      }
+      return state.token; // Token is still valid, proceed
+    }
   },
 };
+
+
+// Define isTokenExpired as a helper function outside the actions
+function isTokenExpired(token) {
+  if (!token) return true;
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const currentTime = Math.floor(Date.now() / 1000);
+  return decodedToken.exp < currentTime;
+}

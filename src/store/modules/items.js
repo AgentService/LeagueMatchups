@@ -9,8 +9,9 @@ export const items = {
       return state.items[id]?.description || "Description not found";
     },
     getItemById: (state) => (id) => {
-      return state.items[id] || null;
+      return state.items.data[id] || null;
     },
+
   },
   mutations: {
     SET_ALL_ITEMS(state, items) {

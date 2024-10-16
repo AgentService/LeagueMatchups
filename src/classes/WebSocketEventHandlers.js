@@ -1,6 +1,9 @@
 import EventEmitter from "events";
 import ChampSelectSession from "./ChampSelectSession";
 import Debug from "debug";
+
+const { authenticate } = require("league-connect");
+
 const debug = Debug("app:websocket-events");
 Debug.enable("*");
 
@@ -19,6 +22,11 @@ class WebSocketEventHandlers extends EventEmitter {
     debug("Setting up WebSocket event handlers.");
     ws.subscribe("/lol-champ-select/v1/session", (event) =>
       this.handleEvent(event)
+    );
+
+    // Subscribe to gameflow phase events for end of game
+    ws.subscribe("/lol-gameflow/v1/gameflow-phase", (event) =>
+      this.handleGameflowPhaseEvent(event)
     );
   }
 
@@ -39,14 +47,6 @@ class WebSocketEventHandlers extends EventEmitter {
   handleCreate(event) {
     debug("Champ select session created.");
     this.champSelectSession = new ChampSelectSession(event);
-    // this.sendToMainWindow(
-    //   "champ-select-session-update",
-    //   this.champSelectSession
-    // );
-    // this.sendToMainWindow(
-    //   "champ-select-phase-update",
-    //   this.champSelectSession.getPhase()
-    // );
   }
 
   handleDelete() {
@@ -65,12 +65,13 @@ class WebSocketEventHandlers extends EventEmitter {
 
     if (oldSessionData !== null) {
       if (newSessionData.getPhase() !== oldSessionData.getPhase()) {
-        debug("1 Champ select phase updated:", newSessionData.getPhase());
+        debug("Champ select phase updated:", newSessionData.getPhase());
         this.sendToMainWindow("champ-select-phase-update", {
           phase: newSessionData.getPhase(),
           timeLeft: newSessionData.timer.adjustedTimeLeftInPhase || 0,
         });
       }
+
       if (
         newSessionData.inProgressActionIds.includes(
           newSessionData.ownPickActionId
@@ -88,8 +89,117 @@ class WebSocketEventHandlers extends EventEmitter {
         }
       }
       this.reflectChanges(oldSessionData, newSessionData);
-    } else {
-      // debug("oldSessionData null", oldSessionData);
+    }
+  }
+
+  handleGameflowPhaseEvent(event) {
+    debug("Gameflow phase event received:", event);
+
+    const currentPhase = event;
+
+    this.sendToMainWindow("gameflow-phase-change", currentPhase);
+
+    console.log(`Gameflow phase updated: ${currentPhase}`);
+
+    switch (currentPhase) {
+      case "EndOfGame":
+      case "Lobby":
+        console.log("Game has ended or in Lobby.");
+        this.sendToMainWindow("game-end-event");
+        this.fetchPostGameData(); // Fetch post-game data
+        break;
+      case "InProgress":
+        console.log("Game has started.");
+        this.sendToMainWindow("game-start-event");
+        break;
+      case "WaitingForStats":
+        console.log("Waiting for stats...");
+        // Optional: Handle WaitingForStats if needed
+        break;
+      case "TerminatedInError":
+        console.log("Game terminated in error.");
+        this.sendToMainWindow("game-end-event");
+        this.fetchPostGameData(); // Fetch post-game data
+        break;
+      case "None":
+        console.log("No active game session.");
+        // Handle no active game scenario if necessary
+        break;
+      default:
+        console.log(`Unhandled phase: ${currentPhase}`);
+        break;
+    }
+  }
+
+  async fetchPostGameData() {
+    try {
+      const endpoint = "/lol-match-history/v1/products/lol/current-summoner/matches";
+      debug("Fetching match history from endpoint:", endpoint);
+
+      const matchHistoryData = await this.fetchFromApi(endpoint);
+      debug("Match history data received:", matchHistoryData);
+
+      if (matchHistoryData && matchHistoryData.games && matchHistoryData.games.games.length > 0) {
+        // Loop through the first 10 games and log their gameMode and gameType
+        for (let i = 0; i < Math.min(10, matchHistoryData.games.games.length); i++) {
+          const game = matchHistoryData.games.games[i];
+          debug(`Game ${i + 1}: gameMode = ${game.gameMode}, gameType = ${game.gameType}`);
+        }
+
+        // Update the filtering logic to check for ranked games in Classic mode
+        const validGames = matchHistoryData.games.games.filter(game =>
+          game.endOfGameResult !== "Abort_TooFewPlayers" &&
+          game.gameMode === "CLASSIC" &&
+          (game.queueId === 420 || game.queueId === 440) // Check for ranked queues
+        );
+        debug("Filtered valid ranked games:", validGames);
+
+        if (validGames.length > 0) {
+          const mostRecentGame = validGames[0];
+          this.sendToMainWindow("post-game-stats", mostRecentGame);
+          debug("Sent post-game stats to main window for game:", mostRecentGame.gameId);
+        } else {
+          console.log("No valid completed ranked games found.");
+          debug("No valid ranked games found after filtering.");
+        }
+      } else {
+        console.log("No game data available.");
+        debug("Match history data is empty or does not contain any games.");
+      }
+    } catch (error) {
+      console.error("Error fetching post-game stats:", error);
+      debug("Error occurred during fetchPostGameData execution:", error);
+    }
+  }
+  async fetchFromApi(endpoint) {
+    const credentials = await authenticate({ awaitConnection: false });
+    const { port, password } = credentials; // Ensure you have credentials available
+    const url = `https://127.0.0.1:${port}${endpoint}`;
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
+    try {
+      const fetch = (...args) =>
+        import("node-fetch").then(({ default: fetch }) => fetch(...args));
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString("base64")}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (response.ok) {
+        return await response.json();
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error during API fetch:", error);
+      throw error; // Ensure the error is propagated for further handling
+    } finally {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
     }
   }
 
@@ -142,7 +252,7 @@ class WebSocketEventHandlers extends EventEmitter {
         newLocalPlayerPickAction.championId;
       const isCompletionChange =
         this.previousPickState.completed !== newLocalPlayerPickAction.completed;
-      // debug("completed", newLocalPlayerPickAction.completed);
+
       if (isChampionChange || isCompletionChange) {
         if (newLocalPlayerPickAction.completed) {
           debug(

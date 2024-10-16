@@ -4,6 +4,7 @@ import express from "express";
 // import { getLatestVersion } from "./utilities.mjs";
 import Debug from "debug";
 import { snakeToCamelCase } from "./utilities.mjs";
+import { updateChampionData, initializeChampionDataCache } from "./champions.mjs"; // Import from champions.js
 
 const debug = Debug("api:matchups");
 const router = express.Router();
@@ -58,37 +59,52 @@ const router = express.Router();
 //     res.json(matchup);
 //   }
 // });
+
 router.get("/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
   debug("Fetching or creating specific matchups id: ", req.params.id);
-  debug("userX:", req.user);
 
-  const combinedId = req.params.id; // This is the "a-b" format ID used on the client
+  const combinedId = req.params.id;
+  const [championAName, championBName] = combinedId.split("-");
 
   try {
+    // Ensure both champions exist in the database
+    let championsCheck = await dbPool.query(
+      `SELECT name FROM champions WHERE name = ANY($1::text[])`,
+      [[championAName, championBName]]
+    );
+
+    if (championsCheck.rows.length !== 2) {
+      // Trigger a data update if either champion doesn't exist
+      await updateChampionData(null, dbPool);  // Pass dbPool here
+
+      // Recheck after update
+      championsCheck = await dbPool.query(
+        `SELECT name FROM champions WHERE name = ANY($1::text[])`,
+        [[championAName, championBName]]
+      );
+
+      if (championsCheck.rows.length !== 2) {
+        return res.status(400).json({ error: "Invalid champion names." });
+      }
+    }
+
     let matchup = await dbPool.query(
       `SELECT * FROM matchups WHERE combined_id = $1`,
       [combinedId]
     );
 
     if (matchup.rows.length === 0) {
-      // If the matchup doesn't exist, derive champion names from combinedId
-      const [championAName, championBName] = combinedId.split("-");
-
-      // Insert a new matchup
       matchup = await dbPool.query(
         `INSERT INTO matchups (champion_a_name, champion_b_name, combined_id) 
          VALUES ($1, $2, $3) RETURNING *;`,
         [championAName, championBName, combinedId]
       );
-      debug("matchup inserted:", matchup.rows[0]);
       const createdMatchup = snakeToCamelCase(matchup.rows[0]);
-      res.status(201).json(createdMatchup); // Send the converted object
+      res.status(201).json(createdMatchup);
     } else {
-      // Matchup found, format and send the response
       const foundMatchup = snakeToCamelCase(matchup.rows[0]);
-      debug("foundMatchup:", foundMatchup.combinedId);
-      res.json(foundMatchup); // Send the converted object
+      res.json(foundMatchup);
     }
   } catch (error) {
     debug("Error accessing database:", error);

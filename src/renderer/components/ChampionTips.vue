@@ -61,6 +61,9 @@ const selectedTip = ref(null);
 const championA = computed(() => store.getters['matchups/getChampionA']);
 
 const formatCategory = (key) => {
+	if (key === 'weaknesses') { 
+		key = 'weakness';
+	}
 	if (!key) return '';
 	key = key.replace(/([A-Z])/g, ' $1').toLowerCase();
 	key = key.replace(/^\w|\s\w/g, (str) => str.toUpperCase());
@@ -71,7 +74,6 @@ const getIconForKey = (category) => {
 	const icons = {
 		'identity': 'fa-solid fa-user-circle',
 		'strengths': 'fa-solid fa-thumbs-up',
-		'weaknesses': 'fa-solid fa-thumbs-down',
 		'earlygame': 'fa-solid fa-hourglass-start',
 		'midgame': 'fa-solid fa-hourglass-half',
 		'lategame': 'fa-solid fa-hourglass-end',
@@ -79,6 +81,7 @@ const getIconForKey = (category) => {
 		'counter': 'fa-solid fa-ban',
 		'mindset': 'fa-solid fa-brain',
 		'insights': 'fa-solid fa-lightbulb',
+		'weaknesses': 'fa-solid fa-thumbs-down',
 	};
 	return icons[category] || 'fa-solid fa-question-circle'; // Fallback icon
 };
@@ -96,17 +99,18 @@ watch(() => props.champion, (newChampion) => {
 .tip-button {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+	align-items: space-between;
+	justify-content: space-between;
 	background-color: transparent;
 	color: var(--black);
-	font-size: .875rem !important;
+	gap: 0.5rem;
+	font-size: .80rem !important;
 }
 
 .tips-card {
-	margin: 0 0;
+	margin: 0 auto;
 	hyphens: auto;
-	font-size: 0.9rem;
+	font-size: 0.875rem;
 	overflow-y: auto;
 	font-weight: 400;
 }
@@ -114,8 +118,8 @@ watch(() => props.champion, (newChampion) => {
 .flex-container {
 	display: flex;
 	flex-wrap: wrap;
-	gap: .25rem;
-	margin-top: 1rem;
+	gap: 0rem;
+	margin-top: .5rem;
 	justify-content: space-between;
 }
 
@@ -197,6 +201,6 @@ watch(() => props.champion, (newChampion) => {
 }
 
 .content-container {
-	padding: .5rem;
+	padding: .25rem;
 }
 </style>

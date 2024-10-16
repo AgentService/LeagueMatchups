@@ -6,6 +6,7 @@ let subscribers = [];
 let lastRefreshAttemptTimestamp = 0;
 const refreshThreshold = 10000; // 10 seconds
 
+// Check if we should refresh the token (based on the threshold)
 function shouldRefreshToken() {
   const now = Date.now();
   if (now - lastRefreshAttemptTimestamp > refreshThreshold) {
@@ -15,17 +16,19 @@ function shouldRefreshToken() {
   return false;
 }
 
+// Add a new subscriber (requests waiting for the new token)
 function subscribeTokenRefresh(cb) {
   subscribers.push(cb);
 }
 
+// Notify all subscribers when the token has been refreshed
 function onRefreshed(token) {
   subscribers.forEach((callback) => callback(token));
-  subscribers = []; // Reset the subscribers array after all callbacks have been called
+  subscribers = []; // Reset the subscribers array after notifying
 }
 
 axios.interceptors.response.use(
-  (response) => response,
+  (response) => response, // Return the response if successful
   (error) => {
     const {
       config,
@@ -33,39 +36,43 @@ axios.interceptors.response.use(
     } = error;
     const originalRequest = config;
 
-    // Check if we should refresh the token
+    // Check if we should refresh the token when a 401 Unauthorized is encountered
     if (status === 401 && !originalRequest._retry && shouldRefreshToken()) {
       originalRequest._retry = true;
+
+      // Prevent multiple refresh requests
       if (!isRefreshing) {
         isRefreshing = true;
         store
-          .dispatch("auth/refreshToken")
+          .dispatch("auth/refreshToken") // Dispatch the refreshToken action in the store
           .then((newToken) => {
-            axios.defaults.headers.common["Authorization"] =
-              "Bearer " + newToken;
+            axios.defaults.headers.common["Authorization"] = "Bearer " + newToken;
             originalRequest.headers["Authorization"] = "Bearer " + newToken;
             isRefreshing = false;
-            onRefreshed(newToken); // Notify subscribers
+            onRefreshed(newToken); // Notify all subscribers waiting for the token
           })
           .catch((refreshError) => {
             isRefreshing = false;
             console.error("Token refresh error:", refreshError);
-            // Handle token refresh error, e.g., by logging out
+            store.dispatch("auth/logout"); // Logout the user on token refresh failure
           });
       }
 
-      // Return the original request promise
+      // Queue the requests while waiting for the token refresh
       return new Promise((resolve, reject) => {
         subscribeTokenRefresh((token) => {
           originalRequest.headers["Authorization"] = "Bearer " + token;
-          resolve(axios(originalRequest));
+          resolve(axios(originalRequest)); // Retry the original request with the new token
         });
       });
-    } else if (status === 401) {
-      // If a refresh isn't allowed due to rate limiting, reject the promise
+    }
+
+    // Handle other cases of 401 Unauthorized
+    if (status === 401) {
       return Promise.reject("Refresh token rate limited.");
     }
 
+    // For all other errors, reject the promise
     return Promise.reject(error);
   }
 );

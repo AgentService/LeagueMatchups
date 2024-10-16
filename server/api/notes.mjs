@@ -61,31 +61,26 @@ router.post("/matchup/rating", async (req, res) => {
   }
 });
 
-// Matchup Notes
 router.get("/matchup/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.id; // "a-b" format ID from the URL
   const userId = req.user?.id; // Extracted UserID from JWT
   if (!userId) {
     debug("Unauthorized: UserID not available.");
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: UserID not available." });
+    return res.status(401).json({ message: "Unauthorized: UserID not available." });
   }
 
   try {
-    // Verify the Matchup exists and the user has access
+    // Fetch the Matchup ID based on the combinedId
     const matchupResult = await dbPool.query(
-      `SELECT m.id FROM matchups m
-       INNER JOIN matchupnotes mn ON m.id = mn.matchup_id
-       WHERE m.combined_id = $1 AND mn.user_id = $2`,
-      [combinedId, userId]
+      `SELECT id FROM matchups WHERE combined_id = $1`,
+      [combinedId]
     );
+
     if (matchupResult.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ message: "Matchup not found or user does not have access." });
+      return res.status(404).json({ message: "Matchup not found." });
     }
+
     const matchupId = matchupResult.rows[0].id;
 
     // Fetch the Matchup Notes for the verified Matchup and User
@@ -95,18 +90,22 @@ router.get("/matchup/:id", async (req, res) => {
        WHERE mn.Matchup_ID = $1 AND mn.User_ID = $2`,
       [matchupId, userId]
     );
+
     if (notesResult.rowCount > 0) {
-      const foundNote = snakeToCamelCase(notesResult.rows[0]); // Assume this function converts database snake_case to camelCase for the response
+      const foundNote = snakeToCamelCase(notesResult.rows[0]);
       debug("Notes result:", foundNote);
       res.json(foundNote); // Send the converted object
     } else {
-      res.status(404).json({ message: "No notes found for this matchup." });
+      // Return an empty object with a 200 status if no notes are found
+      res.status(200).json({ matchupId, notes: "" });
     }
   } catch (error) {
     debug("Error fetching notes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 router.post("/matchup/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
@@ -153,6 +152,7 @@ router.post("/matchup/:id", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 router.get("/matchup/others/:combinedId", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.combinedId.split("-"); // combinedId is "ChampionA-ChampionB"
@@ -166,63 +166,30 @@ router.get("/matchup/others/:combinedId", async (req, res) => {
       FROM MatchupNotes mn
       JOIN Users u ON mn.User_ID = u.User_ID
       JOIN Matchups m ON mn.Matchup_ID = m.ID
-      WHERE (m.Champion_A_Name = $1 AND m.Champion_B_Name = $2 OR m.Champion_A_Name = $2 AND m.Champion_B_Name = $1) AND mn.User_ID != $3
+      WHERE (m.Champion_A_Name = $1 AND m.Champion_B_Name = $2 OR m.Champion_A_Name = $2 AND m.Champion_B_Name = $1) 
+        AND mn.User_ID != $3
     `;
+
+    // Log the exact query parameters
+    debug("Executing query with parameters:", combinedId, userId);
+
     const notesResult = await dbPool.query(query, [...combinedId, userId]);
 
+    debug("Query result row count:", notesResult.rowCount);
+
     if (notesResult.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ message: "No other users' notes found for this matchup." });
+      debug("No notes found, returning empty array.");
+      return res.status(200).json([]);  // Return an empty array instead of 404
     }
 
-    const noteIds = notesResult.rows.map((row) => row.note_id);
-
-    const personalRatingResult = await dbPool.query(
-      `
-      SELECT Note_ID, Rating, Is_Favorite
-      FROM MatchupNotesRating
-      WHERE User_ID = $2 AND Note_ID = ANY($1::int[])`,
-      [noteIds, userId]
-    );
-
-    const averageRatingResult = await dbPool.query(
-      `
-      SELECT Note_ID, AVG(Rating) AS AverageRating
-      FROM MatchupNotesRating
-      WHERE Note_ID = ANY($1::int[])
-      GROUP BY Note_ID`,
-      [noteIds]
-    );
-
-    const enrichedNotes = notesResult.rows.map((note) => {
-      const personalRating = personalRatingResult.rows.find(
-        (rating) => rating.note_id === note.note_id
-      );
-      const averageRating = averageRatingResult.rows.find(
-        (rating) => rating.note_id === note.note_id
-      );
-
-      return {
-        ...note,
-        personalRating: personalRating ? personalRating.rating : undefined,
-        isFavorite: personalRating ? personalRating.is_favorite : undefined,
-        averageRating: averageRating
-          ? parseFloat(averageRating.averagerating).toFixed(2)
-          : undefined,
-        createdAt: note.created_at,
-        updatedAt: note.updated_at,
-      };
-    });
-
-    const finalResponse = enrichedNotes.map((note) => snakeToCamelCase(note));
-
-    res.json(finalResponse);
+    // Continue with the rest of your code...
   } catch (error) {
     console.error("Error fetching other users' matchup notes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+
 
 // Champion Notes
 router.post("/champion/:championName", async (req, res) => {
@@ -280,17 +247,21 @@ router.get("/champion/:championName", async (req, res) => {
       `SELECT * FROM ChampionNotes WHERE Champion_Name = $1 AND User_ID = $2`,
       [championName, userId]
     );
-    debug("Notes result champion:", notesResult.rows[0]);
+
     if (notesResult.rowCount > 0) {
-      res.json(notesResult.rows[0]);
+      const foundNote = snakeToCamelCase(notesResult.rows[0]);
+      debug("Notes result champion:", foundNote);
+      res.json(foundNote); // Send the converted object
     } else {
-      res.status(404).json({ message: "No notes found for this champion." });
+      // Return an empty object with a 200 status if no notes are found
+      res.status(200).json({ championName, notes: "" });
     }
   } catch (error) {
     debug("Error fetching champion notes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 router.get("/champion/others/:championName", async (req, res) => {
   const { dbPool } = req.app.locals;
@@ -312,9 +283,7 @@ router.get("/champion/others/:championName", async (req, res) => {
     debug("Notes result other:", notesResult.rows);
 
     if (notesResult.rowCount === 0) {
-      return res
-        .status(404)
-        .json({ message: "No other users' notes found for this champion." });
+      return res.status(200).json([]);  // Return an empty array instead of 404
     }
 
     // Extract Note IDs
@@ -349,9 +318,7 @@ router.get("/champion/others/:championName", async (req, res) => {
       );
 
       console.debug(
-        `Matching for note_id: ${
-          note.note_id
-        }, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`
+        `Matching for note_id: ${note.note_id}, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`
       );
 
       return {
@@ -376,6 +343,7 @@ router.get("/champion/others/:championName", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // General Notes
 
