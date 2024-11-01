@@ -1,16 +1,13 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import store from "../store";
-// // Lazy load the components
-// const ChampionMatchup = () => import('./ChampionPage.vue');
-// const UserJourney = () => import('./UserJourney.vue');
-// //... other lazy-loaded imports
 
-import ChampionPage from "./ChampionPage.vue";
-import UserJourney from "./UserJourney.vue";
-import LoginPage from "./components/LoginPage.vue";
-import JournalPage from "./JournalPage.vue";
-import ReviewPage from "./components/ReviewPage.vue";
-//... other imports
+// Lazy-load the components to improve performance
+const ChampionPage = () => import("./ChampionPage.vue");
+const UserJourney = () => import("./UserJourney.vue");
+const LoginPage = () => import("./components/LoginPage.vue");
+const JournalPage = () => import("./JournalPage.vue");
+const MatchupPage = () => import("./MatchupPage.vue");
+const ReviewPage = () => import("./components/ReviewPage.vue");
 
 const routes = [
   { path: "/", redirect: "/login" },
@@ -18,19 +15,29 @@ const routes = [
   {
     path: "/ChampionPage",
     component: ChampionPage,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles: ["admin", "member"] },
+  },
+  {
+    path: "/MatchupPage",
+    component: MatchupPage,
+    meta: { requiresAuth: true, roles: ["admin", "member"] },
   },
   {
     path: "/userJourney",
     component: UserJourney,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles: ["admin", "member"] },
   },
   {
     path: "/JournalPage",
     component: JournalPage,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, roles: ["admin", "member"] },
   },
-  { path: "/ReviewPage", name: "ReviewPage", component: ReviewPage }, // Review page route
+  {
+    path: "/ReviewPage",
+    name: "ReviewPage",
+    component: ReviewPage,
+    meta: { requiresAuth: true, roles: ["admin", "member"] },
+  },
 ];
 
 const router = createRouter({
@@ -40,18 +47,28 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const requiredRoles = to.meta.roles || []; // Get required roles from the route's meta
   const isLoggedIn = store.state.auth.isLoggedIn;
+  const userRole = store.state.auth.role; // Assuming role is stored in auth state
 
+  // Redirect to login if the route requires auth and the user is not logged in
   if (requiresAuth && !isLoggedIn) {
-    // Redirect users to the login page if the route requires authentication and they're not logged in
-    next("/login");
-  } else if (isLoggedIn && to.path === "/login") {
-    // Redirect logged-in users away from the login page (to championMatchup, for example)
-    next("/ChampionPage");
-  } else {
-    // Proceed as normal for all other cases
-    next();
+    return next("/login");
   }
+
+  // Redirect logged-in users away from the login page
+  if (isLoggedIn && to.path === "/login" && !requiredRoles.includes(userRole)) {
+    return next("/ChampionPage");
+  }
+
+  // Role-based access control
+  if (requiredRoles.length && !requiredRoles.includes(userRole)) {
+    // Redirect to MatchupPage if user doesn't have required role for the route
+    return next("/MatchupPage");
+  }
+
+  // Proceed as normal if all checks pass
+  next();
 });
 
 export default router;

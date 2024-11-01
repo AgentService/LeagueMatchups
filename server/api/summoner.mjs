@@ -39,45 +39,78 @@ const getSummonerDataByAccountId = async (userId, req) => {
 };
 
 router.get("/by-riot-id", async (req, res) => {
-  debugApi("Fetching summoner by Riot ID");
   const { dbPool } = req.app.locals;
   const { region, gameName, tagLine } = req.query;
   const userId = req.user.id;
 
   try {
-    const URL = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
-      gameName
-    )}/${encodeURIComponent(tagLine)}`;
-
+    // Fetch account data from Riot's API
+    const URL = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
     const accountData = await axios.get(URL, {
       headers: {
         "X-Riot-Token": process.env.VITE_RIOT_API_KEY,
       },
     });
-
     const puuid = accountData.data.puuid;
+    debugApi("Account data fetched from Riot API:", accountData.data);
 
-    debugApi("Fetching summoner by PUUID");
+    // Fetch summoner data by PUUID from Riot's API
     const rAPI = getRiotAPI();
     const summonerData = await rAPI.summoner.getByPUUID({
       region: PlatformId.EUW1,
       puuid: puuid,
     });
 
-    // Database integration starts here
-    // Check if the summoner already exists in the database
+    debugApi("Summoner data fetched from Riot API:", summonerData);
+
+    // Check if the summoner already exists for the specific user in the database
     const existingSummoner = await dbPool.query(
-      "SELECT * FROM SummonerDetails WHERE Puuid = $1",
-      [puuid]
+      "SELECT * FROM SummonerDetails WHERE Puuid = $1 AND User_ID = $2",
+      [puuid, userId]
     );
 
-    let rows;
-
     if (existingSummoner.rows.length > 0) {
-      // If the summoner already exists, use the existing rows
-      rows = existingSummoner.rows.map((row) => snakeToCamelCase(row)); // Convert each existing row
+      // Summoner exists for the user; check if an update is needed
+      const existingData = existingSummoner.rows[0];
+      const existingLevel = existingData.summoner_level;
+      const existingRevisionDate = existingData.revision_date;
+
+      let needsUpdate = false;
+      let updateReasons = [];
+
+      if (Number(existingRevisionDate) !== Number(summonerData.revisionDate)) {
+        updateReasons.push(`Revision date changed from ${existingRevisionDate} to ${summonerData.revisionDate}`);
+        needsUpdate = true;
+      }
+
+      if (Number(existingLevel) !== Number(summonerData.summonerLevel)) {
+        updateReasons.push(`Summoner level changed from ${existingLevel} to ${summonerData.summonerLevel}`);
+        needsUpdate = true;
+      }
+
+      if (needsUpdate) {
+        console.log("Summoner data has been updated. Reasons: ", updateReasons.join(", "));
+        await dbPool.query(
+          `UPDATE SummonerDetails 
+           SET Summoner_Level = $2, Profile_Icon_ID = $3, Revision_Date = $4, Timestamp = $5
+           WHERE Puuid = $1 AND User_ID = $6`,
+          [
+            puuid,
+            summonerData.summonerLevel,
+            summonerData.profileIconId,
+            summonerData.revisionDate,
+            Date.now(),
+            userId
+          ]
+        );
+        console.log("Updated summoner data in the database.");
+      } else {
+        console.log("No update necessary for summoner data.");
+      }
+
+      res.json(existingSummoner.rows.map((row) => snakeToCamelCase(row)));
     } else {
-      // Insert a new record with the fetched data if not found
+      // Summoner does not exist for this user, so insert it
       const insertResult = await dbPool.query(
         "INSERT INTO SummonerDetails (Puuid, User_ID, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *",
         [
@@ -93,19 +126,50 @@ router.get("/by-riot-id", async (req, res) => {
           Date.now(),
         ]
       );
-      // Use the rows from the insertion result
-      rows = insertResult.rows.map((row) => snakeToCamelCase(row)); // Convert each inserted row
+
+      res.json(insertResult.rows.map((row) => snakeToCamelCase(row)));
+      console.log("Inserted new summoner data for user.");
     }
 
-    // Database integration ends here
-
-    debugApi("Sending back combined data ", rows);
-    res.json(rows);
   } catch (error) {
     console.error("Error in /by-riot-id route:", error);
     res.status(500).send("Internal Server Error");
   }
 });
+
+
+/**
+ * Helper function to determine if an update is needed based on changes in summoner data.
+ * Compares stored summoner data in the database with the latest data from Riot API.
+ *
+ * @param {Object} existingData - Current summoner data from the database.
+ * @param {Object} newData - Latest summoner data from Riot API.
+ * @returns {Object} Object containing `needsUpdate` boolean and an array of `updateReasons`.
+ */
+function checkIfUpdateNeeded(existingData, newData) {
+  let needsUpdate = false;
+  const updateReasons = [];
+
+  if (Number(existingData.revision_date) !== Number(newData.revisionDate)) {
+    updateReasons.push(`Revision date changed from ${existingData.revision_date} to ${newData.revisionDate}`);
+    needsUpdate = true;
+  }
+
+  if (Number(existingData.summoner_level) !== Number(newData.summonerLevel)) {
+    updateReasons.push(`Summoner level changed from ${existingData.summoner_level} to ${newData.summonerLevel}`);
+    needsUpdate = true;
+  }
+
+  if (Number(existingData.profile_icon_id) !== Number(newData.profileIconId)) {
+    updateReasons.push(`Profile icon ID changed from ${existingData.profile_icon_id} to ${newData.profileIconId}`);
+    needsUpdate = true;
+  }
+
+  return { needsUpdate, updateReasons };
+}
+
+
+
 
 router.post("/update-summoner-details", async (req, res) => {
   const { puuid, summonerLevel, profileIconId } = req.body;

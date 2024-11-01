@@ -10,37 +10,51 @@ const debug = Debug("app:store:summoner");
 export const summoner = {
   namespaced: true,
   state: () => ({
-    playerDetails: [],
-    currentSummoner: null,
+    playerDetails: [], // Stores summoner-related information
+    currentSummoner: null, // Stores the current summoner
+    fetchedFromAPI: false, // Tracks if the API call has been made
   }),
   getters: {
-    getSummonerDataByName: (state) => (summonerName) => {
-      return (
-        state.playerDetails.find(
-          (detail) => detail.gameName === summonerName
-        ) || null
-      );
+    getSummonerDataByName: (state) => (gameName) => {
+      return state.playerDetails.find(detail => detail.gameName === gameName) || null;
     },
+    getCurrentSummoner: (state) => state.currentSummoner,
     getAllPlayerDetails: (state) => {
-      return state.playerDetails;
-    },
-    getCurrentSummoner: (state) => {
-      return state.currentSummoner;
+      return state.playerDetails; // This will return the list of all known summoners
     },
   },
   mutations: {
-    setPlayerDetails(state, newDataArray) {
-      newDataArray.forEach(newData => {
-        const index = state.playerDetails.findIndex(detail => detail.gameName === newData.gameName);
-    
-        if (index !== -1) {
-          // Existing entry found, update it
-          state.playerDetails[index] = newData;
-        } else {
-          // No existing entry found, add the new entry to the array
-          state.playerDetails.push(newData);
-        }
-      });
+    setFetchedFromAPI(state, status) {
+      state.fetchedFromAPI = status;
+    },
+    setPlayerDetails(state, { summonerNameValue, tagLine, webSocketResponse = null, apiResponse = null }) {
+      // Ensure the new entry is unique by comparing both `gameName` and `tagLine`
+      const existingSummonerIndex = state.playerDetails.findIndex(
+        (detail) => detail.apiResponse?.gameName === summonerNameValue && detail.apiResponse?.tagLine === tagLine
+      );
+      if (existingSummonerIndex !== -1) {
+        // Update existing summoner data only if it's necessary
+        const existingSummoner = state.playerDetails[existingSummonerIndex];
+        state.playerDetails[existingSummonerIndex] = {
+          ...existingSummoner,
+          webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
+          apiResponse: apiResponse || existingSummoner.apiResponse,
+        };
+      } else {
+        // Add new summoner data if it's a unique entry
+        state.playerDetails.push({
+          gameName: summonerNameValue,
+          tagLine: tagLine,
+          webSocketResponse: webSocketResponse || {},
+          apiResponse: apiResponse || {},
+        });
+      }
+
+      // Auto-select as the current summoner only if no current summoner is selected
+      if (!state.currentSummoner) {
+        state.currentSummoner = state.playerDetails[0];
+      }
+      console.log("Updated playerDetails:", state.playerDetails);
     },
     setCurrentSummoner(state, summoner) {
       state.currentSummoner = summoner;
@@ -52,66 +66,102 @@ export const summoner = {
       { gameName, newSummonerLevel, newProfileIconId }
     ) {
       const existingDetail = state.playerDetails.find(
-        (detail) => detail.summonerData.name === gameName
+        (detail) => detail.apiResponse && detail.apiResponse.gameName === gameName
       );
       if (
         existingDetail &&
-        (existingDetail.summonerData.summonerLevel !== newSummonerLevel ||
-          existingDetail.summonerData.profileIconId !== newProfileIconId)
+        (existingDetail.apiResponse.summonerLevel !== newSummonerLevel ||
+          existingDetail.apiResponse.profileIconId !== newProfileIconId)
       ) {
         // Detected change in summoner level or icon ID, initiate an update
         debug("Summoner details changed, updating...");
         await dispatch("updateSummonerDetails", {
-          puuid: existingDetail.accountData.puuid,
+          puuid: existingDetail.apiResponse.puuid,
           summonerLevel: newSummonerLevel,
           profileIconId: newProfileIconId,
         });
       }
     },
 
-    async fetchSummonerData({ commit, state }, { region, gameName, tagLine }) {
-      console.log("fetchSummonerData", gameName);
-      const existingDetail = state.playerDetails.find(
-        (detail) => detail.gameName === gameName
-      );
-      if (existingDetail) {
-        debug("Summoner data loaded from cache:", existingDetail);
-        // Optionally, you could re-fetch to update the data
-      } else {
+    // This action will fetch summoner data from the API and store it
+    async fetchSummonerData({ commit, state }, { region, gameName, tagLine, webSocketResponse = null }) {
+      console.log(`Fetching summoner data for: ${gameName} with tagLine: ${tagLine}`);
+
+      const currentSummoner = state.currentSummoner;
+      if (state.fetchedFromAPI && currentSummoner?.apiResponse) {
+        console.log("API data already fetched. Using WebSocket updates only.");
+        commit("setPlayerDetails", {
+          summonerNameValue: gameName,
+          tagLine: tagLine,
+          webSocketResponse, // Update WebSocket response
+          apiResponse: state.playerDetails.find(detail => detail.gameName === gameName)?.apiResponse || {}, // Keep existing API response
+        });
+        return;
+      }
+
+      if (!currentSummoner?.apiResponse || !state.fetchedFromAPI) {
         try {
           const authConfig = getAuthConfig();
+          console.log("Fetching summoner data from API (forced refresh)");
 
-          debug("Fetching summoner data");
-          const response = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
+          const apiResponse = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
             ...authConfig,
-            params: { region, gameName, tagLine },
+            params: {
+              region,
+              gameName: encodeURIComponent(gameName),
+              tagLine: encodeURIComponent(tagLine)
+            },
           });
-          if (response.status !== 200) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+
+          if (apiResponse.status !== 200) {
+            throw new Error(`HTTP error! status: ${apiResponse.status}`);
           }
-          debug("Summoner data fetched:", response.data);
-          commit("setPlayerDetails", response.data);
-          commit("setCurrentSummoner", response.data[0]);
+
+          console.log("Summoner data fetched from API:", apiResponse.data);
+
+          const newPlayerDetails = {
+            summonerNameValue: gameName,
+            tagLine: tagLine,
+            webSocketResponse: webSocketResponse || {},
+            apiResponse: apiResponse.data[0], // Use the first summoner from API
+          };
+
+          commit("setPlayerDetails", newPlayerDetails);
+          commit("setCurrentSummoner", newPlayerDetails);
+          commit("setFetchedFromAPI", false);
         } catch (error) {
           console.error("Error fetching PlayerDetails:", error);
         }
       }
     },
 
-    async fetchSummonerDataByAccountId({ commit }) {
+    async fetchSummonerDataByAccountId({ commit, state }) {
       try {
         const authConfig = getAuthConfig();
+        const apiResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
 
-        const response = await axios.get(`${baseUrl}/summoner/data`, {
-          ...authConfig,
-        });
-        commit("setPlayerDetails", response.data);
-        if (response.data.length > 0) {
-          commit("setCurrentSummoner", response.data[0]); // Set the first summoner as the current selection
+        if (apiResponse.data.length === 0) {
+          console.log("No summoner data found in the database for this user.");
+          return null; // No data found
         }
+
+        const firstSummoner = apiResponse.data[0];
+        const newPlayerDetails = {
+          gameName: firstSummoner.gameName,
+          tagLine: firstSummoner.tagLine,
+          apiResponse: firstSummoner,
+          webSocketResponse: {}, // Initially empty WebSocket response
+        };
+
+        commit("setPlayerDetails", newPlayerDetails);
+        commit("setCurrentSummoner", newPlayerDetails);
+        return newPlayerDetails; // Return the fetched data
       } catch (error) {
-        console.error("Error fetching summoner data:", error);
+        console.error("Error fetching summoner data by account ID:", error);
+        return null;
       }
-    },
+    }
+
   },
+
 };

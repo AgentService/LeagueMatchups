@@ -1,66 +1,50 @@
-import axios from "axios";
 import { getAuthConfig } from "./utilities.js";
 import { getUrlHelper } from '../../renderer/globalSetup';
+import axios from "axios";
+import Debug from "debug";
+const debug = Debug("app:store:matches");
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export const matches = {
   namespaced: true,
   state: () => ({
-    matchHistory: null,
+    summonerMatches: {}, // Store match histories per summoner keyed by PUUID
     reviewedMatches: {}, // Object to track reviewed match IDs
-    lastFetchTime: null, // To store the last fetch time for caching
+    lastFetchTime: {}, // Store the last fetch time for each summoner
   }),
   getters: {
-    getMatchHistory: (state) => state.matchHistory,
+    getMatchHistory: (state) => (puuid) => state.summonerMatches[puuid] || [], // Get match history for the current summoner
+
     isMatchReviewed: (state) => (gameId) => !!state.reviewedMatches[gameId],
     getReviewedMatches: (state) => Object.keys(state.reviewedMatches),
+
     getPuuid: (state, getters, rootState) => {
-      return rootState.summoner.playerDetails[0]?.puuid;
+      return rootState.summoner.currentSummoner?.apiResponse?.puuid || rootState.summoner.currentSummoner?.webSocketResponse?.puuid;
     },
     getPlayerChampion: (state, getters) => (match) => {
-      // Check if the data is from WebSocket by looking at the number of participants
-      const isWebSocketData = match.info.participants.length === 1;
-
-      if (isWebSocketData) {
-        // If it's WebSocket data, return the only participant available
-        return match.info.participants[0];
-      } else {
-        // If it's API data, use the PUUID to find the correct participant
-        const puuid = getters.getPuuid;
-        const bValue = match.info.participants.find(participant => participant.puuid === puuid);
-        if (!bValue) {
-          console.warn("Participant not found for the given PUUID:", puuid);
-        }
-        return bValue;
-      }
+      const puuid = getters.getPuuid;
+      const participant = match.info?.participants?.find(participant => participant.puuid === puuid);
+      return participant || null;
     },
-  
+
     calculateKDA: () => (participant) => {
-      if (!participant) {
-        debugger
-        return "0.00"; // Default value if participant is not available
-      }
-      const kills = participant.kills || 0;
-      const deaths = participant.deaths || 1; // Prevent division by zero
-      const assists = participant.assists || 0;
+      const kills = participant?.kills || 0;
+      const deaths = participant?.deaths || 1; // Avoid division by 0
+      const assists = participant?.assists || 0;
       return ((kills + assists) / deaths).toFixed(2);
     },
     calculateCsPerMinute: () => (participant, match) => {
-      const cs = participant.totalMinionsKilled || 0;
-      const gameDurationMinutes = match.info.gameDuration / 60;
+      const cs = participant?.totalMinionsKilled || 0;
+      const gameDurationMinutes = match.info?.gameDuration / 60;
       return (cs / gameDurationMinutes).toFixed(2);
     },
     calculateVisionScorePerMinute: () => (participant, match) => {
-      const visionScore = participant.visionScore || 0;
-      const gameDurationMinutes = match.info.gameDuration / 60;
+      const visionScore = participant?.visionScore || 0;
+      const gameDurationMinutes = match.info?.gameDuration / 60;
       return (visionScore / gameDurationMinutes).toFixed(2);
     },
     getChampionImageSource: () => (type, championName) => {
-      if (!championName) {
-        debugger
-        return ""; // Return early if no champion
-      }
       const urlHelper = getUrlHelper();
       return urlHelper.getChampionImageSource(type, championName);
     },
@@ -75,7 +59,7 @@ export const matches = {
       return `${Math.floor(diffInHours)} hours ago`;
     },
     getPlayerChampionAndItems: () => (match) => {
-      const participant = match.info.userParticipant || {};
+      const participant = match.info?.userParticipant || {};
       return {
         championId: participant.championId || '',
         items: [
@@ -91,29 +75,38 @@ export const matches = {
     },
   },
   mutations: {
-    SET_MATCH_HISTORY(state, match) {
-      state.matchHistory = match;
+    SET_SUMMONER_MATCHES(state, { puuid, matches }) {
+      state.summonerMatches[puuid] = matches; // Store matches per summoner's PUUID
     },
     MARK_MATCH_REVIEWED(state, gameId) {
-      state.reviewedMatches[gameId] = true; // Mark the match as reviewed
+      state.reviewedMatches[gameId] = true; // Mark match as reviewed
     },
   },
   actions: {
-    async fetchLastMatch({ commit, state, dispatch }, summonerId) {
-      const puuid = summonerId;
-      const count = 5; // Number of matches to fetch
+    // Fetch match history for the current summoner
+    async fetchLastMatch({ commit, state, dispatch, rootGetters }, { forceRefresh = false, count = 5 } = {}) {
+      // Get currentSummoner from the summoner module
+      const currentSummoner = rootGetters['summoner/getCurrentSummoner'];
+
+      if (!currentSummoner) {
+        console.error("No current summoner is selected.");
+        return;
+      }
+
+      // Extract the puuid from the currentSummoner (either from apiResponse or webSocketResponse)
+      const puuid = currentSummoner.apiResponse?.puuid;
 
       if (!puuid) {
-        console.error("PUUID is missing");
+        console.error("Player PUUID is not available.");
         return;
       }
 
       // Use cached data if available and recent
       const now = Date.now();
-      const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-      if (state.matchHistory && now - state.lastFetchTime < CACHE_DURATION) {
+      const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+      if (state.summonerMatches[puuid] && now - state.lastFetchTime < CACHE_DURATION && !forceRefresh) {
         console.log("Using cached match data.");
-        return state.matchHistory;
+        return state.summonerMatches[puuid]; // Return cached matches for this summoner
       }
 
       const config = getAuthConfig();
@@ -121,8 +114,8 @@ export const matches = {
       const options = {
         module: "matches",
         type: "matchHistory",
-        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`,
-        vuexMutation: "matches/SET_MATCH_HISTORY",
+        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`, // Use `count` here
+        vuexMutation: "matches/SET_SUMMONER_MATCHES",
         itemId: puuid,
         commit,
         state,
@@ -130,14 +123,16 @@ export const matches = {
       };
 
       try {
+        debug("Fetching last match for:", currentSummoner.apiResponse?.gameName);
         const data = await dispatch("fetchDataAndCache", options, { root: true });
 
-        commit("SET_MATCH_HISTORY", data);
+        commit("SET_SUMMONER_MATCHES", { puuid, matches: data });
         state.lastFetchTime = Date.now(); // Update the last fetch time
       } catch (error) {
         console.error("Error fetching the last match:", error);
       }
     },
+
     addReviewedMatch({ commit }, matchReview) {
       commit("MARK_MATCH_REVIEWED", matchReview.gameId);
     },

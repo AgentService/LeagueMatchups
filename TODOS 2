@@ -98,3 +98,34 @@ Implementation Details
    Reuse existing code and ensure it integrates well with the new UI.
 5. Feedback Mechanism
    Add a feedback form to the app using a modal or a dedicated feedback page.
+
+
+
+Fix postmatch websocket data match info in modal
+maybe dont use websocket game data at all? idk
+
+fix why sometimes champnotes get empty. maybe if same champ selected?
+
+2sections:
+questions: what do i observe? tunneling, dying to gank, farming
+question2: underlying trends?
+
+
+playtester:
+kingwebby
+xenon6487
+noodledaddy
+antibiose
+atelo_
+
+LearningOBJECTIVES:
+TAB SOUND QUEUE
+TIMEDBASED SOUND QUEUE
+
+
+basic Learning Objective tracking
+champ auto select 
+enemy picks lobby quick access
+
+FIX REGION SUMMONER 
+FIX SUMMONER FLOW / LOGOUT FRESH / ONLY CLINET / CLINET CONNECT

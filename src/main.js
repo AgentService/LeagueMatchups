@@ -1,4 +1,6 @@
 const { ipcMain, app, BrowserWindow, screen, dialog } = require("electron");
+import fetch from "node-fetch";  // Use static import if bundling issues occur
+
 const fs = require("fs");
 const {
   createWebSocketConnection,
@@ -300,45 +302,31 @@ async function setupLeagueClientMonitoring() {
     });
 
     global.credentials = credentials;
-    
-    console.log("League client found. Credentials obtained.");
 
-    if (mainWindowReady && mainWindow && mainWindow.webContents) {
-      mainWindow.webContents.send("client-status", { connected: true });
-    }
+    console.log("League client found. Credentials obtained.");
+    notifyClientStatus(true);
 
     const client = new LeagueClient(credentials, { pollInterval: 1000 });
 
-    // Initialize WebSocket and event handlers
-    initializeWebSocket(credentials)
-      .then(() => {
-        log.info("initializeWebSocket completed");
-        log.info("fetching summoner name");
-        fetchSummonerNameWithRetry(credentials)
-          .then((summonerName) => {
-            log.info("Summoner name fetched:", summonerName);
-            mainWindow.webContents.send(
-              "summoner-name-response",
-              currentSummoner
-            );
-          })
-          .catch(console.error);
-      })
-      .catch(console.error);
+    // Fetch summoner name on initial setup
+    await initializeWebSocket(credentials);
+    await fetchAndSendSummonerName(credentials);
 
-    client.on("connect", (newCredentials) => {
-      console.log("League client connected.");
-      initializeWebSocket(newCredentials)
-        .then(() => {
-          fetchSummonerNameWithRetry(newCredentials).catch(console.error);
-          mainWindow.webContents.send("client-status", { connected: true });
-        })
-        .catch(console.error);
+    // Handle reconnects
+    client.on("connect", async (newCredentials) => {
+      console.log("League client reconnected. Fetching summoner name...");
+      global.credentials = newCredentials; // Update credentials
+
+      // Initialize WebSocket and fetch summoner name on reconnect
+      await initializeWebSocket(newCredentials);
+      await fetchAndSendSummonerName(newCredentials);
+      notifyClientStatus(true);
     });
 
+    // Handle disconnects
     client.on("disconnect", () => {
       console.log("League client disconnected.");
-      mainWindow.webContents.send("client-status", { connected: false });
+      notifyClientStatus(false);
     });
 
     client.start();
@@ -347,6 +335,24 @@ async function setupLeagueClientMonitoring() {
   }
 }
 
+// Helper function to fetch and send summoner name to renderer
+async function fetchAndSendSummonerName(credentials) {
+  try {
+    currentSummonerResponse = await fetchSummonerNameWithRetry(credentials); // Ensure response is stored
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send("summoner-name-response", currentSummonerResponse);
+    }
+  } catch (error) {
+    console.error("Error fetching and sending summoner name:", error);
+  }
+}
+
+// Helper to notify client status to renderer
+function notifyClientStatus(isConnected) {
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.send("client-status", { connected: isConnected });
+  }
+}
 
 setupLeagueClientMonitoring();
 
@@ -394,7 +400,21 @@ ipcMain.handle("check-client-status", async (event) => {
 });
 
 ipcMain.on("get-summoner-name", async (event) => {
-  event.reply("summoner-name-response", currentSummoner);
+  if (currentSummonerResponse) {
+    console.log("Summoner data available, sending cached data...");
+    event.reply("summoner-name-response", currentSummonerResponse); // Send full response
+  } else {
+    console.log("No summoner data available, fetching new data...");
+    const newCredentials = global.credentials; // Assuming credentials are stored globally
+    if (newCredentials) {
+      console.log("Fetching summoner name with credentials:", newCredentials);
+      currentSummonerResponse = await fetchSummonerName(newCredentials);
+      event.reply("summoner-name-response", currentSummonerResponse); // Send the full object
+    } else {
+      console.error("No credentials available to fetch summoner data.");
+      event.reply("summoner-name-response", null);
+    }
+  }
 });
 
 ipcMain.handle("get-api-key", async (event) => {
@@ -403,25 +423,21 @@ ipcMain.handle("get-api-key", async (event) => {
   return process.env.RIOT_API_KEY;
 });
 
-let currentSummoner = null;
+let currentSummonerResponse = null;
 
 async function fetchSummonerName(credentials) {
   const { port, password } = credentials;
-  debug("Fetching summoner name...", port, password);
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Important: Ensure this is acceptable for your app's security requirements
+  // console.log(`Fetching summoner name with port: ${port} and password: ${password}`);
+
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS cert verification for this request
 
   try {
-    const fetch = (...args) =>
-      import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
     const response = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
       {
         method: "GET",
         headers: {
-          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString(
-            "base64"
-          )}`,
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString("base64")}`,
           Accept: "application/json",
         },
       }
@@ -429,19 +445,29 @@ async function fetchSummonerName(credentials) {
 
     if (response.ok) {
       const data = await response.json();
-      currentSummoner = data;
-      return data.displayName;
+      if (data && data.gameName) {
+        console.log("Summoner name fetched (gameName):", data.gameName);  // Log the gameName
+        currentSummonerResponse = data;  // Store the full response
+        return data;  // Return the full data object instead of just data.gameName
+      } else {
+        console.error("Neither gameName nor displayName found in the API response");
+        return null;
+      }
     } else {
-      console.error(`HTTP error! status: ${response.status}`);
+      console.error(`HTTP error fetching summoner name: ${response.status}`);
       return null;
     }
   } catch (error) {
     console.error("Error fetching summoner name:", error);
     return null;
   } finally {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Reset for safety
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Reset TLS verification
   }
 }
+
+
+
+
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
@@ -500,6 +526,7 @@ function createMainWindow() {
   mainWindow.once("ready-to-show", () => {
     mainWindowReady = true;
     isAppStartup = false;
+
     // Now that mainWindow is ready, check if there are any queued messages
     // and send them to the renderer. This part depends on how you decide to queue messages.
   });

@@ -3,6 +3,7 @@ import ChampSelectSession from "./ChampSelectSession";
 import Debug from "debug";
 
 const { authenticate } = require("league-connect");
+import fetch from "node-fetch";  // Use a static import for consistency
 
 const debug = Debug("app:websocket-events");
 Debug.enable("*");
@@ -171,6 +172,7 @@ class WebSocketEventHandlers extends EventEmitter {
       debug("Error occurred during fetchPostGameData execution:", error);
     }
   }
+
   async fetchFromApi(endpoint) {
     const credentials = await authenticate({ awaitConnection: false });
     const { port, password } = credentials; // Ensure you have credentials available
@@ -179,9 +181,6 @@ class WebSocketEventHandlers extends EventEmitter {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
     try {
-      const fetch = (...args) =>
-        import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -202,6 +201,7 @@ class WebSocketEventHandlers extends EventEmitter {
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
     }
   }
+
 
   reflectChanges(oldSessionData, newSessionData) {
     if (

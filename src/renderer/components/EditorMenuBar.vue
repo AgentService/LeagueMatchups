@@ -19,25 +19,57 @@
             </button>
         </div>
         <div class="action-buttons">
-            <button @click="editor?.chain().focus().undo().run()" class="menu-button">
+            <button @click="handleUndo" class="menu-button" :disabled="!canUndo">
                 <i class="fas fa-undo"></i>
             </button>
-            <button @click="editor?.chain().focus().redo().run()" class="menu-button">
+            <button @click="handleRedo" class="menu-button" :disabled="!canRedo">
                 <i class="fas fa-redo"></i>
             </button>
         </div>
     </div>
 </template>
 
-
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, computed } from 'vue';
 
 // Define props
 const props = defineProps({
     editor: Object,
 });
+
+// Computed properties to check if undo/redo actions are available
+const canUndo = computed(() => props.editor?.can().undo());
+const canRedo = computed(() => props.editor?.can().redo());
+
+// Undo handler
+function handleUndo() {
+    if (canUndo.value) {
+        const contentBeforeUndo = props.editor.getJSON(); // Save current content state
+        props.editor.chain().focus().undo().run();
+
+        // Check if the content has been cleared
+        const contentAfterUndo = props.editor.getJSON();
+        const isNowEmpty = contentAfterUndo.content?.length === 0;
+
+        if (isNowEmpty) {
+            // Optional: Prompt the user for confirmation if undo makes the content empty
+            const confirmClear = confirm("This action will clear the content. Are you sure you want to proceed?");
+            if (!confirmClear) {
+                // Restore previous content if user cancels
+                props.editor.commands.setContent(contentBeforeUndo);
+            }
+        }
+    }
+}
+
+// Redo handler
+function handleRedo() {
+    if (canRedo.value) {
+        props.editor.chain().focus().redo().run();
+    }
+}
 </script>
+
 <style scoped>
 .menu-bar {
     margin-bottom: 10px;
@@ -77,5 +109,4 @@ const props = defineProps({
 .menu-bar button:hover {
     background-color: rgba(0, 123, 255, 0.1);
 }
-
 </style>

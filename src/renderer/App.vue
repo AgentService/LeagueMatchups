@@ -2,10 +2,8 @@
 	<Navbar @before-leave="handleBeforeLeave">
 	</Navbar>
 	<div class="app-wrapper">
-		<transition name="fade">
 			<router-view>
 			</router-view>
-		</transition>
 	</div>
 	<Update />
 </template>

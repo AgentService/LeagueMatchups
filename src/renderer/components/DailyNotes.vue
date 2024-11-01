@@ -257,4 +257,13 @@ onMounted(() => {
 	border-right: 1px solid var(--grey-3);
 	margin: 1rem;
 }
+
+textarea {
+	background-color: var(--grey-4);
+	color: var(--gold-1);
+	border: 1px solid var(--grey-5);
+	border-radius: 4px;
+	padding: 0.5rem;
+	font-size: 1rem;
+}
 </style>

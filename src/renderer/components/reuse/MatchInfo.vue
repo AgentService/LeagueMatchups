@@ -1,10 +1,23 @@
 <template>
     <div v-if="match && playerChampion" class="match-info" :class="[isWin ? 'win-background' : 'loss-background']">
+        <!-- Champion Icon -->
         <div class="champion-icon-container">
             <img :src="getChampionImageSource('small', playerChampion.championName)" alt="Your Champion"
                 :class="['champion-icon', isWin ? 'win-border' : 'loss-border']" />
+
+            <!-- Reviewed/Not-Reviewed Icon -->
+            <div class="review-status">
+                <div :class="['review-status-button', isMatchReviewed ? 'reviewed' : 'not-reviewed']">
+                    <i :class="isMatchReviewed ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                    <span class="review-status-label">
+                        Reviewed
+                    </span>
+                </div>
+            </div>
         </div>
-        <div class="details-container">
+
+        <!-- Left Section: items, cs, vision, kda, win/loss info -->
+        <div class="left-section">
             <!-- Match Result, Duration, and Time Since Match -->
             <div class="stats-block mb-2">
                 <div class="stats-row">
@@ -24,51 +37,50 @@
             <div class="stats-block">
                 <div class="stats-row">
                     <div class="kda-details">
-                        <div class="kda">{{ calculateKDA(playerChampion) }} KDA</div>
-                        <span>{{ playerChampion.kills }} /
-                            <span class="deaths">{{ playerChampion.deaths }}</span> /
-                            {{ playerChampion.assists }}
-                        </span>
+                        <div class="kda">{{ calculateKDA(playerStats) }} KDA</div>
+                        <span>{{ playerStats.kills }} / <span class="deaths">{{ playerStats.deaths }}</span> /
+                            {{ playerStats.assists }}</span>
                     </div>
                     <div class="cs-block">
-                        <div class="cs-min">{{ calculateCsPerMinute(playerChampion, match) }} CS/Min</div>
-                        <span>{{ playerChampion.totalMinionsKilled }} CS</span>
+                        <div class="cs-min">{{ calculateCsPerMinute(playerStats, match) }} CS/Min</div>
+                        <span>{{ playerStats.totalMinionsKilled }} CS</span>
                     </div>
                     <div class="vision-block">
-                        <div class="vision-min">{{ calculateVisionScorePerMinute(playerChampion, match) }} Vis/Min</div>
-                        <span>{{ playerChampion.visionScore }} Vision Score</span>
+                        <div class="vision-min">{{ calculateVisionScorePerMinute(playerStats, match) }} Vis/Min</div>
+                        <span>{{ playerStats.visionScore }} VS</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Items and Teams Block (Teams aligned to the right of the items) -->
-            <div class="items-and-teams">
-                <div class="items-row">
-                    <div v-for="(itemId, index) in playerItems" :key="index" class="item-slot">
-                        <img v-if="itemId" :src="getItemImageSource(itemId)" :alt="`Item ${index + 1}`"
-                            class="item-icon" @mouseover="showItemTooltip(itemId, $event)"
-                            @mousemove="updateTooltipPosition($event)" @mouseout="hideTooltip" />
+            <!-- Items -->
+            <div class="items-row">
+                <div v-for="(itemId, index) in playerItems" :key="index" class="item-slot">
+                    <img v-if="itemId" :src="getItemImageSource(itemId)" :alt="`Item ${index + 1}`" class="item-icon"
+                        @mouseover="showItemTooltip(itemId, $event)" @mousemove="updateTooltipPosition($event)"
+                        @mouseout="hideTooltip" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section: Teams -->
+        <div class="right-section">
+            <!-- Teams block -->
+            <div class="teams-block">
+                <!-- Team 100 -->
+                <div class="team-info">
+                    <div v-for="participant in team100" :key="participant.puuid" class="team-member">
+                        <img :src="getChampionImageSource('small', participant.championName)" alt="Champion Icon"
+                            class="team-icon" />
+                        <span class="game-name">{{ getGameName(participant) }}</span>
                     </div>
                 </div>
 
-                <!-- Teams block aligned to the right -->
-                <div class="teams-block">
-                    <!-- Team 100 -->
-                    <div class="team-info">
-                        <div v-for="participant in team100" :key="participant.puuid" class="team-member">
-                            <img :src="getChampionImageSource('small', participant.championName)" alt="Champion Icon"
-                                class="team-icon" />
-                            <span class="game-name">{{ getGameName(participant) }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Team 200 -->
-                    <div class="team-info">
-                        <div v-for="participant in team200" :key="participant.puuid" class="team-member">
-                            <img :src="getChampionImageSource('small', participant.championName)" alt="Champion Icon"
-                                class="team-icon" />
-                            <span class="game-name">{{ getGameName(participant) }}</span>
-                        </div>
+                <!-- Team 200 -->
+                <div class="team-info">
+                    <div v-for="participant in team200" :key="participant.puuid" class="team-member">
+                        <img :src="getChampionImageSource('small', participant.championName)" alt="Champion Icon"
+                            class="team-icon" />
+                        <span class="game-name">{{ getGameName(participant) }}</span>
                     </div>
                 </div>
             </div>
@@ -82,8 +94,12 @@
                 <div class="item-description">{{ tooltip.content.description }}</div>
             </div>
         </div>
+
     </div>
 </template>
+
+
+
 
 
 <script setup>
@@ -99,27 +115,32 @@ const props = defineProps({
 const store = useStore();
 const team100 = computed(() => {
     const team = props.match?.info?.participants?.filter(participant => participant.teamId === 100);
-    console.log("Team 100 participants:", team);
     return team;
 });
 
 const team200 = computed(() => {
     const team = props.match?.info?.participants?.filter(participant => participant.teamId === 200);
-    console.log("Team 200 participants:", team);
     return team;
+});
+
+const playerStats = computed(() => {
+    if (playerChampion.value?.stats) {
+        return playerChampion.value.stats; // API response case
+    }
+    return playerChampion.value; // WebSocket response case
 });
 
 function getGameName(participant) {
     // Use the summonerName directly from the participant object
-    return participant?.summonerName ?? 'Unknown';
+    return participant?.riotIdGameName ?? 'Unknown';
 }
 
-
-
-
 const playerChampion = computed(() => {
-    const puuid = store.state.summoner.playerDetails[0]?.puuid;
-    const gameName = store.state.summoner.playerDetails[0]?.gameName;
+    const currentSummoner = store.getters['summoner/getCurrentSummoner'];
+
+    // Extract puuid and gameName from currentSummoner
+    const puuid = currentSummoner?.apiResponse?.puuid || currentSummoner?.webSocketResponse?.puuid;
+    const gameName = currentSummoner?.apiResponse?.gameName || currentSummoner?.webSocketResponse?.gameName;
 
     const matchInfo = props.match.info || props.match; // Normalize data to handle both cases (API vs WebSocket)
 
@@ -139,7 +160,6 @@ const playerChampion = computed(() => {
             player = matchInfo.participants?.find(p => p.participantId === participantId);
         }
     }
-
     // If player is found, add the championName to the player object
     if (player) {
         const championName = getChampionName(player.championId);
@@ -148,6 +168,7 @@ const playerChampion = computed(() => {
 
     return {};
 });
+
 
 
 
@@ -213,6 +234,7 @@ const calculateVisionScorePerMinute = (participant, match) => {
 const getChampionImageSource = (type, championId) => {
     return store.getters['matches/getChampionImageSource'](type, championId);
 };
+
 const getItemImageSource = (itemId) => store.getters['matches/getItemImageSource'](itemId);
 
 // Tooltip Logic
@@ -254,41 +276,80 @@ const hideTooltip = () => {
 </script>
 
 <style scoped>
-/* Include the styles from your original .match-info class */
+.review-status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+    margin-top: 12px;
+}
+
+.review-status-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 5px;
+    font-size: 0.875rem;
+    color: #fff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+.review-status-button i {
+    font-size: .8rem;
+}
+
+/* Default neutral state */
+.review-status-button {
+    background-color: #555;
+    color: #fff;
+}
+
+/* Green for Reviewed */
+.review-status-button.reviewed {
+    background-color: #2e6b30;
+}
+
+/* Red for Not Reviewed */
+.review-status-button.not-reviewed {
+    background-color: #691c17;
+}
+
+.review-status-label {
+    font-size: 0.7rem;
+    margin-left: 4px;
+}
+
 .match-info {
     padding: 1rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    height: 330px;
+    align-items: flex-start;
+    gap: 1px;
+    height: auto;
     width: 100%;
     overflow: hidden;
-    border: 1px solid #1d1d1d73;
-}
-
-
-.match-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
-    cursor: pointer;
+    border: 1px solid #000000;
+    border-radius: 5px;
 }
 
 .match-info:hover {
     background-color: #3a3a3a;
 }
 
+.left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 .win-background {
     background: linear-gradient(to bottom right, #122c31, #0b1a1d);
-    background-color: #122c31;
 }
 
 .loss-background {
     background: linear-gradient(to bottom right, #3b1010, #270b0b);
-    background-color: #2b1b1b;
 }
 
 .match-result {
@@ -297,7 +358,7 @@ const hideTooltip = () => {
 }
 
 .match-result.win {
-    color: #4CAF50;
+    color: #30d9d3;
 }
 
 .match-result.loss {
@@ -306,20 +367,22 @@ const hideTooltip = () => {
 
 .champion-icon-container {
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
     text-align: center;
     margin-right: 6px;
     margin-top: 4px;
 }
 
 .champion-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 8%;
+    width: 75px;
+    height: 75px;
+    border-radius: 4%;
     border: 2px solid transparent;
 }
 
 .win-border {
-    border-color: #4CAF50;
+    border-color: #30d9d3;
 }
 
 .loss-border {
@@ -332,23 +395,28 @@ const hideTooltip = () => {
 
 .stats-row {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
-.details-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+.timestamp {
+    color: #999;
+    font-size: 0.8rem;
+}
 
+.game-duration {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #999;
 }
 
 .stats-block {
     display: flex;
     font-size: 0.8rem;
     font-weight: 400;
+    flex-direction: column;
+
 }
 
 .kda,
@@ -357,8 +425,6 @@ const hideTooltip = () => {
     font-weight: bold;
     font-size: 0.8rem;
 }
-
-
 
 .kda-details span,
 .cs-block span,
@@ -371,54 +437,26 @@ const hideTooltip = () => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 110px;
+    width: 80px;
 }
 
 .cs-block {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 110px;
+    width: 80px;
 }
 
 .vision-block {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 100px;
-}
-
-.reviewed-badge {
-    background-color: #358337;
-    padding: 2px 6px;
-    border-radius: 5px;
-    font-size: .8rem;
-    border: 1px solid #00000073;
-}
-
-.not-reviewed-badge {
-    background-color: #f44336;
-    padding: 2px 6px;
-    border-radius: 5px;
-    font-size: .8rem;
-    border: 1px solid #00000073;
+    width: 80px;
 }
 
 .items-row {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-}
-
-.review-status {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-grow: 1;
-}
-
-.item-slot {
-    margin-right: 2px;
 }
 
 .item-icon {
@@ -427,14 +465,43 @@ const hideTooltip = () => {
     border: 2px solid #000000;
 }
 
-.items-row .item-slot {
-    margin-left: auto;
+.right-section {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
 }
 
-.timestamp,
-.game-duration {
-    font-size: 0.8rem;
-    color: #999;
+.teams-block {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+
+.team-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.team-member {
+    display: flex;
+    align-items: center;
+}
+
+.team-icon {
+    width: 25px;
+    height: 25px;
+    margin-right: 4px;
+}
+
+.game-name {
+    font-size: 0.75rem;
+    color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 60px;
+    font-weight: 400;
 }
 
 .item-tooltip {
@@ -462,49 +529,4 @@ const hideTooltip = () => {
     font-size: 0.75rem;
     white-space: pre-wrap;
 }
-
-.items-and-teams {
-    display: flex;
-    justify-content: space-between; /* Spread items and teams to opposite sides */
-    align-items: flex-start;
-}
-
-.items-row {
-    display: flex;
-    align-items: center;
-}
-
-.item-slot {
-    margin-right: 5px;
-}
-
-.team-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 20px; /* Add some space between items and teams */
-}
-
-.team-member {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
-}
-
-.team-icon {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%; /* Circular icon */
-    margin-right: 5px;
-}
-
-.game-name {
-    font-size: 0.85rem;
-    color: #ffffff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 80px; /* Limit the width of the game name */
-}
-
 </style>

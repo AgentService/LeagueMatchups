@@ -4,7 +4,7 @@
             <div class="background-overlay"></div>
         </div>
         <transition name="fade">
-            <div class="auth-container">O
+            <div class="auth-container">
                 <div class="auth-card" v-if="!showDirectoryPicker">
                     <div class="auth-header">
                         <h2>{{ authMode === 'login' ? 'Login' : 'Register' }}</h2>
@@ -12,7 +12,7 @@
                         <div v-if="infoMessage" class="info-message">{{ infoMessage }}</div>
                     </div>
                     <form @submit.prevent="handleSubmit" class="auth-form">
-                        <input type="email" v-model="form.email" placeholder="Email" required>
+                        <input type="email" v-model="form.email" placeholder="Email" required>123@123.de
                         <input type="password" v-model="form.password" placeholder="Password" required>
                         <button class="button-login" type="submit" :disabled="isSubmitting">
                             {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
@@ -70,21 +70,15 @@ const handleSubmit = async () => {
     infoMessage.value = '';
 
     try {
-        if (authMode.value === 'register' && form.password !== form.confirmPassword) {
-            throw new Error('Passwords do not match');
-        }
-        if (authMode.value === 'login' || (authMode.value === 'register' && form.password === form.confirmPassword)) {
-            const payload = { ...form };
-            await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', payload);
-            if (authMode.value === 'register') {
-                infoMessage.value = 'Please check your email to verify your account and complete the registration.';
-                form.password = '';
-                authMode.value = 'login';
-            } else {
-                router.replace('/ChampionPage');
-            }
+        const payload = { ...form };
+        await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', payload);
+
+        if (authMode.value === 'register') {
+            infoMessage.value = 'Please check your email to verify your account and complete the registration.';
+            form.password = ''; // Clear password field after registration
+            authMode.value = 'login'; // Switch back to login mode after registration
         } else {
-            throw new Error('Passwords do not match');
+            router.replace('/ChampionPage'); // Redirect to ChampionPage on successful login
         }
     } catch (error) {
         errorMessage.value = error.message;

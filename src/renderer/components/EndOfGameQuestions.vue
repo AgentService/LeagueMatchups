@@ -245,18 +245,27 @@ function prevStep() {
 function submitFeedback() {
     const matchInfo = localMatchData.value.info || localMatchData.value;
 
-    // Get the user participant either by puuid or by participantId via summonerName
+    // Get the current summoner's information from the Vuex store
+    const currentSummoner = store.getters['summoner/getCurrentSummoner'];
+
+    if (!currentSummoner) {
+        console.error('No current summoner selected.');
+        return;
+    }
+
     let userParticipant = null;
 
-    // First, try to find the user participant using puuid (if available)
-    const puuid = store.state.summoner.playerDetails[0]?.puuid;
+    // Try finding the user participant using the current summoner's PUUID (preferred method)
+    const puuid = currentSummoner.apiResponse?.puuid || currentSummoner.webSocketResponse?.puuid;
+
     if (puuid) {
         userParticipant = matchInfo.participants?.find((p) => p.puuid === puuid);
     }
 
-    // If puuid-based search fails, try finding the user by summonerName
+    // If PUUID-based search fails, try finding the user by their summoner name
     if (!userParticipant && matchInfo.participantIdentities) {
-        const gameName = store.state.summoner.playerDetails[0]?.gameName;
+        const gameName = currentSummoner.apiResponse?.gameName || currentSummoner.webSocketResponse?.gameName;
+
         const identity = matchInfo.participantIdentities.find(
             (pi) => pi.player.gameName === gameName
         );
@@ -296,6 +305,7 @@ function submitFeedback() {
     emit('closeModal');
 }
 
+
 // Helper function to determine if the player won or lost
 function isWin(match, userParticipant) {
     return userParticipant?.stats?.win ?? false;
@@ -330,13 +340,17 @@ function handleGameStart() {
     closeModal();
 }
 
-onMounted(() => {
-    const cleanupPostGameStats = window.ws.receive('post-game-stats', handlePostGameStats);
-    const cleanupGameStart = window.ws.receive('game-start-event', handleGameStart);
 
+onMounted(() => {
+    // const cleanupPostGameStats = window.ws.receive('post-game-stats', handlePostGameStats);
+    const cleanupGameStart = window.ws.receive('game-start-event', handleGameStart);
+    const cleanupGameEnd = window.ws.receive('game-end-event', async () => {
+        await store.dispatch('matches/fetchLastMatch', { forceRefresh: true, count: 1 }); // Call fetchLastMatch from 'matches' module
+    });
     onUnmounted(() => {
-        cleanupPostGameStats();
+        // cleanupPostGameStats();
         cleanupGameStart();
+        cleanupGameEnd(); // Clean up the listener when the component is destroyed
     });
 });
 
@@ -399,7 +413,7 @@ function resetModalState() {
 }
 </script>
 
-<style scoped>
+<style >
 /* Modal and Overlay Styles */
 .modal-overlay {
     position: fixed;
@@ -415,7 +429,7 @@ function resetModalState() {
 }
 
 .questionnaire-modal {
-    width: 55vh;
+    width: 60vh;
     height: 82vh;
     background: #091014;
     border-radius: 8px;

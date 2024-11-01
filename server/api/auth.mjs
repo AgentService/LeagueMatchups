@@ -36,6 +36,7 @@ export function initializePassportStrategy(dbPool) {
                 email: user.email,
                 username: user.username,
                 id: user.userId, // Make sure to include the user's ID
+                role: user.role // Include role here
               });
             } else {
               // Password does not match
@@ -67,20 +68,18 @@ router.post(
 
     debug("User login: ", req.user);
     const user = req.user; // Your authenticated user
-    const email = user.email; // Get the user's email from the authenticated user
-    const id = user.id; // Get the user's ID from the authenticated user
+    const { email, id, role } = user; // Destructure role as well
     debug("mail", email);
+    debug("role", role);
 
     // Generate JWT
-    const token = jwt.sign({ email, id }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
+    const token = jwt.sign({ email, id, role }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
     });
 
-    debug("mail", email);
-
-    // Generate Refresh Token (example, you might want to use a more secure method)
+    // Generate Refresh Token
     const refreshToken = jwt.sign(
-      { email, id },
+      { email, id, role },
       process.env.JWT_REFRESH_SECRET,
       {
         expiresIn: "354d",
@@ -156,39 +155,33 @@ router.post("/token", async (req, res) => {
   }
 
   try {
-    // Verify the refresh token
+    // Verify the refresh token using JWT
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    const userId = decoded.id;
-    console.log("userId", userId);
-    console.log("refreshToken", refreshToken);
-    console.log("decoded", decoded);
+    const { id, role } = decoded; // Extract the role from the refresh token payload
 
-    // Check if the refresh token exists, is valid, and hasn't expired
-    const query =
-      "SELECT * FROM RefreshTokens WHERE user_id = $1 AND refresh_token = $2 AND expiry > NOW()";
-    const { rows } = await dbPool.query(query, [userId, refreshToken]);
-    console.log("rows", rows);
+    // Check if the refresh token exists in the database and hasn't expired
+    const query = "SELECT * FROM RefreshTokens WHERE user_id = $1 AND refresh_token = $2 AND expiry > NOW()";
+    const { rows } = await dbPool.query(query, [id, refreshToken]);
+
     if (rows.length === 0) {
-      debug("Invalid or expired refresh token");
       return res.status(403).send("Invalid or expired refresh token.");
     }
 
-    // Assuming the refresh token is valid, issue a new JWT
-    const newToken = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
+    // Issue a new JWT access token with role
+    const newToken = jwt.sign({ id, role }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
     });
-    debug("New token issued:", newToken);
-    // Respond with the new access token (and optionally, the new refresh token)
+
     res.json({ accessToken: newToken });
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      debug("Refresh token expired:", error);
       res.status(403).send("Refresh token expired.");
     } else {
-      console.error("Token exchange error:", error);
       res.status(500).send("Internal server error during token exchange.");
     }
   }
 });
+
+
 
 export default router;

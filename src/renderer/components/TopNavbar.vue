@@ -4,14 +4,16 @@
 			<div class="container-fluid w-75">
 				<SummonerInfo></SummonerInfo>
 				<div class="mx-auto d-flex justify-content-center">
-					<router-link to="/ChampionPage"
-						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Prepare</router-link>
-					<router-link to="/JournalPage"
-						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Journal</router-link>
-					<router-link to="/userJourney"
-						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Test</router-link>
-					<router-link to="/ReviewPage"
-						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Review</router-link>	
+					<router-link to="/ChampionPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
+						v-if="canAccessAdvancedTabs">Prepare</router-link>
+					<router-link to="/MatchupPage"
+						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Matchup</router-link>
+					<router-link to="/JournalPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
+						v-if="canAccessAdvancedTabs">Journal</router-link>
+					<router-link to="/userJourney" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
+						v-if="canAccessAdvancedTabs">Test</router-link>
+					<router-link to="/ReviewPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
+						v-if="canAccessAdvancedTabs">Review</router-link>
 
 				</div>
 				<div class="d-flex justify-content-center align-items-center ">
@@ -57,7 +59,7 @@
 										<li><a class="dropdown-item text-secondary" href='#'
 												@click="toggleVersionInfoModal">Version:
 												{{
-							appVersionInfo.currentVersion }} </a></li>
+													appVersionInfo.currentVersion }} </a></li>
 									</div>
 								</ul>
 							</div>
@@ -142,6 +144,12 @@ const showVersionInfoModal = ref(false);
 const toggleVersionInfoModal = () => {
 	showVersionInfoModal.value = !showVersionInfoModal.value;
 };
+
+const canAccessAdvancedTabs = computed(() => {
+	const userRole = store.state.auth.role;
+	return userRole === 'admin' || userRole === 'member';
+});
+
 const appVersionInfo = reactive({
 	currentVersion: '',
 	available: '',

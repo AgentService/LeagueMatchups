@@ -1,61 +1,91 @@
 // summonerDataService.js
 import store from "../store/index"; // Import the store directly
 import Debug from "debug";
+import axios from "axios";
+import { getAuthConfig } from "../store/modules/utilities.js";
 const debug = Debug("app:services:summoner-data");
 Debug.enable("*");
+const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 // Function that invokes the fetching of summoner data
-export async function fetchAndSaveSummonerData(summonerNameValue, tagLine) {
+export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, region = "europe", webSocketResponse = null) {
   try {
-    console.log(
-      "Fetching summoner data for:",
-      summonerNameValue,
-      "with tagLine:",
-      tagLine
-    );
-    if (summonerNameValue && tagLine) {
-      debug("Fetching summoner data for:", summonerNameValue);
-      await store.dispatch("summoner/fetchSummonerData", {
-        region: "europe",
-        gameName: summonerNameValue,
-        tagLine: tagLine,
+    console.log("Processing summoner data for:", summonerNameValue, "with tagLine:", tagLine);
+
+    const existingSummoner = store.getters['summoner/getSummonerDataByName'](summonerNameValue);
+
+    if (!existingSummoner || !existingSummoner.apiResponse) {
+      console.log("Fetching additional data from API for:", summonerNameValue);
+
+      const authConfig = getAuthConfig();
+      const apiResponse = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
+        ...authConfig,
+        params: {
+          region,
+          gameName: encodeURIComponent(summonerNameValue),
+          tagLine: encodeURIComponent(tagLine)
+        },
       });
+
+      if (apiResponse.status !== 200) {
+        throw new Error(`HTTP error! status: ${apiResponse.status}`);
+      }
+
+      const newPlayerDetails = {
+        summonerNameValue,
+        tagLine,
+        webSocketResponse: webSocketResponse || {},
+        apiResponse: apiResponse.data[0], // First summoner fetched from API
+      };
+
+      store.commit("summoner/setPlayerDetails", newPlayerDetails);
+      store.commit("summoner/setCurrentSummoner", newPlayerDetails);
+
+    } else {
+      const newPlayerDetails = {
+        summonerNameValue,
+        tagLine,
+        webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
+        apiResponse: existingSummoner.apiResponse,
+      };
+
+      store.commit("summoner/setPlayerDetails", newPlayerDetails);
+      store.commit("summoner/setCurrentSummoner", newPlayerDetails);
     }
+
   } catch (error) {
     console.error("Error fetching and saving summoner data:", error);
   }
 }
 
+
+
 /**
  * The function initializes data fetching for a summoner's name and checks if the summoner data already
  * exists before fetching and saving new data.
  */
+
 export function initializeSummonerDataFetching() {
   window.api.receive("summoner-name-response", async (response) => {
-    // Check if the response contains a valid summoner name and no error
-    if (response && response.displayName && !response.error) {
-      const newSummonerName = response.displayName;
-      const tagLine = response.tagLine;
-      const summonerData =
-        store.getters["summoner/getSummonerDataByName"](newSummonerName);
-      debug("Summoner data:", summonerData, "for:", newSummonerName, tagLine);
-      
-      if (!summonerData) {
-        debug("Fetching summoner data for:", newSummonerName);
-        // Assuming fetchAndSaveSummonerData is an async function that fetches
-        // and then updates the store with the new summoner data.
-        await fetchAndSaveSummonerData(newSummonerName, tagLine);
-      } else {
-        debug("Summoner data already exists for:", newSummonerName);
-      }
+    console.log("Received summoner name response from WebSocket:", response);
+    if (response && typeof response === 'object' && response.gameName && !response.error) {
+      const newSummonerName = response.gameName;
+      const tagLine = response.tagLine || "";
+
+      // Fetch and save the summoner data
+      await fetchAndSaveSummonerData(newSummonerName, tagLine, "europe", response);
     } else {
-      // Handle cases where summoner name couldn't be fetched or an error occurred
-      debug("Error fetching summoner name:", response.error);
-      // Optionally, request the user to specify the path manually or show an error message
+      console.error("Invalid or empty summoner response from WebSocket:", response);
     }
+
   });
+
+  // Trigger the request to get the summoner name
   window.api.send("get-summoner-name");
 }
+
+
+
 
 /*
  * The function checks for the summoner name every hour and fetches the data if it doesn't exist.

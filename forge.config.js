@@ -3,7 +3,8 @@ module.exports = {
     asar: false, // or an object containing your asar options
     ignore: [
       /^\/public$/, // This regex will ignore the 'public' folder at the root of your project
-      /^\/server$/ // This regex will ignore the 'server' folder at the root of your project
+      /^\/server$/, // This regex will ignore the 'server' folder at the root of your project
+      /^\/test$/ // This regex will ignore the 'test' folder at the root of your project
     ],
   },
   rebuildConfig: {},

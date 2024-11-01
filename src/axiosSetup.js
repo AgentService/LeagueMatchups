@@ -27,52 +27,49 @@ function onRefreshed(token) {
   subscribers = []; // Reset the subscribers array after notifying
 }
 
+// Axios response interceptor for handling token expiration and refresh
 axios.interceptors.response.use(
-  (response) => response, // Return the response if successful
-  (error) => {
+  (response) => response,
+  async (error) => {
     const {
       config,
       response: { status },
     } = error;
     const originalRequest = config;
 
-    // Check if we should refresh the token when a 401 Unauthorized is encountered
-    if (status === 401 && !originalRequest._retry && shouldRefreshToken()) {
+    // Refresh Token Flow
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Prevent multiple refresh requests
       if (!isRefreshing) {
         isRefreshing = true;
-        store
-          .dispatch("auth/refreshToken") // Dispatch the refreshToken action in the store
-          .then((newToken) => {
-            axios.defaults.headers.common["Authorization"] = "Bearer " + newToken;
-            originalRequest.headers["Authorization"] = "Bearer " + newToken;
-            isRefreshing = false;
-            onRefreshed(newToken); // Notify all subscribers waiting for the token
-          })
-          .catch((refreshError) => {
-            isRefreshing = false;
-            console.error("Token refresh error:", refreshError);
-            store.dispatch("auth/logout"); // Logout the user on token refresh failure
-          });
-      }
 
-      // Queue the requests while waiting for the token refresh
-      return new Promise((resolve, reject) => {
+        try {
+          const newToken = await store.dispatch("auth/refreshToken");
+          axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+          onRefreshed(newToken);
+          return axios(originalRequest);
+        } catch (refreshError) {
+          store.dispatch("auth/logout"); // Logout if refresh fails
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+      return new Promise((resolve) => {
         subscribeTokenRefresh((token) => {
-          originalRequest.headers["Authorization"] = "Bearer " + token;
-          resolve(axios(originalRequest)); // Retry the original request with the new token
+          originalRequest.headers["Authorization"] = `Bearer ${token}`;
+          resolve(axios(originalRequest));
         });
       });
     }
 
-    // Handle other cases of 401 Unauthorized
-    if (status === 401) {
-      return Promise.reject("Refresh token rate limited.");
+    if (status === 403) {
+      store.dispatch("auth/logout");
+      return Promise.reject("Invalid or expired refresh token.");
     }
 
-    // For all other errors, reject the promise
     return Promise.reject(error);
   }
 );
+

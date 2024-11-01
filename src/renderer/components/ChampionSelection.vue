@@ -13,7 +13,7 @@
 		</div> -->
 		<div class="d-flex justify-content-between align-items-center">
 			<div class="search-container">
-				
+
 				<div class="search-bar position-relative">
 					<div class="input-group">
 						<span class="input-group-text" @click="showGrid">
@@ -42,8 +42,8 @@
 						</div>
 					</div>
 				</div>
-				<button key="championA-community-notes-button" class="btn button shared-button" @click="showNotesModal = true"
-					aria-label="Community Notes for {{ championA.name }}"
+				<button key="championA-community-notes-button" class="btn button shared-button"
+					@click="showNotesModal = true" aria-label="Community Notes for {{ championA.name }}"
 					:title="'Community Notes for ' + championA?.name" v-if="instanceId === 1">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 				</button>
@@ -77,7 +77,12 @@
 
 			</div>
 		</transition>
-
+		<transition name="fade">
+			<div v-if="showRestrictionPopup" class="restriction-popup">
+				<p>You cannot select the same champion for both sides.</p>
+				<button @click="closeRestrictionPopup">OK</button>
+			</div>
+		</transition>
 		<div v-if="loading" class="loading-indicator">
 			Loading...
 		</div>
@@ -85,7 +90,7 @@
 		<div v-else class="champion-detail-container" v-if="selectedChampion" v-show="!isGridVisible">
 			<transition name="fade" mode="out-in">
 				<div class="champion-detail-wrapper champion-detail--instance1 " v-if="instanceId === 1">
-					
+
 					<div :class="[themeClass, 'champion-content']">
 						<!-- Champion Image Container -->
 
@@ -139,7 +144,7 @@
 													</div>
 													<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
 													<p class="spell-description">{{
-			selectedChampion?.passive.description }}
+														selectedChampion?.passive.description }}
 													</p>
 												</div>
 											</div>
@@ -150,7 +155,7 @@
 										<div class="ability-icon-wrapper">
 											<img :src="spellData.url" class="ability-icon" />
 											<div class="cooldown">{{
-			spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+												spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 											<!-- <div class="cooldown">{{ spell.cooldownBurn.split('/')[0] }}</div> -->
 											<div class="tooltip-container">
 												<div class="tooltip">
@@ -159,18 +164,18 @@
 															<img :src="spellData.url" :alt="spellData.spell.name"
 																class="tooltip-spell-icon" />
 															<span class="ability-label">{{
-			getAbilityLabelByIndex(index)
-		}}</span>
+																getAbilityLabelByIndex(index)
+															}}</span>
 														</div>
 														<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 														<div>
 															<p class="spell-cooldown">Cooldown: <span
 																	class="value-text">{{
-			spellData.spell.cooldownBurn
-		}}</span></p>
+																		spellData.spell.cooldownBurn
+																	}}</span></p>
 															<p class="spell-cost">Cost: <span class="value-text">{{
-				spellData.spell.costBurn
-			}}</span>
+																spellData.spell.costBurn
+															}}</span>
 															</p>
 														</div>
 														<p class="spell-description">{{ spellData.spell.description
@@ -237,7 +242,7 @@
 												</div>
 												<h5 class="spell-name">{{ selectedChampion?.passive.name }}</h5>
 												<p class="spell-description">{{
-			selectedChampion?.passive.description }}
+													selectedChampion?.passive.description }}
 												</p>
 											</div>
 										</div>
@@ -247,7 +252,7 @@
 									<div class="ability-icon-wrapper">
 										<img :src="spellData.url" class="ability-icon" />
 										<div class="cooldown">{{
-			spellData.spell.cooldownBurn.split('/')[0] }}s</div>
+											spellData.spell.cooldownBurn.split('/')[0] }}s</div>
 
 										<div class="tooltip-container">
 											<div class="tooltip">
@@ -256,17 +261,17 @@
 														<img :src="spellData.url" :alt="spellData.spell.name"
 															class="tooltip-spell-icon" />
 														<span class="ability-label">{{
-			getAbilityLabelByIndex(index)
-		}}</span>
+															getAbilityLabelByIndex(index)
+														}}</span>
 													</div>
 													<h5 class="spell-name">{{ spellData.spell.name }}</h5>
 													<div>
 														<p class="spell-cooldown">Cooldown: <span class="value-text">{{
-			spellData.spell.cooldownBurn
-																}}</span></p>
+															spellData.spell.cooldownBurn
+														}}</span></p>
 														<p class="spell-cost">Cost: <span class="value-text">{{
-																spellData.spell.costBurn
-																}}</span>
+															spellData.spell.costBurn
+														}}</span>
 														</p>
 													</div>
 													<p class="spell-description">{{ spellData.spell.description
@@ -508,7 +513,8 @@ export default {
 			defaultSpells: [
 				{ id: 'SummonerFlash', name: 'Flash', image: { full: 'SummonerFlash.png' } },
 				{ id: 'SummonerDot', name: 'Ignite', image: { full: 'SummonerDot.png' } },
-			]
+			],
+			showRestrictionPopup: false
 		};
 	},
 
@@ -749,12 +755,20 @@ export default {
 			});
 		},
 		async selectChampion(champion) {
-			this.animateChampion();
+			// Prevent selecting the same champion in both instances
+			if ((this.instanceId === 1 && this.championB?.id === champion.id) ||
+				(this.instanceId === 2 && this.championA?.id === champion.id)) {
+				this.showRestrictionPopup = true; // Show restriction popup
+				return; // Stop selection if the champion is already selected in the other instance
+			}
+
+			// Proceed with champion selection logic
+			// this.animateChampion();
 			this.selectedChampion = champion;
+
 			// Fetch and store passive image URL
 			this.selectedChampionPassiveUrl = this.getPassiveImageUrl(champion.passive);
 
-			// Fetch and store spell image URLs
 			// Fetch and store spell image URLs along with spell data
 			this.selectedChampionSpell = champion.spells.map(spell => ({
 				spell: spell,
@@ -762,8 +776,7 @@ export default {
 			}));
 
 			this.hideGrid();
-			debug('Selected champion:', this.selectedChampion);
-
+			console.debug('Selected champion:', this.selectedChampion);
 
 			// Assuming 'championCustomData' is part of your component's data and is reactive
 			this.$nextTick(() => {
@@ -776,7 +789,7 @@ export default {
 				const championSpells = this.championCustomData[champion.id]?.summonerSpells || this.defaultSpells;
 
 				this.selectedSpells = championSpells;
-				this.animateChampion();
+				// this.animateChampion();
 			});
 
 			this.$emit('championSelected', this.selectedChampion);
@@ -797,6 +810,9 @@ export default {
 				return championData;
 			}
 		},
+		closeRestrictionPopup() {
+			this.showRestrictionPopup = false; // Hide the popup when the user clicks OK
+		},
 		animateChampion() {
 			const animation = this.instanceId === 1 ? this.blueAnimation : this.redAnimation;
 			if (animation && this.elementToAnimate) {
@@ -812,11 +828,36 @@ export default {
 </script>
 
 <style scoped>
+.restriction-popup {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #333;
+	color: white;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	z-index: 1000;
+	width: 80%;
+	max-width: 300px;
+	text-align: center;
+}
+
+.restriction-popup button {
+	margin-top: 10px;
+	padding: 5px 10px;
+	background-color: #555;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
 .shared-button {
-	position: absolute;
 	bottom: -4rem;
 	right: 2rem;
-
+	z-index: 1;
 }
 
 
@@ -1292,7 +1333,7 @@ export default {
 }
 
 .ability-icon:hover {
-	transform: translateY(-5px);
+	/* transform: translateY(-5px); */
 }
 
 .ability-icon-passive {

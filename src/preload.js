@@ -1,4 +1,3 @@
-// preload.js
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("electron", {
@@ -19,23 +18,20 @@ contextBridge.exposeInMainWorld("api", {
   checkForUpdates: () => ipcRenderer.send("check-for-updates"),
   restartAppToUpdate: () => ipcRenderer.send("restart-app-to-update"),
   onUpdateAvailable: (callback) => ipcRenderer.on("update-available", callback),
-  onUpdateNotAvailable: (callback) =>
-    ipcRenderer.on("update-not-available", callback),
-  onDownloadProgress: (callback) =>
-    ipcRenderer.on("download-progress", callback),
-  onUpdateDownloaded: (callback) =>
-    ipcRenderer.on("update-downloaded", callback),
+  onUpdateNotAvailable: (callback) => ipcRenderer.on("update-not-available", callback),
+  onDownloadProgress: (callback) => ipcRenderer.on("download-progress", callback),
+  onUpdateDownloaded: (callback) => ipcRenderer.on("update-downloaded", callback),
   onUpdateError: (callback) => ipcRenderer.on("update-error", callback),
   checkClientStatus: () => ipcRenderer.invoke("check-client-status"),
   getCurrentGamePhase: () => ipcRenderer.invoke("get-current-game-phase"),
   send: (channel, data) => {
-    const validChannels = ["open-path-dialog", "get-summoner-name"]; // Add more valid channels as needed
+    const validChannels = ["open-path-dialog", "get-summoner-name"];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
     }
   },
   receive: (channel, func) => {
-    let validReceiveChannels = [
+    const validReceiveChannels = [
       "summoner-name-response",
       "update-available",
       "update-downloaded",
@@ -51,6 +47,18 @@ contextBridge.exposeInMainWorld("api", {
       return () => {
         ipcRenderer.removeListener(channel, subscription);
       };
+    }
+  },
+  receiveOnce: (channel, func) => {
+    const validReceiveChannels = [
+      "summoner-name-response",
+      "update-available",
+      "update-downloaded",
+      "download-progress",
+      "update-error",
+    ];
+    if (validReceiveChannels.includes(channel)) {
+      ipcRenderer.once(channel, (event, ...args) => func(...args));
     }
   },
   removeReceive: (channel, func) => {
@@ -81,22 +89,21 @@ contextBridge.exposeInMainWorld("ws", {
       "champ-select-done",
       "game-end-event",
       "game-start-event",
-      'gameflow-phase-change',
+      "gameflow-phase-change",
       "get-current-game-phase",
       "post-game-stats",
     ];
     if (validChannels.includes(channel)) {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
+
       // Return a cleanup function
       return () => {
         ipcRenderer.removeListener(channel, func);
       };
     }
   },
-  // setupWebSocket: () => ipcRenderer.invoke("setup-webSocket"),
   onWebSocketMessage: (callback) => {
     ipcRenderer.on("webSocket-message", (event, ...args) => callback(...args));
-    // Return a cleanup function to unregister the event listener
     return () => {
       ipcRenderer.removeListener("webSocket-message", callback);
     };

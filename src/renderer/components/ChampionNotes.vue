@@ -13,12 +13,6 @@
 		</div>
 		<div class="editor-footer-bar">
 			<div class="left-status">
-				<!-- Save Button -->
-				<button @click="manualSave" :class="['btn', 'button', buttonTextColorClass]">
-					<i class="fas fa-save"></i> Save
-				</button>
-			</div>
-			<div class="right-status">
 				<!-- Status Messages -->
 				<span v-if="notesState === 'unsaved'" :class="[buttonTextColorClass]">
 					<i class="fas fa-exclamation-triangle text-warning"></i> Unsaved
@@ -29,6 +23,12 @@
 				<span v-else-if="notesState === 'neutral'">
 					<i class="fas fa-check-circle text-muted"></i>
 				</span>
+			</div>
+			<div class="right-status">
+				<!-- Save Button -->
+				<button @click="manualSave" :class="['btn', 'button', buttonTextColorClass]">
+					<i class="fas fa-save"></i> Save
+				</button>
 			</div>
 		</div>
 	</div>
@@ -184,8 +184,6 @@ onMounted(async () => {
 
 
 <style>
-
-
 .champion-matchup-icon {
 	width: 50px;
 	height: auto;
@@ -261,7 +259,7 @@ onMounted(async () => {
 .editor-footer-bar {
 	display: flex;
 	justify-content: space-between;
-	padding-right: 10px;
+	padding-left: 10px;
 	font-size: 0.9rem;
 	position: relative;
 	right: 0;

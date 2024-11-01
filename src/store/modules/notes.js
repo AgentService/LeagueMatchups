@@ -323,7 +323,6 @@ export const notes = {
       if (!state.matchupNotes[combinedId]) {
         try {
           const authConfig = getAuthConfig(); // Ensure this function is defined and correctly sets up authorization headers
-          debug("authConfig", authConfig);
           const response = await axios.get(
             `${baseUrl}/api/notes/matchup/${combinedId}`,
             authConfig

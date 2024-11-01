@@ -7,6 +7,7 @@ import {
   handleApiError,
   getAuthConfig,
 } from "./utilities";
+import { initializeSummonerDataFetching, startSummonerNameCheck } from '../../services/summonerDataService';
 
 const debug = Debug("app:store:auth");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -15,14 +16,17 @@ export const auth = {
   namespaced: true,
   state: () => ({
     user: null,
+    role: null, // New field for role
     isLoggedIn: false,
     token: null,
+    refreshToken: null,  // Vuex state persists this
     authLoading: true, // Indicates whether authentication is in progress
   }),
   getters: {
     isLoggedIn: (state) => state.isLoggedIn,
     user: (state) => state.user,
     token: (state) => state.token,
+    role: (state) => state.role, // New getter for role
   },
   mutations: {
     SET_REFRESH_TOKEN(state, refreshToken) {
@@ -30,6 +34,7 @@ export const auth = {
     },
     SET_USER(state, user) {
       state.user = user;
+      state.role = user?.role || null; // Set role if available
       state.isLoggedIn = !!user;
       debug("User set", user);
     },
@@ -66,7 +71,7 @@ export const auth = {
         commit("SET_AUTH_LOADING", false); // Indicate that registration process is complete
       }
     },
-    async login({ commit }, credentials) {
+    async login({ commit, dispatch }, credentials) {
       try {
         const response = await axios.post(`${baseUrl}/api/auth/login`, credentials);
         const data = validateApiResponse(response);
@@ -77,9 +82,42 @@ export const auth = {
 
         axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
+        // Initialize summoner data after login
+        await dispatch('initializeSummonerData');
+
         debug("Login successful", data.user);
       } catch (error) {
         return handleApiError(error);
+      }
+    },
+    // Add this action to your store
+    async initializeSummonerData({ dispatch }) {
+      try {
+        // Define getClientStatus here if it’s not globally accessible
+        async function getClientStatus() {
+          try {
+            const status = await window.api.checkClientStatus(); // Adjust the call to match your API
+            return status.connected; // Assuming `status.connected` indicates client activity
+          } catch (error) {
+            console.error('Error checking client status:', error);
+            return false;
+          }
+        }
+
+        // Check if the client is active
+        const isClientActive = await getClientStatus();
+        console.log('Client active:', isClientActive);
+
+        if (isClientActive) {
+          // Start data fetching processes if client is active
+          initializeSummonerDataFetching();
+          startSummonerNameCheck();
+        } else {
+          // Populate with a default summoner if no client is active
+          // await dispatch("summoner/fetchDefaultSummoner");
+        }
+      } catch (error) {
+        console.error('Error initializing summoner data:', error);
       }
     },
 
@@ -102,13 +140,11 @@ export const auth = {
 
         return accessToken;
       } catch (error) {
-        dispatch("logout"); // If refresh fails, log the user out
+        dispatch("logout");  // If refresh fails, log the user out
         console.error("Error refreshing the token:", error);
         throw error;
       }
     },
-
-
     async reauthenticate({ commit, state, dispatch }, { token, refreshToken }) {
       commit("SET_AUTH_LOADING", true);
       try {
@@ -116,28 +152,19 @@ export const auth = {
         const validToken = await dispatch("ensureValidToken");
         if (!validToken) throw new Error("Token refresh failed");
 
-        // Attempt to verify the access token with the API
-        let config = getAuthConfig(validToken);
-        await axios.post(`${baseUrl}/api/auth/verifyToken`, {}, config);
-
-        // Set the token only if it has changed
-        if (state.token !== validToken) {
-          commit("SET_TOKEN", validToken);
-          axios.defaults.headers.common["Authorization"] = `Bearer ${validToken}`;
-        }
+        // Set the Authorization headers
+        axios.defaults.headers.common["Authorization"] = `Bearer ${validToken}`;
       } catch (error) {
         if (error.response && error.response.status === 401) {
           try {
-            const refreshResponse = await dispatch("refreshToken");
-            if (refreshResponse) {
-              commit("SET_TOKEN", refreshResponse);
-              axios.defaults.headers.common[
-                "Authorization"
-              ] = `Bearer ${refreshResponse}`;
+            const refreshedToken = await dispatch("refreshToken");
+            if (refreshedToken) {
+              commit("SET_TOKEN", refreshedToken);
+              axios.defaults.headers.common["Authorization"] = `Bearer ${refreshedToken}`;
             }
           } catch (refreshError) {
             console.error("Token refresh failed:", refreshError);
-            dispatch("logout");
+            await dispatch("logout");
           }
         } else {
           console.error("Token verification failed:", error);
@@ -146,7 +173,6 @@ export const auth = {
         commit("SET_AUTH_LOADING", false);
       }
     },
-
     async logout({ commit }) {
       try {
         const userId = this.state.auth.user.id;
@@ -156,7 +182,7 @@ export const auth = {
         // Invalidate the refresh token on the server
         await axios.post(`${baseUrl}/api/auth/logout`, { userId }, config);
 
-        // Clear tokens from Vuex store and localStorage
+        // Clear tokens from Vuex store
         commit("SET_USER", null);
         commit("SET_TOKEN", null);
         commit("SET_REFRESH_TOKEN", null);
@@ -183,11 +209,10 @@ export const auth = {
         // Token is expired, refresh it
         return await dispatch("refreshToken");
       }
-      return state.token; // Token is still valid, proceed
+      return state.token;  // Token is still valid, proceed
     }
   },
 };
-
 
 // Define isTokenExpired as a helper function outside the actions
 function isTokenExpired(token) {

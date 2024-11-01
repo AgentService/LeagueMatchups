@@ -4,21 +4,40 @@ import jwt from "jsonwebtoken";
 import Debug from "debug";
 const debug = Debug("api:authMiddleware");
 
+// authMiddleware.mjs
+import jwt from "jsonwebtoken";
+
 export function verifyToken(req, res, next) {
-  const token = req.headers["authorization"]?.split(" ")[1]; // Assuming token is sent as a Bearer token
+  // Extract the token from the authorization header
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
+  // Check if the token is missing
   if (!token) {
-    return res.status(403).send("A token is required for authentication");
+    return res.status(401).json({ message: "Access token is required" });
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next(); // Call next() to continue to the route handler if the token is valid
-  } catch (err) {
-    return res.status(401).send("Invalid Token");
-  }
+  // Verify the token using JWT
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      if (err instanceof jwt.TokenExpiredError) {
+        return res.status(401).json({ message: "Access token has expired" });
+      }
+      return res.status(403).json({ message: "Invalid access token" });
+    }
+
+    // Attach user information from the decoded token to req.user
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role, // Attach role to req.user for role-based access
+    };
+
+    // Continue to the next middleware or route handler
+    next();
+  });
 }
+
 
 export function extractEmailFromToken(req, res, next) {
   const authHeader = req.headers.authorization;

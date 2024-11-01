@@ -37,8 +37,9 @@ response = requests.get(local_api_url, headers=headers, verify=False)
 
 if response.status_code == 200:
     summoner_info = response.json()
-    summoner_name = summoner_info['displayName']
-    print(f"Summoner name detected: {summoner_name}")
+    summoner_name = summoner_info['gameName']
+    game_name = summoner_info['gameName']
+    print(f"Summoner name detected: {game_name}")
 else:
     print(f"Could not detect the summoner name. Status Code: {response.status_code}")
     print(f"Response: {response.text}")

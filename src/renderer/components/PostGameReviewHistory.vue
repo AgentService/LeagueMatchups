@@ -5,13 +5,17 @@
             <span class="widget-header-title ms-1">Review History</span>
             <span class="widget-header-right"></span>
         </div>
+
         <div class="refetch-button-container">
-            <button @click="fetchLatestMatch" class="refetch-button">Refresh Matches</button>
+            <button @click="fetchLatestMatches(true)" class="refetch-button">Refresh Matches</button>
         </div>
-        <div v-if="matches?.length === 0" class="no-matches">No matches found.</div>
+
+        <!-- No matches found -->
+        <div v-if="uiMatches.length === 0" class="no-matches">No matches found.</div>
+
+        <!-- Display match history -->
         <div v-else class="matches-list">
-            <div v-for="(match, index) in matches" :key="index" class="match-card" @click="openReviewForm(match)">
-                <!-- Use MatchInfo Component -->
+            <div v-for="(match, index) in uiMatches" :key="index" class="match-card" @click="openReviewForm(match)">
                 <MatchInfo :match="match" />
             </div>
         </div>
@@ -26,22 +30,23 @@
         </div>
 
         <!-- Feedback Modal -->
-        <EndOfGameQuestions v-if="matches" :isVisible="isModalVisible" :matchData="selectedMatch"
+        <EndOfGameQuestions v-if="uiMatches" :isVisible="isModalVisible" :matchData="selectedMatch"
             :savedFeedback="selectedMatch?.feedback" @closeModal="closeModal" />
     </div>
 </template>
 
-
-
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
-import EndOfGameQuestions from "./EndOfGameQuestions.vue";
+import { ref, computed, onMounted, watch } from 'vue';
+import { useStore } from 'vuex';
+import EndOfGameQuestions from './EndOfGameQuestions.vue';
 import MatchInfo from './reuse/MatchInfo.vue'; // Import MatchInfo component
 
 const store = useStore();
+
+// Reactive state for UI
 const isModalVisible = ref(false);
 const selectedMatch = ref(null);
+const uiMatches = ref([]); // UI data to hold match history temporarily
 
 // Tooltip state
 const tooltip = ref({
@@ -50,105 +55,76 @@ const tooltip = ref({
     isVisible: false,
 });
 
-const matches = computed(() => store.getters['matches/getMatchHistory']);
-
 const tooltipPosition = ref({
     top: '0px',
     left: '0px',
 });
 
+// Watch current summoner and fetch matches when it changes
+const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
+watch(currentSummoner, async (newSummoner) => {
+    if (newSummoner) {
+        uiMatches.value = []; // Clear the UI temporarily
+        await fetchLatestMatches(); // Fetch latest matches based on the selected summoner
+
+        // Update `uiMatches` with the matches for the current summoner
+        uiMatches.value = store.getters['matches/getMatchHistory'](newSummoner.apiResponse.puuid);
+    }
+});
+
+
+
+// Open the review form for the selected match
 const openReviewForm = async (match) => {
     try {
-        // Ensure match and gameId exist
-        if (!match || !match?.info?.gameId) {
-            console.warn("Invalid match data provided");
-            return;
-        }
+        const puuid = currentSummoner.value?.apiResponse?.puuid || currentSummoner.value?.webSocketResponse?.puuid;
+        let userParticipant = match.info.participants.find(participant => participant.puuid === puuid);
 
-        // Ensure match data exists
-        if (!match?.info?.participants) {
-            console.warn("No participants data in match!");
-            return;
-        }
-
-        const puuid = store.state.summoner.playerDetails[0]?.puuid;
-        let userParticipant = match.info.participants.find(
-            (participant) => participant.puuid === puuid
-        );
-
-        // If PUUID lookup fails, try matching by summoner name
         if (!userParticipant) {
-            const summonerName = store.state.summoner.playerDetails[0]?.gameName;
-            const participantIdentity = match.info.participantIdentities?.find(
-                (identity) => identity.player.summonerName === summonerName
-            );
-
-            if (participantIdentity) {
-                const participantId = participantIdentity.participantId;
-                userParticipant = match.info.participants.find(
-                    (participant) => participant.participantId === participantId
-                );
-            }
-        }
-
-        // If the user participant is found, proceed
-        if (userParticipant) {
-            // Assign userParticipant to match info
-            match.info.userParticipant = userParticipant;
-
-            // Fetch previously saved feedback for this match
-            const savedFeedback = store.getters['metrics/getSubjectiveFeedbackByGameId'](match?.info?.gameId);
-
-            // Update the selected match with feedback if available
-            selectedMatch.value = {
-                ...match,
-                feedback: savedFeedback?.feedback || null,
-            };
-
-            // Open the modal
-            isModalVisible.value = true;
-        } else {
             console.error("User participant not found in match data");
+            return;
         }
+
+        match.info.userParticipant = userParticipant;
+
+        const savedFeedback = store.getters['metrics/getSubjectiveFeedbackByGameId'](match?.info?.gameId);
+        selectedMatch.value = { ...match, feedback: savedFeedback?.feedback || null };
+        isModalVisible.value = true;
     } catch (error) {
         console.error("Error opening review form:", error);
     }
 };
 
+// Close the modal
 const closeModal = () => {
     selectedMatch.value = null;
     isModalVisible.value = false;
 };
 
-async function fetchLatestMatch() {
+async function fetchLatestMatches(forceRefresh = false) {
     try {
-        const puuid = store.state.summoner.playerDetails[0]?.puuid;
-        if (!puuid) {
-            console.error("Player PUUID is not available.");
-            return;
-        }
-        // Fetch the latest match data using a Vuex action
-        await store.dispatch("matches/fetchLastMatch", puuid);
+        // Fetch matches for the current summoner
+        await store.dispatch('matches/fetchLastMatch', { forceRefresh: forceRefresh });
 
-        // Get the latest match from the Vuex store
-        const recentMatches = store.getters["matches/getMatchHistory"];
-        console.log("Fetched Matches:", recentMatches);
-
-        const latestMatch = recentMatches[0];
-        if (!latestMatch) {
-            console.error("No match data found.");
-            return;
-        }
-        console.log("Latest Match Data:", latestMatch);
+        // Ensure uiMatches is updated from Vuex with the new summoner's matches
+        uiMatches.value = store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid);
     } catch (error) {
-        console.error("Error fetching the latest match:", error);
+        console.error('Error fetching the latest match:', error);
     }
 }
 
-onMounted(() => {
+
+
+
+// Fetch matches on component mount
+onMounted(async () => {
     store.dispatch('items/fetchAllItems');
-    // fetchAndShowLastMatch();
+
+    if (currentSummoner.value) {
+        await fetchLatestMatches();
+        uiMatches.value = store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid);
+    }
 });
 </script>
 
@@ -157,9 +133,14 @@ onMounted(() => {
 .match-history {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    overflow: hidden;
     position: relative;
+    width: 100%;
+    background: #091014;
     border-radius: 0 0 12px 12px;
-    padding: 1rem 1rem;
+    padding: 2rem 2rem;
+    padding-bottom: 1.5rem;
     border: 1px solid rgba(128, 128, 128, 0.1);
     color: var(--gold-1);
 }

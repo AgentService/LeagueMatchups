@@ -4,6 +4,9 @@
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "./index.scss";
 
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 // Importing Bootstrap source SASS for customization
 
 $primary-color: #a1628c; // Change the primary color
@@ -83,5 +86,471 @@ $btn-secondary-bg: $secondary-color;
     margin-right: 10px;
 }
 
+.card-container-header {
+    text-transform: uppercase;
+    text-align: start;
+    font-size: 1.1rem;
+    padding: 0.5rem;
+    padding-top: 0rem;
+    display: flex;
+    color: var(--gold-4);
+}
 
+.card-container {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+}
 
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    color: #e7e7e7;
+    padding: 1rem;
+    max-height: 390px;
+    min-height: 390px;
+    z-index: auto;
+}
+
+.card-small {
+    position: relative;
+    display: flex;
+    border-bottom: 0;
+    border-radius: 0;
+    flex-direction: column;
+    background-image: linear-gradient(to right, #091014, #091014);
+    color: #e7e7e7;
+    padding: 0.5rem 1.25rem;
+    max-height: 250px;
+    min-height: 250px;
+    z-index: auto;
+}
+
+.card-large {
+    user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    color: var(--gold-1);
+    padding: 1rem 1rem;
+    max-height: 320px;
+    min-height: 320px;
+    width: 100%;
+    z-index: auto;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    border-bottom: 0;
+    background-image: linear-gradient(to right, #091014, #091014);
+}
+
+.card-wide {
+    user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-image: linear-gradient(to right, #091014, #091014);
+    color: var(--gold-1);
+    padding: 1rem 1rem;
+    z-index: 0;
+}
+
+.card-widget {
+    flex-direction: column;
+    user-select: none;
+    position: relative;
+    display: flex;
+    color: var(--gold-1);
+    background-image: linear-gradient(to right, #091014, #091014);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+    padding: 1rem;
+}
+
+.card-tips {
+    flex-direction: column;
+    user-select: none;
+    position: relative;
+    display: flex;
+    color: var(--gold-1);
+    background-image: linear-gradient(to right, #091014, #091014);
+    z-index: 0;
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease-in-out;
+    padding: 1rem 1rem;
+    min-height: 360px;
+    max-height: 360px;
+}
+
+.card-widget:hover {
+    background-color: #214153;
+    /* Slightly darker on hover to indicate interactivity */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Elevated shadow on hover */
+}
+
+.card-fluid {
+    user-select: none;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(128, 128, 128, 0.1);
+    background-image: linear-gradient(to right, #091014, #091014);
+    padding: 1rem 1rem;
+    min-height: 440px;
+    max-height: 440px;
+}
+
+.notes-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 0.5rem;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.title-bar {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    color: var(--gold-3);
+}
+
+.title-bar h5 {
+    margin: 0;
+    padding: 0.5rem 0;
+}
+
+.app-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1920px;
+    min-height: 100%;
+}
+
+.app-container {
+    flex: 1;
+    position: relative;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.grid-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.row2 {
+    display: flex;
+    justify-content: center;
+}
+
+.background-container {
+    position: static;
+    height: auto;
+    opacity: 1;
+}
+
+.row.front {
+    z-index: 0;
+}
+
+@media (max-height: 1440px) {
+    .background-container {
+        height: 100%;
+    }
+
+    .card-container {
+        max-height: 100%;
+    }
+}
+
+.gradient-top-border::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: var(--border-grey-gradient-horizontal);
+    z-index: 2;
+}
+
+.gradient-border1::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: var(--border-grey-gradient);
+    z-index: 2;
+}
+
+/* Gradient Border Class for right border */
+
+.gradient-border2::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 1px;
+    background: var(--border-grey-gradient);
+    z-index: 2;
+}
+
+/* Gradient Border Laser Class for vertical border */
+
+.gradient-border-laser::after {
+    content: "";
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+    left: 0;
+    width: 1px;
+    background: linear-gradient(to top, #000406, var(--gold-3), var(--gold-3), #000406);
+    z-index: 0;
+}
+
+.gradient-border:not(:last-child)::after {
+    display: none;
+    /* This hides the right border for all but the last child */
+}
+
+.gradient-border:not(:first-child)::before {
+    display: none;
+    /* This hides the left border for all but the first child */
+}
+
+.card-header-custom {
+    background-color: transparent;
+    font-weight: 600;
+    text-align: start;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    color: var(--gold-3);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+    user-select: none;
+}
+
+.tab-header {
+    background-color: transparent;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 1.5rem 0;
+    color: var(--gold-1);
+}
+
+.active-border {
+    background-color: #04d9ff;
+    width: 20%;
+    margin: 0.5rem 0;
+    align-self: center;
+    height: 3px;
+}
+
+.teams-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+.my-team,
+.enemy-team {
+    display: flex;
+}
+
+.champion-icon {
+    width: 50px;
+    height: auto;
+    background: var(--hextech-black);
+    border: 0px solid var(--blue-7);
+}
+
+.widget-footer {
+    bottom: -5px;
+    right: -2px;
+    display: flex;
+    position: absolute;
+    justify-content: end;
+    color: var(--grey-1);
+    font-size: 0.85rem;
+}
+
+.widget-header {
+    padding-bottom: 0.25rem;
+    margin-bottom: 0rem;
+    display: flex;
+    font-size: 0.9rem;
+    align-items: center;
+    width: 100%;
+    color: var(--gold-3);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.widget-header-title {
+    font-weight: 600;
+}
+
+.widget-header-right {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--grey-1);
+}
+
+.champion-select-widget {
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    height: 50px;
+}
+
+.placeholder {
+    visibility: hidden;
+}
+
+.locked-indicator,
+.timer,
+.enemy-picks {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.phase-text {
+    width: 20%;
+    text-align: center;
+}
+
+/* If a section might be empty but you still want to reserve the space */
+
+.locked-indicator {
+    min-height: 60px;
+}
+
+/* Assuming enemy picks might have multiple items */
+
+.enemy-picks {
+    display: flex;
+    justify-content: space-around;
+    /* Adjust layout of enemy picks */
+}
+
+/* Transitions */
+
+.slide-down-enter-active,
+.slide-down-leave-active,
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.5s ease;
+}
+
+.slide-down-enter-from,
+.slide-up-leave-to {
+    transform: translateY(-100%);
+}
+
+.slide-down-leave-to,
+.slide-up-enter-from {
+    transform: translateY(100%);
+}
+
+.ban-pick-border-animation {
+    animation: pulseBorder 2s infinite;
+}
+
+@keyframes pulseBorder {
+    0% {
+        border-color: transparent;
+    }
+
+    50% {
+        border-color: var(--blue-laser-2);
+    }
+
+    100% {
+        border-color: transparent;
+    }
+}
+
+.loading-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* Full viewport height */
+    font-size: 20px;
+}
+
+/* Save and delete buttons */
+
+.save-button,
+.add-button,
+.delete-button {
+    align-items: flex-end;
+    color: var(--grey-1);
+}
+
+.save-button:hover,
+.add-button:hover,
+.delete-button:hover,
+.show-more-button:hover {
+    opacity: 1;
+    color: var(--gold-2);
+    background: var(--grey-cool);
+}
+
+.buttons-container {
+    display: flex;
+    gap: 5px;
+}
+
+.vs-container {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    position: absolute;
+    z-index: auto;
+    font-size: 4rem;
+    top: 14%;
+    right: 40.8%;
+    width: 10px !important;
+    height: 40px;
+    padding: 1rem;
+    color: #fff;
+    text-shadow:
+        0 0 5px #00ffeacd,
+        0 0 10px #00ffeac2,
+        0 0 20px #00ffeac3;
+    transform: scale(0.775);
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    user-select: none;
+}
+
+.vs-container:hover {
+    cursor: default;
+}

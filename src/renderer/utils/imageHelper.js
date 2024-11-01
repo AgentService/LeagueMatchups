@@ -27,7 +27,6 @@ class ImageUrlHelper {
     let baseUrl = this.baseVersionedUrl; // Use the getter for dynamic access
 
     if (!championId) {
-      debugger
       return ""; // Return early if no champion
     } 
 
