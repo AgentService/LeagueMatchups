@@ -42,10 +42,14 @@ router.get("/by-riot-id", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { region, gameName, tagLine } = req.query;
   const userId = req.user.id;
+  const test = "global";
 
   try {
+    debugApi("Fetching summoner data for:", gameName, tagLine);
     // Fetch account data from Riot's API
-    const URL = `https://${region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
+    const URL = `https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
+    debugApi("Fetching account data from Riot API:", URL);
+    console.log("Fetching account data from Riot API:", URL);
     const accountData = await axios.get(URL, {
       headers: {
         "X-Riot-Token": process.env.VITE_RIOT_API_KEY,

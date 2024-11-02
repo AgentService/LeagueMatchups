@@ -1,59 +1,57 @@
 <template>
 	<div class="app-wrapper">
-		<div class="bg-blue-500 text-white p-6 rounded-lg">
-			Tailwind CSS is Working!
-		  </div>
-		<div v-if="isLoading" class="loading-indicator">Loading...</div>
-		<div v-else class="app-container">
-			<div class="grid-container">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-xxl-12 col-xl-12 mt-4">
+		<div v-if="isLoading" class="flex justify-center items-center min-h-screen text-2xl">
+			Loading...
+		</div>
+
+		<div v-else class="app-container p-4">
+			<div class="container-fluid">
+
+				<div class="row">
+					<div class="col-xxl-12 col-xl-12 mt-4"></div>
+				</div>
+
+				<div class="row align-items-start">
+
+					<div class="col-xxl-8 col-xl-8">
+						<div class="row mb-0">
+
+							<div class="col-xxl-6">
+								<div class="d-flex flex-row justify-content-evenly">
+									<!-- Use Tailwind for the card styling, and Headless UI for interactivity if needed -->
+									<div class="card-large p-4 bg-gray-100 shadow-md rounded-lg"
+										:class="{ 'ban-pick-border-animation': playerTurn }">
+										<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
+									</div>
+								</div>
+							</div>
+
+							<div class="col-xxl-6">
+								<div class="card-large p-4 bg-gray-100 shadow-md rounded-lg">
+									<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
+								</div>
+							</div>
+
+							<div class="vs-container text-white text-4xl absolute transform scale-75 top-14 right-1/2">
+								<span>vs</span>
+							</div>
 						</div>
-					</div>
-					<div class="row align-items-start">
-						<!-- <div class="col-xxl-2 col-xl-4">
-							<div class="">
-								<LearningObjectives></LearningObjectives>
-							</div>
-						</div> -->
-						<div class="col-xxl-8 col-xl-8">
-							<div class="row mb-0 ">
-								<div class="col-xxl-6">
-									<div class="d-flex flex-row justify-content-evenly">
-										<div class="card-large" :class="{ 'ban-pick-border-animation': playerTurn }">
-											<ChampionSearch :instanceId="1" @championSelected="setChampionA" />
-										</div>
 
-									</div>
-								</div>
-							
-								<div class="col-xxl-6">
-									<div class="card-large">
-										<ChampionSearch :instanceId="2" @championSelected="setChampionB" />
-									</div>
-								</div>
-								<div class="vs-container">
-									<span>vs</span>
-								</div>
+						<div class="row mb-4">
+							<div class="col-xxl-6">
+								<ChampionNotes />
 							</div>
-							<div class="row mb-4">
-								<div class="col-xxl-6">
-									<ChampionNotes />
-								</div>
-								<div class="col-xxl-6">
-									<MatchupNotes />
-								</div>
+							<div class="col-xxl-6">
+								<MatchupNotes />
 							</div>
-							<div class="row">
-								<div class="col-xxl-8">
-									<LearningObjectives></LearningObjectives>
+						</div>
 
-									<!-- <PostGameReviewHistory /> -->
-								</div>
-								<div class="col-xxl-4">
-									<!-- <PostGameReview /> -->
-								</div>
+						<div class="row">
+							<div class="col-xxl-8">
+								<LearningObjectives />
+							</div>
+							<div class="col-xxl-4">
+								<!-- Other components like PostGameReview could go here if needed -->
 							</div>
 						</div>
 					</div>
@@ -62,7 +60,6 @@
 		</div>
 	</div>
 </template>
-
 <script setup>
 import { ref, watch, onMounted, computed, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
@@ -302,5 +299,4 @@ watch([championA, championB], ( /* newValues, oldValues */) => {
 .vs-container:hover {
 	cursor: default;
 }
-
 </style>

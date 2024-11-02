@@ -28,32 +28,37 @@ export const summoner = {
       state.fetchedFromAPI = status;
     },
     setPlayerDetails(state, { summonerNameValue, tagLine, webSocketResponse = null, apiResponse = null }) {
-      // Ensure the new entry is unique by comparing both `gameName` and `tagLine`
-      const existingSummonerIndex = state.playerDetails.findIndex(
-        (detail) => detail.apiResponse?.gameName === summonerNameValue && detail.apiResponse?.tagLine === tagLine
+      // Check if there's an existing summoner with the same gameName and tagLine
+      const existingIndex = state.playerDetails.findIndex(
+        (detail) => detail.gameName === summonerNameValue && detail.tagLine === tagLine
       );
-      if (existingSummonerIndex !== -1) {
-        // Update existing summoner data only if it's necessary
-        const existingSummoner = state.playerDetails[existingSummonerIndex];
-        state.playerDetails[existingSummonerIndex] = {
+
+      // Set default values for `gameName` and `webSocketResponse`
+      const newEntry = {
+        gameName: summonerNameValue || apiResponse?.gameName || "", // Fallback to apiResponse gameName if needed
+        tagLine: tagLine,
+        webSocketResponse: webSocketResponse || {}, // Ensure a default empty object
+        apiResponse: apiResponse || {},
+      };
+
+      if (existingIndex !== -1) {
+        // Update existing entry if found
+        const existingSummoner = state.playerDetails[existingIndex];
+        state.playerDetails[existingIndex] = {
           ...existingSummoner,
           webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
           apiResponse: apiResponse || existingSummoner.apiResponse,
         };
       } else {
-        // Add new summoner data if it's a unique entry
-        state.playerDetails.push({
-          gameName: summonerNameValue,
-          tagLine: tagLine,
-          webSocketResponse: webSocketResponse || {},
-          apiResponse: apiResponse || {},
-        });
+        // Add the new entry if it’s unique
+        state.playerDetails.push(newEntry);
       }
 
-      // Auto-select as the current summoner only if no current summoner is selected
+      // Auto-select as the current summoner if no current summoner is selected
       if (!state.currentSummoner) {
         state.currentSummoner = state.playerDetails[0];
       }
+
       console.log("Updated playerDetails:", state.playerDetails);
     },
     setCurrentSummoner(state, summoner) {
@@ -61,6 +66,21 @@ export const summoner = {
     },
   },
   actions: {
+    deduplicatePlayerDetails({ state, commit }) {
+      debugger
+      const uniqueDetails = [];
+      const seen = new Set();
+
+      state.playerDetails.forEach((detail) => {
+        const identifier = `${detail.gameName}:${detail.tagLine}`;
+        if (!seen.has(identifier)) {
+          seen.add(identifier);
+          uniqueDetails.push(detail);
+        }
+      });
+
+      state.playerDetails = uniqueDetails;
+    },
     async updateSummonerDetailsIfNeeded(
       { dispatch, state },
       { gameName, newSummonerLevel, newProfileIconId }
@@ -108,8 +128,8 @@ export const summoner = {
             ...authConfig,
             params: {
               region,
-              gameName: encodeURIComponent(gameName),
-              tagLine: encodeURIComponent(tagLine)
+              gameName,
+              tagLine
             },
           });
 

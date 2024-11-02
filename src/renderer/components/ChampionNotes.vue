@@ -1,38 +1,44 @@
 <template>
-	<div class="notes-container">
-		<!-- Custom Header -->
-		<div class="widget-header">
-			<i class="fas fa-sticky-note note-icon"></i>
-			<span class="widget-header-title ms-1">Champion Notes</span>
+	<div class="notes-container bg-custom-dark-gradient shadow-lg p-4 space-y-4">
+		<!-- Champion Notes Header with Underline Effect -->
+		<div class="flex items-center justify-between mb-0 relative pb-1">
+			<div class="flex items-center space-x-2 text-gold-2 ">
+				<span class="font-semibold text-m">Champion Notes</span>
+				<img :src="getChampionImageSource('small', championA?.name)" alt="Champion A"
+					class="w-8 h-8 rounded-full" />
+			</div>
 		</div>
 
 		<!-- Editor and Status Message -->
 		<EditorMenuBar :editor="editor" />
 		<div class="editor-wrapper">
-			<editor-content :editor="editor" class="editor-content" :class="[borderColorClass]" />
+			<editor-content :editor="editor" class="editor-content text-gold-1  " :class="[borderColorClass]" />
 		</div>
-		<div class="editor-footer-bar">
-			<div class="left-status">
-				<!-- Status Messages -->
-				<span v-if="notesState === 'unsaved'" :class="[buttonTextColorClass]">
-					<i class="fas fa-exclamation-triangle text-warning"></i> Unsaved
+
+		<!-- Footer with Status and Save Button -->
+		<div class="flex items-center justify-between mt-4 ms-2">
+			<div class="flex items-center space-x-2">
+				<!-- Status Indicator -->
+				<span v-if="notesState === 'unsaved'" class="text-yellow-500">
+					<i class="fas fa-exclamation-triangle"></i> Unsaved
 				</span>
-				<span v-else-if="notesState === 'saved'" :class="[buttonTextColorClass]">
-					<i class="fas fa-check-circle text-success"></i> Saved
+				<span v-else-if="notesState === 'saved'" class="text-green-500">
+					<i class="fas fa-check-circle"></i> Saved
 				</span>
-				<span v-else-if="notesState === 'neutral'">
-					<i class="fas fa-check-circle text-muted"></i>
+				<span v-else-if="notesState === 'neutral'" class="text-gray-400">
+					<i class="fas fa-check-circle"></i>
 				</span>
 			</div>
-			<div class="right-status">
-				<!-- Save Button -->
-				<button @click="manualSave" :class="['btn', 'button', buttonTextColorClass]">
-					<i class="fas fa-save"></i> Save
-				</button>
-			</div>
+			<button @click="manualSave" :class="[
+				'flex items-center px-4 py-2 font-semibold rounded-md transition duration-200',
+				saveButtonBgClass
+			]" :disabled="isDisabled">
+				<i class="fas fa-save mr-2"></i> Save
+			</button>
 		</div>
 	</div>
 </template>
+
 
 <script setup>
 import { ref, onBeforeUnmount, onMounted, watch, computed } from 'vue';
@@ -42,7 +48,12 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import EditorMenuBar from './EditorMenuBar.vue';
 import { useStore } from 'vuex';
-import SharedNotesModal from './reuse/NotesShareModal.vue';
+import { getUrlHelper } from '../globalSetup';
+
+function getChampionImageSource(type, championId) {
+	const urlHelper = getUrlHelper(); // Ensure the URL helper is used correctly
+	return urlHelper.getChampionImageSource(type, championId);
+}
 
 // Initialize Vuex store
 const store = useStore();
@@ -144,6 +155,21 @@ async function saveChampionNotes(content) {
 	}
 }
 
+// Computed property for the button background color based on save state
+const saveButtonBgClass = computed(() => {
+	switch (notesState.value) {
+		case 'unsaved':
+			return 'bg-yellow-500 hover:bg-yellow-400 !text-gray-900 !hover:text-gray-900'; // Yellow for unsaved
+		case 'saved':
+			return 'bg-green-600 hover:bg-green-500 text-white'; // Green for saved
+		default:
+			return 'bg-gray-900 text-gray-500 cursor-not-allowed'; // Gray for neutral/disabled
+	}
+});
+
+const isDisabled = computed(() => notesState.value !== 'unsaved'); // Disable if not unsaved
+
+
 // Manual save function triggered by the save button
 async function manualSave() {
 	const content = editor.value?.getHTML();
@@ -182,124 +208,65 @@ onMounted(async () => {
 });
 </script>
 
-
 <style>
-.champion-matchup-icon {
-	width: 50px;
-	height: auto;
-	background: var(--hextech-black);
-	border: 0px solid var(--blue-7);
-}
-
-.notes-container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	overflow: hidden;
-	position: relative;
-	width: 100%;
-	background: #091014;
-	border-radius: 0 0 12px 12px;
-	padding: 2rem 2rem;
-	padding-bottom: 1.5rem;
-	border: 1px solid rgba(128, 128, 128, 0.1);
-	color: var(--gold-1);
-}
-
 .editor-wrapper {
 	flex: 1;
 	display: flex;
 	overflow: hidden;
 	border-radius: 8px;
-	/* Leave space for footer */
 	width: 100%;
 }
 
 .editor-content {
 	flex: 1;
 	width: 100%;
-	/* Ensure it takes full width */
 	min-height: 335px;
 	max-height: 335px;
-	border: 1px solid;
+	border: 1px solid #4a556880;
 	margin: 2px;
 	border-radius: 8px;
 	transition: border-color 0.3s ease;
 	padding: .5rem;
+	font-weight: 400;
 }
 
 .editor-content:focus {
-	/* Highlighted border color */
+	border-color: #ffffff !important;
+}
+
+.notes-container ul {
+	list-style-type: disc;
+	padding-left: 2rem;
+
+}
+
+.notes-container li {
+	margin-bottom: -.5rem;
+	line-height: 1.25;
 }
 
 .ProseMirror {
 	flex: 1;
 	width: 100%;
-	/* Ensure it takes full width */
 	min-height: 322px;
-	/* Minimum height to prevent shrinking */
 	max-height: 322px;
 	overflow-y: auto;
-	box-sizing: border-box;
 	outline: none;
-	border-radius: 12px;
 	padding: .5rem;
 	font-size: 0.9rem;
-	font-weight: 400;
-	background: linear-gradient(to right, #091014, #060c11a8);
-	transition: border-color 0.3s ease;
-	/* Smooth transition for border color */
+}
+
+.notes-container .ProseMirror {
+	line-height: 1.2;
+	/* Adjust line height within editor */
 }
 
 .ProseMirror:focus-within {
-	border-color: #ffffff;
-	/* Highlight border color when focused */
+	border-color: #ffffff !important;
 }
 
-.editor-footer-bar {
-	display: flex;
-	justify-content: space-between;
-	padding-left: 10px;
-	font-size: 0.9rem;
-	position: relative;
-	right: 0;
-	border-radius: 12px;
-	left: 0;
-	bottom: 0;
-}
-
-.left-status,
-.right-status {
-	display: flex;
-	align-items: center;
-}
-
-/* Specific rule to remove margin from <p> inside <li> */
-.ProseMirror ul li p {
-	margin-bottom: 0 !important;
-}
-
-.text-warning {
-	color: #ffc107 !important;
-}
-
-.text-success {
-	color: #28a745 !important;
-}
-
-.text-muted {
-	color: #6c757d !important;
-}
-
-.border-warning {
-	border-color: #ffc107 !important;
-}
-
-.border-success {
-	border-color: #28a745 !important;
-}
-
-.border-muted {
-	border-color: #6c757d2c !important;
+.editor-content {
+	flex: 1;
+	width: 100%;
 }
 </style>

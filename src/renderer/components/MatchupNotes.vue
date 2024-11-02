@@ -1,54 +1,47 @@
 <template>
-	<div class="notes-container">
-		<!-- Custom Header -->
-		<!-- Custom Header -->
-		<div class="widget-header justify-content-between">
-			<div>
-				<i class="fas fa-sticky-note note-icon"></i>
-				<span class="widget-header-title ms-1">Matchup Notes</span>
+	<div class="notes-container bg-custom-dark-gradient shadow-lg p-4 space-y-4">
+		<!-- Matchup Notes Header -->
+		<div class="flex items-center justify-between mb-0 relative pb-1">
+			<div class="flex items-center space-x-2 text-gold-2">
+				<span class="font-semibold text-m">Matchup Notes</span>
+				<img :src="getChampionImageSource('small', currentMatchup?.championAName)" alt="Champion A"
+					class="w-8 h-8 rounded-full" />
+				<span class="text-gray-500 text-sm">vs</span>
+				<img :src="getChampionImageSource('small', currentMatchup?.championBName)" alt="Champion B"
+					class="w-8 h-8 rounded-full" />
 			</div>
-			<div class="champion-icons">
-				<!-- Champion A -->
-				<!-- <img :src="getChampionImageSource('small', currentMatchup.championAName)"
-					:alt="currentMatchup.championAName" class="champion-matchup-icon" /> -->
-				<!-- Champion Names and "vs" -->
-				<span class="vs-text">
-				</span>
-				<!-- Champion B -->
-				<!-- <img :src="getChampionImageSource('small', currentMatchup.championBName)"
-					:alt="currentMatchup.championBName" class="champion-matchup-icon" /> -->
-			</div>
-
 		</div>
 
 		<!-- Editor and Status Message -->
 		<EditorMenuBar :editor="editor" />
 		<div class="editor-wrapper">
-			<editor-content :editor="editor" class="editor-content" :class="[borderColorClass]" />
+			<editor-content :editor="editor" class="editor-content text-gold-1" :class="[borderColorClass]" />
 		</div>
-		<div class="editor-footer-bar">
-			<div class="left-status">
-				<!-- Status Messages -->
-				<span v-if="notesState === 'unsaved'" :class="[buttonTextColorClass]">
-					<i class="fas fa-exclamation-triangle text-warning"></i> Unsaved
-				</span>
-				<span v-else-if="notesState === 'saved'" :class="[buttonTextColorClass]">
-					<i class="fas fa-check-circle text-success"></i> Saved
-				</span>
-				<span v-else-if="notesState === 'neutral'">
-					<i class="fas fa-check-circle text-muted"></i>
-				</span>
-			</div>
-			<div class="right-status">
-				<!-- Save Button -->
-				<button @click="manualSave" :class="['btn', 'button', buttonTextColorClass]">
-					<i class="fas fa-save"></i> Save
-				</button>
 
+		<!-- Footer with Status and Save Button -->
+		<div class="flex items-center justify-between mt-4 ms-2">
+			<div class="flex items-center space-x-2">
+				<!-- Status Indicator -->
+				<span v-if="notesState === 'unsaved'" class="text-yellow-500">
+					<i class="fas fa-exclamation-triangle"></i> Unsaved
+				</span>
+				<span v-else-if="notesState === 'saved'" class="text-green-500">
+					<i class="fas fa-check-circle"></i> Saved
+				</span>
+				<span v-else-if="notesState === 'neutral'" class="text-gray-400">
+					<i class="fas fa-check-circle"></i>
+				</span>
 			</div>
+			<button @click="manualSave" :class="[
+				'flex items-center px-4 py-2 font-semibold rounded-md transition duration-200',
+				saveButtonBgClass
+			]" :disabled="isDisabled">
+				<i class="fas fa-save mr-2"></i> Save
+			</button>
 		</div>
 	</div>
 </template>
+
 
 
 <script setup>
@@ -111,6 +104,20 @@ const buttonTextColorClass = computed(() => {
 			return 'text-muted';
 	}
 });
+
+const saveButtonBgClass = computed(() => {
+	switch (notesState.value) {
+		case 'unsaved':
+			return 'bg-yellow-500 hover:bg-yellow-400 !text-gray-900 !hover:text-gray-900'; // Yellow for unsaved
+		case 'saved':
+			return 'bg-green-600 hover:bg-green-500 text-white'; // Green for saved
+		default:
+			return 'bg-gray-900 text-gray-500 cursor-not-allowed'; // Gray for neutral/disabled
+	}
+});
+
+const isDisabled = computed(() => notesState.value !== 'unsaved');
+
 
 // Computed property for border color class
 const borderColorClass = computed(() => {
@@ -183,8 +190,9 @@ async function manualSave() {
 	notesState.value = 'saved';
 	setTimeout(() => {
 		notesState.value = 'neutral'; // Reset to 'neutral' after some time
-	}, 2000);
+	}, 1000);
 }
+
 </script>
 
 

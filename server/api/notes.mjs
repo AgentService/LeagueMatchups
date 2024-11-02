@@ -432,13 +432,19 @@ router.delete("/general/:noteid", async (req, res) => {
   const userId = req.user.id; // Directly use user ID
 
   try {
-    const deleteQuery = `
-    DELETE FROM generalnotes
-    WHERE note_id = $1 AND User_ID = $2
-    RETURNING *;
-  `;
+    // First, delete related entries in the generalnotestags table to avoid foreign key constraint errors
+    const deleteTagsQuery = `DELETE FROM generalnotestags WHERE note_id = $1;`;
+    await dbPool.query(deleteTagsQuery, [noteId]);
+
+    // Then, delete the note from generalnotes
+    const deleteNoteQuery = `
+      DELETE FROM generalnotes
+      WHERE note_id = $1 AND user_id = $2
+      RETURNING *;
+    `;
     debug("Deleting note:", noteId);
-    const { rows } = await dbPool.query(deleteQuery, [noteId, userId]);
+    const { rows } = await dbPool.query(deleteNoteQuery, [noteId, userId]);
+
     if (rows.length > 0) {
       const deletedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
       debug("Note deleted successfully:", deletedNote);
@@ -447,7 +453,7 @@ router.delete("/general/:noteid", async (req, res) => {
         note: deletedNote, // Send the converted note
       });
     } else {
-      // If no rows returned, the note wasn't found or didn't belong to the user
+      // If no rows were returned, the note wasn't found or didn't belong to the user
       res.status(404).json({ message: "Note not found or not owned by user" });
     }
   } catch (error) {
@@ -455,6 +461,7 @@ router.delete("/general/:noteid", async (req, res) => {
     res.status(500).json({ message: "Error deleting the note" });
   }
 });
+
 
 // General Tags
 router.get("/tags", async (req, res) => {

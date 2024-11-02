@@ -342,7 +342,6 @@ function handleGameStart() {
 
 
 onMounted(() => {
-    // const cleanupPostGameStats = window.ws.receive('post-game-stats', handlePostGameStats);
     const cleanupGameStart = window.ws.receive('game-start-event', handleGameStart);
     const cleanupGameEnd = window.ws.receive('game-end-event', async () => {
         await store.dispatch('matches/fetchLastMatch', { forceRefresh: true, count: 1 }); // Call fetchLastMatch from 'matches' module
@@ -413,7 +412,7 @@ function resetModalState() {
 }
 </script>
 
-<style >
+<style>
 /* Modal and Overlay Styles */
 .modal-overlay {
     position: fixed;

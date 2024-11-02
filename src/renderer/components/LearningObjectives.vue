@@ -1,49 +1,56 @@
 <template>
 	<div class="learning-objectives-section card-widget mb-2">
 		<!-- Header with Settings Button -->
-		<div class="card-header-custom justify-content-between">
-			<span>Learning Objectives</span>
-			<button class="btn settings-button" @click="toggleLOSelector" aria-label="Select Learning Objectives">
+		<div class="flex justify-between items-center p-4 bg-gray-800 rounded-t-lg">
+			<span class="text-white font-semibold">Learning Objectives</span>
+			<button @click="toggleLOSelector" class="text-white" aria-label="Select Learning Objectives">
 				<i class="fa fa-lg fa-cog"></i>
 			</button>
 		</div>
 
 		<!-- Main Widget Content (Always Visible) -->
-		<div class="lo-main-container">
+		<div class="p-4 flex space-x-4 bg-gray-900 rounded-b-lg">
 			<!-- Compact LO List on the left -->
-			<div class="lo-list">
-				<div>In-Game</div>
-				<ul class="lo-items">
+			<div class="w-1/3">
+				<div class="text-white mb-2 font-semibold">In-Game</div>
+				<ul class="space-y-2">
 					<li v-for="lo in activeObjectives['In-Game']" :key="lo.name"
 						@click="selectLearningObjective(lo, 'In-Game')"
-						:class="{ 'lo-selected': selectedLO && selectedLO.name === lo.name }">
+						:class="{ 'bg-blue-600': selectedLO && selectedLO.name === lo.name }"
+						class="p-2 bg-gray-700 rounded-lg cursor-pointer text-white transition hover:bg-gray-600">
 						<span>{{ lo.name }}</span>
 					</li>
 				</ul>
 
-				<div>Out-of-Game</div>
-				<ul class="lo-items">
+				<div class="text-white mt-4 mb-2 font-semibold">Out-of-Game</div>
+				<ul class="space-y-2">
 					<li v-for="lo in activeObjectives['Out-of-Game']" :key="lo.name"
 						@click="selectLearningObjective(lo, 'Out-of-Game')"
-						:class="{ 'lo-selected': selectedLO && selectedLO.name === lo.name }">
+						:class="{ 'bg-blue-600': selectedLO && selectedLO.name === lo.name }"
+						class="p-2 bg-gray-700 rounded-lg cursor-pointer text-white transition hover:bg-gray-600">
 						<span>{{ lo.name }}</span>
 					</li>
 				</ul>
 			</div>
 
 			<!-- Reflection Section on the right -->
-			<div class="lo-reflection-container">
-				<h4>{{ selectedLO ? selectedLO.name : 'Select a Learning Objective' }}</h4>
-				<p v-if="selectedLO">Games Applied: {{ selectedLO.gamesApplied }}</p>
+			<div class="w-2/3 space-y-4 bg-gray-800 p-4 rounded-lg">
+				<h4 class="text-white font-semibold">{{ selectedLO ? selectedLO.name : 'Select a Learning Objective' }}
+				</h4>
+				<!-- <p v-if="selectedLO" class="text-gray-300">Games Applied: {{ selectedLO.gamesApplied }}</p> -->
 
-				<div v-if="selectedLO">
+				<div v-if="selectedLO" class="space-y-2">
 					<input type="text" v-model="newReflection" placeholder="Reflect on this LO..."
-						class="reflection-input" />
-					<button @click="addReflection" class="btn-reflect">Add</button>
-					<ul class="reflection-list">
-						<li v-for="(reflection, index) in selectedLO.reflections" :key="index">
-							{{ reflection }}
-							<button @click="removeReflection(index)" class="btn-delete-reflection">
+						class="w-full p-2 rounded-lg bg-gray-200 outline-none" />
+					<button @click="addReflection"
+						class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-400">
+						Add
+					</button>
+					<ul class="space-y-2">
+						<li v-for="(reflection, index) in selectedLO.reflections" :key="index"
+							class="flex justify-between items-center bg-gray-700 p-2 rounded-lg text-white">
+							<span>{{ reflection }}</span>
+							<button @click="removeReflection(index)" class="text-red-500">
 								<i class="fas fa-times"></i>
 							</button>
 						</li>
@@ -52,32 +59,42 @@
 			</div>
 		</div>
 
-		<!-- Modal (Visible on Button Click) -->
-		<div class="modal-overlay" v-if="showLOSelector" @click="closeLOSelector" role="dialog" aria-modal="true">
-			<div class="questionnaire-modal" @click.stop>
-				<!-- Close Button -->
-				<button class="close-button" @click="closeLOSelector" aria-label="Close Modal">✖</button>
+		<!-- Modal for Selecting Learning Objectives -->
+		<TransitionRoot :show="showLOSelector" as="template">
+			<Dialog as="div" class="fixed inset-0 flex items-center justify-center z-50" @close="closeLOSelector">
+				<DialogOverlay class="fixed inset-0 bg-black opacity-50"></DialogOverlay>
+				<div class="bg-white rounded-lg p-6 z-10 w-full max-w-lg mx-auto">
+					<!-- Close Button -->
+					<button class="absolute top-3 right-3 text-gray-500" @click="closeLOSelector"
+						aria-label="Close Modal">
+						✖
+					</button>
 
-				<!-- Modal Header -->
-				<div class="modal-title">Select or Add Learning Objectives</div>
+					<!-- Modal Header -->
+					<DialogTitle class="text-lg font-bold text-gray-800">Select or Add Learning Objectives</DialogTitle>
 
-				<!-- LO Selector Content -->
-				<div class="lo-selector-content">
-					<div v-for="category in Object.keys(predefinedObjectives)" :key="category"
-						class="lo-selector-category">
-						<h4>{{ category }}</h4>
-						<ul>
-							<li v-for="lo in predefinedObjectives[category]" :key="lo.name"
-								@click="toggleLOSelection(lo, category)"
-								:class="{ 'selected': isLOSelected(lo, category) }">
-								{{ lo.name }}
-							</li>
-						</ul>
+					<!-- LO Selector Content -->
+					<div class="mt-4 space-y-4">
+						<div v-for="category in Object.keys(predefinedObjectives)" :key="category" class="space-y-2">
+							<h4 class="text-gray-800 font-semibold">{{ category }}</h4>
+							<ul class="space-y-1">
+								<li v-for="lo in predefinedObjectives[category]" :key="lo.name"
+									@click="toggleLOSelection(lo, category)"
+									:class="{ 'bg-green-500 text-white': isLOSelected(lo, category) }"
+									class="cursor-pointer p-2 rounded-lg transition bg-gray-100 hover:bg-gray-200">
+									{{ lo.name }}
+								</li>
+							</ul>
+						</div>
+						<button @click="confirmLOSelection"
+							class="w-full py-2 bg-green-500 text-white rounded-lg hover:bg-green-400">
+							Done
+						</button>
 					</div>
-					<button @click="confirmLOSelection" class="btn-close-selector">Done</button>
 				</div>
-			</div>
-		</div>
+			</Dialog>
+		</TransitionRoot>
+
 	</div>
 </template>
 
@@ -85,7 +102,9 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { Dialog, DialogOverlay, DialogTitle, TransitionRoot } from '@headlessui/vue';
 import { useStore } from 'vuex';
+
 const store = useStore();
 const showLOSelector = ref(false);
 const selectedLO = ref(null);
@@ -100,7 +119,6 @@ function toggleLOSelector() {
 	showLOSelector.value = !showLOSelector.value;
 }
 
-// Confirm LO selection and close the selector
 function confirmLOSelection() {
 	showLOSelector.value = false;
 }
@@ -109,12 +127,9 @@ function closeLOSelector() {
 	showLOSelector.value = false;
 }
 
-// Toggle selection of a learning objective
 function toggleLOSelection(lo, category) {
 	if (!activeObjectives.value[category]) return;
-
 	const isActive = activeObjectives.value[category].some(activeLO => activeLO.name === lo.name);
-
 	if (isActive) {
 		store.dispatch('learningObjectives/removeActiveObjective', { loName: lo.name, category });
 	} else if (activeObjectives.value[category].length < 2) {
@@ -122,36 +137,31 @@ function toggleLOSelection(lo, category) {
 	}
 }
 
-// Check if an LO is selected in the current category
 function isLOSelected(lo, category) {
 	return activeObjectives.value[category]?.some(activeLO => activeLO.name === lo.name);
 }
 
-// Modify selectLearningObjective to include category
 function selectLearningObjective(lo, category) {
-	selectedLO.value = { ...lo, category }; // Attach category to selectedLO
+	selectedLO.value = { ...lo, category };
 }
 
-// Add a new reflection to the selected LO
 function addReflection() {
 	if (selectedLO.value && newReflection.value.trim()) {
 		store.dispatch('learningObjectives/addReflection', {
 			loName: selectedLO.value.name,
-			category: selectedLO.value.category, // This should now always be defined
-			reflection: newReflection.value
+			category: selectedLO.value.category,
+			reflection: newReflection.value,
 		});
 		newReflection.value = "";
 	}
 }
 
-
-// Remove a reflection from the selected LO
 function removeReflection(index) {
 	if (selectedLO.value) {
 		store.dispatch('learningObjectives/removeReflection', {
 			loName: selectedLO.value.name,
 			category: selectedLO.value.category,
-			index
+			index,
 		});
 	}
 }

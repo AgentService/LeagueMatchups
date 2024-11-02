@@ -127,5 +127,9 @@ basic Learning Objective tracking
 champ auto select 
 enemy picks lobby quick access
 
-FIX REGION SUMMONER 
-FIX SUMMONER FLOW / LOGOUT FRESH / ONLY CLINET / CLINET CONNECT
+FIX REGION SUMMONER -- fixed? >> only needed on match history then
+FIX SUMMONER FLOW / LOGOUT FRESH / ONLY CLINET / CLINET CONNECT -- fixed?
+
+remove full vuex on logout
+
+topnavbar fixed

@@ -11,6 +11,13 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, region = "europe", webSocketResponse = null) {
   try {
     console.log("Processing summoner data for:", summonerNameValue, "with tagLine:", tagLine);
+    if (!summonerNameValue || !tagLine) {
+      console.error("Invalid arguments passed to fetchAndSaveSummonerData:", {
+        summonerNameValue,
+        tagLine,
+      });
+      return;
+    }
 
     const existingSummoner = store.getters['summoner/getSummonerDataByName'](summonerNameValue);
 
@@ -22,8 +29,8 @@ export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, regio
         ...authConfig,
         params: {
           region,
-          gameName: encodeURIComponent(summonerNameValue),
-          tagLine: encodeURIComponent(tagLine)
+          gameName: summonerNameValue,  // Use summonerNameValue here
+          tagLine,   // No encodeURIComponent here
         },
       });
 

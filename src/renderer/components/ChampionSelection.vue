@@ -31,8 +31,8 @@
 			<div class="button-container">
 				<div class="fav-button" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave"
 					v-if="instanceId === 1">
-					<button class="btn button">
-						<i class="fa-solid fa-star fa-sm"></i> Favorites
+					<button>
+						<i class="fa-solid fa-star fa-sm"></i> 
 					</button>
 					<div class="fav-popup" v-if="showFavorites" @mouseenter="handlePopupMouseEnter"
 						@mouseleave="handlePopupMouseLeave">
@@ -42,12 +42,12 @@
 						</div>
 					</div>
 				</div>
-				<button key="championA-community-notes-button" class="btn button shared-button"
+				<button key="championA-community-notes-button" class="button shared-button"
 					@click="showNotesModal = true" aria-label="Community Notes for {{ championA.name }}"
 					:title="'Community Notes for ' + championA?.name" v-if="instanceId === 1">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
 				</button>
-				<button key="championB-community-notes-button" class="btn button shared-button"
+				<button key="championB-community-notes-button" class="button shared-button"
 					@click="showMatchupNotesModal = true" aria-label="Community Notes for {{ championB.name }}"
 					:title="'Community Notes for ' + championB?.name" v-if="instanceId === 2">
 					<i class="fa fa-sm fa-users" aria-hidden="true"></i>
@@ -858,6 +858,7 @@ export default {
 	bottom: -4rem;
 	right: 2rem;
 	z-index: 1;
+
 }
 
 
@@ -962,7 +963,7 @@ export default {
 	position: relative;
 	cursor: pointer;
 	border-radius: 6px;
-	color: var(--grey-1);
+	color: var(--gold-1);
 }
 
 .fav-button:hover {

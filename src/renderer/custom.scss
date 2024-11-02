@@ -3,10 +3,9 @@
 @import "node_modules/bootstrap/scss/bootstrap";
 @import "node_modules/bootstrap/scss/bootstrap.scss";
 @import "./index.scss";
+@import "./tailwind.css";
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+
 // Importing Bootstrap source SASS for customization
 
 $primary-color: #a1628c; // Change the primary color

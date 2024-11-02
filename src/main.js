@@ -354,6 +354,7 @@ function notifyClientStatus(isConnected) {
   }
 }
 
+
 setupLeagueClientMonitoring();
 
 ipcMain.handle("get-current-game-phase", async () => {
@@ -386,6 +387,43 @@ ipcMain.handle("get-current-game-phase", async () => {
   } catch (error) {
     console.error("Error fetching game phase:", error);
     return null; // Return null or a default value in case of error
+  }
+});
+
+ipcMain.handle("get-client-region", async () => {
+  try {
+    const credentials = await authenticate({ awaitConnection: false });
+    const { port, password } = credentials;
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS verification
+
+    const response = await fetch(
+      `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
+      {
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString(
+            "base64"
+          )}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Restore TLS verification
+
+    if (response.ok) {
+      console.log("Fetching client region...");
+      console.log("Response:", response);
+      const summonerData = await response.json();
+      console.log("summonerData ID:", summonerData);
+      console.log("Platform ID:", summonerData.platformId);
+      return summonerData.platformId; // Return the platform ID to the renderer
+    } else {
+      throw new Error(`Failed to fetch client region. Status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error fetching client region:", error);
+    return null;
   }
 });
 
