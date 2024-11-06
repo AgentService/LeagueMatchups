@@ -5,29 +5,31 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 import { getAuthConfig } from "./utilities.js";
 const debug = Debug("app:store:notes");
 
+const defaultState = () => ({
+  championNotes: {},
+  championNotesShared: {},
+  generalNotes: [],
+  matchupNotes: {},
+  matchupNotesShared: {},
+  rating: {
+    champion: {},
+    matchup: {},
+  },
+  lastFetchTimestamps: {
+    champions: {},
+    matchups: {},
+  },
+  tagsList: [],
+});
+
+
 export const notes = {
   namespaced: true,
-  state: {
-    championNotes: {},
-    championNotesShared: {},
-
-    generalNotes: [],
-
-    matchupNotes: {},
-    matchupNotesShared: {},
-
-    rating: {
-      champion: {},
-      matchup: {},
-    },
-
-    lastFetchTimestamps: {
-      champions: {},
-      matchups: {},
-    },
-    tagsList: [],
-  },
+  state: defaultState(),
   mutations: {
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     // generalNotes
     ADD_GENERAL_NOTE(state, note) {
       state.generalNotes.push(note);

@@ -1,15 +1,21 @@
+const defaultState = () => ({
+  favoriteChampions: [],
+  displaySettings: {
+    theme: "dark", // Default theme
+    notifications: true, // Enable notifications by default
+  },
+  // Add other user preferences here
+});
+
+
 // src/store/userPreferences.js
 export const userPreferences = {
   namespaced: true,
-  state: {
-    favoriteChampions: [],
-    displaySettings: {
-      theme: "dark", // Default theme
-      notifications: true, // Enable notifications by default
-    },
-    // Add other user preferences here
-  },
+  state: defaultState(),
   mutations: {
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     SET_FAVORITE_CHAMPIONS(state, champions) {
       state.favoriteChampions = champions;
     },

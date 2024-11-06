@@ -7,21 +7,23 @@ import {
   handleApiError,
   getAuthConfig,
 } from "./utilities";
-import { initializeSummonerDataFetching, startSummonerNameCheck } from '../../services/summonerDataService';
 
 const debug = Debug("app:store:auth");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+const defaultState = () => ({
+  user: null,
+  role: null,
+  isLoggedIn: false,
+  token: null,
+  refreshToken: null,
+  authLoading: true,
+});
+
+
 export const auth = {
   namespaced: true,
-  state: () => ({
-    user: null,
-    role: null, // New field for role
-    isLoggedIn: false,
-    token: null,
-    refreshToken: null,  // Vuex state persists this
-    authLoading: true, // Indicates whether authentication is in progress
-  }),
+  state: () => defaultState(),
   getters: {
     isLoggedIn: (state) => state.isLoggedIn,
     user: (state) => state.user,
@@ -29,6 +31,10 @@ export const auth = {
     role: (state) => state.role, // New getter for role
   },
   mutations: {
+    RESET_STATE(state) {
+      // Reset the state to its initial state
+      Object.assign(state, defaultState());
+    },
     SET_REFRESH_TOKEN(state, refreshToken) {
       state.refreshToken = refreshToken;
     },
@@ -83,44 +89,13 @@ export const auth = {
         axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
         // Initialize summoner data after login
-        await dispatch('initializeSummonerData');
+        await dispatch('summoner/initializeSummonerData', null, { root: true });
 
         debug("Login successful", data.user);
       } catch (error) {
         return handleApiError(error);
       }
     },
-    // Add this action to your store
-    async initializeSummonerData({ dispatch }) {
-      try {
-        // Define getClientStatus here if it’s not globally accessible
-        async function getClientStatus() {
-          try {
-            const status = await window.api.checkClientStatus(); // Adjust the call to match your API
-            return status.connected; // Assuming `status.connected` indicates client activity
-          } catch (error) {
-            console.error('Error checking client status:', error);
-            return false;
-          }
-        }
-
-        // Check if the client is active
-        const isClientActive = await getClientStatus();
-        console.log('Client active:', isClientActive);
-
-        if (isClientActive) {
-          // Start data fetching processes if client is active
-          initializeSummonerDataFetching();
-          startSummonerNameCheck();
-        } else {
-          // Populate with a default summoner if no client is active
-          // await dispatch("summoner/fetchDefaultSummoner");
-        }
-      } catch (error) {
-        console.error('Error initializing summoner data:', error);
-      }
-    },
-
     async refreshToken({ commit, state, dispatch }) {
       if (!state.refreshToken) {
         await dispatch("logout");
@@ -173,7 +148,7 @@ export const auth = {
         commit("SET_AUTH_LOADING", false);
       }
     },
-    async logout({ commit }) {
+    async logout({ commit, dispatch }) {
       try {
         const userId = this.state.auth.user.id;
         const token = this.state.auth.token;
@@ -188,6 +163,7 @@ export const auth = {
         commit("SET_REFRESH_TOKEN", null);
 
         delete axios.defaults.headers.common["Authorization"];
+        await dispatch("resetAllModules", null, { root: true });
 
         debug("Logout successful");
         router.push("/login");
@@ -200,6 +176,7 @@ export const auth = {
         commit("SET_REFRESH_TOKEN", null);
 
         delete axios.defaults.headers.common["Authorization"];
+        await dispatch("resetAllModules", null, { root: true });
 
         router.push("/login");
       }

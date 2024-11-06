@@ -75,6 +75,18 @@ export const store = createStore({
   },
 
   actions: {
+    // Global reset action for all Vuex modules
+    resetAllModules({ commit }) {
+      // Assuming each module has its own RESET_STATE mutation
+      commit('summoner/RESET_STATE', null, { root: true });
+      commit('matchups/RESET_STATE', null, { root: true });
+      commit('auth/RESET_STATE', null, { root: true });
+      commit('matches/RESET_STATE', null, { root: true });
+      commit('notes/RESET_STATE', null, { root: true });
+      commit('userPreferences/RESET_STATE', null, { root: true });
+      commit('metrics/RESET_STATE', null, { root: true });
+      // commit('learningObjectives/RESET_STATE', null, { root: true });
+    },
     /* GENERIC UTILITY FUNCTION
      * Fetches data from an API endpoint and caches it. If the data is already cached
      * and is valid, it uses the cached data instead of fetching from the API.

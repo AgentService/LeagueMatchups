@@ -47,10 +47,10 @@
 						</div>
 
 						<div class="row">
-							<div class="col-xxl-8">
+							<div class="col-xxl-10">
 								<LearningObjectives />
 							</div>
-							<div class="col-xxl-4">
+							<div class="col-xxl-2">
 								<!-- Other components like PostGameReview could go here if needed -->
 							</div>
 						</div>

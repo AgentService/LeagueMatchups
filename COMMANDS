@@ -4,8 +4,24 @@ ssh -i ~/.ssh/id_rsa github.barstool368@35.207.145.5
 psql -h 10.55.48.3 -U dbadmin -d "db-1"
 
 npm version patch # or 'minor' or 'major', depending on your update
+
+git push origin --follow-tags
+
 git push origin master --tags
 
 
 
-$ npm run build
+$ npm run build >>>> this is the way to build the app
+
+
+npm version patch  # For a minor patch release, e.g., 1.0.1 -> 1.0.2
+npm version minor  # For a minor release, e.g., 1.0.0 -> 1.1.0
+npm version major  # For a major release, e.g., 1.0.0 -> 2.0.0
+
+
+
+git add .
+git commit -m "Describe the changes made in this version"
+git tag -a v2.4.11 -m "Release version 2.4.11"
+git push origin --follow-tags
+git push origin --follow-tags

@@ -53,6 +53,7 @@ async function initializeApp() {
 
   // Always reset the API fetch flag on app start
   store.commit("summoner/setFetchedFromAPI", false);
+  // store.dispatch('summoner/deduplicatePlayerDetails');
 
   if (token && refreshToken) {
     try {
@@ -63,7 +64,7 @@ async function initializeApp() {
       await store.dispatch("matches/fetchLastMatch", { forceRefresh: true, count: 5 });
 
       // Initialize summoner data fetching and summoner name check only after auth
-      initializeSummonerDataFetching();
+      // initializeSummonerDataFetching();
       // startSummonerNameCheck();
 
     } catch (error) {

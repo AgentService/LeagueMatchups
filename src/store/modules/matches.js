@@ -6,13 +6,15 @@ const debug = Debug("app:store:matches");
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+const defaultState = () => ({
+  summonerMatches: {}, // Store match histories per summoner keyed by PUUID
+  reviewedMatches: {}, // Object to track reviewed match IDs
+  lastFetchTime: {}, // Store the last fetch time for each summoner
+});
+
 export const matches = {
   namespaced: true,
-  state: () => ({
-    summonerMatches: {}, // Store match histories per summoner keyed by PUUID
-    reviewedMatches: {}, // Object to track reviewed match IDs
-    lastFetchTime: {}, // Store the last fetch time for each summoner
-  }),
+  state: defaultState(),
   getters: {
     getMatchHistory: (state) => (puuid) => state.summonerMatches[puuid] || [], // Get match history for the current summoner
 
@@ -75,6 +77,9 @@ export const matches = {
     },
   },
   mutations: {
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     SET_SUMMONER_MATCHES(state, { puuid, matches }) {
       state.summonerMatches[puuid] = matches; // Store matches per summoner's PUUID
     },

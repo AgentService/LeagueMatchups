@@ -93,6 +93,7 @@
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "cors": "^2.8.5",
+    "dayjs": "^1.11.13",
     "debug": "^4.3.4",
     "dotenv": "^16.4.5",
     "electron-is-dev": "^3.0.1",

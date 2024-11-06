@@ -39,7 +39,7 @@ export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, regio
       }
 
       const newPlayerDetails = {
-        summonerNameValue,
+        gameName: summonerNameValue,
         tagLine,
         webSocketResponse: webSocketResponse || {},
         apiResponse: apiResponse.data[0], // First summoner fetched from API
@@ -50,7 +50,7 @@ export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, regio
 
     } else {
       const newPlayerDetails = {
-        summonerNameValue,
+        gameName: summonerNameValue,
         tagLine,
         webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
         apiResponse: existingSummoner.apiResponse,
@@ -104,8 +104,8 @@ function checkSummonerName() {
 
 // Function to start checking for Summoner Name every minute
 export function startSummonerNameCheck() {
-  const intervalId = setInterval(checkSummonerName, 3600000); // 3600000 milliseconds = 1 minute 3600000
-
+  console.log("Starting summoner name check");
+  const intervalId = setInterval(checkSummonerName, 400000); // 3600000 milliseconds = 1 minute 3600000
   // Optionally, you can store intervalId to clear it later when needed
   localStorage.setItem("summonerNameCheckIntervalId", intervalId.toString());
 }

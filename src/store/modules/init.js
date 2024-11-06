@@ -6,17 +6,21 @@ import { getAuthConfig } from "./utilities.js";
 const debug = Debug("app:store:init");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+const defaultState = () => ({
+  currentGameVersion: null,
+  dataInitialized: false,
+});
+
 export const init = {
   namespaced: true,
-  state: {
-    currentGameVersion: null,
-    dataInitialized: false,
-  },
+  state: defaultState(),
   getters: {
     currentGameVersion: (state) => state.currentGameVersion,
   },
   mutations: {
-    // ... other mutations
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     SET_GAME_VERSION(state, version) {
       debug("Setting game version:", version);
       state.currentGameVersion = version;

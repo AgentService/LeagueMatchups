@@ -1,19 +1,19 @@
 <template>
 	<div class="main-container">
-		<nav class="navbar navbar-expand-lg navbar-dark bg-dark me-4 ms-4">
+		<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 			<div class="container-fluid w-75">
 				<SummonerInfo></SummonerInfo>
 				<div class="mx-auto d-flex justify-content-center">
 					<router-link to="/ChampionPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
-						v-if="canAccessAdvancedTabs">Prepare</router-link>
+						v-if="canAccessAdvancedTabs">Overview</router-link>
 					<router-link to="/MatchupPage"
 						:class="['nav-link', { 'logged-out': !isLoggedIn }]">Matchup</router-link>
 					<router-link to="/JournalPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
 						v-if="canAccessAdvancedTabs">Journal</router-link>
-					<router-link to="/userJourney" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
+					<!-- <router-link to="/userJourney" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
 						v-if="canAccessAdvancedTabs">Test</router-link>
 					<router-link to="/ReviewPage" :class="['nav-link', { 'logged-out': !isLoggedIn }]"
-						v-if="canAccessAdvancedTabs">Review</router-link>
+						v-if="canAccessAdvancedTabs">Review</router-link> -->
 
 				</div>
 				<div class="d-flex justify-content-center align-items-center ">
@@ -323,10 +323,14 @@ const logout = () => {
 }
 
 .navbar {
+	position: fixed;
 	font-size: 0.85rem;
 	background: var(--navbar-background-gradient);
 	max-height: 50px;
+	width: 100%;
 	margin: 0 auto;
+	z-index: 1000;
+	border-bottom: 1px solid var(--grey-3);
 }
 
 .navbar-brand {

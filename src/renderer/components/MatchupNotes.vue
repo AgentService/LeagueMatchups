@@ -4,10 +4,10 @@
 		<div class="flex items-center justify-between mb-0 relative pb-1">
 			<div class="flex items-center space-x-2 text-gold-2">
 				<span class="font-semibold text-m">Matchup Notes</span>
-				<img :src="getChampionImageSource('small', currentMatchup?.championAName)" alt="Champion A"
+				<img :src="getChampionImageSource('small', championA?.id)" alt="Champion A"
 					class="w-8 h-8 rounded-full" />
 				<span class="text-gray-500 text-sm">vs</span>
-				<img :src="getChampionImageSource('small', currentMatchup?.championBName)" alt="Champion B"
+				<img :src="getChampionImageSource('small', championB?.id)" alt="Champion B"
 					class="w-8 h-8 rounded-full" />
 			</div>
 		</div>
@@ -56,6 +56,9 @@ import { getUrlHelper } from '../globalSetup';
 
 // Initialize Vuex store
 const store = useStore();
+
+const championA = computed(() => store.getters['matchups/getChampionA']);
+const championB = computed(() => store.getters['matchups/getChampionB']);
 
 // Function to get champion image source using the URL helper
 function getChampionImageSource(type, championId) {

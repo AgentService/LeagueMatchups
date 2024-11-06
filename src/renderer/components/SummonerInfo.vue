@@ -27,25 +27,26 @@
 	</div>
 </template>
 
-
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useStore } from 'vuex';
 import { getUrlHelper } from '../globalSetup.js';
+
 const store = useStore();
 
 const dropdownContainer = ref(null);
 const dropdownOpen = ref(false);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
-const gameName = computed(() => store.state.summoner.currentSummoner?.summonerNameValue);
-const tagLine = computed(() => store.state.summoner.currentSummone?.tagLine);
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 const closeDropdownTimeout = ref(null);
+// Correct computed properties
+const gameName = computed(() => store.state.summoner.currentSummoner?.gameName);
+const tagLine = computed(() => store.state.summoner.currentSummoner?.tagLine);
 
 const uniquePlayerDetails = computed(() => {
 	const uniqueSummoners = new Map();
 	allPlayerDetails.value.forEach(detail => {
-		const uniqueKey = `${detail.apiResponse?.gameName}#${detail.apiResponse?.tagLine}`;
+		const uniqueKey = `${detail.gameName}#${detail.tagLine}`;
 		if (!uniqueSummoners.has(uniqueKey)) {
 			uniqueSummoners.set(uniqueKey, detail);
 		}
@@ -53,11 +54,9 @@ const uniquePlayerDetails = computed(() => {
 	return Array.from(uniqueSummoners.values());
 });
 
-
 const currentSelection = computed(() => {
 	const currentSummoner = store.getters['summoner/getCurrentSummoner'];
-	// If there's no current summoner, fallback to the first entry in playerDetails
-	return currentSummoner ? currentSummoner : allPlayerDetails.value.length ? allPlayerDetails.value[0] : null;
+	return currentSummoner ? currentSummoner : null;
 });
 
 // Helper function to get summoner icon, fallback if missing
@@ -91,38 +90,41 @@ function selectSummoner(summonerDetail) {
 	dropdownOpen.value = false;
 }
 
-
-function fetchSummonerDetailsIfNeeded(gameName2, tagLine2) {
-	if (gameName && tagLine) {
+function fetchSummonerDetailsIfNeeded(summonerData) {
+	if (summonerData) {
 		// First, try fetching from the local database
-		store.dispatch('summoner/fetchSummonerDataByAccountId').then((data) => {
-			if (!data) {
-				// If no data is found, fetch from Riot API and create an entry
-				store.dispatch('summoner/fetchSummonerData', {
-					region: 'europe',
-					gameName: gameName.value || gameName2,
-					tagLine: tagLine.value || tagLine2,
-				});
-			}
-		});
+		store.dispatch('summoner/fetchSummonerDataBySummonerData', summonerData)
+			.then((data) => {
+				if (!data) {
+					// If no data is found, fetch from Riot API and create an entry
+					store.dispatch('summoner/fetchSummonerData', {
+						region: 'europe',
+						gameName: summonerData.gameName,
+						tagLine: summonerData.tagLine,
+					});
+				}
+			});
 	}
 }
 
+
 // Listen for client connection status from the main process
 window.api.receive("client-status", (status) => {
+	debugger
 	if (status.connected) {
 		console.log("League client connected, triggering summoner data fetch...");
-		// Call this function only if client is connected
-		window.api.send("get-summoner-name"); // Request summoner name from client
+		// Request summoner name from client
+		window.api.send("get-summoner-name");
 	}
 });
 
 // Listen for summoner name from main process
 window.api.receive("summoner-name-response", (summonerData) => {
-	if (summonerData && summonerData.gameName) {
+	debugger
+	if (summonerData && summonerData.gameName && summonerData.tagLine) {
 		console.log("Summoner data received from client:", summonerData);
 		// Trigger the check or fetch flow with summoner name and tag line
-		fetchSummonerDetailsIfNeeded(summonerData.gameName, summonerData.tagLine);
+		fetchSummonerDetailsIfNeeded(summonerData);
 	} else {
 		console.error("Invalid summoner data received from client");
 	}
@@ -130,10 +132,9 @@ window.api.receive("summoner-name-response", (summonerData) => {
 
 watch(isLoggedIn, (newVal, oldVal) => {
 	if (newVal && !oldVal) {
-		console.log("User logged in, fetching summoner details once.");
-		setTimeout(() => {
-			fetchSummonerDetailsIfNeeded();
-		}, 200); // Optional: Delay to prevent immediate double triggers
+		debugger
+		console.log("User logged in, waiting for summoner data from client...");
+		// Optionally, reset currentSummoner or perform other tasks
 	}
 });
 

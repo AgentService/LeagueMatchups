@@ -8,6 +8,7 @@ export default defineConfig({
     port: 3002,
   },
   build: {
+    sourcemap: false, // Disable source maps in production
     rollupOptions: {
       // Your rollup options here
     }

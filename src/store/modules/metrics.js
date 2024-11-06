@@ -1,11 +1,13 @@
 // metrics.js
 
+const defaultState = () => ({
+  subjectiveFeedbacks: {}, // Store subjective feedbacks by gameId
+  objectiveMetrics: {},    // Store objective metrics by gameId (future use)
+});
+
 export const metrics = {
   namespaced: true,
-  state: () => ({
-    subjectiveFeedbacks: {}, // Store subjective feedbacks by gameId
-    objectiveMetrics: {},    // Store objective metrics by gameId (future use)
-  }),
+  state: defaultState(),
   getters: {
     // Get subjective feedback for a specific game
     getSubjectiveFeedbackByGameId: (state) => (gameId) => {
@@ -21,6 +23,10 @@ export const metrics = {
     },
   },
   mutations: {
+    RESET_STATE(state) {
+      // Reset the state to its initial state
+      Object.assign(state, defaultState());
+    },
     // Save or update subjective feedback for a game
     ADD_OR_UPDATE_SUBJECTIVE_FEEDBACK(state, feedbackEntry) {
       state.subjectiveFeedbacks[feedbackEntry.gameId] = feedbackEntry;

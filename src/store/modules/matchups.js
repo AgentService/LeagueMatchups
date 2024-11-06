@@ -6,20 +6,25 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const debug = Debug("app:store:matchups");
 
+const defaultState = () => ({
+  championA: null,
+  championB: null,
+  matchupList: [],
+  currentMatchup: null,
+});
+
 export const matchups = {
   namespaced: true,
-  state: {
-    championA: null,
-    championB: null,
-    matchupList: [],
-    currentMatchup: null, // Holds the currently selected matchup
-  },
+  state: defaultState(),
   getters: {
     getChampionA: (state) => state.championA,
     getChampionB: (state) => state.championB,
     getCurrentMatchup: (state) => state.currentMatchup,
   },
   mutations: {
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     SET_CHAMPION_A(state, champion) {
       state.championA = champion;
     },
@@ -84,4 +89,3 @@ export const matchups = {
     },
   },
 };
-export default matchups; // Make sure this line is present

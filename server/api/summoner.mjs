@@ -38,6 +38,29 @@ const getSummonerDataByAccountId = async (userId, req) => {
   }
 };
 
+function getRegionByPlatformId(platformId) {
+  const regionMap = {
+    NA1: "americas",
+    LA1: "americas",
+    LA2: "americas",
+    BR1: "americas",
+    EUW1: "europe",
+    EUNE1: "europe",
+    TR1: "europe",
+    RU: "europe",
+    KR: "asia",
+    JP1: "asia",
+    OC1: "sea",
+    PH2: "sea",
+    SG2: "sea",
+    TH2: "sea",
+    TW2: "sea",
+    VN2: "sea",
+  };
+  return regionMap[platformId] || "americas"; // Default to americas if not found
+}
+
+
 router.get("/by-riot-id", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { region, gameName, tagLine } = req.query;

@@ -3,16 +3,18 @@ const debug = Debug("app:store:champions");
 
 // const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+const defaultState = () => ({
+  currentChampionA: null,
+  selectedSpells: [], // Array to store selected summoner spells
+  championList: {},
+  championDetails: {}, // Initialize as an empty object
+  championTips: {}, // Dieses Objekt wird nur Tipps für jeden Champion speichern
+  championCustomData: {}, // Object to store notes for each champion
+});
+
 export const champions = {
   namespaced: true,
-  state: () => ({
-    currentChampionA: null,
-    selectedSpells: [], // Array to store selected summoner spells
-    championList: {},
-    championDetails: {}, // Initialize as an empty object
-    championTips: {}, // Dieses Objekt wird nur Tipps für jeden Champion speichern
-    championCustomData: {}, // Object to store notes for each champion
-  }),
+  state: defaultState(),
   getters: {
     getChampionTips: (state) => (championId) => {
       // Get tips for the requested champion if available
@@ -30,6 +32,9 @@ export const champions = {
     },
   },
   mutations: {
+    RESET_STATE(state) {
+      Object.assign(state, defaultState());
+    },
     SET_CHAMPION_LIST_DATA(state, listData) {
       state.championList = listData.data;
     },

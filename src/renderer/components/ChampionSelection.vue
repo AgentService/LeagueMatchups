@@ -384,7 +384,6 @@ export default {
 		const NotesSharedModalRef = ref(null);
 		const MatchupNotesModalRef = ref(null);
 		const currentMatchup = computed(() => store.getters['matchups/getCurrentMatchup']);
-		let cleanups = []; // Store cleanup functions
 
 		const elementToAnimate = ref(null);
 		const showInput = ref(false);
@@ -468,7 +467,7 @@ export default {
 		return {
 			elementToAnimate, blueAnimation, redAnimation, getInstanceIdRef, showInput,
 			toggleSearch, toggleFavorite, isFavorite, favoriteChampions, getStatImageUrl, championPicked, showNotesModal, showMatchupNotesModal, fetchOtherUsersNotes, championA, championB,
-			NotesSharedModalRef, MatchupNotesModalRef, cleanups
+			NotesSharedModalRef, MatchupNotesModalRef
 		};
 	},
 	data() {
@@ -514,6 +513,7 @@ export default {
 				{ id: 'SummonerFlash', name: 'Flash', image: { full: 'SummonerFlash.png' } },
 				{ id: 'SummonerDot', name: 'Ignite', image: { full: 'SummonerDot.png' } },
 			],
+			cleanups: [],
 			showRestrictionPopup: false
 		};
 	},
