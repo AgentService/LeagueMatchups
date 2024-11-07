@@ -39,9 +39,6 @@ const dropdownOpen = ref(false);
 const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDetails']);
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 const closeDropdownTimeout = ref(null);
-// Correct computed properties
-const gameName = computed(() => store.state.summoner.currentSummoner?.gameName);
-const tagLine = computed(() => store.state.summoner.currentSummoner?.tagLine);
 
 const uniquePlayerDetails = computed(() => {
 	const uniqueSummoners = new Map();
@@ -56,6 +53,9 @@ const uniquePlayerDetails = computed(() => {
 
 const currentSelection = computed(() => {
 	const currentSummoner = store.getters['summoner/getCurrentSummoner'];
+	if (!currentSummoner && uniquePlayerDetails.value.length > 0) {
+		return uniquePlayerDetails.value[0];
+	}
 	return currentSummoner ? currentSummoner : null;
 });
 
@@ -90,7 +90,7 @@ function selectSummoner(summonerDetail) {
 	dropdownOpen.value = false;
 }
 
-function fetchSummonerDetailsIfNeeded(summonerData) {
+function fetchSummonerData(summonerData) {
 	if (summonerData) {
 		// First, try fetching from the local database
 		store.dispatch('summoner/fetchSummonerDataBySummonerData', summonerData)
@@ -110,7 +110,6 @@ function fetchSummonerDetailsIfNeeded(summonerData) {
 
 // Listen for client connection status from the main process
 window.api.receive("client-status", (status) => {
-	debugger
 	if (status.connected) {
 		console.log("League client connected, triggering summoner data fetch...");
 		// Request summoner name from client
@@ -120,11 +119,10 @@ window.api.receive("client-status", (status) => {
 
 // Listen for summoner name from main process
 window.api.receive("summoner-name-response", (summonerData) => {
-	debugger
 	if (summonerData && summonerData.gameName && summonerData.tagLine) {
 		console.log("Summoner data received from client:", summonerData);
 		// Trigger the check or fetch flow with summoner name and tag line
-		fetchSummonerDetailsIfNeeded(summonerData);
+		fetchSummonerData(summonerData);
 	} else {
 		console.error("Invalid summoner data received from client");
 	}
@@ -132,7 +130,6 @@ window.api.receive("summoner-name-response", (summonerData) => {
 
 watch(isLoggedIn, (newVal, oldVal) => {
 	if (newVal && !oldVal) {
-		debugger
 		console.log("User logged in, waiting for summoner data from client...");
 		// Optionally, reset currentSummoner or perform other tasks
 	}

@@ -7,7 +7,6 @@ const defaultState = () => ({
   // Add other user preferences here
 });
 
-
 // src/store/userPreferences.js
 export const userPreferences = {
   namespaced: true,

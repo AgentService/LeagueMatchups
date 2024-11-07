@@ -67,7 +67,6 @@ export const summoner = {
     // Add this action to your store
     async initializeSummonerData({ dispatch }) {
       try {
-        debugger
         // Define getClientStatus here if it’s not globally accessible
         async function getClientStatus() {
           try {

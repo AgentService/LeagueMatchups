@@ -16,10 +16,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import "../axiosSetup";
 import { setupBaseUrl } from "./globalSetup";
-import {
-  initializeSummonerDataFetching,
-  startSummonerNameCheck,
-} from "../services/summonerDataService";
 
 import Debug from "debug";
 
