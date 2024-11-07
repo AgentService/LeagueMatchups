@@ -50,7 +50,6 @@ axios.interceptors.response.use(
 
         } catch (refreshError) {
           isRefreshing = false;
-          store.dispatch("auth/logout"); // Logout if refresh fails
           return Promise.reject(new Error("Session expired. Please log in again."));
         } finally {
           isRefreshing = false;

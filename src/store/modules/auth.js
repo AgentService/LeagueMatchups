@@ -97,11 +97,6 @@ export const auth = {
       }
     },
     async refreshToken({ commit, state, dispatch }) {
-      if (!state.refreshToken) {
-        await dispatch("logout");
-        return;
-      }
-
       try {
         const refreshToken = state.refreshToken;
         const response = await axios.post(`${baseUrl}/api/auth/token`, {
@@ -115,7 +110,6 @@ export const auth = {
 
         return accessToken;
       } catch (error) {
-        dispatch("logout");  // If refresh fails, log the user out
         console.error("Error refreshing the token:", error);
         throw error;
       }
@@ -139,7 +133,6 @@ export const auth = {
             }
           } catch (refreshError) {
             console.error("Token refresh failed:", refreshError);
-            await dispatch("logout");
           }
         } else {
           console.error("Token verification failed:", error);
