@@ -242,11 +242,7 @@ export default {
 		};
 
 		const fetchAndShowLastMatch = async () => {
-			if (summonerId.value) {
-				await store.dispatch("matches/fetchLastMatch", { forceRefresh: true });
-			} else {
-				console.error("Summoner ID not found");
-			}
+			await store.dispatch("matches/fetchLastMatch", { forceRefresh: true });
 		};
 
 
