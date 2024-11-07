@@ -3,6 +3,7 @@
         <div class="widget-header">
             <i class="fas fa-history note-icon"></i>
             <span class="widget-header-title ms-1">Review History</span>
+
             <span class="widget-header-right"></span>
         </div>
 
@@ -104,13 +105,12 @@ const closeModal = () => {
 
 async function fetchLatestMatches(forceRefresh = false) {
     try {
-        // Fetch matches for the current summoner
-        await store.dispatch('matches/fetchLastMatch', { forceRefresh: forceRefresh });
+        await store.dispatch("matches/fetchLastMatch", { forceRefresh: forceRefresh });
 
-        // Ensure uiMatches is updated from Vuex with the new summoner's matches
-        uiMatches.value = store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid);
+        // Update uiMatches from Vuex with the current summoner's matches
+        uiMatches.value = store.getters["matches/getMatchHistory"](currentSummoner.value.apiResponse.puuid);
     } catch (error) {
-        console.error('Error fetching the latest match:', error);
+        console.error("Error fetching the latest match:", error);
     }
 }
 

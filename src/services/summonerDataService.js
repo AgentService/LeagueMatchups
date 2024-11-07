@@ -73,19 +73,19 @@ export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, regio
  */
 
 export function initializeSummonerDataFetching() {
-  window.api.receive("summoner-name-response", async (response) => {
-    console.log("Received summoner name response from WebSocket:", response);
-    if (response && typeof response === 'object' && response.gameName && !response.error) {
-      const newSummonerName = response.gameName;
-      const tagLine = response.tagLine || "";
+  // window.api.receive("summoner-name-response", async (response) => {
+  //   console.log("Received summoner name response from WebSocket:", response);
+  //   if (response && typeof response === 'object' && response.gameName && !response.error) {
+  //     const newSummonerName = response.gameName;
+  //     const tagLine = response.tagLine || "";
+  //     debugger
+  //     // Fetch and save the summoner data
+  //     await fetchAndSaveSummonerData(newSummonerName, tagLine, "europe", response);
+  //   } else {
+  //     console.error("Invalid or empty summoner response from WebSocket:", response);
+  //   }
 
-      // Fetch and save the summoner data
-      await fetchAndSaveSummonerData(newSummonerName, tagLine, "europe", response);
-    } else {
-      console.error("Invalid or empty summoner response from WebSocket:", response);
-    }
-
-  });
+  // });
 
   // Trigger the request to get the summoner name
   window.api.send("get-summoner-name");

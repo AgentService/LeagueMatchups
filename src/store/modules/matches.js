@@ -90,7 +90,7 @@ export const matches = {
   actions: {
     // Fetch match history for the current summoner
     async fetchLastMatch({ commit, state, dispatch, rootGetters }, { forceRefresh = false, count = 5 } = {}) {
-      // Get currentSummoner from the summoner module
+      // Get currentSummoner from Vuex if not provided as a parameter
       const currentSummoner = rootGetters['summoner/getCurrentSummoner'];
 
       if (!currentSummoner) {
@@ -98,28 +98,29 @@ export const matches = {
         return;
       }
 
-      // Extract the puuid from the currentSummoner (either from apiResponse or webSocketResponse)
       const puuid = currentSummoner.apiResponse?.puuid;
+      const region = currentSummoner.webSocketResponse?.region;
 
       if (!puuid) {
         console.error("Player PUUID is not available.");
         return;
       }
 
-      // Use cached data if available and recent
+      // Cache duration and fetch time check
       const now = Date.now();
       const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
       if (state.summonerMatches[puuid] && now - state.lastFetchTime < CACHE_DURATION && !forceRefresh) {
         console.log("Using cached match data.");
-        return state.summonerMatches[puuid]; // Return cached matches for this summoner
+        return state.summonerMatches[puuid];
       }
 
       const config = getAuthConfig();
 
+      // Options for fetching match history
       const options = {
         module: "matches",
         type: "matchHistory",
-        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}`, // Use `count` here
+        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}&region=${region}`, // Dynamically set region
         vuexMutation: "matches/SET_SUMMONER_MATCHES",
         itemId: puuid,
         commit,
@@ -132,12 +133,11 @@ export const matches = {
         const data = await dispatch("fetchDataAndCache", options, { root: true });
 
         commit("SET_SUMMONER_MATCHES", { puuid, matches: data });
-        state.lastFetchTime = Date.now(); // Update the last fetch time
+        state.lastFetchTime = Date.now();
       } catch (error) {
         console.error("Error fetching the last match:", error);
       }
     },
-
     addReviewedMatch({ commit }, matchReview) {
       commit("MARK_MATCH_REVIEWED", matchReview.gameId);
     },

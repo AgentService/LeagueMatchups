@@ -57,12 +57,12 @@ router.post("/register", async (req, res) => {
 async function sendVerificationEmail(email, verificationToken) {
   // Use the Brevo API key from environment variables
   const brevoApiKey = process.env.BREVO_API_KEY;
-
+  console.log("Sending verification email to:", email);
   // Configure Brevo SDK
   const defaultClient = SibApiV3Sdk.ApiClient.instance;
   const apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = brevoApiKey;
-
+  console.log("Brevo API key:", brevoApiKey);
   const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
@@ -71,10 +71,16 @@ async function sendVerificationEmail(email, verificationToken) {
     email: "hello@skyquads.com",
     name: "SoloQ",
   };
+  console.log("Verification token:", verificationToken);
   sendSmtpEmail.subject = "Account Verification";
   sendSmtpEmail.htmlContent = `<p>Please verify your account by clicking the following link: <a href="${process.env.VITE_API_BASE_URL}/api/user/verify/${verificationToken}">Verify Account</a></p>`;
 
-  await apiInstance.sendTransacEmail(sendSmtpEmail);
+  try {
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Verification email sent successfully.");
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+  }
 }
 
 // Email Verification Endpoint

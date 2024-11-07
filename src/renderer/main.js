@@ -23,6 +23,9 @@ import Debug from "debug";
 if (import.meta.env.MODE !== "production") {
   console.log("Running in development mode");
   Debug.enable(import.meta.env.VITE_DEBUG);
+  try {
+    require('electron-reloader')(module);
+  } catch (_) { }
 }
 
 library.add(fas);

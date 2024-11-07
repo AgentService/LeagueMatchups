@@ -13,6 +13,9 @@
                     </div>
                     <form @submit.prevent="handleSubmit" class="auth-form">
                         <input type="email" v-model="form.email" placeholder="Email" required>123@123.de
+                        <input v-if="authMode === 'register'" type="text" v-model="form.username" placeholder="Username"
+                            required />
+
                         <input type="password" v-model="form.password" placeholder="Password" required>
                         <button class="button-login" type="submit" :disabled="isSubmitting">
                             {{ authMode === 'login' ? 'Log In' : 'Create Account' }}
@@ -70,7 +73,13 @@ const handleSubmit = async () => {
     infoMessage.value = '';
 
     try {
-        const payload = { ...form };
+        // Conditionally add username to payload if registering
+        const payload = {
+            email: form.email,
+            password: form.password,
+            ...(authMode.value === 'register' && { username: form.username })
+        };
+
         await store.dispatch(authMode.value === 'login' ? 'auth/login' : 'auth/register', payload);
 
         if (authMode.value === 'register') {
@@ -86,6 +95,7 @@ const handleSubmit = async () => {
         isSubmitting.value = false;
     }
 };
+
 </script>
 
 <style scoped>

@@ -43,11 +43,11 @@
 				<div class="details-container">
 					<div class="stats-row">
 						<div class="match-result" :class="{ 'win': isWin(match), 'loss': !isWin(match) }">{{
-		isWin(match) ?
-			'Win' : 'Loss' }}</div>
+							isWin(match) ?
+								'Win' : 'Loss' }}</div>
 						<div>{{ getPlayerChampion(match).kills }} / <span class="deaths">{{
-		getPlayerChampion(match).deaths
-	}}</span> / {{ getPlayerChampion(match).assists }}</div>
+							getPlayerChampion(match).deaths
+						}}</span> / {{ getPlayerChampion(match).assists }}</div>
 						<div>{{ calculateCsPerMinute(getPlayerChampion(match)) }} CS/Min.</div>
 						<div>{{ calculateVisionScorePerMinute(getPlayerChampion(match)) }} Vis/Min.</div>
 					</div>
@@ -243,11 +243,12 @@ export default {
 
 		const fetchAndShowLastMatch = async () => {
 			if (summonerId.value) {
-				await store.dispatch('matches/fetchLastMatch', summonerId.value);
+				await store.dispatch("matches/fetchLastMatch", { forceRefresh: true });
 			} else {
-				console.error('Summoner ID not found');
+				console.error("Summoner ID not found");
 			}
 		};
+
 
 		const formatSummonerName = (name) => {
 			return name.length > 10 ? name.substring(0, 10) + '...' : name;

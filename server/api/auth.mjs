@@ -169,7 +169,7 @@ router.post("/token", async (req, res) => {
 
     // Issue a new JWT access token with role
     const newToken = jwt.sign({ id, role }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
+      expiresIn: "7d",
     });
 
     res.json({ accessToken: newToken });

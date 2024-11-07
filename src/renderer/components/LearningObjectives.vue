@@ -412,7 +412,6 @@ const groupedReflections = computed(() => {
 }
 
 .reflection-item {
-
 	color: #d1d5db;
 	font-size: 0.875rem;
 	display: flex;

@@ -38,8 +38,6 @@ export const summoner = {
       const existingIndex = state.playerDetails.findIndex(
         (detail) => detail.gameName === gameName && detail.tagLine === tagLine
       );
-
-
       if (existingIndex !== -1) {
         const existingSummoner = state.playerDetails[existingIndex];
         state.playerDetails[existingIndex] = {
@@ -110,76 +108,76 @@ export const summoner = {
         commit('setPlayerDetails', detail);
       });
     },
-    async fetchSummonerDataBySummonerData({ commit }, summonerData) {
+    // summoner module in Vuex
+    // summoner module in Vuex
+    async fetchOrUpdateSummonerData({ commit }, summonerData) {
       try {
         const authConfig = getAuthConfig();
+
+        // Step 1: Retrieve all summoners associated with the account from the database
         const apiResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
 
-        if (apiResponse.data.length === 0) {
-          console.log("No summoner data found in the database for this user.");
-          return null; // No data found
+        if (apiResponse.data && apiResponse.data.length > 0) {
+          let matchingSummoner = null;
+
+          // Step 2: Iterate over each summoner in the response
+          apiResponse.data.forEach(summoner => {
+            const isMatchingSummoner = summoner.gameName === summonerData.gameName && summoner.tagLine === summonerData.tagLine;
+
+            // Construct player details with or without `webSocketResponse` based on matching criteria
+            const playerDetails = {
+              gameName: summoner.gameName,
+              tagLine: summoner.tagLine,
+              apiResponse: summoner,
+              webSocketResponse: isMatchingSummoner ? summonerData : null // Preserve WebSocket data only for matching summoner
+            };
+
+            // Commit each summoner to setPlayerDetails
+            commit("setPlayerDetails", playerDetails);
+
+            // If we find a match, save it for setting as currentSummoner
+            if (isMatchingSummoner) {
+              matchingSummoner = playerDetails;
+            }
+          });
+
+          // Step 3: Set currentSummoner if a matching summoner was found
+          if (matchingSummoner) {
+            commit("setCurrentSummoner", matchingSummoner);
+          }
+          return matchingSummoner;
+        } else {
+          // Step 4: If no data is found in the database, fetch from Riot API
+          const riotApiData = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
+            ...authConfig,
+            params: {
+              region: summonerData.region,
+              gameName: summonerData.gameName,
+              tagLine: summonerData.tagLine
+            }
+          });
+
+          if (riotApiData.status === 200 && riotApiData.data.length > 0) {
+            const apiData = riotApiData.data[0];
+            const playerDetails = {
+              gameName: summonerData.gameName,
+              tagLine: summonerData.tagLine,
+              apiResponse: apiData,
+              webSocketResponse: summonerData // Preserve WebSocket data
+            };
+
+            // Commit the newly fetched data to the store
+            commit("setPlayerDetails", playerDetails);
+            commit("setCurrentSummoner", playerDetails);
+            return playerDetails;
+          } else {
+            console.log("No summoner data found in Riot API for this summoner.");
+            return null;
+          }
         }
-
-        // Find the summoner matching the provided gameName and tagLine
-        const summoner = apiResponse.data.find(
-          (s) => s.gameName === summonerData.gameName && s.tagLine === summonerData.tagLine
-        );
-
-        if (!summoner) {
-          console.log("No matching summoner data found in the database.");
-          return null;
-        }
-
-        const newPlayerDetails = {
-          gameName: summoner.gameName,
-          tagLine: summoner.tagLine,
-          apiResponse: summoner,
-          webSocketResponse: summonerData, // Use the received summonerData as WebSocket response
-        };
-
-        commit("setPlayerDetails", newPlayerDetails);
-        commit("setCurrentSummoner", newPlayerDetails);
-        return newPlayerDetails; // Return the fetched data
       } catch (error) {
-        console.error("Error fetching summoner data by account ID:", error);
+        console.error("Error fetching or updating summoner data:", error);
         return null;
-      }
-    },
-
-    async fetchSummonerData({ commit }, { region, gameName, tagLine }) {
-      console.log(`Fetching summoner data for: ${gameName} with tagLine: ${tagLine}`);
-
-      try {
-        const authConfig = getAuthConfig();
-        console.log("Fetching summoner data from API (forced refresh)");
-
-        const apiResponse = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
-          ...authConfig,
-          params: {
-            region,
-            gameName,
-            tagLine
-          },
-        });
-
-        if (apiResponse.status !== 200) {
-          throw new Error(`HTTP error! status: ${apiResponse.status}`);
-        }
-
-        console.log("Summoner data fetched from API:", apiResponse.data);
-
-        const newPlayerDetails = {
-          gameName,
-          tagLine,
-          webSocketResponse: {},
-          apiResponse: apiResponse.data[0],
-        };
-
-        commit("setPlayerDetails", newPlayerDetails);
-        commit("setCurrentSummoner", newPlayerDetails);
-        commit("setFetchedFromAPI", false);
-      } catch (error) {
-        console.error("Error fetching PlayerDetails:", error);
       }
     },
     async fetchAllSummoners({ commit }) {

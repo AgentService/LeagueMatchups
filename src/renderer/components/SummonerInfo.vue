@@ -1,31 +1,29 @@
 <template>
-	<div class="dropdown summoner-display" @mouseover="clearCloseDropdownTimeout" @mouseleave="setCloseDropdownTimeout"
-		:aria-expanded="dropdownOpen.toString()">
-		<button class="btn dropdown-toggler" href="#" role="button" aria-expanded="false">
+	<div ref="dropdownContainer" class="dropdown summoner-display" @mouseover="clearCloseDropdownTimeout"
+		@mouseleave="setCloseDropdownTimeout" :aria-expanded="dropdownOpen.toString()">
+		<button class="btn dropdown-toggler" @click="toggleDropdown" role="button" aria-expanded="false">
 			<div class="d-flex align-items-center">
 				<img :src="currentSelection ? getSummonerIcon(getSummonerProfileIcon(currentSelection)) : getSummonerIcon(5541)"
 					alt="Summoner Icon" class="rounded-circle icon-image me-2">
 				<span class="text-light">{{ getSummonerName(currentSelection) || 'Summoner' }}</span>
 				<span class="text-secondary ms-1 tag">#{{ getSummonerTagLine(currentSelection) || '' }}</span>
 			</div>
-			<ul class="dropdown-menu mt-2" :class="{ 'show': dropdownOpen }">
-				<!-- <li class="dropdown-header">Summoner</li> -->
-				<!-- <li>
-					<hr class="dropdown-divider">
-				</li> -->
-				<li v-for="detail in uniquePlayerDetails" :key="detail.apiResponse.puuid"
-					@click="selectSummoner(detail)">
-					<a class="dropdown-item d-flex align-items-center">
-						<img :src="getSummonerIcon(getSummonerProfileIcon(detail))" alt="Summoner Icon"
-							class="icon-menu-image me-2">
-						<span>{{ detail.apiResponse?.gameName || detail.webSocketResponse?.gameName }}</span>
-						<span class="text-secondary ms-1 tag">#{{ getSummonerTagLine(detail) }}</span>
-					</a>
-				</li>
-			</ul>
 		</button>
+		<ul class="dropdown-menu" :class="{ 'show': dropdownOpen }">
+			<!-- Use apiResponse.puuid as the unique key -->
+			<li v-for="detail in allPlayerDetails" :key="detail.apiResponse.puuid" @click="selectSummoner(detail)">
+				<a class="dropdown-item d-flex align-items-center">
+					<img :src="getSummonerIcon(getSummonerProfileIcon(detail))" alt="Summoner Icon"
+						class="icon-menu-image me-2">
+					<span>{{ getSummonerName(detail) }}</span>
+					<span class="text-secondary ms-1 tag">#{{ getSummonerTagLine(detail) }}</span>
+				</a>
+			</li>
+		</ul>
 	</div>
 </template>
+
+
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
@@ -40,29 +38,22 @@ const allPlayerDetails = computed(() => store.getters['summoner/getAllPlayerDeta
 const isLoggedIn = computed(() => store.state.auth.isLoggedIn);
 const closeDropdownTimeout = ref(null);
 
-const uniquePlayerDetails = computed(() => {
-	const uniqueSummoners = new Map();
-	allPlayerDetails.value.forEach(detail => {
-		const uniqueKey = `${detail.gameName}#${detail.tagLine}`;
-		if (!uniqueSummoners.has(uniqueKey)) {
-			uniqueSummoners.set(uniqueKey, detail);
-		}
-	});
-	return Array.from(uniqueSummoners.values());
-});
+const currentSelection = computed(() => store.getters['summoner/getCurrentSummoner']);
 
-const currentSelection = computed(() => {
-	const currentSummoner = store.getters['summoner/getCurrentSummoner'];
-	if (!currentSummoner && uniquePlayerDetails.value.length > 0) {
-		return uniquePlayerDetails.value[0];
+watch(currentSelection, (newSelection) => {
+	console.log("Updated currentSelection:", newSelection);
+
+	if (!store.getters['summoner/getCurrentSummoner'] && newSelection) {
+		store.commit('summoner/setCurrentSummoner', newSelection);
 	}
-	return currentSummoner ? currentSummoner : null;
 });
 
 // Helper function to get summoner icon, fallback if missing
 const getSummonerProfileIcon = (summonerDetail) => {
-	return summonerDetail?.webSocketResponse?.profileIconId || summonerDetail?.apiResponse?.profileIconId || 5541;
+	return summonerDetail?.webSocketResponse?.profileIconId ||
+		summonerDetail?.apiResponse?.profileIconId || 5541;
 };
+
 
 // Helper function to get summoner name from either WebSocket or API
 const getSummonerName = (summonerDetail) => {
@@ -88,25 +79,20 @@ function handleClickOutside(event) {
 function selectSummoner(summonerDetail) {
 	store.commit('summoner/setCurrentSummoner', summonerDetail);
 	dropdownOpen.value = false;
+	console.log("Current Summoner Updated:", summonerDetail);
 }
 
-function fetchSummonerData(summonerData) {
-	if (summonerData) {
-		// First, try fetching from the local database
-		store.dispatch('summoner/fetchSummonerDataBySummonerData', summonerData)
-			.then((data) => {
-				if (!data) {
-					// If no data is found, fetch from Riot API and create an entry
-					store.dispatch('summoner/fetchSummonerData', {
-						region: 'europe',
-						gameName: summonerData.gameName,
-						tagLine: summonerData.tagLine,
-					});
-				}
-			});
+
+async function fetchSummonerData(summonerData) {
+	if (!summonerData) return;
+
+	try {
+		// Dispatch a single action that handles both database checking and API fetching if needed
+		await store.dispatch('summoner/fetchOrUpdateSummonerData', summonerData);
+	} catch (error) {
+		console.error("Error in fetchSummonerData:", error);
 	}
 }
-
 
 // Listen for client connection status from the main process
 window.api.receive("client-status", (status) => {
@@ -157,6 +143,11 @@ onBeforeUnmount(() => {
 	border: 2px solid #c0c0c0;
 }
 
+.dropdown-menu {
+	margin-top: -2px;
+	border-top: 0;
+	border-radius: 0 0 12px 12px;
+}
 .dropdown-menu.show {
 	display: block;
 }

@@ -401,7 +401,7 @@ ipcMain.handle("check-client-status", async (event) => {
 
 ipcMain.on("get-summoner-name", async (event) => {
   if (currentSummonerResponse) {
-    console.log("Summoner data available, sending cached data...");
+    console.log("Summoner data available, sending cached data...", currentSummonerResponse);
     event.reply("summoner-name-response", currentSummonerResponse); // Send full response
   } else {
     console.log("No summoner data available, fetching new data...");
@@ -424,15 +424,14 @@ ipcMain.handle("get-api-key", async (event) => {
 });
 
 let currentSummonerResponse = null;
-
 async function fetchSummonerName(credentials) {
   const { port, password } = credentials;
-  // console.log(`Fetching summoner name with port: ${port} and password: ${password}`);
 
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Disable TLS cert verification for this request
 
   try {
-    const response = await fetch(
+    // Fetch current summoner data
+    const summonerResponse = await fetch(
       `https://127.0.0.1:${port}/lol-summoner/v1/current-summoner`,
       {
         method: "GET",
@@ -443,27 +442,61 @@ async function fetchSummonerName(credentials) {
       }
     );
 
-    if (response.ok) {
-      const data = await response.json();
-      if (data && data.gameName) {
-        console.log("Summoner name fetched (gameName):", data.gameName);  // Log the gameName
-        currentSummonerResponse = data;  // Store the full response
-        return data;  // Return the full data object instead of just data.gameName
-      } else {
-        console.error("Neither gameName nor displayName found in the API response");
-        return null;
-      }
-    } else {
-      console.error(`HTTP error fetching summoner name: ${response.status}`);
+    if (!summonerResponse.ok) {
+      console.error(`HTTP error fetching summoner name: ${summonerResponse.status}`);
       return null;
     }
+
+    const summonerData = await summonerResponse.json();
+    if (!summonerData || !summonerData.gameName) {
+      console.error("Neither gameName nor displayName found in the API response");
+      return null;
+    }
+
+    // Fetch region data from /riotclient/region-locale
+    const regionResponse = await fetch(
+      `https://127.0.0.1:${port}/riotclient/region-locale`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${Buffer.from(`riot:${password}`).toString("base64")}`,
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!regionResponse.ok) {
+      console.error(`HTTP error fetching region data: ${regionResponse.status}`);
+      return null;
+    }
+
+    const regionData = await regionResponse.json();
+    if (!regionData || !regionData.region) {
+      console.error("Region information not found in the API response");
+      return null;
+    }
+
+    // Combine summoner data with region information
+    const combinedResponse = {
+      ...summonerData,
+      region: regionData.region,
+    };
+
+    console.log("Summoner and region data fetched:", combinedResponse); // Log the combined data
+
+    // Update the global currentSummonerResponse with the full data including region
+    currentSummonerResponse = combinedResponse;
+
+    return combinedResponse; // Return the full object with region included
+
   } catch (error) {
-    console.error("Error fetching summoner name:", error);
+    console.error("Error fetching summoner or region data:", error);
     return null;
   } finally {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"; // Reset TLS verification
   }
 }
+
 
 
 

@@ -138,8 +138,6 @@ const saveNote = (noteId) => {
 };
 
 onMounted(() => {
-	store.dispatch('summoner/deduplicatePlayerDetails');
-
 	fetchNotes();
 });
 
