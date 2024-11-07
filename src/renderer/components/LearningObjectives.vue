@@ -106,12 +106,10 @@
 							<div class="text-white font-semibold text-m">{{ category }}</div>
 							<ul class="space-y-1 p-0">
 								<li v-for="lo in predefinedObjectives[category]" :key="lo.name"
-									class="flex justify-between items-center cursor-pointer p-2 rounded-lg transition bg-gray-700 hover:bg-gray-600">
-									<span @click="toggleLOSelection(lo, category)"
-										:class="{ 'text-green-400': isLOSelected(lo, category) }">
-										{{ lo.name }}
-									</span>
-									<button @click="deleteLO(lo, category)" class="text-red-500 ml-2"
+									@click="toggleLOSelection(lo, category)"
+									:class="['flex justify-between items-center cursor-pointer p-2 rounded-lg transition bg-gray-700 hover:bg-gray-600', isLOSelected(lo, category) ? 'modal-lo-item-selected' : 'modal-lo-item']">
+									<span>{{ lo.name }}</span>
+									<button @click.stop="deleteLO(lo, category)" class="text-red-500 ml-2"
 										aria-label="Delete LO">
 										<i class="fas fa-trash"></i>
 									</button>
@@ -132,6 +130,7 @@
 										{{ category }}
 									</option>
 								</select>
+
 								<button @click="addNewLO" :disabled="isDuplicateLO"
 									class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed">
 									Add
@@ -267,18 +266,23 @@ const isDuplicateLO = computed(() => {
 	);
 });
 
-// Function to add a new LO
 function addNewLO() {
 	const trimmedName = newLOName.value.trim();
-	if (!trimmedName || !newLOCategory.value) return;
+	const selectedCategory = newLOCategory.value; // Make a local copy to ensure it doesn't lose context
 
-	// Check for duplicate LO name
-	const exists = predefinedObjectives.value[newLOCategory.value].some(
+	// Ensure both name and category are selected
+	if (!trimmedName || !selectedCategory) {
+		alert('Please enter a name and select a category.');
+		return;
+	}
+
+	// Check for duplicate LO name in the selected category
+	const exists = predefinedObjectives.value[selectedCategory]?.some(
 		(lo) => lo.name.toLowerCase() === trimmedName.toLowerCase()
 	);
 
 	if (exists) {
-		alert('A Learning Objective with this name already exists.');
+		alert('A Learning Objective with this name already exists in the selected category.');
 		return;
 	}
 
@@ -287,10 +291,29 @@ function addNewLO() {
 		gamesApplied: 0,
 		reflections: []
 	};
-	store.dispatch('learningObjectives/addPredefinedObjective', { lo: newLO, category: newLOCategory.value });
+
+	// Add the new LO and use the locally scoped selectedCategory for further logic
+	store.dispatch('learningObjectives/addPredefinedObjective', { lo: newLO, category: selectedCategory }).then(() => {
+		// Ensure activeObjectives category exists before checking length
+		if (!activeObjectives.value[selectedCategory]) {
+			store.commit('learningObjectives/setActiveObjectives', {
+				category: selectedCategory,
+				objectives: []
+			});
+		}
+
+		// Auto-select new LO if less than 2 active objectives exist for the category
+		if (activeObjectives.value[selectedCategory]?.length < 2) {
+			toggleLOSelection(newLO, selectedCategory);
+		}
+	});
+
+	// Clear input fields
 	newLOName.value = "";
 	newLOCategory.value = "";
 }
+
+
 
 // Function to delete a LO
 function deleteLO(lo, category) {
@@ -545,5 +568,13 @@ const groupedReflections = computed(() => {
 	cursor: pointer;
 	margin-top: 15px;
 	border: none;
+}
+
+.modal-lo-item {
+	color: rgb(190, 190, 190);
+}
+
+.modal-lo-item-selected {
+	color: #2cda7d;
 }
 </style>
