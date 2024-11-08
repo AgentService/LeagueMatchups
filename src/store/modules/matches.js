@@ -22,7 +22,7 @@ export const matches = {
     getReviewedMatches: (state) => Object.keys(state.reviewedMatches),
 
     getPuuid: (state, getters, rootState) => {
-      return rootState.summoner.currentSummoner?.apiResponse?.puuid || rootState.summoner.currentSummoner?.webSocketResponse?.puuid;
+      return rootState.summoner.currentSummoner?.apiResponse?.puuid;
     },
     getPlayerChampion: (state, getters) => (match) => {
       const puuid = getters.getPuuid;
@@ -88,11 +88,8 @@ export const matches = {
     },
   },
   actions: {
-    // Fetch match history for the current summoner
-    async fetchLastMatch({ commit, state, dispatch, rootGetters }, { forceRefresh = false, count = 5 } = {}) {
-      // Get currentSummoner from Vuex if not provided as a parameter
+    async fetchLastMatch({ commit, state, rootGetters }, { forceRefresh = false, count = 5 } = {}) {
       const currentSummoner = rootGetters['summoner/getCurrentSummoner'];
-
       if (!currentSummoner) {
         console.error("No current summoner is selected.");
         return;
@@ -100,46 +97,86 @@ export const matches = {
 
       const puuid = currentSummoner.apiResponse?.puuid;
       const region = currentSummoner.webSocketResponse?.region;
-
       if (!puuid) {
         console.error("Player PUUID is not available.");
         return;
       }
 
-      // Cache duration and fetch time check
       const now = Date.now();
       const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
+      debugger
       if (state.summonerMatches[puuid] && now - state.lastFetchTime < CACHE_DURATION && !forceRefresh) {
         console.log("Using cached match data.");
         return state.summonerMatches[puuid];
       }
 
-      const config = getAuthConfig();
-
-      // Options for fetching match history
-      const options = {
-        module: "matches",
-        type: "matchHistory",
-        apiEndpoint: `/api/matches/last-match/${puuid}?count=${count}&region=${region}`, // Dynamically set region
-        vuexMutation: "matches/SET_SUMMONER_MATCHES",
-        itemId: puuid,
-        commit,
-        state,
-        auth: config,
-      };
-
       try {
-        debug("Fetching last match for:", currentSummoner.apiResponse?.gameName);
-        const data = await dispatch("fetchDataAndCache", options, { root: true });
+        const response = await axios.get(`${baseUrl}/api/matches/last-match/${puuid}`, {
+          params: { count, region }
+        });
+        const newMatches = response.data;
 
-        commit("SET_SUMMONER_MATCHES", { puuid, matches: data });
-        state.lastFetchTime = Date.now();
+        // Filter out any matches already present to avoid duplicates
+        const existingMatches = state.summonerMatches[puuid] || [];
+        const matchesToAdd = newMatches.filter(
+          newMatch => !existingMatches.some(existing => existing.gameId === newMatch.gameId)
+        );
+
+        // Add only new matches and keep order intact
+        const updatedMatches = [...matchesToAdd, ...existingMatches];
+        commit("SET_SUMMONER_MATCHES", { puuid, matches: updatedMatches });
+        state.lastFetchTime = now;
       } catch (error) {
-        console.error("Error fetching the last match:", error);
+        console.error("Error fetching last matches:", error);
       }
     },
     addReviewedMatch({ commit }, matchReview) {
       commit("MARK_MATCH_REVIEWED", matchReview.gameId);
+    },
+    // In matches module
+    async fetchMatchDetails({ commit, state, rootGetters }, { gameId }) {
+      const currentSummoner = rootGetters["summoner/getCurrentSummoner"];
+
+      if (!currentSummoner) {
+        console.error("No current summoner data available.");
+        return;
+      }
+
+      const puuid = currentSummoner.apiResponse?.puuid;
+      const region = currentSummoner.webSocketResponse?.region;
+
+      if (!puuid || !region) {
+        console.error("Missing summoner puuid or region");
+        return;
+      }
+
+      // Simulate a missing match by removing it from the state if it exists
+      const existingMatches = state.summonerMatches[puuid] || [];
+      const matchIndex = existingMatches.findIndex((match) => match.info?.gameId === gameId);
+
+      if (matchIndex !== -1) {
+        // Remove the match to simulate a missing state
+        existingMatches.splice(matchIndex, 1);
+        commit("SET_SUMMONER_MATCHES", { puuid, matches: existingMatches });
+        console.log("Simulated missing match by deleting from state:", gameId);
+      }
+
+      // Proceed with the network request as if the match didn’t exist
+      try {
+        const response = await axios.get(`${baseUrl}/api/matches/match-details/${gameId}`, {
+          params: { puuid, region },
+          headers: getAuthConfig().headers,
+        });
+        const matchDetails = response.data;
+
+        // Commit the new match details to the state
+        commit("SET_SUMMONER_MATCHES", { puuid, matches: [matchDetails, ...existingMatches] });
+
+        return matchDetails;
+      } catch (error) {
+        console.error("Error fetching match details:", error);
+        throw error;
+      }
     },
   },
 };

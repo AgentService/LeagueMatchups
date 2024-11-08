@@ -60,7 +60,7 @@ async function initializeApp() {
       await store.dispatch("auth/reauthenticate", { token, refreshToken });
 
       // Fetch recent matches after successful reauthentication
-      await store.dispatch("matches/fetchLastMatch", { forceRefresh: true, count: 5 });
+      await store.dispatch("matches/fetchLastMatch", { forceRefresh: false, count: 5 });
 
       // Initialize summoner data fetching and summoner name check only after auth
       // initializeSummonerDataFetching();

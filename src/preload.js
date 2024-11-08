@@ -76,6 +76,9 @@ contextBridge.exposeInMainWorld("api", {
 });
 
 contextBridge.exposeInMainWorld("ws", {
+  receivePostGameStatsOnce: (func) => {
+    ipcRenderer.once("post-game-stats", (event, ...args) => func(...args));
+  },
   receive: (channel, func) => {
     const validChannels = [
       "client-status",

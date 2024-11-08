@@ -343,13 +343,13 @@ function handleGameStart() {
 
 onMounted(() => {
     const cleanupGameStart = window.ws.receive('game-start-event', handleGameStart);
-    const cleanupGameEnd = window.ws.receive('game-end-event', async () => {
-        await store.dispatch('matches/fetchLastMatch', { forceRefresh: true, count: 1 }); // Call fetchLastMatch from 'matches' module
-    });
+    // const cleanupGameEnd = window.ws.receive('game-end-event', async () => {
+    //     await store.dispatch('matches/fetchLastMatch', { forceRefresh: true, count: 1 });
+    // });
     onUnmounted(() => {
         // cleanupPostGameStats();
         cleanupGameStart();
-        cleanupGameEnd(); // Clean up the listener when the component is destroyed
+        // cleanupGameEnd(); // Clean up the listener when the component is destroyed
     });
 });
 

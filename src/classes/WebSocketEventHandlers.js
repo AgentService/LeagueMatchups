@@ -97,17 +97,15 @@ class WebSocketEventHandlers extends EventEmitter {
     debug("Gameflow phase event received:", event);
 
     const currentPhase = event;
-
     this.sendToMainWindow("gameflow-phase-change", currentPhase);
 
     console.log(`Gameflow phase updated: ${currentPhase}`);
 
     switch (currentPhase) {
       case "EndOfGame":
-      case "Lobby":
-        console.log("Game has ended or in Lobby.");
-        this.sendToMainWindow("game-end-event");
-        this.fetchPostGameData(); // Fetch post-game data
+        console.log("Game has ended.");
+        this.sendToMainWindow("game-end-event"); // Only trigger on EndOfGame
+        this.fetchPostGameData(); // Only fetch post-game data on EndOfGame
         break;
       case "InProgress":
         console.log("Game has started.");
@@ -115,16 +113,16 @@ class WebSocketEventHandlers extends EventEmitter {
         break;
       case "WaitingForStats":
         console.log("Waiting for stats...");
-        // Optional: Handle WaitingForStats if needed
         break;
       case "TerminatedInError":
         console.log("Game terminated in error.");
-        this.sendToMainWindow("game-end-event");
-        this.fetchPostGameData(); // Fetch post-game data
+        break;
+      case "Lobby":
+        console.log("In lobby phase, no game in progress.");
+        // this.fetchPostGameData(); // Only fetch post-game data on EndOfGame
         break;
       case "None":
         console.log("No active game session.");
-        // Handle no active game scenario if necessary
         break;
       default:
         console.log(`Unhandled phase: ${currentPhase}`);
@@ -132,28 +130,29 @@ class WebSocketEventHandlers extends EventEmitter {
     }
   }
 
+
   async fetchPostGameData() {
     try {
       const endpoint = "/lol-match-history/v1/products/lol/current-summoner/matches";
       debug("Fetching match history from endpoint:", endpoint);
 
       const matchHistoryData = await this.fetchFromApi(endpoint);
-      debug("Match history data received:", matchHistoryData);
+      // debug("Match history data received:", matchHistoryData);
 
       if (matchHistoryData && matchHistoryData.games && matchHistoryData.games.games.length > 0) {
         // Loop through the first 10 games and log their gameMode and gameType
         for (let i = 0; i < Math.min(10, matchHistoryData.games.games.length); i++) {
           const game = matchHistoryData.games.games[i];
-          debug(`Game ${i + 1}: gameMode = ${game.gameMode}, gameType = ${game.gameType}`);
+          // debug(`Game ${i + 1}: gameMode = ${game.gameMode}, gameType = ${game.gameType}`);
         }
 
         // Update the filtering logic to check for ranked games in Classic mode
         const validGames = matchHistoryData.games.games.filter(game =>
           game.endOfGameResult !== "Abort_TooFewPlayers" &&
           game.gameMode === "CLASSIC" &&
-          (game.queueId === 420 || game.queueId === 440) // Check for ranked queues
+          (game.queueId === 420) // Check for ranked queues
         );
-        debug("Filtered valid ranked games:", validGames);
+        // debug("Filtered valid ranked games:", validGames);
 
         if (validGames.length > 0) {
           const mostRecentGame = validGames[0];

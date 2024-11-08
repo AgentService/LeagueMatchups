@@ -3,7 +3,6 @@
         <div class="widget-header">
             <i class="fas fa-history note-icon"></i>
             <span class="widget-header-title ms-1">Review History</span>
-
             <span class="widget-header-right"></span>
         </div>
 
@@ -21,7 +20,6 @@
             </div>
         </div>
 
-        <!-- Tooltip -->
         <div v-if="tooltip.isVisible" class="item-tooltip"
             :style="{ top: tooltipPosition.top, left: tooltipPosition.left }">
             <div class="tooltip-content">
@@ -30,7 +28,6 @@
             </div>
         </div>
 
-        <!-- Feedback Modal -->
         <EndOfGameQuestions v-if="uiMatches" :isVisible="isModalVisible" :matchData="selectedMatch"
             :savedFeedback="selectedMatch?.feedback" @closeModal="closeModal" />
     </div>
@@ -40,14 +37,21 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import EndOfGameQuestions from './EndOfGameQuestions.vue';
-import MatchInfo from './reuse/MatchInfo.vue'; // Import MatchInfo component
+import MatchInfo from './reuse/MatchInfo.vue';
 
 const store = useStore();
 
 // Reactive state for UI
 const isModalVisible = ref(false);
 const selectedMatch = ref(null);
-const uiMatches = ref([]); // UI data to hold match history temporarily
+const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
+
+// Computed property for match history to make it reactive
+const uiMatches = computed(() => {
+    return currentSummoner.value
+        ? store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid)
+        : [];
+});
 
 // Tooltip state
 const tooltip = ref({
@@ -60,21 +64,6 @@ const tooltipPosition = ref({
     top: '0px',
     left: '0px',
 });
-
-// Watch current summoner and fetch matches when it changes
-const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
-
-watch(currentSummoner, async (newSummoner) => {
-    if (newSummoner) {
-        uiMatches.value = []; // Clear the UI temporarily
-        await fetchLatestMatches(); // Fetch latest matches based on the selected summoner
-
-        // Update `uiMatches` with the matches for the current summoner
-        uiMatches.value = store.getters['matches/getMatchHistory'](newSummoner.apiResponse.puuid);
-    }
-});
-
-
 
 // Open the review form for the selected match
 const openReviewForm = async (match) => {
@@ -106,25 +95,50 @@ const closeModal = () => {
 async function fetchLatestMatches(forceRefresh = false) {
     try {
         await store.dispatch("matches/fetchLastMatch", { forceRefresh: forceRefresh });
-
-        // Update uiMatches from Vuex with the current summoner's matches
-        uiMatches.value = store.getters["matches/getMatchHistory"](currentSummoner.value.apiResponse.puuid);
     } catch (error) {
         console.error("Error fetching the latest match:", error);
     }
 }
 
+let activePostGameStatsListener = null;
 
+// Helper function to set up the one-time listener for post-game stats
+function setupPostGameStatsListener() {
+    // Remove the existing listener if any
+    if (activePostGameStatsListener) {
+        window.ws.removeReceive("post-game-stats", activePostGameStatsListener);
+    }
+    // Define and register a new listener
+    activePostGameStatsListener = async (mostRecentGame) => {
+        if (mostRecentGame.queueId === 420) {
+            const gameId = mostRecentGame.gameId;
+            const currentSummoner = store.getters["summoner/getCurrentSummoner"];
 
+            if (currentSummoner) {
+                const puuid = currentSummoner.apiResponse?.puuid;
+                const region = currentSummoner.webSocketResponse?.region;
+
+                try {
+                    const matchDetails = await store.dispatch(
+                        "matches/fetchMatchDetails",
+                        { gameId, puuid, region },
+                        { root: true }
+                    );
+                } catch (error) {
+                    console.error("Error fetching match details:", error);
+                }
+            }
+        }
+    };
+
+    // Register the listener for one-time execution
+    window.ws.receivePostGameStatsOnce(activePostGameStatsListener);
+}
 
 // Fetch matches on component mount
 onMounted(async () => {
-    store.dispatch('items/fetchAllItems');
-
-    if (currentSummoner.value) {
-        await fetchLatestMatches();
-        uiMatches.value = store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid);
-    }
+    await store.dispatch("items/fetchAllItems");
+    setupPostGameStatsListener();
 });
 </script>
 
