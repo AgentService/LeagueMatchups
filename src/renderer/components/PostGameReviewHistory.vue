@@ -46,13 +46,25 @@ const isModalVisible = ref(false);
 const selectedMatch = ref(null);
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
-// Computed property for match history to make it reactive
-const uiMatches = computed(() => {
-    return currentSummoner.value
-        ? store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse.puuid)
-        : [];
-});
+const uiMatches = ref([]); 
 
+watch(currentSummoner, async (newSummoner) => {
+    if (newSummoner) {
+        uiMatches.value = []; // Clear the UI temporarily
+        await fetchLatestMatches(); // Fetch latest matches based on the selected summoner
+        uiMatches.value = store.getters['matches/getMatchHistory'](newSummoner.apiResponse?.puuid);
+    }
+});
+// Add an additional watch on the Vuex getter if needed
+watch(
+    () => store.getters['matches/getMatchHistory'](currentSummoner.value?.apiResponse.puuid),
+    (newMatches) => {
+        if (newMatches) {
+            uiMatches.value = newMatches;
+        }
+    },
+    { immediate: true }
+);
 // Tooltip state
 const tooltip = ref({
     content: null,
@@ -134,6 +146,7 @@ function setupPostGameStatsListener() {
     // Register the listener for one-time execution
     window.ws.receivePostGameStatsOnce(activePostGameStatsListener);
 }
+
 
 // Fetch matches on component mount
 onMounted(async () => {

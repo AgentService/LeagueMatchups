@@ -104,7 +104,6 @@ export const matches = {
 
       const now = Date.now();
       const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
-      debugger
       if (state.summonerMatches[puuid] && now - state.lastFetchTime < CACHE_DURATION && !forceRefresh) {
         console.log("Using cached match data.");
         return state.summonerMatches[puuid];

@@ -428,8 +428,8 @@ function resetModalState() {
 }
 
 .questionnaire-modal {
-    width: 60vh;
-    height: 82vh;
+    width: 60%;
+    height: 82%;
     background: #091014;
     border-radius: 8px;
     padding: 60px;
