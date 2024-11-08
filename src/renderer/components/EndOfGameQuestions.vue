@@ -424,16 +424,17 @@ function resetModalState() {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 5;
+    z-index: 10;
 }
 
 .questionnaire-modal {
-    width: 60%;
-    height: 82%;
+    width: 700px;
+    height: 85%;
+    max-height: 800px;
     background: #091014;
     border-radius: 8px;
-    padding: 60px;
-    padding-top: 30px;
+
+    padding: 20px 60px;
     display: flex;
     flex-direction: column;
     overflow: visible;
@@ -441,8 +442,6 @@ function resetModalState() {
 }
 
 .match-card {
-    margin-bottom: 20px;
-    padding: 20px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -469,8 +468,6 @@ function resetModalState() {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 10px;
-    margin-top: 20px;
 }
 
 .progress-bar {
@@ -518,8 +515,8 @@ function resetModalState() {
 }
 
 .step-content {
-    margin-top: 20px;
-    border-top: 1px solid #444;
+    margin-top: 10px;
+    border-top: 1px solid #44444470;
     flex: 1;
     overflow-y: auto;
 }
@@ -532,16 +529,16 @@ function resetModalState() {
 
 .step-title {
     font-size: 1.5rem;
-    margin: 20px 0;
+    margin: 10px 0;
     text-align: left;
 }
 
 .modal-title {
     font-size: 2rem;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: center;
     color: var(--gold-3);
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid #44444470;
 }
 
 .issue-options,
@@ -713,8 +710,8 @@ function resetModalState() {
 .navigation-buttons {
     display: flex;
     align-items: center;
-    padding-top: 20px;
-    border-top: 1px solid #444;
+    padding-top: 10px;
+    border-top: 1px solid #4444447c;
 }
 
 
@@ -726,7 +723,6 @@ function resetModalState() {
     border: none;
     cursor: pointer;
     transition: background 0.3s;
-    margin-left: 10px;
 }
 
 .navigation-buttons button:hover {
@@ -831,7 +827,7 @@ function resetModalState() {
 /* Title Styling */
 .step-container h2 {
     font-size: 1.5rem;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: center;
     color: #fff;
 }
@@ -867,20 +863,4 @@ function resetModalState() {
     font-size: 1rem;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 650px) {
-    .questionnaire-modal {
-        width: 90%;
-        height: 80vh;
-    }
-
-    .issue-card,
-    .sub-issue-card {
-        flex: 1 1 100%;
-    }
-
-    .step-container {
-        min-height: auto;
-    }
-}
 </style>
