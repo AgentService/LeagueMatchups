@@ -7,63 +7,63 @@ const debug = Debug("app:services:summoner-data");
 Debug.enable("*");
 const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-// Function that invokes the fetching of summoner data
-export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, region = "europe", webSocketResponse = null) {
-  try {
-    console.log("Processing summoner data for:", summonerNameValue, "with tagLine:", tagLine);
-    if (!summonerNameValue || !tagLine) {
-      console.error("Invalid arguments passed to fetchAndSaveSummonerData:", {
-        summonerNameValue,
-        tagLine,
-      });
-      return;
-    }
+// // Function that invokes the fetching of summoner data
+// export async function fetchAndSaveSummonerData(summonerNameValue, tagLine, region = "europe", webSocketResponse = null) {
+//   try {
+//     console.log("Processing summoner data for:", summonerNameValue, "with tagLine:", tagLine);
+//     if (!summonerNameValue || !tagLine) {
+//       console.error("Invalid arguments passed to fetchAndSaveSummonerData:", {
+//         summonerNameValue,
+//         tagLine,
+//       });
+//       return;
+//     }
 
-    const existingSummoner = store.getters['summoner/getSummonerDataByName'](summonerNameValue);
+//     const existingSummoner = store.getters['summoner/getSummonerDataByName'](summonerNameValue);
 
-    if (!existingSummoner || !existingSummoner.apiResponse) {
-      console.log("Fetching additional data from API for:", summonerNameValue);
+//     if (!existingSummoner || !existingSummoner.apiResponse) {
+//       console.log("Fetching additional data from API for:", summonerNameValue);
 
-      const authConfig = getAuthConfig();
-      const apiResponse = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
-        ...authConfig,
-        params: {
-          region,
-          gameName: summonerNameValue,  // Use summonerNameValue here
-          tagLine,   // No encodeURIComponent here
-        },
-      });
+//       const authConfig = getAuthConfig();
+//       const apiResponse = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
+//         ...authConfig,
+//         params: {
+//           region,
+//           gameName: summonerNameValue,  // Use summonerNameValue here
+//           tagLine,   // No encodeURIComponent here
+//         },
+//       });
 
-      if (apiResponse.status !== 200) {
-        throw new Error(`HTTP error! status: ${apiResponse.status}`);
-      }
+//       if (apiResponse.status !== 200) {
+//         throw new Error(`HTTP error! status: ${apiResponse.status}`);
+//       }
 
-      const newPlayerDetails = {
-        gameName: summonerNameValue,
-        tagLine,
-        webSocketResponse: webSocketResponse || {},
-        apiResponse: apiResponse.data[0], // First summoner fetched from API
-      };
+//       const newPlayerDetails = {
+//         gameName: summonerNameValue,
+//         tagLine,
+//         webSocketResponse: webSocketResponse || {},
+//         apiResponse: apiResponse.data[0], // First summoner fetched from API
+//       };
 
-      store.commit("summoner/setPlayerDetails", newPlayerDetails);
-      store.commit("summoner/setCurrentSummoner", newPlayerDetails);
+//       store.commit("summoner/setPlayerDetails", newPlayerDetails);
+//       store.commit("summoner/setCurrentSummoner", newPlayerDetails);
 
-    } else {
-      const newPlayerDetails = {
-        gameName: summonerNameValue,
-        tagLine,
-        webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
-        apiResponse: existingSummoner.apiResponse,
-      };
+//     } else {
+//       const newPlayerDetails = {
+//         gameName: summonerNameValue,
+//         tagLine,
+//         webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
+//         apiResponse: existingSummoner.apiResponse,
+//       };
 
-      store.commit("summoner/setPlayerDetails", newPlayerDetails);
-      store.commit("summoner/setCurrentSummoner", newPlayerDetails);
-    }
+//       store.commit("summoner/setPlayerDetails", newPlayerDetails);
+//       store.commit("summoner/setCurrentSummoner", newPlayerDetails);
+//     }
 
-  } catch (error) {
-    console.error("Error fetching and saving summoner data:", error);
-  }
-}
+//   } catch (error) {
+//     console.error("Error fetching and saving summoner data:", error);
+//   }
+// }
 
 
 

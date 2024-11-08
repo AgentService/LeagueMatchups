@@ -55,6 +55,7 @@ watch(currentSummoner, async (newSummoner) => {
         uiMatches.value = store.getters['matches/getMatchHistory'](newSummoner.apiResponse?.puuid);
     }
 });
+
 // Add an additional watch on the Vuex getter if needed
 watch(
     () => store.getters['matches/getMatchHistory'](currentSummoner.value?.apiResponse.puuid),
@@ -80,7 +81,7 @@ const tooltipPosition = ref({
 // Open the review form for the selected match
 const openReviewForm = async (match) => {
     try {
-        const puuid = currentSummoner.value?.apiResponse?.puuid || currentSummoner.value?.webSocketResponse?.puuid;
+        const puuid = currentSummoner.value?.apiResponse?.puuid;
         let userParticipant = match.info.participants.find(participant => participant.puuid === puuid);
 
         if (!userParticipant) {
@@ -128,7 +129,7 @@ function setupPostGameStatsListener() {
 
             if (currentSummoner) {
                 const puuid = currentSummoner.apiResponse?.puuid;
-                const region = currentSummoner.webSocketResponse?.region;
+                const region = currentSummoner.apiResponse?.region;
 
                 try {
                     const matchDetails = await store.dispatch(

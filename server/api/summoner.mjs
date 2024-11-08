@@ -26,13 +26,13 @@ const getSummonerDataByAccountId = async (userId, req) => {
   const { dbPool } = req.app.locals;
 
   const queryText = `
-      SELECT Puuid, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp
+      SELECT Puuid, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp, Region
       FROM SummonerDetails
       WHERE User_ID = $1;
   `;
   try {
     const { rows } = await dbPool.query(queryText, [userId]);
-    return rows; // This will return an array of summoner details
+    return rows; // This will return an array of summoner details, including region
   } catch (err) {
     console.error("Error querying SummonerDetails:", err);
     throw err; // Re-throw the error and handle it in the calling function
@@ -47,75 +47,66 @@ router.get("/by-riot-id", async (req, res) => {
   try {
     debug("Fetching summoner data for:", gameName, tagLine);
 
-    // Convert the general region (e.g., "EU" or "NA") to the specific platform ID (e.g., "euw1", "na1")
+    // Convert region to platform ID (e.g., "EUW" to "euw1")
     const platformId = getRiotAPIPlatformByClientRegion(region);
-
     if (!platformId) {
       return res.status(400).json({ message: "Invalid or unsupported region specified." });
     }
 
-    // Convert the platform ID to the Riot API's general region (e.g., "euw1" to "europe")
     const riotRegion = getRegionByPlatformId(platformId);
-
-    // Step 1: Fetch account data using the Riot API's general region format
     const accountUrl = `https://${riotRegion}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
     const accountData = await axios.get(accountUrl, {
-      headers: {
-        "X-Riot-Token": process.env.VITE_RIOT_API_KEY,
-      },
+      headers: { "X-Riot-Token": process.env.VITE_RIOT_API_KEY },
     });
 
     const puuid = accountData.data.puuid;
-    debug("Account data fetched from Riot API:", accountData.data);
-
-    // Step 2: Fetch summoner data by PUUID using the specific platform ID
     const rAPI = getRiotAPI();
-    const summonerData = await rAPI.summoner.getByPUUID({
-      region: platformId,
-      puuid: puuid,
-    });
+    const summonerData = await rAPI.summoner.getByPUUID({ region: platformId, puuid });
 
-    debug("Summoner data fetched from Riot API:", summonerData);
-
-    // Step 3: Check if the summoner already exists for this user in the database
-    const existingSummoner = await dbPool.query(
+    let existingSummoner = await dbPool.query(
       "SELECT * FROM SummonerDetails WHERE Puuid = $1 AND User_ID = $2",
       [puuid, userId]
     );
 
     if (existingSummoner.rows.length > 0) {
-      // Summoner exists; check if an update is needed
       const existingData = existingSummoner.rows[0];
       const { needsUpdate, updateReasons } = checkIfUpdateNeeded(existingData, summonerData);
 
-      if (needsUpdate) {
+      if (needsUpdate || existingData.region !== region) {
         debug("Updating summoner data for reasons:", updateReasons.join(", "));
 
         await dbPool.query(
           `UPDATE SummonerDetails 
-           SET Summoner_Level = $2, Profile_Icon_ID = $3, Revision_Date = $4, Timestamp = $5
-           WHERE Puuid = $1 AND User_ID = $6`,
+           SET Summoner_Level = $2, Profile_Icon_ID = $3, Revision_Date = $4, Timestamp = $5, Region = $6
+           WHERE Puuid = $1 AND User_ID = $7`,
           [
             puuid,
             summonerData.summonerLevel,
             summonerData.profileIconId,
             summonerData.revisionDate,
             Date.now(),
+            region, // Ensure region is updated
             userId
           ]
         );
 
         debug("Updated summoner data in the database.");
+
+        // Re-fetch the updated summoner data from the database
+        existingSummoner = await dbPool.query(
+          "SELECT * FROM SummonerDetails WHERE Puuid = $1 AND User_ID = $2",
+          [puuid, userId]
+        );
       } else {
         debug("No update necessary for summoner data.");
       }
 
+      // Send the re-fetched (or original) data back to the client
       res.json(existingSummoner.rows.map(row => snakeToCamelCase(row)));
     } else {
-      // Summoner does not exist for this user, so insert new data
       const insertResult = await dbPool.query(
-        `INSERT INTO SummonerDetails (Puuid, User_ID, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+        `INSERT INTO SummonerDetails (Puuid, User_ID, Game_Name, Tag_Line, Summoner_ID, Account_ID, Profile_Icon_ID, Revision_Date, Summoner_Level, Timestamp, Region) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
         [
           puuid,
           userId,
@@ -127,6 +118,7 @@ router.get("/by-riot-id", async (req, res) => {
           summonerData.revisionDate,
           summonerData.summonerLevel,
           Date.now(),
+          region // Store region with new entry
         ]
       );
 

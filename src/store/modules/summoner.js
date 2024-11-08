@@ -34,31 +34,37 @@ export const summoner = {
     setFetchedFromAPI(state, status) {
       state.fetchedFromAPI = status;
     },
-    setPlayerDetails(state, { gameName, tagLine, webSocketResponse = null, apiResponse = null }) {
+    setCurrentSummoner(state, summoner) {
+      state.currentSummoner = summoner;
+    },
+    setPlayerDetails(state, { gameName, tagLine, apiResponse = null }) {
       const existingIndex = state.playerDetails.findIndex(
         (detail) => detail.gameName === gameName && detail.tagLine === tagLine
       );
+
       if (existingIndex !== -1) {
         const existingSummoner = state.playerDetails[existingIndex];
+
+        // Warning log to catch potential overwrites with an empty `apiResponse`
+        if (apiResponse && !Object.keys(apiResponse).length) {
+          console.warn(`Attempted to overwrite apiResponse with an empty object for Summoner: ${gameName}#${tagLine}`);
+        }
+
+        // Update existing entry, but only replace `apiResponse` if a valid `apiResponse` is provided
         state.playerDetails[existingIndex] = {
           ...existingSummoner,
-          webSocketResponse: webSocketResponse || existingSummoner.webSocketResponse,
-          apiResponse: apiResponse || existingSummoner.apiResponse,
+          apiResponse: apiResponse && Object.keys(apiResponse).length ? apiResponse : existingSummoner.apiResponse,
         };
       } else {
+        // Add new entry with only `apiResponse`
         const newEntry = {
           gameName: gameName || apiResponse?.gameName || "",
           tagLine: tagLine,
-          webSocketResponse: webSocketResponse || {},
           apiResponse: apiResponse || {},
         };
         state.playerDetails.push(newEntry);
       }
-
       console.log("Updated playerDetails:", state.playerDetails);
-    },
-    setCurrentSummoner(state, summoner) {
-      state.currentSummoner = summoner;
     },
   },
   actions: {
@@ -112,40 +118,39 @@ export const summoner = {
       try {
         const authConfig = getAuthConfig();
 
-        // Step 1: Retrieve all summoners associated with the account from the database
-        const apiResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
+        // Step 1: Retrieve all Summoner data from the local database
+        const dbResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
 
-        let matchingSummoner = null;
+        let currentSummoner = null;
 
-        if (apiResponse.data && apiResponse.data.length > 0) {
-          // Step 2: Iterate over each summoner in the response to look for a match
-          apiResponse.data.forEach(summoner => {
-            const isMatchingSummoner = summoner.gameName === summonerData.gameName && summoner.tagLine === summonerData.tagLine;
-
+        // Step 2: Process each summoner from the database response and commit to Vuex
+        if (dbResponse.data && dbResponse.data.length > 0) {
+          dbResponse.data.forEach((summoner) => {
             const playerDetails = {
               gameName: summoner.gameName,
               tagLine: summoner.tagLine,
-              apiResponse: summoner,
-              webSocketResponse: isMatchingSummoner ? summonerData : null
+              apiResponse: summoner
             };
-
-            // Commit each summoner to setPlayerDetails
+            debugger
+            // Commit each summoner to Vuex; setPlayerDetails will handle adding or updating as needed
             commit("setPlayerDetails", playerDetails);
 
-            // If we find a match, save it for setting as currentSummoner
-            if (isMatchingSummoner) {
-              matchingSummoner = playerDetails;
+            // If this summoner matches the one we're specifically fetching, set as currentSummoner
+            if (
+              summoner.gameName === summonerData.gameName &&
+              summoner.tagLine === summonerData.tagLine &&
+              summoner.region
+            ) {
+              currentSummoner = playerDetails;
+              commit("setCurrentSummoner", playerDetails);
             }
           });
 
-          // Step 3: If a matching summoner was found, set it as currentSummoner
-          if (matchingSummoner) {
-            commit("setCurrentSummoner", matchingSummoner);
-            return matchingSummoner;
-          }
+          // Return the matched summoner if found in the database
+          if (currentSummoner) return currentSummoner;
         }
 
-        // Step 4: If no match was found in the database, fetch from Riot API
+        // Step 3: If no exact match found in the database, fetch from Riot API
         const riotApiData = await axios.get(`${baseUrl}/summoner/by-riot-id`, {
           ...authConfig,
           params: {
@@ -160,13 +165,13 @@ export const summoner = {
           const playerDetails = {
             gameName: summonerData.gameName,
             tagLine: summonerData.tagLine,
-            apiResponse: apiData,
-            webSocketResponse: summonerData
+            apiResponse: apiData
           };
 
           // Commit the newly fetched data to the store
           commit("setPlayerDetails", playerDetails);
           commit("setCurrentSummoner", playerDetails);
+
           return playerDetails;
         } else {
           console.log("No summoner data found in Riot API for this summoner.");
@@ -177,11 +182,12 @@ export const summoner = {
         return null;
       }
     },
-    async fetchAllSummoners({ commit }) {
+
+    async fetchAllSummoners({ commit, state }) {
       try {
         const authConfig = getAuthConfig();
         const apiResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
-
+        debugger
         if (apiResponse.data.length === 0) {
           console.log("No summoner data found in the database for this user.");
           return; // No data found
@@ -193,24 +199,24 @@ export const summoner = {
             gameName: summoner.gameName,
             tagLine: summoner.tagLine,
             apiResponse: summoner,
-            webSocketResponse: {}, // Initially empty WebSocket response
           };
           commit("setPlayerDetails", newPlayerDetails);
         });
 
-        // Set the first summoner as the currentSummoner
-        const firstSummoner = apiResponse.data[0];
-        const firstSummonerDetails = {
-          gameName: firstSummoner.gameName,
-          tagLine: firstSummoner.tagLine,
-          apiResponse: firstSummoner,
-          webSocketResponse: {},
-        };
-        commit("setCurrentSummoner", firstSummonerDetails);
-        console.log("Set first summoner as currentSummoner:", firstSummonerDetails);
+        // Set the first summoner as the currentSummoner only if it's not already set
+        if (!state.currentSummoner) {
+          const firstSummoner = apiResponse.data[0];
+          const firstSummonerDetails = {
+            gameName: firstSummoner.gameName,
+            tagLine: firstSummoner.tagLine,
+            apiResponse: firstSummoner,
+          };
+          commit("setCurrentSummoner", firstSummonerDetails);
+          console.log("Set first summoner as currentSummoner:", firstSummonerDetails);
+        }
       } catch (error) {
         console.error("Error fetching all summoners:", error);
       }
-    },
+    }
   },
 };

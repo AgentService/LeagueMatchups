@@ -68,8 +68,6 @@ export const getRiotAPIPlatformByClientRegion = (clientRegion) => {
   return platformId;
 };
 
-
-
 export const initializeRiotAPI = () => {
   if (!process.env.VITE_RIOT_API_KEY) {
     console.error("VITE_RIOT_API_KEY is not set.");

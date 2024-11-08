@@ -6,60 +6,36 @@ const predefinedObjectives = {
       name: "Skillshot Accuracy",
       gamesApplied: 0,
       reflections: [
-        { loName: "Skillshot Accuracy", category: "In-Game", text: "Noticed a significant improvement in landing skillshots during the last three matches. Practicing in the training mode really paid off." },
-        { loName: "Skillshot Accuracy", category: "In-Game", text: "Missed a crucial skillshot in the recent game which led to a disadvantage. Need to focus more on aiming under pressure." },
-        { loName: "Skillshot Accuracy", category: "In-Game", text: "Consistently hitting skillshots has boosted my confidence and overall performance in team fights." }
+        { loName: "Skillshot Accuracy", category: "In-Game", text: "Noticed a significant improvement in landing skillshots during the last three matches. Practicing in the training mode really paid off.", timestamp: "2024-11-01 12:30" },
+        { loName: "Skillshot Accuracy", category: "In-Game", text: "Missed a crucial skillshot in the recent game which led to a disadvantage. Need to focus more on aiming under pressure.", timestamp: "2024-11-02 15:45" },
+        { loName: "Skillshot Accuracy", category: "In-Game", text: "Consistently hitting skillshots has boosted my confidence and overall performance in team fights.", timestamp: "2024-11-03 18:00" }
       ]
     },
     {
       name: "Wave Management",
       gamesApplied: 0,
       reflections: [
-        { loName: "Wave Management", category: "In-Game", text: "Successfully froze the wave near my turret, making it harder for the opponent to farm safely." },
-        { loName: "Wave Management", category: "In-Game", text: "Struggled with pushing the wave at the right times, leading to multiple deaths in the lane." },
-        { loName: "Wave Management", category: "In-Game", text: "Managed to reset the wave after recalling, ensuring a balanced minion wave upon return." }
+        { loName: "Wave Management", category: "In-Game", text: "Successfully froze the wave near my turret, making it harder for the opponent to farm safely.", timestamp: "2024-11-01 10:20" },
+        { loName: "Wave Management", category: "In-Game", text: "Struggled with pushing the wave at the right times, leading to multiple deaths in the lane.", timestamp: "2024-11-02 12:30" },
+        { loName: "Wave Management", category: "In-Game", text: "Managed to reset the wave after recalling, ensuring a balanced minion wave upon return.", timestamp: "2024-11-03 16:15" }
       ]
     },
-    {
-      name: "Positioning",
-      gamesApplied: 0,
-      reflections: [
-        { loName: "Positioning", category: "In-Game", text: "Maintained optimal positioning during team fights, avoiding unnecessary engagements and staying safe." },
-        { loName: "Positioning", category: "In-Game", text: "Found myself out of position multiple times, which resulted in getting caught by the enemy's crowd control." },
-        { loName: "Positioning", category: "In-Game", text: "Improved positioning by staying behind the frontline, allowing me to deal damage without being targeted." }
-      ]
-    }
+    // ... other objectives
   ],
   "Out-of-Game": [
     {
       name: "Review Replays",
       gamesApplied: 0,
       reflections: [
-        { loName: "Review Replays", category: "Out-of-Game", text: "Analyzed my last five games and identified recurring mistakes in decision-making during late game." },
-        { loName: "Review Replays", category: "Out-of-Game", text: "Noticed that I often miss opportunities to ward key areas, which affects map control." },
-        { loName: "Review Replays", category: "Out-of-Game", text: "Replays helped me understand the importance of objective prioritization over solo kills." }
+        { loName: "Review Replays", category: "Out-of-Game", text: "Analyzed my last five games and identified recurring mistakes in decision-making during late game.", timestamp: "2024-11-01 11:00" },
+        { loName: "Review Replays", category: "Out-of-Game", text: "Noticed that I often miss opportunities to ward key areas, which affects map control.", timestamp: "2024-11-02 13:45" },
+        { loName: "Review Replays", category: "Out-of-Game", text: "Replays helped me understand the importance of objective prioritization over solo kills.", timestamp: "2024-11-03 15:30" }
       ]
     },
-    {
-      name: "Mental Resilience",
-      gamesApplied: 0,
-      reflections: [
-        { loName: "Mental Resilience", category: "Out-of-Game", text: "Maintained composure after a series of losses, focusing on learning rather than getting frustrated." },
-        { loName: "Mental Resilience", category: "Out-of-Game", text: "Faced a toxic teammate but chose to stay positive and encourage team communication." },
-        { loName: "Mental Resilience", category: "Out-of-Game", text: "Implemented breathing exercises to stay calm during high-stress moments in matches." }
-      ]
-    },
-    {
-      name: "Teamfight Analysis",
-      gamesApplied: 0,
-      reflections: [
-        { loName: "Teamfight Analysis", category: "Out-of-Game", text: "Reviewed teamfights to understand positioning errors and timing of abilities." },
-        { loName: "Teamfight Analysis", category: "Out-of-Game", text: "Identified that our team lacks proper coordination during engagements, leading to disorganized fights." },
-        { loName: "Teamfight Analysis", category: "Out-of-Game", text: "Learned the importance of target prioritization by observing successful teamfights in high-level play." }
-      ]
-    }
+    // ... other objectives
   ]
 };
+
 
 
 const defaultState = () => ({
@@ -111,7 +87,7 @@ export const learningObjectives = {
       const loCategory = state.predefinedObjectives[category] || []; // Safe check
       const lo = loCategory.find((lo) => lo.name === loName);
       if (lo) {
-        lo.reflections.push(reflection);
+        lo.reflections.unshift(reflection); // Adds the reflection to the start of the list
       }
     },
     REMOVE_REFLECTION(state, { loName, category, index }) { // Changed from reflectionIndex to index

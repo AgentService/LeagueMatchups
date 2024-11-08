@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const main = require("./main-C0kcN-c_.js");
+const main = require("./main-CuDbxIn3.js");
 Object.defineProperty(exports, "mainWindow", {
   enumerable: true,
   get: () => main.mainWindow

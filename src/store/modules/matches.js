@@ -88,6 +88,9 @@ export const matches = {
     },
   },
   actions: {
+    addReviewedMatch({ commit }, matchReview) {
+      commit("MARK_MATCH_REVIEWED", matchReview.gameId);
+    },
     async fetchLastMatch({ commit, state, rootGetters }, { forceRefresh = false, count = 5 } = {}) {
       const currentSummoner = rootGetters['summoner/getCurrentSummoner'];
       if (!currentSummoner) {
@@ -96,7 +99,7 @@ export const matches = {
       }
 
       const puuid = currentSummoner.apiResponse?.puuid;
-      const region = currentSummoner.webSocketResponse?.region;
+      const region = currentSummoner.apiResponse?.region;
       if (!puuid) {
         console.error("Player PUUID is not available.");
         return;
@@ -129,9 +132,7 @@ export const matches = {
         console.error("Error fetching last matches:", error);
       }
     },
-    addReviewedMatch({ commit }, matchReview) {
-      commit("MARK_MATCH_REVIEWED", matchReview.gameId);
-    },
+
     // In matches module
     async fetchMatchDetails({ commit, state, rootGetters }, { gameId }) {
       const currentSummoner = rootGetters["summoner/getCurrentSummoner"];
@@ -141,8 +142,9 @@ export const matches = {
         return;
       }
 
+      // Access puuid and region directly from apiResponse
       const puuid = currentSummoner.apiResponse?.puuid;
-      const region = currentSummoner.webSocketResponse?.region;
+      const region = currentSummoner.apiResponse?.region;
 
       if (!puuid || !region) {
         console.error("Missing summoner puuid or region");
@@ -176,8 +178,8 @@ export const matches = {
         console.error("Error fetching match details:", error);
         throw error;
       }
-    },
-  },
+    }
+  }
 };
 
 export default matches;

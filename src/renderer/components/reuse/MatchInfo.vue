@@ -139,8 +139,8 @@ const playerChampion = computed(() => {
     const currentSummoner = store.getters['summoner/getCurrentSummoner'];
 
     // Extract puuid and gameName from currentSummoner
-    const puuid = currentSummoner?.apiResponse?.puuid || currentSummoner?.webSocketResponse?.puuid;
-    const gameName = currentSummoner?.apiResponse?.gameName || currentSummoner?.webSocketResponse?.gameName;
+    const puuid = currentSummoner?.apiResponse?.puuid;
+    const gameName = currentSummoner?.apiResponse?.gameName;
 
     const matchInfo = props.match.info || props.match; // Normalize data to handle both cases (API vs WebSocket)
 

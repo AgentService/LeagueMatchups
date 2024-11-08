@@ -8,7 +8,7 @@ export default defineConfig({
   mode: process.env.NODE_ENV || 'development', // Ensure mode is set correctly
   server: {
     port: 3002,
-    // hmr: true,
+    hmr: true,
   },
   build: {
     sourcemap: true,
@@ -18,9 +18,9 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    // electron({
-    //   entry: 'src/main.js', // Path to your Electron main process entry
-    // }),
+    electron({
+      entry: 'src/main.js', // Path to your Electron main process entry
+    }),
     ViteImagemin({
       mozjpeg: {
         quality: 75,

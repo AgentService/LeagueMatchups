@@ -1,15 +1,15 @@
 <template>
 	<div class="learning-objectives-section card-widget mb-2">
 		<!-- Header with Settings Button -->
-		<div class="flex justify-between items-center p-4 bg-gray-800 rounded-t-lg">
-			<span class="text-white font-semibold">Learning Objectives</span>
+		<div class="flex justify-between items-center p-2 rounded-t-lg">
+			<span class="text-gold-3 font-semibold">Learning Objectives</span>
 			<button @click="toggleLOSelector" class="text-white" aria-label="Select Learning Objectives">
 				<i class="fa fa-lg fa-cog"></i>
 			</button>
 		</div>
 
 		<!-- Main Widget Content (Always Visible) -->
-		<div class="p-4 flex space-x-4 bg-gray-900 rounded-b-lg">
+		<div class="p-4 flex space-x-4 rounded-b-lg">
 			<!-- LO Selection Area on the Left (Reduced Width) -->
 			<div class="w-1/4 lo-list">
 				<!-- In-Game Objectives -->
@@ -34,7 +34,7 @@
 			</div>
 
 			<!-- Reflection Section on the Right (Increased Width) -->
-			<div class="w-3/4 text-center space-y-4 bg-gray-800 p-4 rounded-lg flex flex-col">
+			<div class="w-3/4 text-center space-y-4 p-2 rounded-lg flex flex-col">
 				<h5 class="text-white font-semibold">
 					{{ selectedLO ? selectedLO.name : 'Select a Learning Objective' }}
 				</h5>
@@ -42,7 +42,7 @@
 				<!-- Reflection Container -->
 				<div v-if="selectedPredefinedLO" class="lo-reflection-container flex flex-col flex-1">
 					<!-- Reflections List -->
-					<ul ref="reflectionsList" class="reflections-list space-y-6 overflow-y-auto p-0 pe-3">
+					<ul ref="reflectionsList" class="reflections-list space-y-6 overflow-y-auto p-0">
 						<li v-for="(reflections, date) in groupedReflections" :key="date" class="date-group">
 							<!-- Date Header -->
 							<div class="date-header text-center text-gray-500 mb-2">
@@ -517,7 +517,6 @@ const groupedReflections = computed(() => {
 	padding: 0.5rem;
 	border-radius: 8px;
 	cursor: pointer;
-	background-color: #2a2a3b;
 	color: #d1d5db;
 	transition: background 0.2s, color 0.2s;
 	display: flex;

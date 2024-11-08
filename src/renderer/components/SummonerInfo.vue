@@ -50,20 +50,19 @@ watch(currentSelection, (newSelection) => {
 
 // Helper function to get summoner icon, fallback if missing
 const getSummonerProfileIcon = (summonerDetail) => {
-	return summonerDetail?.webSocketResponse?.profileIconId ||
-		summonerDetail?.apiResponse?.profileIconId || 5541;
+	return summonerDetail?.apiResponse?.profileIconId || 5541;
 };
 
-
-// Helper function to get summoner name from either WebSocket or API
+// Helper function to get summoner name from either API or WebSocket
 const getSummonerName = (summonerDetail) => {
-	return summonerDetail?.webSocketResponse?.gameName || summonerDetail?.apiResponse?.gameName || 'Summoner';
+	return summonerDetail?.apiResponse?.gameName || 'Summoner';
 };
 
 // Helper function to get summoner tag line
 const getSummonerTagLine = (summonerDetail) => {
-	return summonerDetail?.webSocketResponse?.tagLine || summonerDetail?.apiResponse?.tagLine || '';
+	return summonerDetail?.apiResponse?.tagLine || '';
 };
+
 
 const getSummonerIcon = (iconId) => {
 	const urlHelper = getUrlHelper();
@@ -148,6 +147,7 @@ onBeforeUnmount(() => {
 	border-top: 0;
 	border-radius: 0 0 12px 12px;
 }
+
 .dropdown-menu.show {
 	display: block;
 }
