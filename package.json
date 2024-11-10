@@ -1,7 +1,7 @@
 {
   "name": "SoloQ",
   "productName": "SoloQ",
-  "version": "2.6.3",
+  "version": "2.5.3",
   "description": "SoloQ is a desktop application that helps you in your journey to become a better League of Legends player. You can make notes about your games, track your progress, and get insights about your performance.",
   "main": ".vite/build/main.js",
   "type": "commonjs",
@@ -42,11 +42,6 @@
       "package.json",
       "node_modules/gsap/types/index.d.ts"
     ],
-    "extraMetadata": {
-      "env": {
-        "NODE_ENV": "production"
-      }
-    },
     "extraResources": [
       {
         "from": ".vite/build",
