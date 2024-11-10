@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => ({
   ],
   mode: mode || 'DEVELOPMENT',
   build: {
+    minify: false, // Disable minification to keep variable names
+    sourcemap: true,  // Enables source maps for debugging
     rollupOptions: {
       input: 'src/main.js',
       output: {
