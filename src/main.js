@@ -12,6 +12,7 @@ const { autoUpdater } = require("electron-updater");
 const EventEmitter = require("events");
 import ChampSelectSession from "./classes/ChampSelectSession";
 // import { setupWebSocketEventHandlers } from "./classes/WebSocketEvents";
+const log = require("electron-log");
 
 import WebSocketEventHandlers from "./classes/WebSocketEventHandlers";
 
@@ -107,7 +108,6 @@ const mockAutoUpdater = new MockAutoUpdater();
 let updater =
   process.env.NODE_ENV === "DEVELOPMENT" ? autoUpdater : autoUpdater; // mockAutoUpdater for development, autoUpdater for production
 
-const log = require("electron-log");
 const path = require("path");
 require("dotenv").config();
 const Debug = require("debug");
