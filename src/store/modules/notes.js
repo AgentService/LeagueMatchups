@@ -434,7 +434,7 @@ export const notes = {
     async fetchTags({ commit, state }) {
       try {
         // Fetch if tagsList is empty or if cached data is outdated
-        if (state.tagsList.length === 0 || (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags))) {
+        if (!state.tagsList.length || (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags))) {
           console.log("Using cached tags data.");
           return; // Exit if cached data is valid and tagsList is not empty
         }
