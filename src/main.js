@@ -16,7 +16,7 @@ import ChampSelectSession from "./classes/ChampSelectSession";
 import WebSocketEventHandlers from "./classes/WebSocketEventHandlers";
 
 if (!process.env.NODE_ENV) {
-  console.log("NODE_ENV not set, defaulting to production");
+  log.info("NODE_ENV not set, defaulting to production");
   process.env.NODE_ENV = 'production';
 }
 
@@ -649,7 +649,9 @@ ipcMain.on("restart-app-to-update", () => {
 ipcMain.on("check-for-updates", () => {
   // autoUpdater.checkForUpdates();
   // updater.checkForUpdates();
+  log.info("Checking for updates...");
   if (process.env.NODE_ENV === "DEVELOPMENT") {
+    log.info("In development mode, skipping update checks.");
     // In development, skip update checks and directly initialize the app
     updater.checkForUpdates();
     return;
@@ -663,7 +665,7 @@ ipcMain.on("confirm-update-installation", () => {
 });
 
 async function checkForUpdatesAndInitialize() {
-  console.log("Current environment:", process.env.NODE_ENV);
+  log.info("Current environment:", process.env.NODE_ENV);
   if (process.env.NODE_ENV === "DEVELOPMENT") {
     // In development, skip update checks and directly initialize the app
     log.info("In development mode, skipping update checks.");
