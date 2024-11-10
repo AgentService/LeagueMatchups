@@ -1,18 +1,20 @@
-// vite.main.config.js
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig } from 'vite';
+import electron from 'vite-plugin-electron';
 
-export default defineConfig({
-  plugins: [vue()],
-  mode: "production",
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    electron({
+      entry: 'src/main.js', // Main process entry
+    }),
+  ],
+  mode: mode || 'DEVELOPMENT',
   build: {
-    // Target specific formats for Electron
     rollupOptions: {
-      input: "src/main.js",
+      input: 'src/main.js',
       output: {
-        format: "cjs", // CommonJS format suitable for Electron's main process+
-        entryFileNames: "main.js",
+        format: 'cjs',
+        entryFileNames: 'main.js',
       },
     },
   },
-});
+}));

@@ -46,15 +46,17 @@ const isModalVisible = ref(false);
 const selectedMatch = ref(null);
 const currentSummoner = computed(() => store.getters['summoner/getCurrentSummoner']);
 
-const uiMatches = ref([]); 
+const uiMatches = ref([]);
 
-watch(currentSummoner, async (newSummoner) => {
+watch(currentSummoner, async (newSummoner, oldSummoner) => {
+    console.log("Watcher triggered:", { newSummoner, oldSummoner });
     if (newSummoner) {
         uiMatches.value = []; // Clear the UI temporarily
-        await fetchLatestMatches(); // Fetch latest matches based on the selected summoner
+        await fetchLatestMatches(false); // Fetch latest matches based on the selected summoner
         uiMatches.value = store.getters['matches/getMatchHistory'](newSummoner.apiResponse?.puuid);
     }
 });
+
 
 // Add an additional watch on the Vuex getter if needed
 watch(
@@ -105,9 +107,9 @@ const closeModal = () => {
     isModalVisible.value = false;
 };
 
-async function fetchLatestMatches(forceRefresh = false) {
+async function fetchLatestMatches(forceRefresh) {
     try {
-        await store.dispatch("matches/fetchLastMatch", { forceRefresh: forceRefresh });
+        await store.dispatch("matches/fetchLastMatch", { forceRefresh });
     } catch (error) {
         console.error("Error fetching the latest match:", error);
     }
@@ -153,6 +155,11 @@ function setupPostGameStatsListener() {
 onMounted(async () => {
     await store.dispatch("items/fetchAllItems");
     setupPostGameStatsListener();
+    if (currentSummoner.value) {
+        uiMatches.value = []; // Clear the UI temporarily
+        await fetchLatestMatches(false); // Fetch latest matches based on the selected summoner
+        uiMatches.value = store.getters['matches/getMatchHistory'](currentSummoner.value.apiResponse?.puuid);
+    }
 });
 </script>
 

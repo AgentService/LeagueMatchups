@@ -1,3 +1,4 @@
+// main.js is the entry point for the renderer process in Electron.
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
@@ -5,10 +6,7 @@ import ClickOutsideDirective from "./utils/ClickOutsideDirective";
 
 import VueLazyload from "vue3-lazy";
 import { store } from "../store"; // Import your Vuex store
-import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/js/all.js";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "./custom.scss";
 import "@fortawesome/fontawesome-free/css/all.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 import "../axiosSetup";
 import { setupBaseUrl } from "./globalSetup";
-
+import "./custom.scss";
 import Debug from "debug";
 
 // Set up debugging based on environment variables

@@ -1,9 +1,9 @@
 // api/notes.mjs
 import express from "express";
-import Debug from "debug";
 import { snakeToCamelCase } from "./utilities.mjs";
+import { getNamespaceLogger, logInfo, logError } from "../utils/logger.mjs";
+const logger = getNamespaceLogger("api:notes");
 
-const debug = Debug("api:notes");
 const router = express.Router();
 
 // Rating
@@ -11,8 +11,8 @@ router.post("/champion/rating", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { noteId, rating } = req.body;
   const userId = req.user.id;
-  debug("Note ID:", noteId);
-  debug("Rating:", rating);
+  logInfo(logger, `Rating champion note ID: ${noteId} with rating: ${rating}`, req);
+
   try {
     // Insert or update the rating
     const { rowCount } = await dbPool.query(
@@ -29,7 +29,7 @@ router.post("/champion/rating", async (req, res) => {
       res.status(404).json({ message: "Failed to update rating." });
     }
   } catch (error) {
-    console.error("Error updating champion note rating:", error);
+    logError(logger, "Error updating champion note rating", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -38,8 +38,8 @@ router.post("/matchup/rating", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { noteId, rating } = req.body;
   const userId = req.user.id;
-  debug("Note ID:", noteId);
-  debug("Rating:", rating);
+  logInfo(logger, `Rating matchup note ID: ${noteId} with rating: ${rating}`, req);
+
   try {
     // Insert or update the rating
     const { rowCount } = await dbPool.query(
@@ -56,7 +56,7 @@ router.post("/matchup/rating", async (req, res) => {
       res.status(404).json({ message: "Failed to update rating." });
     }
   } catch (error) {
-    console.error("Error updating champion note rating:", error);
+    logError(logger, "Error updating matchup note rating", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -66,7 +66,7 @@ router.get("/matchup/:id", async (req, res) => {
   const combinedId = req.params.id; // "a-b" format ID from the URL
   const userId = req.user?.id; // Extracted UserID from JWT
   if (!userId) {
-    debug("Unauthorized: UserID not available.");
+    logError(logger, "Unauthorized access attempt: UserID not available", req);
     return res.status(401).json({ message: "Unauthorized: UserID not available." });
   }
 
@@ -93,14 +93,14 @@ router.get("/matchup/:id", async (req, res) => {
 
     if (notesResult.rowCount > 0) {
       const foundNote = snakeToCamelCase(notesResult.rows[0]);
-      debug("Notes result:", foundNote);
+      logInfo(logger, `Matchup note found: ${JSON.stringify(foundNote)}`, req);
       res.json(foundNote); // Send the converted object
     } else {
       // Return an empty object with a 200 status if no notes are found
       res.status(200).json({ matchupId, notes: "" });
     }
   } catch (error) {
-    debug("Error fetching notes:", error);
+    logError(logger, "Error fetching matchup notes", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -121,10 +121,7 @@ router.post("/matchup/:id", async (req, res) => {
     if (matchupRows.length === 0) {
       return res.status(404).json({ message: "Matchup not found." });
     }
-    debug("Matchup found:", matchupRows[0]);
     const matchupId = matchupRows[0].id;
-    debug("req.user:", req.user.id);
-    debug("notes:", content);
     // Insert or update note in the Content column
     const { rows, rowCount } = await dbPool.query(
       `INSERT INTO MatchupNotes (User_ID, Matchup_ID, Content, Visibility, Created_At, Updated_At)
@@ -138,7 +135,8 @@ router.post("/matchup/:id", async (req, res) => {
     if (rowCount > 0) {
       // Assuming we always affect exactly one row, either by inserting or updating
       const savedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
-
+      logInfo(logger, `Matchup note saved for ID: ${combinedId}`, req);
+      logInfo(logger, `Matchup note saved, content: ${savedNote.content}`, req);
       res.status(200).json({
         message: "Note saved successfully.",
         content: savedNote.content, // Return the saved or updated note data from the Content column
@@ -148,7 +146,7 @@ router.post("/matchup/:id", async (req, res) => {
       res.status(400).json({ message: "Failed to save note." });
     }
   } catch (error) {
-    debug("Error saving note:", error);
+    logError(logger, "Error saving matchup note", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -157,8 +155,6 @@ router.get("/matchup/others/:combinedId", async (req, res) => {
   const { dbPool } = req.app.locals;
   const combinedId = req.params.combinedId.split("-"); // combinedId is "ChampionA-ChampionB"
   const userId = req.user.id;
-  debug("Fetching other users' notes for:", combinedId);
-  debug("User ID:", userId);
 
   try {
     const query = `
@@ -170,21 +166,17 @@ router.get("/matchup/others/:combinedId", async (req, res) => {
         AND mn.User_ID != $3
     `;
 
-    // Log the exact query parameters
-    debug("Executing query with parameters:", combinedId, userId);
-
     const notesResult = await dbPool.query(query, [...combinedId, userId]);
-
-    debug("Query result row count:", notesResult.rowCount);
+    logInfo(logger, `Other users' notes found for ID: ${combinedId}`, req);
 
     if (notesResult.rowCount === 0) {
-      debug("No notes found, returning empty array.");
+      logInfo(logger, `No other users' notes found for ID: ${combinedId}`, req);
       return res.status(200).json([]);  // Return an empty array instead of 404
     }
 
     // Continue with the rest of your code...
   } catch (error) {
-    console.error("Error fetching other users' matchup notes:", error);
+    logError(logger, "Error fetching other users' matchup notes", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -204,11 +196,10 @@ router.post("/champion/:championName", async (req, res) => {
       `SELECT Name FROM champions WHERE Name = $1`,
       [championName]
     );
-    debug("Champion result:", championResult.rows[0]);
+    logInfo(logger, `Saving note for champion: ${championName}`, req);
     if (championResult.rowCount === 0) {
       return res.status(404).json({ message: "Champion not found." });
     }
-
     // Insert or update the note
     const { rows, rowCount } = await dbPool.query(
       `INSERT INTO ChampionNotes (User_ID, Champion_Name, Content, Visibility, Created_At, Updated_At)
@@ -220,7 +211,8 @@ router.post("/champion/:championName", async (req, res) => {
     );
 
     if (rowCount > 0) {
-      debug("Saved note champion:", rows[0]);
+      logInfo(logger, `Note content saved for champion: ${championName}`, req);
+      logInfo(logger, `Note content saved, content: ${content}`, req);
       const savedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
       res.status(200).json({
         message: "Note saved successfully.",
@@ -231,7 +223,7 @@ router.post("/champion/:championName", async (req, res) => {
       res.status(400).json({ message: "Failed to save note." });
     }
   } catch (error) {
-    debug("Error saving champion note:", error);
+    logError(logger, "Error saving champion note", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -250,14 +242,13 @@ router.get("/champion/:championName", async (req, res) => {
 
     if (notesResult.rowCount > 0) {
       const foundNote = snakeToCamelCase(notesResult.rows[0]);
-      debug("Notes result champion:", foundNote);
+      logInfo(logger, `Champion note found: ${JSON.stringify(foundNote)}`, req);
       res.json(foundNote); // Send the converted object
     } else {
-      // Return an empty object with a 200 status if no notes are found
       res.status(200).json({ championName, notes: "" });
     }
   } catch (error) {
-    debug("Error fetching champion notes:", error);
+    logError(logger, "Error fetching champion notes", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -269,8 +260,6 @@ router.get("/champion/others/:championName", async (req, res) => {
   const userId = req.user.id;
 
   try {
-    debug("Fetching other users' notes for:", championName);
-
     // Fetch notes
     const notesResult = await dbPool.query(
       `SELECT cn.Note_ID, cn.Content, cn.Visibility, u.Username, cn.Created_At, cn.Updated_At
@@ -279,9 +268,7 @@ router.get("/champion/others/:championName", async (req, res) => {
        WHERE cn.Champion_Name = $1 AND cn.User_ID != $2`,
       [championName, userId]
     );
-
-    debug("Notes result other:", notesResult.rows);
-
+    logInfo(logger, `Other users' notes found for champion: ${championName}`, req);
     if (notesResult.rowCount === 0) {
       return res.status(200).json([]);  // Return an empty array instead of 404
     }
@@ -296,8 +283,6 @@ router.get("/champion/others/:championName", async (req, res) => {
        WHERE User_ID = $2 AND Note_ID = ANY($1::int[])`,
       [noteIds, userId]
     );
-
-    debug("Personal ratings:", personalRatingResult.rows);
 
     // Calculate average ratings for these notes
     const averageRatingResult = await dbPool.query(
@@ -317,9 +302,7 @@ router.get("/champion/others/:championName", async (req, res) => {
         (rating) => rating.note_id === note.note_id
       );
 
-      console.debug(
-        `Matching for note_id: ${note.note_id}, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`
-      );
+      logInfo(logger, `Matching for note_id: ${note.note_id}, Personal rating found: ${!!personalRating}, Average rating found: ${!!averageRating}`, req);
 
       return {
         ...note,
@@ -335,11 +318,10 @@ router.get("/champion/others/:championName", async (req, res) => {
 
     // Ensure the keys are in camelCase before sending the response
     const finalResponse = enrichedNotes.map((note) => snakeToCamelCase(note));
-
-    debug("Final enriched notes:", finalResponse);
+    logInfo(logger, `Final enriched notes: ${finalResponse}`, req);
     res.json(finalResponse);
   } catch (error) {
-    console.error("Error fetching other users' champion notes:", error);
+    logError(logger, "Error fetching other users' champion notes", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -367,7 +349,7 @@ router.get("/general", async (req, res) => {
       notes: notesWithTags,
     });
   } catch (error) {
-    console.error("Error retrieving notes with tags:", error);
+    logError(logger, "Error retrieving general notes", req, error);
     res.status(500).json({ message: "Error retrieving notes" });
   }
 });
@@ -380,7 +362,6 @@ router.post("/general", async (req, res) => {
   try {
     let noteResponse;
     if (noteId) {
-      debug("Updating note:", noteId);
       // Update an existing note if noteid is provided
       const updateQuery = `
         UPDATE generalnotes
@@ -394,10 +375,9 @@ router.post("/general", async (req, res) => {
         noteId,
         userId,
       ]);
-      debug("Note updated successfully:", rows[0]);
+      logInfo(logger, `Note updated successfully row: ${rows[0]}`, req);
       noteResponse = rows[0]; // Store the updated note for conversion
     } else {
-      debug("Inserting new note");
       // If no noteId is provided, insert a new note
       const noteContent = content ? content : "";
       const insertQuery = `
@@ -407,7 +387,7 @@ router.post("/general", async (req, res) => {
       `;
 
       const { rows } = await dbPool.query(insertQuery, [userId, noteContent]);
-      debug("Note inserted successfully:", noteContent);
+      logInfo(logger, `New note created successfully row: ${rows[0]}`, req);
       noteResponse = rows[0]; // Store the new note for conversion
     }
 
@@ -421,7 +401,7 @@ router.post("/general", async (req, res) => {
       note: convertedNote, // Send the converted note
     });
   } catch (error) {
-    debug("Error saving the note:", error);
+    logError(logger, "Error saving the note", req, error);
     res.status(500).json({ message: "Error saving the note" });
   }
 });
@@ -442,12 +422,11 @@ router.delete("/general/:noteid", async (req, res) => {
       WHERE note_id = $1 AND user_id = $2
       RETURNING *;
     `;
-    debug("Deleting note:", noteId);
     const { rows } = await dbPool.query(deleteNoteQuery, [noteId, userId]);
 
     if (rows.length > 0) {
       const deletedNote = snakeToCamelCase(rows[0]); // Convert to camelCase
-      debug("Note deleted successfully:", deletedNote);
+      logInfo(logger, `Note deleted successfully row: ${deletedNote}`, req);
       res.status(200).json({
         message: "Note deleted successfully",
         note: deletedNote, // Send the converted note
@@ -457,7 +436,7 @@ router.delete("/general/:noteid", async (req, res) => {
       res.status(404).json({ message: "Note not found or not owned by user" });
     }
   } catch (error) {
-    debug("Error deleting the note:", error);
+    logError(logger, "Error deleting the note", req, error);
     res.status(500).json({ message: "Error deleting the note" });
   }
 });
@@ -488,7 +467,6 @@ router.post("/general/:noteId/tags", async (req, res) => {
   try {
     // Begin a transaction
     await dbPool.query("BEGIN");
-    debug("Associating tags with note:", noteId);
 
     // Insert tag associations
     const promises = tagIds.map((tagId) =>
@@ -497,18 +475,18 @@ router.post("/general/:noteId/tags", async (req, res) => {
         [noteId, tagId]
       )
     );
-    debug("Tag associations:", promises);
+
+    logInfo(logger, `Tag associations inserted noteId: ${noteId} and tagId: ${tagIds}`, req);
     // Wait for all insertions to complete
     await Promise.all(promises);
 
     // Commit the transaction
     await dbPool.query("COMMIT");
-    debug("Tags associated successfully");
     res.status(200).json({ message: "Tags associated successfully" });
   } catch (error) {
     // Rollback the transaction in case of error
     await dbPool.query("ROLLBACK");
-    debug("Error associating tags with the note:", error);
+    logError(logger, "Error associating tags with the note", req, error);
     res.status(500).json({ message: "Error associating tags with the note" });
   }
 });
@@ -517,19 +495,19 @@ router.delete("/general/:noteId/tags/:tagId", async (req, res) => {
   const { dbPool } = req.app.locals;
   const noteId = req.params.noteId;
   const tagId = req.params.tagId;
-  debug("Disassociating tag with note:", noteId, tagId);
   try {
     const { rowCount } = await dbPool.query(
       `DELETE FROM GeneralNotesTags WHERE Note_ID = $1 AND Tag_ID = $2`,
       [noteId, tagId]
     );
-    debug("Disassociating tag with note:", rowCount);
+    logInfo(logger, `Tag disassociated successfully noteId: ${noteId} and tagId: ${tagId}`, req);
     if (rowCount > 0) {
       res.status(200).json({ message: "Tag disassociated successfully" });
     } else {
       res.status(404).json({ message: "Tag association not found" });
     }
   } catch (error) {
+    logError(logger, "Error removing tag association", req, error);
     res.status(500).json({ message: "Error removing tag association" });
   }
 });

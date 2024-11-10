@@ -1,29 +1,25 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import Debug from "debug";
 import { snakeToCamelCase } from "./utilities.mjs";
 import SibApiV3Sdk from "sib-api-v3-sdk";
 import dotenv from 'dotenv';
 dotenv.config();
 
-const debug = Debug("api:userManagement");
+import { getNamespaceLogger, logInfo, logError } from "../utils/logger.mjs";
+const logger = getNamespaceLogger("api:summoner");
 const router = express.Router();
 
 // User Registration Endpoint
 router.post("/register", async (req, res) => {
   const { dbPool } = req.app.locals;
   const { username, email, password, testEmail } = req.body;
-
-  debug("registering user");
+  logInfo(logger, `Registering user with email: ${email}`, req);
 
   // Generate verification token
   const verificationToken = uuidv4();
 
   try {
-    console.log("Checking for existing user with email:", email);
-    console.log("testEmail:", testEmail);
-
     if (!testEmail) {
       // Hash the password
       const saltRounds = 10;
@@ -39,7 +35,6 @@ router.post("/register", async (req, res) => {
 
       // Send verification email
       await sendVerificationEmail(email, verificationToken);
-
       // Respond with the new user (excluding password hash)
       res.status(201).json({ user: newUser });
     } else {
@@ -48,7 +43,7 @@ router.post("/register", async (req, res) => {
       res.status(200).json({ message: "Verification email sent for testing" });
     }
   } catch (error) {
-    console.error("Error processing request:", error);
+    logError(logger, "Error during registration", req, error);
     res.status(500).json({ error: "Failed to process request" });
   }
 });
@@ -57,12 +52,10 @@ router.post("/register", async (req, res) => {
 async function sendVerificationEmail(email, verificationToken) {
   // Use the Brevo API key from environment variables
   const brevoApiKey = process.env.BREVO_API_KEY;
-  console.log("Sending verification email to:", email);
   // Configure Brevo SDK
   const defaultClient = SibApiV3Sdk.ApiClient.instance;
   const apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = brevoApiKey;
-  console.log("Brevo API key:", brevoApiKey);
   const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
@@ -71,15 +64,14 @@ async function sendVerificationEmail(email, verificationToken) {
     email: "hello@skyquads.com",
     name: "SoloQ",
   };
-  console.log("Verification token:", verificationToken);
   sendSmtpEmail.subject = "Account Verification";
   sendSmtpEmail.htmlContent = `<p>Please verify your account by clicking the following link: <a href="${process.env.VITE_API_BASE_URL}/api/user/verify/${verificationToken}">Verify Account</a></p>`;
 
   try {
     await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log("Verification email sent successfully.");
+    logInfo(logger, `Verification email sent to: ${email}`);
   } catch (error) {
-    console.error("Error sending verification email:", error);
+    logError(logger, "Error sending verification email", req, error);
   }
 }
 
@@ -87,7 +79,7 @@ async function sendVerificationEmail(email, verificationToken) {
 router.get("/verify/:token", async (req, res) => {
   const { token } = req.params;
   const { dbPool } = req.app.locals;
-  console.log("Verifying user with token:", token);
+  logInfo(logger, `Verifying user with token`, req);
 
   try {
     const result = await dbPool.query(
@@ -100,11 +92,11 @@ router.get("/verify/:token", async (req, res) => {
     }
 
     const user = result.rows[0];
-    debug("User verified: ", user);
+    logInfo(logger, `User verified: ${user.email}`, req);
 
     res.status(200).send("Account verified successfully.");
   } catch (error) {
-    console.error("Error during email verification", error);
+    logError(logger, "Error during email verification", req, error);
     res.status(500).send("Internal Server Error during email verification.");
   }
 });

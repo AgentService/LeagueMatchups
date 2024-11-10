@@ -1,13 +1,11 @@
 // In api/summoner.js
-import { PlatformId } from "@fightmegg/riot-api";
 import express from "express";
 import axios from "axios";
-import Debug from "debug";
-const debug = Debug("api:summoner");
 import { getRiotAPI } from "./utilities.mjs";
 import { snakeToCamelCase } from "./utilities.mjs";
 import { getRiotAPIPlatformByClientRegion, getRegionByPlatformId } from "./utilities.mjs";
-
+import { getNamespaceLogger, logInfo, logError } from "../utils/logger.mjs";
+const logger = getNamespaceLogger("api:summoner");
 const router = express.Router();
 
 router.get("/data", async (req, res) => {
@@ -15,9 +13,10 @@ router.get("/data", async (req, res) => {
   try {
     const summonerData = await getSummonerDataByAccountId(userId, req);
     const convertedData = summonerData.map((row) => snakeToCamelCase(row)); // Convert each row
+    logInfo(logger, `Fetched summoner: ${JSON.stringify(convertedData)}`, req);
     res.json(convertedData);
   } catch (error) {
-    console.error("Failed to fetch summoner data:", error);
+    logError(logger, "Failed to fetch summoner data", req, error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -34,7 +33,7 @@ const getSummonerDataByAccountId = async (userId, req) => {
     const { rows } = await dbPool.query(queryText, [userId]);
     return rows; // This will return an array of summoner details, including region
   } catch (err) {
-    console.error("Error querying SummonerDetails:", err);
+    logError(logger, "Error fetching summoner data", req, err);
     throw err; // Re-throw the error and handle it in the calling function
   }
 };
@@ -45,8 +44,7 @@ router.get("/by-riot-id", async (req, res) => {
   const userId = req.user.id;
 
   try {
-    debug("Fetching summoner data for:", gameName, tagLine);
-
+    logInfo(logger, `Fetching summoner by Riot ID: ${gameName}#${tagLine}`, req);
     // Convert region to platform ID (e.g., "EUW" to "euw1")
     const platformId = getRiotAPIPlatformByClientRegion(region);
     if (!platformId) {
@@ -73,8 +71,7 @@ router.get("/by-riot-id", async (req, res) => {
       const { needsUpdate, updateReasons } = checkIfUpdateNeeded(existingData, summonerData);
 
       if (needsUpdate || existingData.region !== region) {
-        debug("Updating summoner data for reasons:", updateReasons.join(", "));
-
+        logInfo(logger, `Reasons for Summoner Data update: ${updateReasons.join(", ")}`, req);
         await dbPool.query(
           `UPDATE SummonerDetails 
            SET Summoner_Level = $2, Profile_Icon_ID = $3, Revision_Date = $4, Timestamp = $5, Region = $6
@@ -89,16 +86,14 @@ router.get("/by-riot-id", async (req, res) => {
             userId
           ]
         );
-
-        debug("Updated summoner data in the database.");
-
+        logInfo(logger, "Summoner data updated successfully", req);
         // Re-fetch the updated summoner data from the database
         existingSummoner = await dbPool.query(
           "SELECT * FROM SummonerDetails WHERE Puuid = $1 AND User_ID = $2",
           [puuid, userId]
         );
       } else {
-        debug("No update necessary for summoner data.");
+        logInfo(logger, "No update needed for summoner data", req);
       }
 
       // Send the re-fetched (or original) data back to the client
@@ -123,11 +118,11 @@ router.get("/by-riot-id", async (req, res) => {
       );
 
       res.json(insertResult.rows.map((row) => snakeToCamelCase(row)));
-      debug("Inserted new summoner data for user.");
+      logInfo(logger, "Summoner data inserted successfully", req);
     }
 
   } catch (error) {
-    console.error("Error in /by-riot-id route:", error);
+    logError(logger, "Error fetching summoner by Riot ID", req, error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -184,7 +179,7 @@ router.post("/update-summoner-details", async (req, res) => {
 
     res.status(200).json({ message: "Summoner details updated successfully.", details: convertedDetails[0] });
   } catch (error) {
-    console.error("Error updating summoner details:", error);
+    logError(logger, "Error updating summoner details", req, error);
     res.status(500).send("Internal Server Error");
   }
 });

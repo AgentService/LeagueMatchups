@@ -18,6 +18,7 @@ const defaultState = () => ({
   lastFetchTimestamps: {
     champions: {},
     matchups: {},
+    tags: {},
   },
   tagsList: [],
 });
@@ -429,15 +430,20 @@ export const notes = {
       }
     },
     // Tags Actions
-    async fetchTags({ commit }) {
+    async fetchTags({ commit, state }) {
       try {
-        const authConfig = getAuthConfig();
+        // Check if cached data is still valid (using 24-hour threshold)
+        if (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags)) {
+          console.log("Using cached tags data.");
+          return; // Exit if cached data is valid
+        }
 
-        const response = await axios.get(
-          `${baseUrl}/api/notes/tags`,
-          authConfig
-        ); // Updated URL path
+        const authConfig = getAuthConfig();
+        const response = await axios.get(`${baseUrl}/api/notes/tags`, authConfig);
+
+        // Commit the fetched tags and update the timestamp
         commit("SET_TAGS", response.data.tags);
+        updateLastFetchTimestamp(commit, { type: "tags", key: "tags" });
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
@@ -463,7 +469,7 @@ export const notes = {
         const authConfig = getAuthConfig();
         await axios.delete(
           `${baseUrl}/api/notes/general/${noteId}/tags/${tagId}`, authConfig),
-        commit("REMOVE_TAG_FROM_NOTE", { noteId, tagId });
+          commit("REMOVE_TAG_FROM_NOTE", { noteId, tagId });
       } catch (error) {
         console.error("Error removing tag from note:", error);
       }

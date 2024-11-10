@@ -1,12 +1,8 @@
 // custom.scss
-@import "bootstrap/scss/bootstrap.scss";
-@import "node_modules/bootstrap/scss/bootstrap";
-@import "node_modules/bootstrap/scss/bootstrap.scss";
-@import "./index.scss";
+@use "bootstrap/scss/bootstrap";
+@use "./index.scss";
 @import "./tailwind.css";
 
-
-// Importing Bootstrap source SASS for customization
 
 $primary-color: #a1628c; // Change the primary color
 $secondary-color: #0f813f; // Change the secondary color

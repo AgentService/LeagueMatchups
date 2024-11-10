@@ -100,6 +100,7 @@ export const matches = {
 
       const puuid = currentSummoner.apiResponse?.puuid;
       const region = currentSummoner.apiResponse?.region;
+
       if (!puuid) {
         console.error("Player PUUID is not available.");
         return;
@@ -114,15 +115,17 @@ export const matches = {
 
       try {
         const response = await axios.get(`${baseUrl}/api/matches/last-match/${puuid}`, {
-          params: { count, region }
+          params: { count, region },
+          headers: getAuthConfig()
         });
         const newMatches = response.data;
 
         // Filter out any matches already present to avoid duplicates
         const existingMatches = state.summonerMatches[puuid] || [];
         const matchesToAdd = newMatches.filter(
-          newMatch => !existingMatches.some(existing => existing.gameId === newMatch.gameId)
+          newMatch => !existingMatches.some(existing => existing.metadata.matchId === newMatch.metadata.matchId)
         );
+
 
         // Add only new matches and keep order intact
         const updatedMatches = [...matchesToAdd, ...existingMatches];
@@ -153,20 +156,12 @@ export const matches = {
 
       // Simulate a missing match by removing it from the state if it exists
       const existingMatches = state.summonerMatches[puuid] || [];
-      const matchIndex = existingMatches.findIndex((match) => match.info?.gameId === gameId);
-
-      if (matchIndex !== -1) {
-        // Remove the match to simulate a missing state
-        existingMatches.splice(matchIndex, 1);
-        commit("SET_SUMMONER_MATCHES", { puuid, matches: existingMatches });
-        console.log("Simulated missing match by deleting from state:", gameId);
-      }
 
       // Proceed with the network request as if the match didn’t exist
       try {
         const response = await axios.get(`${baseUrl}/api/matches/match-details/${gameId}`, {
           params: { puuid, region },
-          headers: getAuthConfig().headers,
+          headers: getAuthConfig(),
         });
         const matchDetails = response.data;
 

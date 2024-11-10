@@ -256,7 +256,7 @@ function submitFeedback() {
     let userParticipant = null;
 
     // Try finding the user participant using the current summoner's PUUID (preferred method)
-    const puuid = currentSummoner.apiResponse?.puuid || currentSummoner.webSocketResponse?.puuid;
+    const puuid = currentSummoner.apiResponse?.puuid;
 
     if (puuid) {
         userParticipant = matchInfo.participants?.find((p) => p.puuid === puuid);
@@ -264,7 +264,7 @@ function submitFeedback() {
 
     // If PUUID-based search fails, try finding the user by their summoner name
     if (!userParticipant && matchInfo.participantIdentities) {
-        const gameName = currentSummoner.apiResponse?.gameName || currentSummoner.webSocketResponse?.gameName;
+        const gameName = currentSummoner.apiResponse?.gameName;
 
         const identity = matchInfo.participantIdentities.find(
             (pi) => pi.player.gameName === gameName

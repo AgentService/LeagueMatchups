@@ -131,7 +131,6 @@ export const summoner = {
               tagLine: summoner.tagLine,
               apiResponse: summoner
             };
-            debugger
             // Commit each summoner to Vuex; setPlayerDetails will handle adding or updating as needed
             commit("setPlayerDetails", playerDetails);
 
@@ -187,7 +186,6 @@ export const summoner = {
       try {
         const authConfig = getAuthConfig();
         const apiResponse = await axios.get(`${baseUrl}/summoner/data`, { ...authConfig });
-        debugger
         if (apiResponse.data.length === 0) {
           console.log("No summoner data found in the database for this user.");
           return; // No data found

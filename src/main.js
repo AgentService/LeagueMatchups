@@ -497,11 +497,6 @@ async function fetchSummonerName(credentials) {
   }
 }
 
-
-
-
-
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 function createMainWindow() {
@@ -525,6 +520,8 @@ function createMainWindow() {
     y: y,
     minWidth: 1850, // set the minimum width 1600
     minHeight: 900, // set the minimum height 800
+    title: "SoloQ", // Set your desired title here
+    icon: path.join(__dirname, 'iconApp.png'), // Path to your custom icon
     width: 2560,
     height: 1240,
     // maxHeight: 800,

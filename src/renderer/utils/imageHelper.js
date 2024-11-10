@@ -29,6 +29,9 @@ class ImageUrlHelper {
     if (!championId) {
       return ""; // Return early if no champion
     } 
+    if (championId === "FiddleSticks") {
+      championId = "Fiddlesticks"; // Special case for Fiddlesticks
+    }
 
     // Normalize championId by removing spaces (and any other necessary normalization)
     const normalizedChampionId = championId.replace(/\s+/g, '');

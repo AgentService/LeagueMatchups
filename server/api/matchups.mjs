@@ -1,69 +1,14 @@
-// api/matchups.mjs
 import express from "express";
-// import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
-// import { getLatestVersion } from "./utilities.mjs";
-import Debug from "debug";
 import { snakeToCamelCase } from "./utilities.mjs";
-import { updateChampionData, initializeChampionDataCache } from "./champions.mjs"; // Import from champions.js
+import { updateChampionData } from "./champions.mjs"; // Import from champions.js
+import { getNamespaceLogger, logInfo, logError } from "../utils/logger.mjs";
 
-const debug = Debug("api:matchups");
+const logger = getNamespaceLogger("api:matchups");
 const router = express.Router();
 
-// // Function to read matchups from JSON file
-// function readMatchups(userMatchupsFilePath) {
-//   return readJsonFile(userMatchupsFilePath);
-// }
-
-// // Function to write matchups to JSON file
-// function writeMatchups(userMatchupsFilePath, matchups) {
-//   writeJsonFile(userMatchupsFilePath, matchups);
-// }
-
-// // Get all matchups
-// router.get("/DELETE", (req, res) => {
-//   debudebuggApi("Fetching all matchups");
-//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
-
-//   const matchups = readMatchups(userMatchupsFilePath);
-//   res.json(matchups);
-// });
-
-// router.get("/:id", async (req, res) => {
-//   debug("Fetching or creating specific matchups id: ", req.params.id);
-//   debug("user:", req.user.email);
-//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
-
-//   let matchups = readMatchups(userMatchupsFilePath);
-//   const [championAId, championBId] = req.params.id.split("-");
-
-//   let matchup = matchups.find((m) => m.id === req.params.id);
-//   debug("matchup:", matchup);
-//   if (!matchup) {
-//     // Matchup not found - create a new one
-//     matchup = {
-//       id: req.params.id,
-//       champions: [
-//         { id: championAId, name: championAId },
-//         { id: championBId, name: championBId },
-//       ],
-//       personalNotes: "",
-//       sharedNotes: null,
-//       lastUpdated: new Date().toISOString(), // Current timestamp
-//       gameVersion: await getLatestVersion(), // Fetch or define the current game version
-//     };
-//     matchups.push(matchup);
-//     writeMatchups(userMatchupsFilePath, matchups);
-//     res.status(201).json(matchup); // 201 Created
-//   } else {
-//     // Matchup found
-//     res.json(matchup);
-//   }
-// });
-
+// Fetch or create a specific matchup by ID
 router.get("/:id", async (req, res) => {
   const { dbPool } = req.app.locals;
-  debug("Fetching or creating specific matchups id: ", req.params.id);
-
   const combinedId = req.params.id;
   const [championAName, championBName] = combinedId.split("-");
 
@@ -76,7 +21,8 @@ router.get("/:id", async (req, res) => {
 
     if (championsCheck.rows.length !== 2) {
       // Trigger a data update if either champion doesn't exist
-      await updateChampionData(null, dbPool);  // Pass dbPool here
+      logInfo(logger, `Champion(s) missing, updating champion data`, req);
+      await updateChampionData(null, dbPool);
 
       // Recheck after update
       championsCheck = await dbPool.query(
@@ -85,16 +31,20 @@ router.get("/:id", async (req, res) => {
       );
 
       if (championsCheck.rows.length !== 2) {
+        logError(logger, "Invalid champion names provided", req);
         return res.status(400).json({ error: "Invalid champion names." });
       }
     }
 
+    // Check for an existing matchup in the database
     let matchup = await dbPool.query(
       `SELECT * FROM matchups WHERE combined_id = $1`,
       [combinedId]
     );
 
     if (matchup.rows.length === 0) {
+      // No matchup found, create a new one
+      logInfo(logger, `Creating a new matchup with ID: ${combinedId}`, req);
       matchup = await dbPool.query(
         `INSERT INTO matchups (champion_a_name, champion_b_name, combined_id) 
          VALUES ($1, $2, $3) RETURNING *;`,
@@ -103,60 +53,14 @@ router.get("/:id", async (req, res) => {
       const createdMatchup = snakeToCamelCase(matchup.rows[0]);
       res.status(201).json(createdMatchup);
     } else {
+      // Matchup found, return it
       const foundMatchup = snakeToCamelCase(matchup.rows[0]);
       res.json(foundMatchup);
     }
   } catch (error) {
-    debug("Error accessing database:", error);
+    logError(logger, "Error accessing database", req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
-// // Create a new matchup
-// router.post("/", (req, res) => {
-//   debug("Create a new matchup");
-//   debug("user:", req.user.email);
-//   // Create the user-specific matchups file path
-//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
-//   const matchups = readMatchups(userMatchupsFilePath);
-//   const newMatchup = req.body;
-//   matchups.push(newMatchup);
-//   writeMatchups(userMatchupsFilePath, matchups);
-//   res.status(201).json(newMatchup);
-// });
-
-// // Delete all matchups
-// router.delete("/delete", (req, res) => {
-//   debug("Delete all matchups");
-//   writeMatchups([]);
-//   res.status(204).send();
-// });
-
-// // Update a matchup's notes by id
-// router.patch("/:id/notes", (req, res) => {
-//   const { id } = req.params;
-//   const { personalNotes } = req.body;
-//   // Create the user-specific matchups file path
-//   const userMatchupsFilePath = `./user_data/${req.user.email}/matchups_data.json`;
-
-//   //const savedNote = saveNoteForUser(userEmail, noteContent);
-
-//   // Read matchups from the user's specific file
-//   const matchups = readJsonFile(userMatchupsFilePath);
-
-//   // Find the index of the matchup to update
-//   const matchupIndex = matchups.findIndex((m) => m.id === id);
-//   if (matchupIndex !== -1) {
-//     // Update the matchup's notes
-//     matchups[matchupIndex].personalNotes = personalNotes;
-//     debug("matchups note update:", matchups[matchupIndex]);
-//     // Write the updated matchups back to the user's specific file
-//     writeJsonFile(userMatchupsFilePath, matchups);
-
-//     res.json(matchups[matchupIndex]);
-//   } else {
-//     res.status(404).json({ error: "Matchup not found" });
-//   }
-// });
 
 export default router;

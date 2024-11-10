@@ -43,6 +43,7 @@ api-data/converttips.py
 # TypeScript v1 declaration files
 typings/
 dist/
+dist-electron/
 release/
 # TypeScript cache
 *.tsbuildinfo

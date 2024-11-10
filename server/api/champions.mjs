@@ -1,5 +1,4 @@
 import express from "express";
-import Debug from "debug";
 import { extractEmailFromToken } from "../utils/authMiddleware.mjs";
 import { readJsonFile, writeJsonFile } from "../utils/fileOperations.mjs";
 import schedule from "node-schedule"; // Make sure to install node-schedule package
@@ -8,8 +7,9 @@ import { readdir } from "fs/promises"; // Node.js filesystem module to read dire
 import { join } from "path"; // To construct file paths
 import { existsSync, mkdirSync } from "fs";
 import { downloadChampionImages } from "../download.mjs";
+import { getNamespaceLogger, logInfo, logError } from '../utils/logger.mjs'; // Import your logger
 
-const debug = Debug("api:champions");
+const logger = getNamespaceLogger("api:champions");
 const router = express.Router();
 
 let championListCache = { data: null, version: null };
@@ -25,9 +25,9 @@ export async function updateChampionData(currentVersion, dbPool) {
 
   try {
     localVersionInfo = await readJsonFile(championsFilePath);
-    debug("localVersionInfo", localVersionInfo.version);
+    logInfo(logger, `localVersionInfo: ${localVersionInfo.version}`);
   } catch (error) {
-    console.error("Error reading local champion version:", error);
+    logError(logger, "Error reading local champion version:", error);
     localVersionInfo = { version: null };
   }
 
@@ -46,7 +46,7 @@ export async function updateChampionData(currentVersion, dbPool) {
     };
 
     writeJsonFile(championsFilePath, fileContent);
-    debug("champions.json updated successfully.");
+    logInfo(logger, "champions.json updated successfully.");
 
     // Update the database with the new champions
     await updateChampionsDatabase(dbPool, championsList);
@@ -60,10 +60,9 @@ export async function updateChampionData(currentVersion, dbPool) {
     for (const championDetails of Object.values(championsList)) {
       await downloadChampionImages(championDetails, championDetails.version);
     }
-
-    console.log("Champion data updated successfully.");
+    logInfo(logger, "Champion data updated successfully.");
   } else {
-    console.log("Champion data is already up-to-date.");
+    logInfo(logger, "Champion data is already up-to-date.");
   }
 }
 
@@ -84,7 +83,7 @@ async function updateChampionsDatabase(dbPool, championsList) {
          ON CONFLICT (key) DO NOTHING;`,
         [parseInt(champion.key), champion.name]
       );
-      debug(`Inserted new champion: ${champion.name}`);
+      logInfo(logger, `Inserted new champion: ${champion.name}`);
     }
   }
 }
@@ -93,12 +92,12 @@ async function updateChampionsDatabase(dbPool, championsList) {
 
 async function fetchChampionList(currentVersion) {
   try {
-    debug("Fetching champion list");
+    logInfo(logger, "Fetching champion list");
     const ddragon = getDDragon();
     const listChampionsResponse = await ddragon.champion.all(currentVersion);
     return listChampionsResponse.data;
   } catch (error) {
-    console.error("Error fetching champion list:", error);
+    logError(logger, "Error fetching champion list:", error);
     throw error;
   }
 }
@@ -123,9 +122,9 @@ async function loadChampionListCache(currentVersion) {
   try {
     const data = await readJsonFile(championsFilePath);
     championListCache = { data: data.data, version: currentVersion };
-    debug("Champion List Cache loaded from file.");
+    logInfo(logger, "Champion List Cache loaded from file.");
   } catch (error) {
-    console.error("Error loading champion list cache:", error);
+    logError(logger, "Error loading champion list cache:", error);
   }
 }
 
@@ -152,9 +151,7 @@ async function loadChampionDetailsCache(currentVersion) {
         // Assuming the structure is direct without needing to access a nested 'data'
         allChampionDetails[championName] = detailedData;
       } else {
-        console.error(
-          `Invalid data structure in ${filePath}, expected an object.`
-        );
+        logError(logger, `Invalid data structure in ${filePath}`);
       }
     }
 
@@ -162,19 +159,18 @@ async function loadChampionDetailsCache(currentVersion) {
       data: allChampionDetails,
       version: currentVersion,
     };
-    debug("Champion Details Cache loaded from file.");
+    logInfo(logger, "Champion Details Cache loaded from file.");
   } catch (error) {
-    console.error("Error loading champion details from files:", error);
+    logError(logger, "Error loading champion details cache:", error);
     championDetailsCache = null; // Ensure global cache is null if loading fails
   }
 }
 
 export async function initializeChampionDataCache(dbPool) {
   const currentVersion = await getLatestVersion();
-
-  debug("Updating champions database...");
+  logInfo(logger, "Updating champions database...");
   await updateChampionData(currentVersion, dbPool);
-  debug("Champions database updated successfully.");
+  logInfo(logger, "Champions database updated successfully.");
 
   // Load from local cache first
   await loadChampionListCache(currentVersion);
@@ -184,7 +180,7 @@ export async function initializeChampionDataCache(dbPool) {
   if (isNewVersionAvailable(currentVersion)) {
     await updateChampionDataCache(currentVersion); // Make sure to pass currentVersion
   } else {
-    debug("Champion caches are up-to-date. No update required.");
+    logInfo(logger, "Champion caches are up-to-date. No update required.");
   }
 }
 
@@ -200,9 +196,9 @@ async function updateChampionDataCache(currentVersion) {
       data: allChampionDetails,
       version: currentVersion,
     };
-    debug("Champion caches updated to version:", currentVersion);
+    logInfo(logger, `Champion caches updated to version: ${currentVersion}`);
   } catch (error) {
-    console.error("Error updating champion data caches:", error);
+    logError(logger, "Error updating champion data caches:", error);
   }
 }
 
@@ -212,19 +208,15 @@ const getChampionTips = (req, res) => {
 
   try {
     const championData = readJsonFile(filePath);
-
     // Log the championId and available keys for debugging
-    console.debug("Requested championId:", championId);
-    console.debug("Available champions in JSON:", Object.keys(championData));
-
     if (championData[championId]) {
       res.json({ championId, ...championData[championId] });
     } else {
-      console.warn("No tips available for champion:", championId);
+      logInfo(logger, `No tips available for champion: ${championId}`, req);
       res.status(200).json({ message: "No tips available for this champion." });
     }
   } catch (error) {
-    console.error("Error reading JSON file:", error);
+    logError(logger, `Error reading JSON file: ${error.message}`, req);
     res.status(500).json({ error: "Failed to read champion data file" });
   }
 };
@@ -295,12 +287,8 @@ router.get(
   "/:championId/custom-data",
   extractEmailFromToken,
   async (req, res) => {
-    debug(
-      "Get Request for custom data for champion: ",
-      req.params.championId,
-      " by user: ",
-      req.userEmail
-    );
+    logInfo(logger, `Get Request for custom data for champion: ${req.params.championId}`, req);
+
     const championId = req.params.championId;
     const userEmail = req.userEmail; // Extracted email from the token
 
@@ -321,7 +309,7 @@ router.get(
         data: championsData[championId],
       });
     } catch (error) {
-      console.error("Error reading JSON file:", error);
+      logError(logger, `Error reading JSON file: ${error.message}`, req);
       res.status(500).json({ error: "Failed to read champion data file" });
     }
   }
@@ -352,7 +340,7 @@ router.post(
         data: championsData[championId],
       });
     } catch (error) {
-      console.error("Error updating JSON file:", error);
+      logError(logger, `Error updating JSON file: ${error.message}`, req);
       res.status(500).json({ error: "Failed to update champion data file" });
     }
   }
@@ -362,12 +350,7 @@ router.post(
   "/:championId/custom-data/notes",
   extractEmailFromToken,
   async (req, res) => {
-    debug(
-      "post request for notes for champion: ",
-      req.params.championId,
-      " by user: ",
-      req.userEmail
-    );
+    logInfo(logger, `Post Request to update notes for champion: ${req.params.championId}`, req);
     const championId = req.params.championId;
     const customData = req.body; // Ensure you have body-parser middleware set up to parse JSON body
     const userEmail = req.userEmail; // Extracted email from the token
@@ -381,7 +364,7 @@ router.post(
 
       // Update the champion's custom data
       championsData[championId].personalNotes = customData.personalNotes;
-      debug("Update Notes: ", championsData[championId].personalNotes);
+      logInfo(logger, `Notes updated for champion: ${championId}`, req);
       writeJsonFile(filePath, championsData);
       res.json({
         success: true,
@@ -389,7 +372,7 @@ router.post(
         data: championsData[championId],
       });
     } catch (error) {
-      console.error("Error updating JSON file:", error);
+      logError(logger, `Error updating JSON file: ${error.message}`, req);
       res.status(500).json({ error: "Failed to update champion data file" });
     }
   }
@@ -403,7 +386,7 @@ router.get("/custom-data", extractEmailFromToken, async (req, res) => {
     const championData = readJsonFile(filePath);
     res.json(championData); // Return the entire file content
   } catch (error) {
-    console.error("Error reading JSON file:", error);
+    logError(logger, `Error reading JSON file: ${error.message}`, req);
     res.status(500).json({ error: "Failed to read champion data file" });
   }
 });

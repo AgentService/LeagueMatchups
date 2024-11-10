@@ -49,6 +49,8 @@ import Link from '@tiptap/extension-link';
 import EditorMenuBar from './EditorMenuBar.vue';
 import { useStore } from 'vuex';
 import { getUrlHelper } from '../globalSetup';
+import OrderedList from '@tiptap/extension-ordered-list';
+import ListItem from '@tiptap/extension-list-item';
 
 function getChampionImageSource(type, championId) {
 	const urlHelper = getUrlHelper(); // Ensure the URL helper is used correctly
@@ -68,6 +70,8 @@ const editor = useEditor({
 	extensions: [
 		StarterKit,
 		Underline,
+		OrderedList,
+		ListItem,
 		Link.configure({
 			openOnClick: false,
 		}),
@@ -237,11 +241,14 @@ onMounted(async () => {
 .notes-container ul {
 	list-style-type: disc;
 	padding-left: 2rem;
+}
 
+.ProseMirror ol {
+	list-style-type: decimal;
+	padding-left: 2rem;
 }
 
 .notes-container li {
-	margin-bottom: -.5rem;
 	line-height: 1.25;
 }
 

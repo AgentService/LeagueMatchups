@@ -2,10 +2,12 @@
 
 import { RiotAPI, DDragon } from '@fightmegg/riot-api';
 import express from "express";
-import Debug from "debug";
-const debug = Debug("app:utilities");
+import { getNamespaceLogger, logInfo, logError } from "../utils/logger.mjs";
+const logger = getNamespaceLogger("api:utilities"); // Define namespace logger once
+
 let rAPI;
 let ddragon;
+
 // Map platform ID (e.g., "euw1") to Riot API region (e.g., "europe")
 export const getRegionByPlatformId = (platformId) => {
   const regionMap = {
@@ -32,13 +34,11 @@ export const getRegionByPlatformId = (platformId) => {
 // Helper to map client region codes (e.g., "euw") to platform IDs (e.g., "euw1")
 export const getRiotAPIPlatformByClientRegion = (clientRegion) => {
   if (!clientRegion) {
-    console.warn("Client region is undefined or null.");
+    logError(logger, "Client region is undefined or null.");
     return null;
   }
 
-  // Normalize the clientRegion to lowercase to handle case insensitivity
   const normalizedRegion = clientRegion.toLowerCase();
-
   const regionMap = {
     br: "br1",
     eune: "eun1",
@@ -59,10 +59,9 @@ export const getRiotAPIPlatformByClientRegion = (clientRegion) => {
   };
 
   const platformId = regionMap[normalizedRegion];
-
   if (!platformId) {
-    console.warn(`Unrecognized client region: ${clientRegion}`);
-    return null; // Returns null if the client region is unrecognized
+    logError(logger, `Unrecognized client region: ${clientRegion}`);
+    return null;
   }
 
   return platformId;
@@ -70,7 +69,7 @@ export const getRiotAPIPlatformByClientRegion = (clientRegion) => {
 
 export const initializeRiotAPI = () => {
   if (!process.env.VITE_RIOT_API_KEY) {
-    console.error("VITE_RIOT_API_KEY is not set.");
+    logError(logger, "VITE_RIOT_API_KEY is not set.");
     throw new Error("VITE_RIOT_API_KEY is not set.");
   }
   rAPI = new RiotAPI(process.env.VITE_RIOT_API_KEY);
@@ -79,7 +78,7 @@ export const initializeRiotAPI = () => {
 
 export const getRiotAPI = () => {
   if (!rAPI) {
-    console.error("RiotAPI has not been initialized.");
+    logError(logger, "RiotAPI has not been initialized.");
     throw new Error("RiotAPI has not been initialized.");
   }
   return rAPI;
@@ -87,7 +86,7 @@ export const getRiotAPI = () => {
 
 export const getDDragon = () => {
   if (!ddragon) {
-    console.error("DDragon has not been initialized.");
+    logError(logger, "DDragon has not been initialized.");
     throw new Error("DDragon has not been initialized.");
   }
   return ddragon;
@@ -96,18 +95,17 @@ export const getDDragon = () => {
 export const getLatestVersion = async () => {
   try {
     if (!rAPI || !ddragon) {
-      console.error("RiotAPI client or ddragon has not been initialized.");
+      logError(logger, "RiotAPI client or ddragon has not been initialized.");
       return null;
     }
-    debug("Fetching latest version");
+    logInfo(logger, "Fetching latest version");
     const latestVersion = await rAPI.ddragon.versions.latest();
     return latestVersion;
   } catch (error) {
-    console.error("Error fetching latest version:", error);
+    logError(logger, `Error fetching latest version: ${error.message}`);
     return null;
   }
 };
-
 
 export const snakeToCamelCase = (obj) => {
   const convertedObject = {};
@@ -116,8 +114,7 @@ export const snakeToCamelCase = (obj) => {
     convertedObject[convertedKey] = obj[key];
   });
   return convertedObject;
-}
-
+};
 
 const router = express.Router();
 
@@ -130,7 +127,7 @@ router.get("/version", async (req, res) => {
       res.json({ version: latestVersion });
     }
   } catch (error) {
-    console.error("Error in /version endpoint:", error);
+    logError(logger, `Error in /version endpoint: ${error.message}`, req);
     res.status(500).send("Server error");
   }
 });

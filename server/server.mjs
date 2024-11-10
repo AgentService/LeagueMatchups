@@ -1,24 +1,3 @@
-// GET /api/champions
-// GET /summoner/:region/:name
-// GET /summoner/by-riot-id
-// GET /api/update-champions
-// GET /api/matchups
-// GET /api/matchups/:id
-// POST /api/matchups
-// DELETE /api/matchups/delete
-// PATCH /api/matchups/:id/notes
-
-// api-data/champion_data/ChampionInfos.json
-// project-root/
-// |-- api/
-// |   |-- champions.mjs
-// |   |-- summoners.mjs
-// |   |-- matchups.mjs
-// |   |-- images.mjs
-// |-- utils/
-// |   |-- fileOperations.mjs
-// |-- server.mjs
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -40,19 +19,19 @@ import generalNotes from "./api/generalNotes.mjs";
 import itemRouter from "./api/items.mjs";
 import notes from "./api/notes.mjs";
 import userManagementRouter from "./api/userManagement.mjs";
-import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
-import Debug from "debug";
-const debug = Debug("server");
 import { initializePassportStrategy } from "./api/auth.mjs"; // Adjust based on your file structure
 
-Debug.enable(process.env.DEBUG);
-debug("Debug is enabled");
+
+import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import pg from "pg";
 const { Pool } = pg;
 
+// Import logger
+import { getNamespaceLogger, logInfo, logError } from "./utils/logger.mjs";
+const logger = getNamespaceLogger("api:server");
+
 const app = express();
-const PORT = process.env.PORT || 8080; // GCP
-// const PORT = process.env.PORT || 80; // Ensure PORT is defined
+const PORT = process.env.PORT || 8080;
 
 // Function to initialize the database connection
 function initializeDatabase() {
@@ -66,7 +45,6 @@ function initializeDatabase() {
 }
 
 async function fetchAndSetSecrets() {
-  // Assuming you have set up your Google Cloud Secret Manager client
   const client = new SecretManagerServiceClient();
   const projectName = "seismic-catbird-402416";
   const secrets = [
@@ -79,7 +57,7 @@ async function fetchAndSetSecrets() {
     "JWT_SECRET",
     "JWT_REFRESH_SECRET",
     "BREVO_API_KEY",
-    "VITE_API_BASE_URL"
+    "VITE_API_BASE_URL",
   ];
 
   for (const secretName of secrets) {
@@ -88,17 +66,17 @@ async function fetchAndSetSecrets() {
       const [version] = await client.accessSecretVersion({ name: secretPath });
       const secretValue = version.payload.data.toString("utf8");
       process.env[secretName] = secretValue;
-      debug(`Secret ${secretName} fetched successfully: ${secretValue}`);
+      logInfo(logger, `Secret ${secretName} fetched successfully`);
     } catch (error) {
-      debug(`Failed to fetch secret ${secretName}: ${error.message}`);
+      logError(logger, `Failed to fetch secret ${secretName}`, null, error);
     }
   }
-  debug("Secrets fetched and set successfully.");
+  logInfo(logger, "Secrets fetched and set successfully.");
 }
 
 async function startServer() {
-  const dbPool = initializeDatabase(); // Now it's safe to initialize the database
-  app.locals.dbPool = dbPool; // Optional: Make pool accessible in route handlers
+  const dbPool = initializeDatabase();
+  app.locals.dbPool = dbPool;
 
   app.use(cors());
   app.use(express.json());
@@ -106,126 +84,86 @@ async function startServer() {
   initializePassportStrategy(dbPool);
   app.use(passport.initialize());
 
+  // Apply middleware
   app.use("/api/matchups", verifyToken);
-  app.use("/api/champions", championsRouter); // Assuming championsRouter handles both GET and update routes
-  // Logger middleware to check req.user
+  app.use("/api/champions", championsRouter);
   app.use("/summoner", verifyToken);
   app.use("/summoner", summonerRouter);
-
   app.use("/api/matchups", matchupsRouter);
-
   app.use("/api/auth", authRouter);
-  app.use("/api/user", userManagementRouter); // Route user management endpoints
-
+  app.use("/api/user", userManagementRouter);
   app.use("/api/utilities", utilitiesRouter);
-
   app.use("/api/matches", matchesRouter);
   app.use("/api/generalNotes", generalNotes);
   app.use("/api/items", itemRouter);
-
   app.use("/api/notes", verifyToken);
   app.use("/api/notes", notes);
 
   // Health check route
   app.get("/health", (req, res) => {
+    logInfo(logger, "Health check endpoint accessed");
     res.status(200).send({ status: "up" });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Error handling middleware
   app.use((error, req, res, next) => {
+    logError(logger, "Unhandled server error", req, error);
     res
       .status(error.status || 500)
       .json({ message: error.message || "Internal Server Error" });
   });
 
-  // Logging middleware
+  // Logging middleware for incoming requests
   app.use((req, res, next) => {
-    debug(`Incoming request on ${req.path} with method ${req.method}`);
+    // logInfo(logger, `Incoming request on ${req.path} with method ${req.method}`, req);
     next();
   });
 
   app.listen(PORT, () => {
-    debug(`Server is running on ${PORT}`);
-    debug(`- Home: ${PORT}/`);
-    debug(`- API Endpoints:`);
-    debug(`   - Champions: /api/champions`);
-    debug(`   - Summoner by Name: /summoner/:region/:name`);
-    debug(`   - Summoner by Riot ID: /summoner/by-riot-id`);
-    debug(`   - Update Champions: /api/update-champions`);
-    debug(`   - Matchups: /api/matchups`);
-    debug(`   - Authentication: /api/auth`);
-    debug(`   - User Management: /api/user`);
-    debug(`   - Utilities: /api/utilities`);
-    debug(`   - Matches: /api/matches`);
-    debug(`   - General Notes: /api/generalNotes`);
-    debug(`   - Items: /api/items`);
-    debug(`   - Notes: /api/notes`);
-    debug(`   - Health Check: /health`);
-    if (dbPool) {
-      debug(
-        "Database connection initialized successfully and is ready to use!"
-      );
-    }
+    logInfo(logger, `Server is running on ${PORT}`);
+    logInfo(logger, `- API Endpoints initialized`);
   });
 }
 
 if (process.env.NODE_ENV === "development") {
-  debug("Starting server in development mode", process.env.NODE_ENV);
+  logInfo(logger, "Starting server in development mode");
   import("dotenv").then((dotenv) => {
-    debug("Loading environment variables from .env");
     dotenv.config();
 
-    debug("Initializing Riot API client");
+    logInfo(logger, "Initializing Riot API client in development");
     initializeRiotAPI();
 
-    debug("Starting the server...");
+    logInfo(logger, "Starting the server...");
     startServer().then(() => {
-      const { dbPool } = app.locals; // Access dbPool after startServer
-      debug("Server started. dbPool initialized.");
-      debug("Initializing champion data cache with dbPool...");
-      debug("Checking dbPool before initialzeCDC:", dbPool);
-
-      initializeChampionDataCache(dbPool).then(() => {
-        debug("Champion data cache initialized successfully DEV.");
-      }).catch((error) => {
-        debug("Error initializing champion data cache:", error);
-      });
+      const { dbPool } = app.locals;
+      logInfo(logger, "Server started, initializing champion data cache...");
+      initializeChampionDataCache(dbPool)
+        .then(() => logInfo(logger, "Champion data cache initialized successfully in development"))
+        .catch((error) => logError(logger, "Error initializing champion data cache", null, error));
     });
   });
 } else {
-  debug("Starting server in production mode");
-  dotenv.config(); // Load environment variables
+  logInfo(logger, "Starting server in production mode");
+  dotenv.config();
+
   fetchAndSetSecrets()
     .then(() => {
-      debug("Secrets fetched and set successfully.");
-      debug("Initializing Riot API client");
+      logInfo(logger, "Secrets fetched and set successfully in production");
+      logInfo(logger, "Initializing Riot API client");
       initializeRiotAPI();
 
-      debug("Starting the server...");
+      logInfo(logger, "Starting the server...");
       return startServer();
     })
     .then(() => {
-      const { dbPool } = app.locals; // Access dbPool after startServer
-      debug("Server started. dbPool initialized.");
-      debug("Initializing champion data cache with dbPool...");
-      debug("Checking dbPool before initialzeCDC:", dbPool);
-
+      const { dbPool } = app.locals;
+      logInfo(logger, "Server started, initializing champion data cache...");
       return initializeChampionDataCache(dbPool);
     })
     .then(() => {
-      debug("Champion data cache initialized successfully PROD.");
+      logInfo(logger, "Champion data cache initialized successfully in production");
     })
     .catch((error) => {
-      debug("Error during server startup or champion data cache initialization:", error);
+      logError(logger, "Error during server startup or champion data cache initialization", null, error);
     });
 }
-
-
-
-// else {
-// 	debug("Starting server in production mode");
-// 	initializeRiotAPI()
-// 	initializeChampionDataCache()
-// 	startServer() // Your function to start the server, define routes, etc.
-// 	  .catch(console.error); // Proper error handling
-//   }

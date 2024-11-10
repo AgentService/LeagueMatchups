@@ -1,25 +1,27 @@
-//vite.renderer.config.mjs
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import ViteImagemin from 'vite-plugin-imagemin';
 
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import ViteImagemin from "vite-plugin-imagemin";
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  mode: "production", // This sets NODE_ENV to production
+export default defineConfig(({ mode }) => ({
+  mode: mode || 'DEVELOPMENT',
   plugins: [
     vue(),
     ViteImagemin({
-      mozjpeg: {
-        quality: 75,
-      },
-      pngquant: {
-        quality: [0.65, 0.9],
-        speed: 4,
-      },
-      svgo: {
-        plugins: [{ removeViewBox: false }],
-      },
+      disable: mode === 'DEVELOPMENT', // Disable in development for faster builds
+      mozjpeg: { quality: 75 },
+      pngquant: { quality: [0.65, 0.9], speed: 4 },
+      svgo: { plugins: [{ removeViewBox: false }] },
     }),
   ],
-});
+  build: {
+    sourcemap: mode === 'DEVELOPMENT',
+    minify: mode !== 'DEVELOPMENT',
+  },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true,
+      }
+    }
+  }
+}));
