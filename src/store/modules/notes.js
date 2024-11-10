@@ -18,7 +18,7 @@ const defaultState = () => ({
   lastFetchTimestamps: {
     champions: {},
     matchups: {},
-    tags: {},
+    tags: null,
   },
   tagsList: [],
 });
@@ -430,12 +430,13 @@ export const notes = {
       }
     },
     // Tags Actions
+    // Tags Actions
     async fetchTags({ commit, state }) {
       try {
-        // Check if cached data is still valid (using 24-hour threshold)
-        if (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags)) {
+        // Fetch if tagsList is empty or if cached data is outdated
+        if (state.tagsList.length === 0 || (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags))) {
           console.log("Using cached tags data.");
-          return; // Exit if cached data is valid
+          return; // Exit if cached data is valid and tagsList is not empty
         }
 
         const authConfig = getAuthConfig();
