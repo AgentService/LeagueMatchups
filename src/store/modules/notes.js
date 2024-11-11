@@ -86,10 +86,14 @@ export const notes = {
     },
     // TIMESTAMP MUTATIONS
     SET_LAST_FETCH_TIMESTAMP(state, { type, key, timestamp }) {
-      if (!state.lastFetchTimestamps[type]) {
-        state.lastFetchTimestamps[type] = {};
+      if (type === "tags") {
+        state.lastFetchTimestamps.tags = timestamp; // Store the timestamp directly as a number
+      } else {
+        if (!state.lastFetchTimestamps[type]) {
+          state.lastFetchTimestamps[type] = {};
+        }
+        state.lastFetchTimestamps[type][key] = timestamp;
       }
-      state.lastFetchTimestamps[type][key] = timestamp;
     },
     // Rating Mutations
     SET_CHAMPION_NOTES_RATING(state, { championName, noteId, rating }) {
@@ -432,8 +436,10 @@ export const notes = {
     // Tags Actions
     async fetchTags({ commit, state }) {
       try {
-        // Fetch if tagsList is empty or if cached data is outdated
-        if (state.tagsList.length || (state.lastFetchTimestamps.tags && !shouldFetchData(state.lastFetchTimestamps.tags))) {
+        const hasValidTimestamp = typeof state.lastFetchTimestamps.tags === 'number';
+        var shouldFetch = state.tagsList.length === 0 && (!state.lastFetchTimestamps.tags || hasValidTimestamp && shouldFetchData(state.lastFetchTimestamps.tags));
+
+        if (!shouldFetch) {
           console.log("Using cached tags data.");
           return; // Exit if cached data is valid and tagsList is not empty
         }
@@ -448,6 +454,8 @@ export const notes = {
         console.error("Error fetching tags:", error);
       }
     },
+
+
     async addTagToNote({ commit }, { noteId, tagId }) {
       try {
         const authConfig = getAuthConfig();
