@@ -436,17 +436,23 @@ export const notes = {
     // Tags Actions
     async fetchTags({ commit, state }) {
       try {
-        const hasValidTimestamp = typeof state.lastFetchTimestamps.tags === 'number';
-        var shouldFetch = state.tagsList.length === 0 && (!state.lastFetchTimestamps.tags || hasValidTimestamp && shouldFetchData(state.lastFetchTimestamps.tags));
-
+        // Check if `lastFetchTimestamps.tags` is a valid timestamp
+        const isTagsTimestampValid = typeof state.lastFetchTimestamps.tags === 'number';
+        
+        // Determine if we should fetch data
+        const shouldFetch = 
+          state.tagsList.length === 0 ||  // Fetch if tagsList is empty
+          !isTagsTimestampValid ||        // Fetch if `tags` is not a valid timestamp (e.g., `null`, `{}`, or missing)
+          shouldFetchData(state.lastFetchTimestamps.tags); // Fetch if timestamp is outdated
+    
         if (!shouldFetch) {
           console.log("Using cached tags data.");
           return; // Exit if cached data is valid and tagsList is not empty
         }
-
+    
         const authConfig = getAuthConfig();
         const response = await axios.get(`${baseUrl}/api/notes/tags`, authConfig);
-
+    
         // Commit the fetched tags and update the timestamp
         commit("SET_TAGS", response.data.tags);
         updateLastFetchTimestamp(commit, { type: "tags", key: "tags" });
@@ -454,7 +460,6 @@ export const notes = {
         console.error("Error fetching tags:", error);
       }
     },
-
 
     async addTagToNote({ commit }, { noteId, tagId }) {
       try {
