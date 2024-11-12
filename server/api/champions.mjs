@@ -168,7 +168,6 @@ async function loadChampionDetailsCache(currentVersion) {
 
 export async function initializeChampionDataCache(dbPool) {
   const currentVersion = await getLatestVersion();
-  logInfo(logger, "Updating champions database...");
   await updateChampionData(currentVersion, dbPool);
   logInfo(logger, "Champions database updated successfully.");
 

@@ -2,7 +2,7 @@ import { createLogger, format, transports } from 'winston';
 
 const { combine, label, printf, colorize } = format;
 
-// Remove `timestamp()` from the format combination
+// Configure the logger format
 export const getNamespaceLogger = (namespace) => {
     return createLogger({
         format: combine(
@@ -10,7 +10,7 @@ export const getNamespaceLogger = (namespace) => {
             label({ label: namespace }),
             printf(({ level, message, label, username }) => {
                 const userInfo = username ? `(${username})` : '';
-                return `[${label}] ${userInfo} ${level}: ${message}`;
+                return `[${label}] ${userInfo.trim()} ${level}: ${message.trim()}`; // Trim to avoid line breaks and extra spaces
             })
         ),
         transports: [new transports.Console()],
@@ -19,8 +19,8 @@ export const getNamespaceLogger = (namespace) => {
 
 // Log info-level messages with optional `username` using a predefined logger
 export const logInfo = (logger, message, req = null) => {
-    const username = req?.user?.username || null;
-    logger.info(message, { username });
+    const username = req?.user?.username?.trim() || null; // Ensure username is trimmed
+    logger.info(message.trim(), { username }); // Ensure message is trimmed
 };
 
 export const logError = (logger, message, req = undefined, error = undefined) => {

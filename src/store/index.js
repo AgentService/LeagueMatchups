@@ -8,6 +8,7 @@ import { items } from "./modules/items.js";
 import { userPreferences } from "./modules/userPreferences.js"; // Adjust the path as necessary
 import { wsClient } from "./modules/wsClient.js";
 import { learningObjectives } from './modules/learningObjectives';
+import { client } from "./modules/client.js";
 
 import { champions } from "./modules/champions.js";
 import { auth } from "./modules/auth.js";
@@ -40,6 +41,7 @@ const vuexLocal = new VuexPersistence({
     "wsClient",
     "metrics",
     "learningObjectives",
+    "client",
   ],
   reducer: (state) => ({
     champions: state.champions,
@@ -53,6 +55,7 @@ const vuexLocal = new VuexPersistence({
     wsClient: state.wsClient,
     metrics: state.metrics,
     learningObjectives: state.learningObjectives,
+    client: state.client,
   }),
 });
 
@@ -72,6 +75,7 @@ export const store = createStore({
     wsClient: wsClient,
     metrics: metrics,
     learningObjectives: learningObjectives,
+    client: client,
   },
 
   actions: {

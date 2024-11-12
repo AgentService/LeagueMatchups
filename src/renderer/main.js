@@ -11,11 +11,13 @@ import "@fortawesome/fontawesome-free/css/all.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import EventHandler from './utils/EventHandler';
 
 import "../axiosSetup";
 import { setupBaseUrl } from "./globalSetup";
 import "./custom.scss";
 import Debug from "debug";
+import debug from "debug";
 
 // Set up debugging based on environment variables
 if (import.meta.env.MODE !== "production") {
@@ -29,6 +31,12 @@ if (import.meta.env.MODE !== "production") {
 library.add(fas);
 
 async function initializeApp() {
+  const webSocket = window.ws;                // WebSocket instance (from preload script)
+  const ipcRenderer = window.electron.ipcRenderer;  // IPC instance (from preload script)
+  const eventHandler = new EventHandler(webSocket, ipcRenderer); // Initialize EventHandler
+  debug("Initialized EventHandler:", eventHandler);
+  debug("WebSocket instance:", webSocket);
+  debug("IPC Renderer instance:", ipcRenderer);
   // Initialize base URL and app state
   await setupBaseUrl();
   await store.dispatch("init/initializeApp");

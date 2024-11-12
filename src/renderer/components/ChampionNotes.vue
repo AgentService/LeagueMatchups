@@ -70,8 +70,6 @@ const editor = useEditor({
 	extensions: [
 		StarterKit,
 		Underline,
-		OrderedList,
-		ListItem,
 		Link.configure({
 			openOnClick: false,
 		}),

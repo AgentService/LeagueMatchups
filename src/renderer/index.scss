@@ -49,6 +49,7 @@
 	--grey-3: #1e2328;
 	--grey-cool: #1e282d;
 	--hextech-black: #010a13;
+	--hextech-black-2: #0b1014;
 
 	--grey-4: #0d2029;
 
@@ -111,22 +112,12 @@ body {
 	padding: 0;
 	font-family: Poppins, sans-serif;
 	font-weight: 600;
+	scrollbar-gutter: stable;
 }
 
-button {
-	padding: 0.5rem 1rem;
-	font-size: 0.9rem !important;
-	font-weight: 600;
-	border-radius: 4px;
-	cursor: pointer;
-	text-align: center;
-	transition:
-		background-color 0.3s,
-		box-shadow 0.3s;
-	border: none;
-	color: var(--gold-1);
-	z-index: 0;
-}
+// button {
+// 	color: var(--grey-1);
+// }
 
 button:hover {
 	color: var(--gold-2);
